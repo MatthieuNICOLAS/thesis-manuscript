@@ -1,0 +1,344 @@
+\documentclass[12pt]{thesul}
+%----------------------------------------------------------------------
+%                               Packages
+%----------------------------------------------------------------------
+\usepackage[french]{minitoc}
+\usepackage{biblatex}
+
+%-------------------------------------------------------------------
+%                             Marges
+%-------------------------------------------------------------------
+
+% pour positionner les vraies marges:
+%\SetRealMargins{1mm}{1mm}
+
+%-------------------------------------------------------------------
+%                             En-têtes
+%-------------------------------------------------------------------
+
+% Les en-têtes: quelques exemples
+%\UppercaseHeadings
+%\UnderlineHeadings
+%\newcommand\bfheadings[1]{{\bf #1}}
+%\FormatHeadingsWith{\bfheadings}
+%\FormatHeadingsWith{\uppercase}
+%\FormatHeadingsWith{\underline}
+\newcommand\upun[1]{\uppercase{\underline{\underline{#1}}}}
+\FormatHeadingsWith\upun
+
+\newcommand\itheadings[1]{\textit{#1}}
+\FormatHeadingsWith{\itheadings}
+
+% pour avoir un trait sous l'en-tete:
+\setlength{\HeadRuleWidth}{0.4pt}
+
+%-------------------------------------------------------------------
+%                         Les références
+%-------------------------------------------------------------------
+
+\NoChapterNumberInRef
+\NoChapterPrefix
+
+%-------------------------------------------------------------------
+%                           Brouillons
+%-------------------------------------------------------------------
+
+% ceci ajoute une marque « brouillon » et la date
+\ThesisDraft
+
+%-------------------------------------------------------------------
+%                   Pour collecter un glossaire et un index
+%-------------------------------------------------------------------
+
+\makeglossary
+\makeindex
+
+%-------------------------------------------------------------------
+%                           Acronymes
+%-------------------------------------------------------------------
+
+% \input{assets/acronyms.tex}
+
+%-------------------------------------------------------------------
+%                           Couleurs
+%-------------------------------------------------------------------
+
+% \input{assets/colours.tex}
+
+%-------------------------------------------------------------------
+%                     Global custom tikz commands
+%-------------------------------------------------------------------
+
+% \input{assets/tikz_presets.tex}
+
+\begin{document}
+
+
+      \OddHead={{\leftmark\rightmark}{\hfil\slshape\rightmark}}
+      \EvenHead={{\leftmark}{{\slshape\leftmark}\hfil}}
+      \OddFoot={\hfil\thepage}
+      \EvenFoot={\thepage\hfil}
+      \pagestyle{ThesisHeadingsII}
+
+
+%-------------------------------------------------------------------
+%                          Encadrements
+%-------------------------------------------------------------------
+
+% encadre les chapitres dans la table des matières:
+% (ces commandes doivent figurer apres \begin{document}
+
+\FrameChaptersInToc
+%\FramePartsInToc
+
+
+%-------------------------------------------------------------------
+%            Réinitialisation de la numérotation des chapitres
+%-------------------------------------------------------------------
+
+% Si la commande suivante est présente,
+% elle doit figurer APRÈS \begin{document}
+% et avant la première commande \part
+\ResetChaptersAtParts
+
+%-------------------------------------------------------------------
+%               mini-tables des matières par chapitre
+%-------------------------------------------------------------------
+
+% préparer les mini-tables des matières par chapitre.
+% (commande de minitoc.sty)
+\dominitoc
+
+%-------------------------------------------------------------------
+%                         Page de titre:
+%-------------------------------------------------------------------
+
+\ThesisTitle{Ré-identification efficace dans les types de données répliquées sans conflit (CRDTs)}
+\ThesisDate{28 janvier 1986}
+\ThesisAuthor{Matthieu Nicolas}
+
+% Type de la these
+\ThesisUL
+% Jury:
+
+% (ne pas mettre de \\ apres la dernière entree)
+
+% Exemple de création d'une nouvelle catégorie dans le jury:
+
+\NewJuryCategory{family}{\it Membre de la famille :}
+                        {\it Membres de la famille :}
+
+\family={Mon frère\\Ma sœur}
+
+\def\blanc{\hspace*{1cm}}
+
+\President    = {Stephan Merz}
+\Rapporteurs  = {Le rapporteur 1&de Paris\\
+                 Le rapporteur 2\\
+                 \blanc suite&taratata\\
+                 Le rapporteur 3}
+\Examinateurs = {L'examinateur 1&d'ici\\
+                 L'examinateur 2}
+%\Invites=       {}
+
+% Création de la page de titre:
+\MakeThesisTitlePage
+
+%-------------------------------------------------------------------
+
+
+%-------------------------------------------------------------------
+%                          remerciements
+%-------------------------------------------------------------------
+
+%\DontFrameThisInToc
+\begin{ThesisAcknowledgments}
+Les remerciements.
+\end{ThesisAcknowledgments}
+
+%-------------------------------------------------------------------
+%                            dédicace
+%-------------------------------------------------------------------
+
+\begin{ThesisDedication}
+Je dédie cette thèse\\
+à ma machine.\\
+Oui, à Pandore,\\
+qui fut la première de toutes.
+\end{ThesisDedication}
+
+
+%-------------------------------------------------------------------
+%                  écriture de `Chapitre' et `Partie'
+%                      dans la table des matières
+%-------------------------------------------------------------------
+
+\WritePartLabelInToc
+\WriteChapterLabelInToc
+
+%-------------------------------------------------------------------
+%                        table des matières
+%-------------------------------------------------------------------
+
+\tableofcontents
+
+%-------------------------------------------------------------------
+%              Exemple d'utilisation de \SpecialSection
+%-------------------------------------------------------------------
+%\SpecialSection{Introduction générale}
+
+\DontWriteThisInToc
+\listoffigures
+
+\mainmatter
+\NumberThisInToc
+\chapter*{Introduction}
+\minitoc
+\section{Contexte}
+\section{Questions de recherche}
+\section{Contributions}
+\section{Plan du manuscrit}
+% \input{assets/intro}
+
+\NumberThisInToc
+\chapter*{Problématique}
+\minitoc
+% \input{assets/chapter_problematic}
+
+\NumberThisInToc
+\chapter{État de l'art}
+\minitoc
+\section{Transformées opérationnelles}
+\section{Séquences répliquées sans conflits}
+\subsection{Type de données répliquées sans conflits}
+\subsection{Approches pour les séquences répliquées sans conflits}
+\section{LogootSplit}
+% \include{assets/chapter_soa_ergm}
+
+\NumberThisInToc
+\chapter{Renommage dans un système centralisé}
+\minitoc
+\section{Approche}
+\section{RenamableLogootSplit}
+\subsection{Opération de renommage}
+\subsubsection{Propriétés}
+\subsubsection{Proposition}
+\subsection{Gestion des opérations concurrentes au renommage}
+\subsection{Récupération de la mémoire des états précédents}
+\subsection{Modèle de cohérence}
+\section{Évaluation}
+\subsection{Expérimentations}
+\subsubsection{Scénario d'expérimentation}
+\subsubsection{Implémentation des simulations}
+\subsection{Résultats}
+\subsubsection{Convergence}
+\subsubsection{Consommation mémoire}
+\subsubsection{Temps d'intégration des opérations "simples"}
+\subsubsection{Temps d'intégration de l'opération de renommage}
+\section{Discussion}
+\subsection{Stockage d'anciens états sur disque}
+\subsection{Compression de l'opération de renommage}
+\subsection{Limitation de la taille de l'opération de renommage}
+% \include{assets/chapter_baye_approach}
+
+\NumberThisInToc
+\chapter{Renommage dans un système distribué}
+\minitoc
+\section{Approche}
+\section{RenamableLogootSplit v2}
+\subsection{Opération de renommage et inversion du renommage}
+\subsubsection{Propriétés}
+\subsubsection{Proposition}
+\subsection{Relation de priorité entre renommages concurrents}
+\subsection{Identification des renommages à inverser et à appliquer}
+\subsection{Récupération de la mémoire des états précédents}
+\section{Évaluation}
+\subsection{Expérimentations}
+\subsubsection{Scénario d'expérimentation}
+\subsubsection{Implémentation des simulations}
+\subsection{Résultats}
+\subsubsection{Convergence}
+\subsubsection{Consommation mémoire}
+\subsubsection{Temps d'intégration des opérations "simples"}
+\subsubsection{Temps d'intégration de l'opération de renommage}
+\section{Discussion}
+\subsection{Définition de relations de priorité plus optimales}
+\subsection{Report de la transition vers la nouvelle epoch principale}
+% \include{assets/chapter_application_HAL}
+
+\NumberThisInToc
+\chapter{Stratégies de déclenchement du renommage}
+\section{Motivation}
+\section{Stratégies proposées}
+\subsection{Propriétés}
+\subsection{Stratégie 1 : ???}
+\subsection{Stratégie 2 : ???}
+\section{Évaluation}
+\minitoc
+% \include{assets/chapter_extension}
+
+\NumberThisInToc
+\chapter{Conclusions et perspectives}
+\minitoc
+\section{Résumé des contributions}
+\section{Perspectives}
+\subsection{Définition de relations de priorité plus optimales}
+\subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
+\subsection{Définition de types de données répliquées sans conflits plus complexes}
+% \include{assets/conclusion}
+
+\Annex{Algorithmes}
+% \include{assets/annex_extension}
+
+%
+%%-------------------------------------------------------------------
+%%                         Le glossaire
+%%-------------------------------------------------------------------
+%\BeginGloWith{Voici un glossaire tout-à-fait fictif,
+%              introduit par un texte sur toute la largeur
+%              des deux colonnes.}
+%\twocolumn
+%\PrintGlossary
+
+%-------------------------------------------------------------------
+%              L'index (toujours sur deux colonnes)
+%-------------------------------------------------------------------
+\BeginIndWith{Voici un index}
+\PrintIndex
+
+\onecolumn
+
+%-------------------------------------------------------------------
+%                       La bibliographie
+%-------------------------------------------------------------------
+
+% La bibliographie (comme d'habitude)
+
+%\nocite{*}
+%\bibliographystyle{named}
+
+\printbibliography
+
+%-------------------------------------------------------------------
+%                          Les résumés
+%-------------------------------------------------------------------
+% (si le résumé apparaît sur une colonne étroite, avec la
+% bibliographie à gauche, c'est sans doute parce que vous avez
+% oublié de générer les fichiers d'index et de glossaire...)
+
+\NumberAbstractPages
+\begin{ThesisAbstract}
+  \begin{FrenchAbstract}
+    Le résumé.
+    \KeyWords{chat, chien, puces.}
+  \end{FrenchAbstract}
+  \begin{EnglishAbstract}
+    \KeyWords{}
+  \end{EnglishAbstract}
+\end{ThesisAbstract}
+
+
+\end{document}
+
+
+
