@@ -2,8 +2,10 @@
 %----------------------------------------------------------------------
 %                               Packages
 %----------------------------------------------------------------------
-\usepackage[french]{minitoc}
+\usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
 \usepackage{biblatex}
+\usepackage[inline]{enumitem}
+\usepackage[french]{minitoc}
 
 %-------------------------------------------------------------------
 %                             Marges
@@ -57,7 +59,18 @@
 %                           Acronymes
 %-------------------------------------------------------------------
 
+% Acronyms
+% --------
 % \input{assets/acronyms.tex}
+\acrodef{ADT}[ADT]{Abstract Data Type}
+\acrodefplural{ADT}[ADTs]{Abstract Data Types}
+\acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
+\acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
+\acrodef{JIT}[JIT]{Just-In-Time}
+\acrodef{OT}[OT]{Operational Transformation}
+\acrodefplural{OT}[OT]{Operational Transformations}
+\acrodef{P2P}[P2P]{Peer-to-Peer}
+\acrodef{SEC}[SEC]{Strong Eventual Consistency}
 
 %-------------------------------------------------------------------
 %                           Couleurs
@@ -329,11 +342,32 @@ qui fut la première de toutes.
 \NumberAbstractPages
 \begin{ThesisAbstract}
   \begin{FrenchAbstract}
-    Le résumé.
-    \KeyWords{chat, chien, puces.}
+    Afin d'assurer leur haute disponibilité, les systèmes distribués à large échelle se doivent de répliquer leurs données tout en minimisant les coordinations nécessaires entre noeuds.
+    Pour concevoir de tels systèmes, la littérature et l'industrie adoptent de plus en plus l'utilisation de types de données répliquées sans conflits (CRDTs).
+    Les \acp{CRDT} sont des types de données qui offrent des comportements similaires aux types existants, tel l'Ensemble ou la Séquence.
+    Ils se distinguent cependant des types traditionnels par leur spécification, qui supporte nativement les modifications concurrentes.
+    À cette fin, les \acp{CRDT} incorporent un mécanisme de résolution de conflits au sein de leur spécification.
+
+    Afin de résoudre les conflits de manière déterministe, les \acp{CRDT} associent généralement des identifiants aux éléments stockés au sein de la structure de données.
+    Les identifiants doivent respecter un ensemble de contraintes en fonction du \ac{CRDT}, telles que l'unicité ou l'appartenance à un ordre dense.
+    Ces contraintes empêchent de borner la taille des identifiants.
+    La taille des identifiants utilisés croît alors continuellement avec le nombre de modifications effectuées, aggravant le surcoût lié à l'utilisation des \acp{CRDT} par rapport aux structures de données traditionnelles.
+    Le but de cette thèse est de proposer des solutions pour pallier ce problème.
+
+    Nous présentons dans cette thèse deux contributions visant à répondre à ce problème :
+    \begin{enumerate*}[label=(\roman*)]
+      \item Un nouveau \ac{CRDT} pour Séquence, RenamableLogootSplit, qui intègre un mécanisme de renommage à sa spécification.
+      Ce mécanisme de renommage permet aux noeuds du système de réattribuer des identifiants de taille minimale aux éléments de la séquence.
+      Cependant, cette première version requiert une coordination entre les noeuds pour effectuer un renommage.
+      L'évaluation expérimentale montre que le mécanisme de renommage permet de réinitialiser à chaque renommage le surcoût lié à l'utilisation du \ac{CRDT}.
+      \item Une seconde version de RenamableLogootSplit conçue pour une utilisation dans un système distribué.
+      Cette nouvelle version permet aux noeuds de déclencher un renommage sans coordination préalable.
+      L'évaluation expérimentale montre que cette nouvelle version présente un surcoût temporaire en cas de renommages concurrents, mais que ce surcoût est à terme.
+    \end{enumerate*}
+    \KeyWords{CRDTs, édition collaborative en temps réel, cohérence à terme, optimisation mémoire, performance}
   \end{FrenchAbstract}
   \begin{EnglishAbstract}
-    \KeyWords{}
+    \KeyWords{CRDTs, real-time collaborative editing, eventual consistency, memory-wise optimisation, performance}
   \end{EnglishAbstract}
 \end{ThesisAbstract}
 
