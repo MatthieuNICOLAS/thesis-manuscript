@@ -4,6 +4,7 @@
 %----------------------------------------------------------------------
 \usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
 \usepackage{biblatex}
+\usepackage{csquotes}
 \usepackage[inline]{enumitem}
 \usepackage[french]{minitoc}
 
@@ -127,7 +128,7 @@
 %-------------------------------------------------------------------
 
 \ThesisTitle{Ré-identification efficace dans les types de données répliquées sans conflit (CRDTs)}
-\ThesisDate{28 janvier 1986}
+\ThesisDate{TODO: Définir une date}
 \ThesisAuthor{Matthieu Nicolas}
 
 % Type de la these
@@ -213,9 +214,9 @@ qui fut la première de toutes.
 \section{Plan du manuscrit}
 % \input{assets/intro}
 
-\NumberThisInToc
-\chapter*{Problématique}
-\minitoc
+% \NumberThisInToc
+% \chapter*{Problématique}
+% \minitoc
 % \input{assets/chapter_problematic}
 
 \NumberThisInToc
@@ -225,47 +226,52 @@ qui fut la première de toutes.
 \section{Séquences répliquées sans conflits}
 \subsection{Type de données répliquées sans conflits}
 \subsection{Approches pour les séquences répliquées sans conflits}
+\subsection{Mitigation du surcoût des séquences répliquées sans conflits}
+\subsubsection{Core-Nebula}
+\subsubsection{LSEQ}
 \section{LogootSplit}
 % \include{assets/chapter_soa_ergm}
 
 \NumberThisInToc
+\chapter{Présentation de l'approche}
+\minitoc
+\section{Modèle du système}
+\section{Définition de l'opération de renommage}
+\subsection{Objectifs}
+\subsection{Propriétés}
+\subsection{Contraintes} % Non-bloquante, performante (pour un utilisateur)
+
+\NumberThisInToc
 \chapter{Renommage dans un système centralisé}
 \minitoc
-\section{Approche}
 \section{RenamableLogootSplit}
-\subsection{Opération de renommage}
-\subsubsection{Propriétés}
-\subsubsection{Proposition}
+\subsection{Opération de renommage proposée}
 \subsection{Gestion des opérations concurrentes au renommage}
+\subsection{Intégration d'une opération}
+\subsection{Évolution du modèle de cohérence}
 \subsection{Récupération de la mémoire des états précédents}
-\subsection{Modèle de cohérence}
-\section{Évaluation}
-\subsection{Expérimentations}
-\subsubsection{Scénario d'expérimentation}
-\subsubsection{Implémentation des simulations}
-\subsection{Résultats}
-\subsubsection{Convergence}
-\subsubsection{Consommation mémoire}
-\subsubsection{Temps d'intégration des opérations "simples"}
-\subsubsection{Temps d'intégration de l'opération de renommage}
+\section{Validation}
+\subsection{Preuve de correction}
+\subsection{Complexité temporelle}
 \section{Discussion}
 \subsection{Stockage d'anciens états sur disque}
 \subsection{Compression de l'opération de renommage}
 \subsection{Limitation de la taille de l'opération de renommage}
+\section{Conclusion}
 % \include{assets/chapter_baye_approach}
 
 \NumberThisInToc
 \chapter{Renommage dans un système distribué}
 \minitoc
-\section{Approche}
 \section{RenamableLogootSplit v2}
-\subsection{Opération de renommage et inversion du renommage}
-\subsubsection{Propriétés}
-\subsubsection{Proposition}
-\subsection{Relation de priorité entre renommages concurrents}
-\subsection{Identification des renommages à inverser et à appliquer}
+\subsection{Conflits en cas de renommages concurrents}
+\subsection{Méthode de résolution de conflits proposée}
+\subsection{Relation de priorité entre renommages}
+\subsection{Algorithme d'annulation de l'opération de renommage}
+\subsection{Mise à jour de l'intégration d'une opération}
 \subsection{Récupération de la mémoire des états précédents}
-\section{Évaluation}
+\section{Validation}
+\subsection{Complexité temporelle}
 \subsection{Expérimentations}
 \subsubsection{Scénario d'expérimentation}
 \subsubsection{Implémentation des simulations}
@@ -275,19 +281,27 @@ qui fut la première de toutes.
 \subsubsection{Temps d'intégration des opérations "simples"}
 \subsubsection{Temps d'intégration de l'opération de renommage}
 \section{Discussion}
+\subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité plus optimales}
 \subsection{Report de la transition vers la nouvelle epoch principale}
+\section{Conclusion}
 % \include{assets/chapter_application_HAL}
 
 \NumberThisInToc
 \chapter{Stratégies de déclenchement du renommage}
+\minitoc
 \section{Motivation}
 \section{Stratégies proposées}
 \subsection{Propriétés}
 \subsection{Stratégie 1 : ???}
 \subsection{Stratégie 2 : ???}
+
+NOTE: Peut considérer une stratégie où on prend en compte la hauteur de l'epoch tree pour déclencher un renommage : peut attendre qu'on ait plus qu'une epoch pour autoriser un nouveau renommage d'avoir lieu.
+Permettrait d'empêcher le cas où un noeud revient après 6 mois d'absence et doit intégrer 100 renommages avant de pouvoir collaborer.
+Mais dans le cas où un noeud ne rejoint plus la collaboration, bloque le mécanisme de renommage pour les autres
+
 \section{Évaluation}
-\minitoc
+\section{Conclusion}
 % \include{assets/chapter_extension}
 
 \NumberThisInToc
