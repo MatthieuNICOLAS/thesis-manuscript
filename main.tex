@@ -4,9 +4,34 @@
 %----------------------------------------------------------------------
 \usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
 \usepackage{biblatex}
+\bibliography{biblio.bib}
 \usepackage{csquotes}
 \usepackage[inline]{enumitem}
 \usepackage[french]{minitoc}
+
+\usepackage{color}
+\AtBeginDocument{
+\definecolor{pdfurlcolor}{rgb}{0,0,0}
+\definecolor{pdfcitecolor}{rgb}{0,0,0}
+\definecolor{pdflinkcolor}{rgb}{0,0,0}
+\definecolor{light}{gray}{.85}
+\definecolor{vlight}{gray}{.95}
+\definecolor{darkgreen}{RGB}{77,172,38}
+\definecolor{darkblue}{RGB}{5,113,176}
+\definecolor{mydarkblue}{RGB}{116,173,209}
+\definecolor{mydarkblueid}{RGB}{83,154,198}
+\definecolor{mylightblue}{RGB}{171,217,233}
+\definecolor{mydarkorange}{RGB}{244,109,67}
+\definecolor{mylightorange}{RGB}{252,153,54}
+\definecolor{mydarkred}{RGB}{215,48,39}
+\definecolor{mydarkpurple}{RGB}{140,107,177}
+\definecolor{mydarkpurpleid}{RGB}{136,86,167}
+}
+
+\usepackage[draft,inline,nomargin,index]{fixme}
+\fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
+\FXRegisterAuthor{go}{ago}{Gerald}
+\FXRegisterAuthor{mn}{amn}{Matthieu}
 
 %-------------------------------------------------------------------
 %                             Marges
@@ -224,12 +249,57 @@ qui fut la première de toutes.
 \minitoc
 \section{Transformées opérationnelles}
 \section{Séquences répliquées sans conflits}
-\subsection{Type de données répliquées sans conflits}
+\subsection{Types de données répliquées sans conflits}
+\subsubsection{Principes}
+
+\subsubsection{Familles de types de données répliquées sans conflits}
+
+\begin{itemize}
+  \item Types de données répliquées sans conflits à base d'états \cite{shapiro_2011_crdt, shapiro:inria-00555588}
+  \item Types de données répliquées sans conflits à base d'opérations \cite{shapiro_2011_crdt, shapiro:inria-00555588, 10.1145/2596631.2596632, baquero2017pure}
+  \item Types de données répliquées sans conflits à base de différences \cite{almeida2015delta, Almeida_2018}
+\end{itemize}
+
+\subsubsection{Adoption dans la littérature et l'industrie}
+
+\begin{itemize}
+  \item Conception et développement de librairies mettant à disposition des développeurs d'applications des types de données composés \cite{Nicolaescu2015Yjs, Nicolaescu2016YATA, yjsimplem, jsoncrdt2017, automerge}
+  \item Conception de langages de programmation intégrant des CRDTs comme types primitifs, destinés au développement d'applications distribuées \cite{Meiklejohn2015Lasp2, DePorre2020cscript}
+  \item Conception et implémentation de bases de données distribuées, relationnelles ou non, privilégiant la disponibilité et la minimisation de la latence à l'aide des CRDTs \cite{RiakKV, AntidoteDB, Anna2021, Concordant, yu:hal-02983557}
+  \item Conception d'un nouveau paradigme d'applications, Local-First Software, dont une des fondations est les CRDTs \cite{localfirstsoftware2019, pushpin2020}
+  \item Éditeurs collaboratifs temps réel à large échelle et offrant de nouveaux scénarios de collaboration grâce aux CRDTs \cite{Nedelec2016CRATE, MUTE2017}
+\end{itemize}
+
 \subsection{Approches pour les séquences répliquées sans conflits}
-\subsection{Mitigation du surcoût des séquences répliquées sans conflits}
-\subsubsection{Core-Nebula}
-\subsubsection{LSEQ}
+\subsubsection{Approche à pierres tombales}
+
+\begin{itemize}
+  \item WOOT \cite{oster:inria-00108523, Weiss_2007, ahmednacer:inria-00629503}
+  \item RGA \cite{ROH2011354}
+  \item RGASplit \cite{briot:hal-01343941}
+\end{itemize}
+
+\subsubsection{Approche à identifiants densément ordonnés}
+
+\begin{itemize}
+  \item Treedoc \cite{5158449}
+  \item Logoot \cite{WeissICDCS09, weiss:hal-00450416}
+\end{itemize}
+
 \section{LogootSplit}
+\subsection{Identifiants}
+\subsubsection{Composition}
+\subsubsection{Stratégie d'allocation}
+\subsection{Aggrégation dynamique d'élements en blocs}
+\subsection{Limites}
+\section{Mitigation du surcoût des séquences répliquées sans conflits}
+\subsection{Core-Nebula}
+\subsection{LSEQ}
+
+\mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
+
+\section{Synthèse}
+
 % \include{assets/chapter_soa_ergm}
 
 \NumberThisInToc
@@ -247,14 +317,14 @@ qui fut la première de toutes.
 \section{RenamableLogootSplit}
 \subsection{Opération de renommage proposée}
 \subsection{Gestion des opérations concurrentes au renommage}
-\subsection{Intégration d'une opération}
+\subsection{Processus d'intégration d'une opération}
 \subsection{Évolution du modèle de cohérence}
 \subsection{Récupération de la mémoire des états précédents}
 \section{Validation}
 \subsection{Preuve de correction}
 \subsection{Complexité temporelle}
 \section{Discussion}
-\subsection{Stockage d'anciens états sur disque}
+\subsection{Stockage des états précédents sur disque}
 \subsection{Compression de l'opération de renommage}
 \subsection{Limitation de la taille de l'opération de renommage}
 \section{Conclusion}
@@ -268,8 +338,8 @@ qui fut la première de toutes.
 \subsection{Méthode de résolution de conflits proposée}
 \subsection{Relation de priorité entre renommages}
 \subsection{Algorithme d'annulation de l'opération de renommage}
-\subsection{Mise à jour de l'intégration d'une opération}
-\subsection{Récupération de la mémoire des états précédents}
+\subsection{Mise à jour du processus d'intégration d'une opération}
+\subsection{Mise à jour des règles de récupération de la mémoire des états précédents}
 \section{Validation}
 \subsection{Complexité temporelle}
 \subsection{Expérimentations}

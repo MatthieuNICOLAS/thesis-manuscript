@@ -1,0 +1,1018 @@
+% CRDTs
+% --------
+
+% + Cohérence à terme forte pour celui-là
+@inproceedings{shapiro_2011_crdt,
+  title = {Conflict-Free Replicated Data Types},
+  author = {Shapiro, Marc and
+            Preguiça, Nuno M. and
+            Baquero, Carlos and
+            Zawirski, Marek},
+  doi = {10.1007/978-3-642-24550-3_29},
+  booktitle = {Proceedings of the 13th International Symposium on Stabilization, Safety, and Security of Distributed Systems},
+  series = {{SSS} 2011},
+  pages = {386--400},
+  year = {2011}
+}
+
+@techreport{shapiro:inria-00555588,
+  TITLE = {{A comprehensive study of Convergent and Commutative Replicated Data Types}},
+  AUTHOR = {Shapiro, Marc and Pregui{\c c}a, Nuno and Baquero, Carlos and Zawirski, Marek},
+  URL = {https://hal.inria.fr/inria-00555588},
+  TYPE = {Research Report},
+  NUMBER = {RR-7506},
+  PAGES = {50},
+  INSTITUTION = {{Inria -- Centre Paris-Rocquencourt ; INRIA}},
+  YEAR = {2011},
+  MONTH = Jan,
+  KEYWORDS = {eventual consistency ; optimistic replication ; replicated data types ; distributed algorithms ; distributed systems ; Data replication ; commutative operations},
+  PDF = {https://hal.inria.fr/inria-00555588/file/techreport.pdf},
+  HAL_ID = {inria-00555588},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{10.1145/2596631.2596632,
+  author = {Baquero, Carlos and Almeida, Paulo S\'{e}rgio and Shoker, Ali},
+  title = {Making Operation-Based CRDTs Operation-Based},
+  year = {2014},
+  isbn = {9781450327169},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/2596631.2596632},
+  doi = {10.1145/2596631.2596632},
+  abstract = {Conflict-free Replicated Datatypes can simplify the design of predictable eventual consistency. They can be classified into state-based or operation-based. Operation-based approaches have the potential for allowing compact designs in both the sent message and the object state size, but current approaches are still far from this objective. Here we explore the design space for operation-based solutions, and we leverage the interaction with the middleware by offering a technique that delivers very compact solutions, while only broadcasting operation names and arguments.},
+  booktitle = {Proceedings of the First Workshop on Principles and Practice of Eventual Consistency},
+  articleno = {7},
+  numpages = {2},
+  keywords = {eventual consistency, operation-based CRDTs},
+  location = {Amsterdam, The Netherlands},
+  series = {PaPEC '14}
+}
+
+@misc{baquero2017pure,
+  title={Pure Operation-Based Replicated Data Types},
+  author={Carlos Baquero and Paulo Sergio Almeida and Ali Shoker},
+  year={2017},
+  eprint={1710.04469},
+  archivePrefix={arXiv},
+  primaryClass={cs.DC}
+}
+
+@InProceedings{almeida2015delta,
+author="Almeida, Paulo S{\'e}rgio
+and Shoker, Ali
+and Baquero, Carlos",
+editor="Bouajjani, Ahmed
+and Fauconnier, Hugues",
+title="Efficient State-Based CRDTs by Delta-Mutation",
+booktitle="Networked Systems ",
+year="2015",
+publisher="Springer International Publishing",
+address="Cham",
+pages="62--76",
+isbn="978-3-319-26850-7"
+}
+
+@article{Almeida_2018,
+   title={Delta state replicated data types},
+   volume={111},
+   ISSN={0743-7315},
+   url={http://dx.doi.org/10.1016/j.jpdc.2017.08.003},
+   DOI={10.1016/j.jpdc.2017.08.003},
+   journal={Journal of Parallel and Distributed Computing},
+   publisher={Elsevier BV},
+   author={Almeida, Paulo Sérgio and Shoker, Ali and Baquero, Carlos},
+   year={2018},
+   month={Jan},
+   pages={162–173}
+}
+
+@INPROCEEDINGS{enes2019,
+  author={V. {Enes} and P. S. {Almeida} and C. {Baquero} and J. {Leitão}},
+  booktitle={2019 IEEE 35th International Conference on Data Engineering (ICDE)},
+  title={Efficient Synchronization of State-Based CRDTs},
+  year={2019},
+  volume={},
+  number={},
+  pages={148-159},
+  doi={10.1109/ICDE.2019.00022}
+}
+
+@inproceedings{Nicolaescu2015Yjs,
+  author = {Nicolaescu, Petru and Jahns, Kevin and Derntl, Michael and Klamma, Ralf},
+  title = {{Yjs}: A Framework for Near Real-Time {P2P} Shared Editing on Arbitrary Data Types},
+  booktitle = {15th International Conference on Web Engineering},
+  series = {ICWE 2015},
+  year = {2015},
+  month = jun,
+  publisher = {Springer LNCS volume 9114},
+  pages = {675--678},
+  doi = {10.1007/978-3-319-19890-3_55},
+  url = {http://dbis.rwth-aachen.de/~derntl/papers/preprints/icwe2015-preprint.pdf},
+  keywords = {systems, Yjs}
+}
+
+@inproceedings{Nicolaescu2016YATA,
+  author = {Nicolaescu, Petru and Jahns, Kevin and Derntl, Michael and Klamma, Ralf},
+  title = {Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types},
+  booktitle = {19th International Conference on Supporting Group Work},
+  series = {GROUP 2016},
+  year = {2016},
+  pages = {39--49},
+  publisher = {ACM},
+  month = nov,
+  doi = {10.1145/2957276.2957310},
+  pdf = {https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types},
+  keywords = {text-editing, Yjs}
+}
+
+
+@article{jsoncrdt2017,
+  title={A Conflict-Free Replicated JSON Datatype},
+  volume={28},
+  ISSN={1045-9219},
+  url={http://dx.doi.org/10.1109/TPDS.2017.2697382},
+  DOI={10.1109/tpds.2017.2697382},
+  number={10},
+  journal={IEEE Transactions on Parallel and Distributed Systems},
+  publisher={Institute of Electrical and Electronics Engineers (IEEE)},
+  author={Kleppmann, Martin and Beresford, Alastair R.},
+  year={2017},
+  month={Oct},
+  pages={2733–2746}
+}
+
+% Fixed size sequence CRDTs
+% --------
+
+@inproceedings{oster:inria-00108523,
+  TITLE = {{Data Consistency for P2P Collaborative Editing}},
+  AUTHOR = {Oster, G{\'e}rald and Urso, Pascal and Molli, Pascal and Imine, Abdessamad},
+  URL = {https://hal.inria.fr/inria-00108523},
+  BOOKTITLE = {{ACM Conference on Computer-Supported Cooperative Work - CSCW 2006}},
+  ADDRESS = {Banff, Alberta, Canada},
+  PUBLISHER = {{ACM Press}},
+  SERIES = {Proceedings of the 2006 20th anniversary conference on Computer supported cooperative work},
+  PAGES = {259 - 268},
+  YEAR = {2006},
+  MONTH = Nov,
+  KEYWORDS = {CSCW ; Collaborative Editing ; Optimistic Replication ; Concurrency Control},
+  PDF = {https://hal.inria.fr/inria-00108523/file/OsterCSCW06.pdf},
+  HAL_ID = {inria-00108523},
+  HAL_VERSION = {v1},
+}
+
+% WOOTO
+@inproceedings{Weiss_2007,
+  author = {Weiss, Stéphane and Urso, Pascal and Molli, Pascal},
+  year = {2007},
+  month = {12},
+  pages = {},
+  title = {Wooki: a P2P Wiki-based Collaborative Writing Tool},
+  volume = {4831},
+  isbn = {978-3-540-76992-7},
+  doi = {10.1007/978-3-540-76993-4_42}
+}
+
+% RGA + Inclut mécanisme de GC des tombstones
+@article{ROH2011354,
+  title = "Replicated abstract data types: Building blocks for collaborative applications",
+  journal = "Journal of Parallel and Distributed Computing",
+  volume = "71",
+  number = "3",
+  pages = "354 - 368",
+  year = "2011",
+  issn = "0743-7315",
+  doi = "https://doi.org/10.1016/j.jpdc.2010.12.006",
+  url = "http://www.sciencedirect.com/science/article/pii/S0743731510002716",
+  author = "Hyun-Gul Roh and Myeongjae Jeon and Jin-Soo Kim and Joonwon Lee",
+  keywords = "Distributed data structures, Optimistic replication, Replicated abstract data types, Optimistic algorithm, Collaboration",
+}
+
+% RGASplit
+@inproceedings{briot:hal-01343941,
+  TITLE = {{High Responsiveness for Group Editing CRDTs}},
+  AUTHOR = {Briot, Lo{\"i}ck and Urso, Pascal and Shapiro, Marc},
+  URL = {https://hal.inria.fr/hal-01343941},
+  BOOKTITLE = {{ACM International Conference on Supporting Group Work}},
+  ADDRESS = {Sanibel Island, FL, United States},
+  YEAR = {2016},
+  MONTH = Nov,
+  DOI = {10.1145/2957276.2957300},
+  KEYWORDS = {CRDT ; linear data structure ; tombstones management},
+  PDF = {https://hal.inria.fr/hal-01343941/file/camera-ready-2016-06-27.pdf},
+  HAL_ID = {hal-01343941},
+  HAL_VERSION = {v1},
+}
+
+% Variable size sequence CRDTs
+% --------
+
+% Treedoc
+@INPROCEEDINGS{5158449,
+  author={Preguica, Nuno and Marques, Joan Manuel and Shapiro, Marc and Letia, Mihai},
+  booktitle={2009 29th IEEE International Conference on Distributed Computing Systems},
+  title={A Commutative Replicated Data Type for Cooperative Editing},
+  year={2009},
+  volume={},
+  number={},
+  pages={395-403},
+  keywords={concurrency control;groupware;storage management;text editing;trees (mathematics);commutative replicated data type;concurrent operations;Treedoc;cooperative text editing;identifier space;extended binary tree;metadata storage;tree compacting;Binary trees;Concurrency control;History;Convergence;Concurrent computing;Compaction;Distributed computing;Delay;Automatic control;Writing;commutative replicated data type;distributed algorithms;replicated data;co-operative editing;dense identifier space},
+  doi={10.1109/ICDCS.2009.20},
+  ISSN={1063-6927},
+  month={June},
+}
+
+% Core-nebula
+@inproceedings{letia:hal-01248270,
+  TITLE = {{Consistency without concurrency control in large, dynamic systems}},
+  AUTHOR = {Letia, Mihai and Pregui{\c c}a, Nuno and Shapiro, Marc},
+  URL = {https://hal.inria.fr/hal-01248270},
+  BOOKTITLE = {{LADIS 2009 - 3rd ACM SIGOPS International Workshop on Large Scale Distributed Systems and Middleware}},
+  ADDRESS = {Big Sky, MT, United States},
+  PUBLISHER = {{Assoc. for Computing Machinery}},
+  SERIES = {Operating Systems Review},
+  VOLUME = {44},
+  NUMBER = {2},
+  PAGES = {29--34},
+  YEAR = {2009},
+  MONTH = Oct,
+  DOI = {10.1145/1773912.1773921},
+  KEYWORDS = {alg ; rep},
+  PDF = {https://hal.inria.fr/hal-01248270/file/LS-consistency-ladis-2009.pdf},
+  HAL_ID = {hal-01248270},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{WeissICDCS09,
+  author    = {St\'ephane Weiss and Pascal Urso and Pascal Molli},
+  title     = {Logoot : A Scalable Optimistic Replication Algorithm for Collaborative Editing on {P2P} Networks},
+  booktitle = {Proceedings of the 29th International Conference on Distributed Computing Systems - ICDCS 2009},
+  issn      = {1063-6927},
+  year      = 2009,
+  month     = jun,
+  pages     = {404--412},
+  doi       = {10.1109/ICDCS.2009.75},
+  url       = {http://doi.ieeecomputersociety.org/10.1109/ICDCS.2009.75},
+  address   = {Montreal, QC, Canada},
+  publisher = {IEEE Computer Society},
+}
+
+@article{weiss:hal-00450416,
+  TITLE = {{Logoot-Undo: Distributed Collaborative Editing System on P2P Networks}},
+  AUTHOR = {Weiss, St{\'e}phane and Urso, Pascal and Molli, Pascal},
+  URL = {https://hal.archives-ouvertes.fr/hal-00450416},
+  JOURNAL = {{IEEE Transactions on Parallel and Distributed Systems}},
+  PUBLISHER = {{Institute of Electrical and Electronics Engineers}},
+  VOLUME = {21},
+  NUMBER = {8},
+  PAGES = {1162-1174},
+  YEAR = {2010},
+  MONTH = Aug,
+  DOI = {10.1109/TPDS.2009.173},
+  HAL_ID = {hal-00450416},
+  HAL_VERSION = {v1},
+}
+
+% Core-nebula v2
+@inproceedings{zawirski:hal-01248197,
+  TITLE = {{Asynchronous rebalancing of a replicated tree}},
+  AUTHOR = {Zawirski, Marek and Shapiro, Marc and Pregui{\c c}a, Nuno},
+  URL = {https://hal.inria.fr/hal-01248197},
+  BOOKTITLE = {{Conf{\'e}rence Fran{\c c}aise en Syst{\`e}mes d'Exploitation (CFSE)}},
+  ADDRESS = {Saint-Malo, France},
+  PAGES = {12},
+  YEAR = {2011},
+  MONTH = May,
+  PDF = {https://hal.inria.fr/hal-01248197/file/Asynch%2520rebalancing%2520of%2520a%2520replicated%2520tree%2520Zawirski-CFSE-2011.pdf},
+  HAL_ID = {hal-01248197},
+  HAL_VERSION = {v1},
+}
+
+% LogootSplit
+@inproceedings{AndreCollaborateCom2013,
+  author    = {Luc André and Stéphane Martin and Gérald Oster and Claudia-Lavinia Ignat},
+  title     = {Supporting Adaptable Granularity of Changes for Massive-Scale Collaborative Editing},
+  booktitle = {International Conference on Collaborative Computing: Networking, Applications and Worksharing - CollaborateCom 2013},
+  year      = 2013,
+  pages     = {50--59},
+  month     = oct,
+  publisher = {IEEE Computer Society},
+  address   = {Austin, TX, USA},
+  doi       = {10.4108/icst.collaboratecom.2013.254123},
+}
+
+@inproceedings{lseq2013,
+  title = {{LSEQ:} an adaptive structure for sequences in distributed collaborative editing},
+  author = {Nédelec, Brice and
+           Molli, Pascal and
+           Mostéfaoui, Achour and
+           Desmontils, Emmanuel},
+  doi = {10.1145/2494266.2494278},
+  booktitle = {Proceedings of the 2013 {ACM} Symposium on Document Engineering},
+  series = {DocEng 2013},
+  pages = {37--46},
+  month = sep,
+  year = {2013}
+}
+
+% LSEQ++
+@article{lseq2017,
+author = {Nédelec, Brice and Molli, Pascal and Mostéfaoui, Achour},
+title = {A scalable sequence encoding for collaborative editing},
+journal = {Concurrency and Computation: Practice and Experience},
+
+pages = {e4108},
+keywords = {real-time collaborative editing, optimistic replication, replicated sequences},
+doi = {10.1002/cpe.4108},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/cpe.4108},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
+}
+
+@inproceedings{nicolas:hal-01932552,
+  TITLE = {{Efficient renaming in CRDTs}},
+  AUTHOR = {Nicolas, Matthieu},
+  URL = {https://hal.inria.fr/hal-01932552},
+  BOOKTITLE = {{Middleware 2018 - 19th ACM/IFIP International Middleware Conference (Doctoral Symposium)}},
+  ADDRESS = {Rennes, France},
+  YEAR = {2018},
+  MONTH = Dec,
+  PDF = {https://hal.inria.fr/hal-01932552/file/position-paper.pdf},
+  HAL_ID = {hal-01932552},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{nicolas:hal-02526724,
+  TITLE = {{Efficient Renaming in Sequence CRDTs}},
+  AUTHOR = {Nicolas, Matthieu and Oster, G{\'e}rald and Perrin, Olivier},
+  URL = {https://hal.inria.fr/hal-02526724},
+  BOOKTITLE = {{7th Workshop on Principles and Practice of Consistency for Distributed Data (PaPoC'20)}},
+  ADDRESS = {Heraklion, Greece},
+  YEAR = {2020},
+  MONTH = Apr,
+  KEYWORDS = {CRDTs ; CCS Concepts $\bullet$ Theory of computation $\rightarrow$ Distributed algorithms ; $\bullet$ Software and its engineering $\rightarrow$ Consis- tency ; $\bullet$ Human-centered computing $\rightarrow$ Collaborative and social computing systems and tools ; $\bullet$ Applied com- puting $\rightarrow$ Text editing ; Keywords CRDTs ; real-time collaborative editing ; eventual consistency ; memory-wise optimisation ; performance},
+  PDF = {https://hal.inria.fr/hal-02526724v2/file/main.pdf},
+  HAL_ID = {hal-02526724},
+  HAL_VERSION = {v2},
+}
+
+% Éditeurs collaboratifs à base de CRDTs
+% --------
+
+@inproceedings{Nedelec2016CRATE,
+  author = {N{\'e}delec, Brice and Molli, Pascal and Mostefaoui, Achour},
+  title = {{CRATE}: Writing Stories Together with our Browsers},
+  booktitle = {25th International World Wide Web Conference},
+  series = {WWW 2016},
+  year = {2016},
+  pages = {231--234},
+  publisher = {ACM},
+  month = apr,
+  doi = {10.1145/2872518.2890539},
+  pdf = {https://hal.archives-ouvertes.fr/hal-01303333},
+  keywords = {text-editing, LSEQ}
+}
+
+@inproceedings{MUTE2017,
+  TITLE = {{MUTE: A Peer-to-Peer Web-based Real-time Collaborative Editor}},
+  AUTHOR = {Nicolas, Matthieu and Elvinger, VIctorien and Oster, G{\'e}rald and Ignat, Claudia-Lavinia and Charoy, Fran{\c c}ois},
+  URL = {https://hal.inria.fr/hal-01655438},
+  BOOKTITLE = {{ECSCW 2017 - 15th European Conference on Computer-Supported Cooperative Work}},
+  ADDRESS = {Sheffield, United Kingdom},
+  PUBLISHER = {{EUSSET}},
+  SERIES = {Proceedings of 15th European Conference on Computer-Supported Cooperative Work - Panels, Posters and Demos},
+  VOLUME = {1},
+  NUMBER = {3},
+  PAGES = {1-4},
+  YEAR = {2017},
+  MONTH = Aug,
+  DOI = {10.18420/ecscw2017\_p5},
+  PDF = {https://hal.inria.fr/hal-01655438/file/Nicolasetal2017.pdf},
+  HAL_ID = {hal-01655438},
+  HAL_VERSION = {v1},
+}
+
+% Implémentations de CRDTs
+% --------
+
+% Automerge
+@misc{automerge,
+  title = {{Automerge: data structures for building collaborative applications in Javascript}},
+  author = {Automerge},
+  url = {https://github.com/automerge/automerge}
+}
+
+% Yjs
+@misc{yjsimplem,
+  title = {{Yjs: A CRDT framework with a powerful abstraction of shared data}},
+  author = {Yjs},
+  url = {https://github.com/yjs/yjs}
+}
+
+% Autres applications construites à base de CRDTs
+% --------
+
+% Riak
+@misc{RiakKV,
+  title = {{Riak KV}},
+  author = {Riak},
+  url = {http://riak.com/}
+}
+@misc{RiakDataTypes,
+  title = {{Riak KV Data Types}},
+  author = {Riak},
+  url = {https://docs.riak.com/riak/kv/latest/developing/data-types/index.html}
+}
+
+@inproceedings{riak2010,
+  author = {Klophaus, Rusty},
+  year = {2010},
+  month = {10},
+  pages = {},
+  title = {Riak Core: building distributed applications without shared state},
+  journal = {In: ACM SIGPLAN Commercial Users Functional Programming},
+  doi = {10.1145/1900160.1900176}
+}
+
+@inproceedings{Brown2014Riak,
+  author = {Brown, Russell and Cribbs, Sean and Meiklejohn, Christopher and Elliott, Sam},
+  title = {{Riak DT Map}: A Composable, Convergent Replicated Dictionary},
+  booktitle = {1st Workshop on Principles and Practice of Eventual Consistency},
+  series = {PaPEC 2014},
+  year = {2014},
+  month = apr,
+  articleno = {1},
+  publisher = {ACM},
+  doi = {10.1145/2596631.2596633},
+  pdf = {https://pages.lip6.fr/syncfree/attachments/article/46/WP3-report.pdf#page=31},
+  keywords = {systems, composition}
+}
+
+@inproceedings{Brown2016bigsets,
+  author = {Brown, Russell and Lakhani, Zeeshan and Place, Paul},
+  title = {Big(Ger) Sets: Decomposed Delta {CRDT} Sets in {Riak}},
+  booktitle = {2nd Workshop on the Principles and Practice of Consistency for Distributed Data},
+  series = {PaPoC 2016},
+  year = {2016},
+  month = apr,
+  articleno = {5},
+  publisher = {ACM},
+  doi = {10.1145/2911151.2911156},
+  eprint = {1605.06424},
+  keywords = {set-crdt, systems, composition}
+}
+
+% Swiftcloud - rapport de recherche
+@misc{zawirski2013swiftcloud,
+  title={SwiftCloud: Fault-Tolerant Geo-Replication Integrated all the Way to the Client Machine},
+  author={Marek Zawirski and Annette Bieniusa and Valter Balegas and Sérgio Duarte and Carlos Baquero and Marc Shapiro and Nuno Preguiça},
+  year={2013},
+  eprint={1310.3107},
+  archivePrefix={arXiv},
+  primaryClass={cs.DC}
+}
+
+% Swiftcloud - Workshop
+@inproceedings{swiftcloud2014,
+  author={N. {Preguiça} and M. {Zawirski} and A. {Bieniusa} and S. {Duarte} and V. {Balegas} and C. {Baquero} and M. {Shapiro}},
+  booktitle={2014 IEEE 33rd International Symposium on Reliable Distributed Systems Workshops},
+  title={SwiftCloud: Fault-Tolerant Geo-Replication Integrated all the Way to the Client Machine},
+  year={2014},
+  volume={},
+  number={},
+  pages={30-33},
+  doi={10.1109/SRDSW.2014.33}
+}
+
+% Swiftcloud - Middleware
+@inproceedings{Zawirski2015SwiftCloud,
+  author = {Zawirski, Marek and Pregui{\c c}a, Nuno and Duarte, S{\'e}rgio and Bieniusa, Annette and Balegas, Valter and Shapiro, Marc},
+  title = {Write Fast, Read in the Past: Causal Consistency for Client-side Applications},
+  booktitle = {16th Annual Middleware Conference},
+  year = {2015},
+  month = dec,
+  publisher = {ACM/IFIP/USENIX},
+  pages = {75--87},
+  doi = {10.1145/2814576.2814733},
+  pdf = {http://lip6.fr/Marc.Shapiro/papers/write-fast-read-past-middleware-2015.pdf},
+  keywords = {systems, SwiftCloud}
+}
+
+% Lasp
+@inproceedings{Meiklejohn2015Lasp2,
+  author = {Meiklejohn, Christopher and Van Roy, Peter},
+  title = {{Lasp}: A Language for Distributed, Coordination-free Programming},
+  booktitle = {17th International Symposium on Principles and Practice of Declarative Programming},
+  series = {PPDP 2015},
+  year = {2015},
+  month = jul,
+  publisher = {ACM},
+  pages = {184--195},
+  doi = {10.1145/2790449.2790525},
+  pdf = {https://www.info.ucl.ac.be/~pvr/ppdp-2015-cr.pdf},
+  keywords = {computation, systems}
+}
+
+@inproceedings{vanderLinde2017Legion,
+  author = {van der Linde, Albert and Fouto, Pedro and Leit{\~a}o, Jo{\~a}o and Pregui{\c c}a, Nuno and Casti{\~n}eira, Santiago and Bieniusa, Annette},
+  title = {{Legion}: Enriching Internet Services with Peer-to-Peer Interactions},
+  booktitle = {26th International Conference on World Wide Web},
+  series = {WWW 2017},
+  year = {2017},
+  month = apr,
+  publisher = {ACM},
+  pages = {283--292},
+  doi = {10.1145/3038912.3052673},
+  pdf = {http://novasys.di.fct.unl.pt/~alinde/publications/fp0964-vanderlinde.pdf},
+  keywords = {systems, Legion}
+}
+
+@misc{AntidoteDB,
+  title = {{AntidoteDB: A planet scale, highly available, transactional database}},
+  author = {The SyncFree Consortium},
+  url = {http://antidoteDB.eu/}
+}
+
+@misc{AntidoteDBDataTypes,
+  title = {{Datatypes in Antidote}},
+  author = {The SyncFree Consortium},
+  url = {https://antidotedb.gitbook.io/documentation/architecture/datatypes}
+}
+
+% Cure - Se base sur AntidoteDB
+@inproceedings{Akkoorath2016Cure,
+  author = {Akkoorath, Deepthi Devaki and Tomsic, Alejandro Z. and Bravo, Manuel and Li, Zhongmiao and Crain, Tyler and Bieniusa, Annette and Pregui{\c c}a, Nuno and Shapiro, Marc},
+  title = {{Cure}: Strong Semantics Meets High Availability and Low Latency},
+  booktitle = {36th IEEE International Conference on Distributed Computing Systems},
+  series = {ICDCS 2016},
+  year = {2016},
+  month = jun,
+  publisher = {IEEE},
+  pages = {405--414},
+  doi = {10.1109/ICDCS.2016.98},
+  pdf = {https://pages.lip6.fr/Marc.Shapiro/papers/Cure-final-ICDCS16.pdf},
+  keywords = {systems, Cure, Antidote}
+}
+
+% Redis
+@misc{RedisEnterprise,
+  title = {{Redis Enterprise}},
+  author = {Redis Labs},
+  url = {https://redislabs.com/redis-enterprise/}
+}
+
+@misc{RedisEnterpriseActiveActiveGeoDistribution,
+  title = {{Active-Active Geo-Distribution (CRDTs-Based}},
+  author = {redis Labs},
+  url = {https://www.redislabs.com/redis-enterprise/technology/active-active-geo-distribution/}
+}
+
+% Local-First Software
+@inproceedings{localfirstsoftware2019,
+  author = {Kleppmann, Martin and Wiggins, Adam and van Hardenberg, Peter and McGranaghan, Mark},
+  title = {Local-First Software: You Own Your Data, in Spite of the Cloud},
+  year = {2019},
+  isbn = {9781450369954},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3359591.3359737},
+  doi = {10.1145/3359591.3359737},
+  booktitle = {Proceedings of the 2019 ACM SIGPLAN International Symposium on New Ideas, New Paradigms, and Reflections on Programming and Software},
+  pages = {154–178},
+  numpages = {25},
+  keywords = {data ownership, CRDTs, mobile computing, peer-to-peer communication, collaboration software},
+  location = {Athens, Greece},
+  series = {Onward! 2019}
+}
+
+@inproceedings{pushpin2020,
+  author = {van Hardenberg, Peter and Kleppmann, Martin},
+  title = {{PushPin}: Towards Production-Quality Peer-to-Peer Collaboration},
+  booktitle = {7th Workshop on Principles and Practice of Consistency for Distributed Data},
+  series = {PaPoC 2020},
+  year = {2020},
+  month = apr,
+  publisher = {ACM},
+  articleno = {10},
+  doi = {10.1145/3380787.3393683},
+  pdf = {https://martin.kleppmann.com/papers/pushpin-papoc20.pdf},
+  keywords = {systems, usability, PushPin}
+}
+
+% Anna - Conf
+@INPROCEEDINGS{Anna2018,
+  author={C. {Wu} and J. {Faleiro} and Y. {Lin} and J. {Hellerstein}},
+  booktitle={2018 IEEE 34th International Conference on Data Engineering (ICDE)},
+  title={Anna: A KVS for Any Scale},
+  year={2018},
+  volume={},
+  number={},
+  pages={401-412},
+  doi={10.1109/ICDE.2018.00044}}
+
+% Anna - Journal
+@ARTICLE{Anna2021,
+  author={C. {Wu} and J. M. {Faleiro} and Y. {Lin} and J. M. {Hellerstein}},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  title={Anna: A KVS for Any Scale},
+  year={2021},
+  volume={33},
+  number={2},
+  pages={344-358},
+  doi={10.1109/TKDE.2019.2898401}
+}
+
+% CScript
+@article{DePorre2020cscript,
+  author = {De Porre, Kevin and Myter, Florian and Scholliers, Christophe and Gonzalez Boix, Elisa},
+  title = {{CScript}: A distributed programming language for building mixed-consistency applications},
+  journal = {Journal of Parallel and Distributed Computing volume 144},
+  pages = {109-123},
+  year = {2020},
+  month = oct,
+  issn = {0743-7315},
+  doi = {10.1016/j.jpdc.2020.05.010},
+  pdf = {http://soft.vub.ac.be/Publications/2020/vub-tr-soft-20-04.pdf},
+  keywords = {computation, composition, systems, CScript}
+}
+
+@misc{Concordant,
+  title = {{Concordant}},
+  author = {Concordant},
+  url = {http://www.concordant.io/}
+}
+
+@inproceedings{yu:hal-02983557,
+  TITLE = {{Conflict-Free Replicated Relations for Multi-Synchronous Database Management at Edge}},
+  AUTHOR = {Yu, Weihai and Ignat, Claudia-Lavinia},
+  URL = {https://hal.inria.fr/hal-02983557},
+  BOOKTITLE = {{IEEE International Conference on Smart Data Services, 2020 IEEE World Congress on Services}},
+  ADDRESS = {Beijing, China},
+  YEAR = {2020},
+  MONTH = Oct,
+  KEYWORDS = {CRDTs ; relational database ; eventual consistency ; integrity constraints},
+  PDF = {https://hal.inria.fr/hal-02983557/file/SMDS2020.pdf},
+  HAL_ID = {hal-02983557},
+  HAL_VERSION = {v1},
+}
+
+
+% Metadata overhead
+% --------
+
+% + Weak/Strong list specification
+@inproceedings{10.1145/2933057.2933090,
+  author = {Attiya, Hagit and Burckhardt, Sebastian and Gotsman, Alexey and Morrison, Adam and Yang, Hongseok and Zawirski, Marek},
+  title = {Specification and Complexity of Collaborative Text Editing},
+  year = {2016},
+  isbn = {9781450339643},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/2933057.2933090},
+  doi = {10.1145/2933057.2933090},
+  booktitle = {Proceedings of the 2016 ACM Symposium on Principles of Distributed Computing},
+  pages = {259–268},
+  numpages = {10},
+  keywords = {collaborative text editing, eventual consistency},
+  location = {Chicago, Illinois, USA},
+  series = {PODC '16}
+}
+
+% + Weak/Strong list specification
+@article{ATTIYA2021141,
+  title = "Specification and space complexity of collaborative text editing",
+  journal = "Theoretical Computer Science",
+  volume = "855",
+  pages = "141 - 160",
+  year = "2021",
+  issn = "0304-3975",
+  doi = "https://doi.org/10.1016/j.tcs.2020.11.046",
+  url = "http://www.sciencedirect.com/science/article/pii/S0304397520306952",
+  author = "Hagit Attiya and Sebastian Burckhardt and Alexey Gotsman and Adam Morrison and Hongseok Yang and Marek Zawirski",
+  keywords = "Collaborative text editing, Specification, Metadata lower bound, Eventual consistency",
+}
+
+@inbook{10.1145/3426182.3426183,
+  author = {Bauwens, Jim and Gonzalez Boix, Elisa},
+  title = {From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs},
+  year = {2020},
+  isbn = {9781450388535},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3426182.3426183},
+  booktitle = {Proceedings of the 17th International Conference on Managed Programming Languages and Runtimes},
+  pages = {3–14},
+  numpages = {12}
+}
+
+% Miscellaneous
+% --------
+
+% Happen-before relation
+@article{10.1145/359545.359563,
+  author = {Lamport, Leslie},
+  title = {Time, Clocks, and the Ordering of Events in a Distributed System},
+  year = {1978},
+  issue_date = {July 1978},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {21},
+  number = {7},
+  issn = {0001-0782},
+  url = {https://doi.org/10.1145/359545.359563},
+  doi = {10.1145/359545.359563},
+  journal = {Commun. ACM},
+  month = jul,
+  pages = {558–565},
+  numpages = {8},
+  keywords = {clock synchronization, distributed systems, multiprocess systems, computer networks}
+}
+
+% Causal stability
+@InProceedings{10.1007/978-3-662-43352-2_11,
+  author="Baquero, Carlos
+  and Almeida, Paulo S{\'e}rgio
+  and Shoker, Ali",
+  editor="Magoutis, Kostas
+  and Pietzuch, Peter",
+  title="Making Operation-Based CRDTs Operation-Based",
+  booktitle="Distributed Applications and Interoperable Systems",
+  year="2014",
+  publisher="Springer Berlin Heidelberg",
+  address="Berlin, Heidelberg",
+  pages="126--140"
+}
+
+% CAP Theorem
+@inproceedings{brewer_2000_podc,
+  author = {Brewer, Eric A.},
+  title = {Towards Robust Distributed Systems},
+  booktitle = {Proceedings of the Nineteenth Annual ACM Symposium on Principles of Distributed Computing},
+  series = {PODC '00},
+  year = {2000},
+  isbn = {1-58113-183-6},
+  location = {Portland, Oregon, USA},
+  pages = {7--},
+  url = {http://doi.acm.org/10.1145/343477.343502},
+  doi = {10.1145/343477.343502},
+  acmid = {343502},
+  publisher = {ACM},
+  address = {New York, NY, USA},
+}
+
+% PACELC Theorem
+@ARTICLE{pacelc2012,
+  author={D. {Abadi}},
+  journal={Computer},
+  title={Consistency Tradeoffs in Modern Distributed Database System Design: CAP is Only Part of the Story},
+  year={2012},
+  volume={45},
+  number={2},
+  pages={37-42},
+  doi={10.1109/MC.2012.33}
+}
+
+% Eventual consistency
+@article{10.1145/224057.224070,
+  author={Terry, Douglas B and Theimer, Marvin M and Petersen, Karin and Demers, Alan J and Spreitzer, Mike J and Hauser, Carl H},
+  title = {Managing Update Conflicts in Bayou, a Weakly Connected Replicated Storage System},
+  year = {1995},
+  issue_date = {December 1995},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {29},
+  number = {5},
+  issn = {0163-5980},
+  url = {https://doi.org/10.1145/224057.224070},
+  doi = {10.1145/224057.224070},
+  journal = {SIGOPS Oper. Syst. Rev.},
+  month = dec,
+  pages = {172–182},
+  numpages = {11}
+}
+
+% Optimistic Replication + EC
+@article{10.1145/1057977.1057980,
+  author = {Saito, Yasushi and Shapiro, Marc},
+  title = {Optimistic Replication},
+  year = {2005},
+  issue_date = {March 2005},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {37},
+  number = {1},
+  issn = {0360-0300},
+  url = {https://doi.org/10.1145/1057977.1057980},
+  doi = {10.1145/1057977.1057980},
+  journal = {ACM Comput. Surv.},
+  month = mar,
+  pages = {42–81},
+  numpages = {40},
+  keywords = {distributed systems, disconnected operation, optimistic techniques, Replication, large scale systems}
+}
+
+% CCI properties (Causality, Convergence, Intention)
+@article{10.1145/274444.274447,
+  author = {Sun, Chengzheng and Jia, Xiaohua and Zhang, Yanchun and Yang, Yun and Chen, David},
+  title = {Achieving Convergence, Causality Preservation, and Intention Preservation in Real-Time Cooperative Editing Systems},
+  year = {1998},
+  issue_date = {March 1998},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {5},
+  number = {1},
+  issn = {1073-0516},
+  url = {https://doi.org/10.1145/274444.274447},
+  doi = {10.1145/274444.274447},
+  journal = {ACM Trans. Comput.-Hum. Interact.},
+  month = mar,
+  pages = {63–108},
+  numpages = {46},
+  keywords = {causality preservation, consistency maintenance, operational transformation, intention preservation, groupware systems, REDUCE, cooperative editing, computer-supported cooperative work, convergence}
+}
+
+% Version-vector based anti-entropy mechanism
+@article{10.1109/TSE.1983.236733,
+  author = {Parker, D. S. and Popek, G. J. and Rudisin, G. and Stoughton, A. and Walker, B. J. and Walton, E. and Chow, J. M. and Edwards, D. and Kiser, S. and Kline, C.},
+  title = {Detection of Mutual Inconsistency in Distributed Systems},
+  year = {1983},
+  issue_date = {May 1983},
+  publisher = {IEEE Press},
+  volume = {9},
+  number = {3},
+  issn = {0098-5589},
+  url = {https://doi.org/10.1109/TSE.1983.236733},
+  doi = {10.1109/TSE.1983.236733},
+  journal = {IEEE Trans. Softw. Eng.},
+  month = may,
+  pages = {240–247},
+  numpages = {8},
+  keywords = {replicated data, Availability, mutual consistency, distributed systems, network partitioning, network failures}
+}
+
+% Effect of delay
+% --------
+
+% + Design de WOOTH
+@inproceedings{ahmednacer:inria-00629503,
+  TITLE = {{Evaluating CRDTs for Real-time Document Editing}},
+  AUTHOR = {Ahmed-Nacer, Mehdi and Ignat, Claudia-Lavinia and Oster, G{\'e}rald and Roh, Hyun-Gul and Urso, Pascal},
+  URL = {https://hal.inria.fr/inria-00629503},
+  BOOKTITLE = {{11th ACM Symposium on Document Engineering}},
+  ADDRESS = {Mountain View, California, United States},
+  EDITOR = {ACM},
+  PAGES = {103--112},
+  YEAR = {2011},
+  MONTH = Sep,
+  DOI = {10.1145/2034691.2034717},
+  KEYWORDS = {benchmark ; collaboration ; commutative replicated data types ; real-time editing},
+  PDF = {https://hal.inria.fr/inria-00629503/file/doce63-ahmednacer.pdf},
+  HAL_ID = {inria-00629503},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{ignat:hal-01088815,
+  TITLE = {{Studying the Effect of Delay on Group Performance in Collaborative Editing}},
+  AUTHOR = {Ignat, Claudia-Lavinia and Oster, G{\'e}rald and Newman, Meagan and Shalin, Valerie and Charoy, Fran{\c c}ois},
+  URL = {https://hal.archives-ouvertes.fr/hal-01088815},
+  BOOKTITLE = {{Proceedings of 11th International Conference on Cooperative Design, Visualization, and Engineering, CDVE 2014, Springer 2014 Lecture Notes in Computer Science}},
+  ADDRESS = {Seattle, WA, United States},
+  SERIES = {Proceedings of 11th International Conference on Cooperative Design, Visualization, and Engineering, CDVE 2014},
+  PAGES = {191 - 198},
+  YEAR = {2014},
+  MONTH = Sep,
+  DOI = {10.1007/978-3-319-10831-5_29},
+  KEYWORDS = {Collaborative editing ; groupware ; delay ; usability measurement},
+  PDF = {https://hal.archives-ouvertes.fr/hal-01088815/file/main.pdf},
+  HAL_ID = {hal-01088815},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{ignat:hal-01238831,
+  TITLE = {{How Do User Groups Cope with Delay in Real-Time Collaborative Note Taking}},
+  AUTHOR = {Ignat, Claudia-Lavinia and Oster, G{\'e}rald and Fox, Olivia and Charoy, Fran{\c c}ois and Shalin, Valerie},
+  URL = {https://hal.inria.fr/hal-01238831},
+  BOOKTITLE = {{European Conference on Computer Supported Cooperative Work 2015}},
+  ADDRESS = {Oslo, Norway},
+  EDITOR = {Nina Boulus-Rodje and Gunnar Ellingsen and Tone Bratteteig and Margunn Aanestad and Pernille Bjorn},
+  PUBLISHER = {{Springer International Publishing}},
+  SERIES = {Proceedings of the 14th European Conference on Computer Supported Cooperative Work},
+  PAGES = {223-242},
+  YEAR = {2015},
+  MONTH = Sep,
+  DOI = {10.1007/978-3-319-20499-4_12},
+  PDF = {https://hal.inria.fr/hal-01238831/file/IgnatECSCW15.pdf},
+  HAL_ID = {hal-01238831},
+  HAL_VERSION = {v1},
+}
+
+% Operational Transformation
+% --------
+
+@inproceedings{10.1145/67544.66963,
+author = {Ellis, C. A. and Gibbs, S. J.},
+title = {Concurrency Control in Groupware Systems},
+year = {1989},
+isbn = {0897913175},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/67544.66963},
+doi = {10.1145/67544.66963},
+booktitle = {Proceedings of the 1989 ACM SIGMOD International Conference on Management of Data},
+pages = {399–407},
+numpages = {9},
+location = {Portland, Oregon, USA},
+series = {SIGMOD '89}
+}
+
+@inproceedings{10.1145/289444.289469,
+  author = {Sun, Chengzheng and Ellis, Clarence},
+  title = {Operational Transformation in Real-Time Group Editors: Issues, Algorithms, and Achievements},
+  year = {1998},
+  isbn = {1581130090},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/289444.289469},
+  doi = {10.1145/289444.289469},
+  booktitle = {Proceedings of the 1998 ACM Conference on Computer Supported Cooperative Work},
+  pages = {59–68},
+  numpages = {10},
+  keywords = {groupware, intention preservation, operational transformation, causality preservation, consistency maintenance, convergence, group editors, distributed computing},
+  location = {Seattle, Washington, USA},
+  series = {CSCW ’98}
+}
+
+@article{4668339,
+  author = {Sun, David and Sun, Chengzheng},
+  year = {2009},
+  month = {11},
+  pages = {1454 - 1470},
+  title = {Context-Based Operational Transformation in Distributed Collaborative Editing Systems},
+  volume = {20},
+  journal = {Parallel and Distributed Systems, IEEE Transactions on},
+  doi = {10.1109/TPDS.2008.240}
+}
+
+@inproceedings{handlingChurnDHT2004,
+  title={Handling churn in a DHT},
+  author={Rhea, Sean and Geels, Dennis and Roscoe, Timothy and Kubiatowicz, John and others},
+  booktitle={Proceedings of the USENIX Annual Technical Conference},
+  volume={6},
+  pages={127--140},
+  year={2004},
+  organization={Boston, MA, USA}
+}
+
+@inproceedings{minimizingChurnDistSys2005,
+author = {Godfrey, P. Brighten and Shenker, Scott and Stoica, Ion},
+title = {Minimizing Churn in Distributed Systems},
+year = {2006},
+isbn = {1595933085},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1159913.1159931},
+doi = {10.1145/1159913.1159931},
+booktitle = {Proceedings of the 2006 Conference on Applications, Technologies, Architectures, and Protocols for Computer Communications},
+pages = {147–158},
+numpages = {12},
+keywords = {multicast, node selection, DHT, churn},
+location = {Pisa, Italy},
+series = {SIGCOMM '06}
+}
+
+@inproceedings{understandingChurnP2PNetworks2006,
+author = {Stutzbach, Daniel and Rejaie, Reza},
+title = {Understanding Churn in Peer-to-Peer Networks},
+year = {2006},
+isbn = {1595935614},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1177080.1177105},
+doi = {10.1145/1177080.1177105},
+booktitle = {Proceedings of the 6th ACM SIGCOMM Conference on Internet Measurement},
+pages = {189–202},
+numpages = {14},
+keywords = {uptime, bitTorrent, churn, Gnutella, kad, peer-to-peer, session length},
+location = {Rio de Janeriro, Brazil},
+series = {IMC '06}
+}
+
+@inproceedings{swim2002,
+author={A. {Das} and I. {Gupta} and A. {Motivala}},
+booktitle={Proceedings International Conference on Dependable Systems and Networks},
+title={SWIM: scalable weakly-consistent infection-style process group membership protocol},
+year={2002},
+volume={},
+number={},
+pages={303-312},
+doi={10.1109/DSN.2002.1028914}
+}
+
+@inproceedings{lifeguard2018,
+title={Lifeguard: Local health awareness for more accurate failure detection},
+author={Dadgar, Armon and Phillips, James and Currey, Jon},
+booktitle={2018 48th Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops (DSN-W)},
+pages={22--25},
+year={2018},
+organization={IEEE}
+}
