@@ -369,6 +369,32 @@ qui fut la première de toutes.
 \subsection{Complexité temporelle}
 \section{Discussion}
 \subsection{Stockage des états précédents sur disque}
+\subsection{Utilisation de l'opération de renommage comme snapshot}
+
+\begin{itemize}
+  \item L'opération de renommage embarque la somme de toutes les opérations passées sous la forme du \emph{former state}
+  \item On peut à tout moment re-calculer l'état courant du document à partir de l'opération de renommage primaire, des opérations concurrentes à cette dernière et des opérations générées depuis
+  \item Peut utiliser ce principe pour le mécanisme de synchronisation
+  \item Lorsqu'un nouveau pair rejoint la collaboration, le noeud avec lequel il se synchronise peut lui fournir uniquement ce sous-ensemble des opérations
+  \item De la même manière, on pourrait généraliser l'utilisation de cette méthode de synchronisation
+  \item À la réception d'une demande de synchronisation d'un pair présentant un important retard, le noeud peut choisir d'employer cette méthode
+  \begin{itemize}
+    \item Plutôt que de lui envoyer et de lui faire rejouer l'ensemble des opérations
+  \end{itemize}
+  \item La question étant de comment procéder pour quantifier ce retard et pour définir le seuil à partir duquel ce retard est considéré comme important
+  \item Cette méthode de synchronisation pose néanmoins le problème suivant
+  \item Le pair synchronisé de cette manière ne possède qu'une partie du log des opérations
+  \item S'il reçoit ensuite une demande de synchronisation d'un autre pair, il est possible qu'il ne puisse y répondre
+  \begin{itemize}
+    \item Cas où il manque à l'autre pair juste une opération d'avant le renommage (possible si les dépendances causales ne sont pas requises pour intégrer l'opération de renommage)
+  \end{itemize}
+  \item Dans ce cas, ne peut pas fournir la seule opération manquante au pair qui la demande
+  \begin{itemize}
+    \item \mnnote{NOTE: Mais dans ce cas, le pair peut tout à fait générer un état courant à jour à partir des infos qu'il possède puisque l'opération qui lui manque est intégrée dans l'opé de renommage}
+  \end{itemize}
+  \item \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
+\end{itemize}
+
 \subsection{Compression de l'opération de renommage}
 \subsection{Limitation de la taille de l'opération de renommage}
 \section{Conclusion}
