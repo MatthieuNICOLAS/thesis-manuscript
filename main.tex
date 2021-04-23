@@ -252,11 +252,55 @@ qui fut la première de toutes.
 \subsection{Types de données répliquées sans conflits}
 \subsubsection{Principes}
 
+\begin{itemize}
+  \item Nouvelles spécifications des types de données existants
+  \item Structures conçues pour être répliquées au sein d'un système
+  \item Et être modifiées sans coordination par ses différents noeuds
+  \item Doivent donc supporter de nouveaux scénarios uniquement possible dans des exécutions parallèles
+  \item Et définir une sémantique pour ces scénarios inédits
+  \begin{itemize}
+    \item Exemple du Registre avec LWW-Register et MV-Register ?
+  \end{itemize}
+  \item Pour gérer ces scénarios, intègrent un mécanisme de résolution de conflits directement au sein de leur spécification
+  \item Garantissent la cohérence forte à terme
+\end{itemize}
+
 \subsubsection{Familles de types de données répliquées sans conflits}
 
 \begin{itemize}
+  \item Une catégorisation des CRDTs a été proposée
+  \item Propose de répartir les CRDTs en différentes familles en fonction de la méthode de synchronisation utilisée
+  \item Chacune de ces méthodes de synchronisation implique des contraintes sur la couche réseau du système et entraîne des répercussions sur la structure de données elle-même
   \item Types de données répliquées sans conflits à base d'états \cite{shapiro_2011_crdt, shapiro:inria-00555588}
+  \begin{itemize}
+    \item Les noeuds partagent leur état de manière périodique
+    \item Une fonction \emph{merge} permet aux noeuds de fusionner leur état courant avec un autre état reçu
+    \item Aucune hypothèse sur la partie réseau autre que les noeuds arrivent à communiquer à terme
+    \item Pas un problème si états perdus, les prochains intégreront les informations de ces derniers
+    \item Pas un problème si états reçus dans le désordre, la fonction \emph{merge} est commutative
+    \item Pas un problème si états reçus plusieurs fois, \emph{merge} est idempotent
+    \item Mais nécessite de conserver au sein de la structure de données assez d'informations pour proposer une telle fonction de \emph{merge}
+    \item Par exemple, besoin de conserver une trace des éléments supprimés pour empêcher leur réapparition suite à une fusion d'états
+    \item \mnnote{TODO: Ajouter forces, faiblesses et cas d'utilisation de cette approche}
+  \end{itemize}
   \item Types de données répliquées sans conflits à base d'opérations \cite{shapiro_2011_crdt, shapiro:inria-00555588, 10.1145/2596631.2596632, baquero2017pure}
+  \begin{itemize}
+    \item Les noeuds partagent uniquement des opérations représentant leurs modifications
+    \item Une modification peut se formaliser en deux étapes
+    \item \emph{prepare}, qui permet de générer une opération correspondant à une modification
+    \item \emph{effect}, qui permet d'appliquer l'effet de la modification à un état
+    \item Les opérations concurrentes doivent être commutatives pour assurer la convergence
+    \item Mais pas de contraintes sur les opérations causalement liées
+    \item Pas de contraintes non plus sur l'idempotence des opérations
+    \item Nécessite donc généralement d'ajouter une couche \emph{livraison} pour faire le lien entre le réseau et le CRDT
+    \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
+    \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
+    \item Besoin d'un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
+    \item Permet de lisser la consommation réseau
+    \item Offre des temps d'intégration et de propagation des modifications rapides
+    \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
+    \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
+  \end{itemize}
   \item Types de données répliquées sans conflits à base de différences \cite{almeida2015delta, Almeida_2018}
 \end{itemize}
 
