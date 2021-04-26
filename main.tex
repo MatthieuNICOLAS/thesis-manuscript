@@ -28,10 +28,60 @@
 \definecolor{mydarkpurpleid}{RGB}{136,86,167}
 }
 
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
 \usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
 \FXRegisterAuthor{go}{ago}{Gerald}
 \FXRegisterAuthor{mn}{amn}{Matthieu}
+
+\usepackage{tikz} % \begin{tikzpicture} \end{tikzpicture}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.misc}
+
+\usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
+
+% Commands
+%---------
+\newcommand{\eg}{e.g. }
+\newcommand{\ie}{i.e. }
+
+\newcommand{\headerparagraph}[1]{\textbf{\emph{#1}}\quad}
+
+\newcommand{\inbb}[1]{\in \mathbb{#1}}
+\newcommand{\mathlist}[2]{\set{#1_i \in #2}_{i \inbb{N}}}
+\newcommand{\new}{\textbf{new}}
+\newcommand{\trm}[1]{\mathit{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}} % set brace notation
+
+\newcommand{\id}[3]{$\trm{#1}^{\trm{#2}}_{\trm{#3}}$}
+\newcommand{\epoch}[1]{$\varepsilon_{#1}$}
+
+\newcommand{\widthletter}{2em}
+\newcommand{\widthblock}{3em}
+\newcommand{\widthoriginepoch}{1.65em}
+\newcommand{\widthepoch}{1.8em}
+
+% Tikz styles
+\tikzset{
+    common/.style={anchor=west, draw, rectangle, minimum height=6mm},
+    letter/.style={common, minimum width=\widthletter},
+    block/.style={common, minimum width=\widthblock},
+    epoch/.style={letter, rounded rectangle, rounded rectangle east arc=0pt, minimum width=\widthepoch},
+    op/.style={draw, circle, minimum size=2.7em},
+    causalop/.style={op, double=white, inner sep=2pt},
+    gc-rule-1/.style={dashed, thick, darkblue},
+    gc-rule-2/.style={densely dotted, thick, darkgreen},
+    cross/.style={
+        path picture={
+            \draw[mydarkred, very thick]
+                (path picture bounding box.south east)--(path picture bounding box.north west)
+                (path picture bounding box.south west)--(path picture bounding box.north east);
+        }
+    }
+}
+
 
 %-------------------------------------------------------------------
 %                             Marges
@@ -95,7 +145,7 @@
 \acrodef{JIT}[JIT]{Just-In-Time}
 \acrodef{OT}[OT]{Operational Transformation}
 \acrodefplural{OT}[OT]{Operational Transformations}
-\acrodef{P2P}[P2P]{Peer-to-Peer}
+\acrodef{P2P}[P2P]{Pair-à-Pair}
 \acrodef{SEC}[SEC]{Strong Eventual Consistency}
 
 %-------------------------------------------------------------------
@@ -349,7 +399,35 @@ qui fut la première de toutes.
 \NumberThisInToc
 \chapter{Présentation de l'approche}
 \minitoc
+
+Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{nicolas:hal-01932552,nicolas:hal-02526724}.
+Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
+Nous introduisons une opération de renommage qui permet de
+\begin{enumerate*}
+  \item réassigner des identifiants plus courts aux différents éléments de la séquence
+  \item fusionner les blocs composant la séquence.
+\end{enumerate*}
+Ces deux actions permettent à l'opération de renommage de produire un nouvel état minimisant son surcoût en métadonnées.
+
 \section{Modèle du système}
+
+Le système est composé d'un ensemble dynamique de noeuds, les noeuds pouvant rejoindre puis quitter la collaboration tout au long de sa durée.
+Les noeuds collaborent afin de construire et maintenir une séquence à l'aide de RenamableLogootSplit.
+Chaque noeud possède une copie de la séquence et peut l'éditer sans se coordonner avec les autres.
+Les modifications des noeuds prennent la forme d'opérations qui sont appliquées immédiatement à leur copie locale.
+Les opérations sont ensuite transmises de manière asynchrone aux autres noeudds pour qu'ils puissent à leur tour appliquer les modifications à leur copie.
+
+Les noeuds communiquement par l'intermédiaire d'un réseau \ac{P2P}.
+Ce réseau est non-fiable : les messages peuvent être perdus, ré-ordonnés ou même livrés à plusieurs reprises.
+Le réseau peut aussi être sujet à des partitions, qui séparent alors les noeuds en des sous-groupes disjoints.
+Afin de compenser les limitations du réseau, les noeuds reposent sur une couche de livraison de messages.
+
+Puisque RenamableLogootSplit est une extension de LogootSplit, il partage les mêmes contraintes sur la livraison de messages.
+La couche de livraison de messages sert donc à livrer les messages à l'application exactement une fois.
+La couche de livraison de messages a aussi pour tâche de garantir la livraison des opérations de suppression après les opérations d'insertion correspondantes.
+Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733}.
+Ce mécanisme permet aux noeuds de se synchroniser par paires, en détectant et ré-échangeant les messages perdus.
+
 \section{Définition de l'opération de renommage}
 \subsection{Objectifs}
 \subsection{Propriétés}
@@ -360,9 +438,81 @@ qui fut la première de toutes.
 \minitoc
 \section{RenamableLogootSplit}
 \subsection{Opération de renommage proposée}
+
+Notre opération de renommage permet à RenamableLogootSplit de réduire le surcoût en métadonnées des séquences répliquées.
+Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la séquence.
+
+\begin{figure}[t!]
+  \centering
+  \subfloat[Selecting the new identifier of the first element]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  to ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
+
+              \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
+          \end{tikzpicture}
+          \label{fig:renaming-first-id}
+      \end{minipage}}
+  \hfil
+  \subfloat[Selecting the new identifiers of the remaining ones]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  to ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H}
+                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{1}}] {E}
+                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{2}}] {L}
+                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{3}}] {O};
+
+                  \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
+              \end{tikzpicture}
+          \label{fig:renaming-second-id}
+      \end{minipage}}
+  \hfil
+  \subfloat[Final state obtained]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  to ++(0:4 * \widthletter) node[block, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0..3}}] (HELO) {HELO};
+
+              \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (HELO);
+          \end{tikzpicture}
+          \label{fig:renaming-final-state}
+      \end{minipage}}
+  \caption{Renaming the sequence on node \emph{A}}
+  \label{fig:renaming}
+\end{figure}
+
+Son comportement est illustré dans la \autoref{fig:renaming}.
+Dans cet exemple, le noeud A initie une opération \emph{rename} sur son état local.
+Tout d'abord, le noeud A réutilise l'identifiant du premier élément de la séquence (\id{i}{B0}{0}) mais en le modifiant avec son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
+De plus, son offset est mis à 0.
+Le noeud A réassigne l'identifiant résultant (\id{i}{A1}{0}) au premier élément de la séquence, comme décrit dans \autoref{fig:renaming-first-id}.
+Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A1}{1}, \id{i}{A1}{2}, \id{i}{A1}{3}), comme présenté dans \autoref{fig:renaming-second-id}.
+Comme nous assignons des identifiants consécutifs à tous les éléments de la séquence, nous pouvons au final aggréger ces éléments en un seul bloc, comme illustré en \autoref{fig:renaming-final-state}.
+Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs et de minimiser le surcoût en métadonnés de l'état résultat.
+
 \subsection{Gestion des opérations concurrentes au renommage}
 \subsection{Processus d'intégration d'une opération}
 \subsection{Évolution du modèle de cohérence}
+
+\mnnote{TODO: Revoir si une livraison causale de l'opération \emph{rename} (et non epoch-based) peut avoir un intérêt}
+
 \subsection{Récupération de la mémoire des états précédents}
 \section{Validation}
 \subsection{Preuve de correction}
