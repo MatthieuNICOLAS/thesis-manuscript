@@ -949,6 +949,163 @@ Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le 
 
 \label{sec:reverting-rename-ops}
 
+Nous présentons maintenant la fonction \textsc{revertRenameId}.
+Décrite dans \autoref{alg:revertRenameId}, cette fonction permet aux noeuds d'annuler une opération \emph{rename} appliquée précéddemment.
+Pour ce faire, \textsc{revertRenameId} associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
+
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{revertRenameId}{id, renamedIds, nId, nSeq}
+          % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
+          % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
+          % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
+          % \Statex \LeftComment{$nSeq}$ is $node~seq}$ of the node which issued the \emph{rename} op}
+          % \\
+          \State length $\gets$ renamedIds.length
+          \State firstId $\gets$ renamedIds[0]
+          \State lastId $\gets$ renamedIds[length - 1]
+          \State pos $\gets$ position(firstId)
+          \\
+          \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
+          \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
+          \\
+          \If{id < newFirstId}
+              \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
+          \ElsIf{isRenamedId(id, pos, nId, nSeq, length)}
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return renamedIds[index]
+          \ElsIf{newLastId < id}
+              \State \Return revRenIdGreaterThanNewLastId(id, lastId)
+          \Else
+              % Ajouter commentaire sur cas
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return revRenIdfromPredId(id, renamedIds, index)
+          \EndIf
+      \EndFunction
+      \\
+      \Function{revRenIdfromPredId}{id, renamedIds, index}
+          \State predId $\gets$ renamedIds[index]
+          \State succId $\gets$ renamedIds[index + 1]
+          \State tail $\gets$ getTail(id, 1)
+          \\
+          \If{tail < predId}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State \Return concat(predId, MIN\_TUPLE, tail)
+          \ElsIf{succId < tail}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State offset $\gets$ getLastOffset(succId) - 1
+              \State predOfSuccId $\gets$ createIdFromBase(succId, offset)
+              \State \Return concat(predOfSuccId, MAX\_TUPLE, tail)
+          \Else
+              \State \Return tail
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Main functions to revert an identifier renaming}
+  \label{alg:revertRenameId}
+\end{figure}
+
+Les objectifs de \textsc{revertRenameId} sont les suivants :
+\begin{enumerate*}[label=(\roman*)]
+  \item Restaurer à leur ancienne valeur les identifiants générés causalement avant ou de manière concurrente à l'opération \emph{rename} annulée
+  \item Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
+\end{enumerate*}
+Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+      \path
+          node {\textbf{A}}
+          to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                      ] (S1A-right) {HELO}
+          to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                      ] {HE}
+          to ++(0:\widthblock) node[letter, fill=mylightblue,
+                  label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                      ] {L}
+          to ++(0:\widthletter) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                      ] (S2A-right) {LO}
+          to ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
+          to ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
+          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
+          to ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
+          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+              ] {HELLO};
+
+      \path
+          to ++(270:3) node {\textbf{B}}
+          to ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+          to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+              ] (S2B-right) {HELLO};
+
+      \draw[dotted] (S1A-right) -- (S2A-left);
+      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+      \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
+      \draw[dotted] (S2A-right) -- (between-S2A-S3A) (S3A-right) -- (S4A-left);
+      \draw[->, dashed, thick] (S2B-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{B2}}} (between-S2A-S3A);
+      \draw[->, loosely dash dot, thick, shorten >= 1] (between-S2A-S3A) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S3A-left);
+      \draw[->, dashed, thick, shorten >= 3] (between-S2A-S3A) edge[bend right] (S4A-left.west);
+  \end{tikzpicture}
+  \caption{Reverting a previously applied \emph{rename} operation}
+  \label{fig:revertRenameId}
+\end{figure}
+
+Cette figure reprend le scénario de la \autoref{fig:concurrent-insert-rename-inconsistent}.
+Le noeud A reçoit l'opération \emph{rename} du noeudd B, qui est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
+Selon la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible.
+Il procède donc à ramener son état à un état équivalent à l'époque \epoch{0}, le \ac{LCA} de son époque courante \epoch{A1} et de l'époque cible \epoch{B2}.
+Pour ce faire, il applique \textsc{revertRenameId} à chaque identifiant de son état courant.
+
+\textsc{revertRenameId} détermine quelle stratégie appliquer pour restaurer un identifiant donné en utilisant des motifs.
+Par exemple, les identifiants de la forme \id{pos}{nId~nSeq}{offset} (\id{i}{A1}{offset} dans l'exemple courant) correspondent aux nouvelles valeurs des identifiants qui composent l'\emph{ancien état}.
+Pour retrouver les identifiants d'origine, \textsc{revertRenameId} utilise simplement leur offset puisqu'il correspond à leur index dans l'\emph{ancien état}.
+
+Les identifiants de la forme \id{pos}{nId~nSeq}{offset}$\trm{tail}$ (\eg \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}) correspondent à des identifiants qui ont été soit insérés de façon concurrente à l'opération \emph{rename}, soit causalement après.
+Pour traiter ces identifiant, \textsc{revertRenameId} retire tout d'abord le premier tuple (\id{i}{A1}{1}) pour isoler la queue de l'identifiant (\id{i}{B0}{0}\id{m}{B1}{0}).
+En faisant cela, \textsc{revertRenameId} annule la transformation appliquée à l'identifiant par \textsc{renIdFromPredId} si l'identifiant a été inséré de manière concurrente.
+L'algorithme compare ensuite la queue de l'identifiant aux identifiants de l'élément précédant et de l'élément suivant dans l'\emph{ancien état}.
+Dans cette exemple, nous avons \id{i}{B0}{0}\id{f}{A0}{0} < \id{i}{B0}{0}\id{m}{B1}{0} < \id{i}{B0}{1}.
+L'algorithme peut alors retourner la queue comme identifiant résultant tout en préservant l'ordre souhaité, puisque sa valeur est comprise entre celles des identifiants du prédécesseur et du successeur.
+
+Sinon, cela signifie que l'identifiant donné a été inséré de manière causale après l'opération \emph{rename}.
+Puisqu'aucun identifiant correspondant n'existe encore à l'époque \emph{parente}, \textsc{revertRenameId} peut retourner n'importe quel identifiant tant qu'il préserve l'ordre souhaité.
+Pour ce faire, \textsc{revertRenameId} génère l'identifiant à partir de l'identifiant du prédecesseur ou du successeur, et en utilisant des tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$.
+
+\mnnote{TODO: Modifier exemple pour illustrer le cas de figure où on a besoin de MIN/MAX\_TUPLE}
+
+Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
+
+Comme pour \autoref{alg:renameId}, \autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
+Il s'agit du cas où l'identifiant à restaurer appartient à l'interval des identifiants renommés $\trm{newFirstId} \leq \trm{id} \leq \trm{newLastId}$).
+Les fonctions pour gérer les cas restants sont présentées dans \autoref{app:revert-rename-id}.
+
+Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
+\textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération \emph{rename}.
+Par contre, \textsc{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération \emph{rename}.
+Rejouer une opération \emph{rename} précédemment annulée altère donc ces identifiants.
+Cette modification peut entraîner une divergence entre les noeuds, puis qu'un même élément sera désigné par des identifiants différents.
+
+Ce problème est toutefois évité dans notre système grâce à la relation \emph{priority} utilisée.
+Puisque la relation \emph{priority} est définie en utilisant l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, les noeuds se déplacent seulement vers l'époque la plus à droite de l'\emph{arbre des époques} lorsqu'ils changent d'époque.
+Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations \emph{rename} correspondantes.
+
 \subsection{Mise à jour du processus d'intégration d'une opération}
 \subsection{Mise à jour des règles de récupération de la mémoire des états précédents}
 \section{Validation}
