@@ -1273,8 +1273,48 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 \section{Validation}
 \subsection{Complexité temporelle}
 \subsection{Expérimentations}
+
+Afin de valider l'approche que nous proposons, nous avons procédé à une évaluation expérimentale.
+Les objectifs de cette évaluation étaient de mesurer
+\begin{enumerate*}[label=(\roman*)]
+  \item le surcoût mémoire de la séquence répliquée
+  \item le surcoût en calculs ajouté aux opérations \emph{insert} et \emph{remove} par le mécanisme de renommage
+  \item le coût d'intégration des opérations \emph{rename}.
+\end{enumerate*}
+
+Par le biais de simulations, nous avons généré le jeu de données utilisé par nos benchmarks.
+Ces simulations reproduisent le scénario suivant.
+
 \subsubsection{Scénario d'expérimentation}
+
+Plusieurs authors rédigent de manière collaborative un article en temps réel.
+Dans un premier temps, les auteurs spécifie principalement le contenu de l'article.
+Quelques opérations \emph{remove} sont tout même générées pour simuler des fautes de frappes.
+Une fois que le document atteint une taille arbitrairement définie comme critique, les collaborateurs passent à la seconde phase de la collaboration.
+Au cours de cette phase, les auteurs arrêtent d'ajouter du nouveau contenu mais se concentre à la place sur le remaniement du contenu existant.
+Ceci est simulé en équilibrant le ratio entre les opérations \emph{insert} et \emph{remove}.
+Chaque auteur doit émettre un nombre donné d'opérations \emph{insert} et \emph{remove}.
+La simulation prend fin une fois que tous les collaborateurs ont reçu toutes les opérations.
+Au cours de la simulation, nous prenons des instantanés de l'état des pairs à des points donnés pour suivre leur évolution.
+
 \subsubsection{Implémentation des simulations}
+
+Nous avons effectué nos simulations avec les paramètres expérimentaux suivants : nous avons déployé 10 bots à l'aide de conteneurs Docker sur une même machine.
+Chaque conteneur correspond à un processus Node.js mono-threadé et permet de simuler un auteur.
+Les bots partagent et éditent de façon collaborative le document en utilisant soit LogootSplit soit RenamableLogootSplit en fonction de la session.
+Dans chaque cas, chaque bot génère localement une opération \emph{insert} ou \emph{remove} toutes les 200 $\pm$ 50ms et la diffuse immédiatement aux autres noeuds via un réseau P2P maillé.
+Au cours de la première phase, la probabilité d'émetter une opération \emph{insert} (resp. \emph{remove}) est de 80\% (resp. 20\%).
+Une fois que le document atteint 60k caractères (environ 15 pages), les bots passent à la seconde phase et mettent chaque probabilité à 50\%.
+Après chaque opération locale, le bot peut déplacer son curseur à une autre position aléatoire dans le document avec une probabilité de 5\%.
+Chaque bot génère 15k opérations \emph{insert} ou \emph{remove} et s'arrête une fois qu'il a observé 150k opérations.
+Des instantanés de l'état du bot sont pris de façon périodique, toutes les 10k opérations observées.
+
+De plus, dans le cas de RenamableLogootSplit, 1 à 4 bots sont désignés de façon arbitraire comme des \emph{renaming bots} en fonction de la session.
+Les \emph{renaming bots} génèrent des opérations \emph{rename} toutes les 30k opérations qu'ils observent.
+Ces opérations \emph{rename} sont générées de façon à assurer qu'elles soient concurrentes.
+
+Dans un but de reproductibilité, nous avons mis à disposition notre code, nos benchmarks et les résultats à l'adresse suivante : \url{https://github.com/coast-team/mute-bot-random/}.
+
 \subsection{Résultats}
 \subsubsection{Convergence}
 \subsubsection{Consommation mémoire}
