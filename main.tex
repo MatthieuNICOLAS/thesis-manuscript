@@ -158,7 +158,7 @@
 \acrodef{OT}[OT]{Operational Transformation}
 \acrodefplural{OT}[OT]{Operational Transformations}
 \acrodef{P2P}[P2P]{Pair-à-Pair}
-\acrodef{SEC}[SEC]{Strong Eventual Consistency}
+\acrodef{SEC}[SEC]{Cohérence forte à terme}
 
 %-------------------------------------------------------------------
 %                           Couleurs
@@ -1316,7 +1316,21 @@ Ces opérations \emph{rename} sont générées de façon à assurer qu'elles soi
 Dans un but de reproductibilité, nous avons mis à disposition notre code, nos benchmarks et les résultats à l'adresse suivante : \url{https://github.com/coast-team/mute-bot-random/}.
 
 \subsection{Résultats}
+
+En utilisant les instantanés générés, nous avons effectué plusieurs benchmarks.
+Ces benchmarks évaluent les performances de RenamableLogootSplit et les compare à celles de LogootSplit.
+Les résultats sont présentés et analysés ci-dessous.
+
 \subsubsection{Convergence}
+
+Nous avons tout d'abord vérifié la convergence de l'état des noeuds à l'issue des simulations.
+Pour chaque simulation, nous avons comparé l'état final de chaque noeud à l'aide de leur instantanés respectifs.
+Nous avons pu confirmer que les noeuds convergaient sans aucune autre forme de communication que les opérations, satisfaisant donc le modèle de la \ac{SEC}.
+
+Ce résultat établit un premier jalon dans la validation de la correction de RenamableLogootSplit.
+Il n'est cependant qu'empirique.
+Des travaux supplémentaires pour prouver formellement sa correction doivent être entrepris.
+
 \subsubsection{Consommation mémoire}
 \subsubsection{Temps d'intégration des opérations "simples"}
 \subsubsection{Temps d'intégration de l'opération de renommage}
