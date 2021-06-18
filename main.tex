@@ -6,6 +6,7 @@
 \usepackage{biblatex}
 \bibliography{biblio.bib}
 \usepackage{csquotes}
+\usepackage{booktabs} % \toprule, \midrule, \cmidrule, \bottomrule
 \usepackage[inline]{enumitem}
 \usepackage[french]{minitoc}
 
@@ -1408,6 +1409,63 @@ Au fur et à mesure que la distance entre les deux époques augmente, les perfor
 Néanmoins, le mécanisme de renommage réduit le temps d'intégration de la majorité des opérations, \ie les opérations générées entre deux séries d'opérations \emph{rename}.
 
 \subsubsection{Temps d'intégration de l'opération de renommage}
+
+Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations depuis l'opération \emph{rename} précédente.
+Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.
+Le cas des opérations \emph{rename distantes} se sous-divise en trois catégories.
+Les opérations \emph{distantes directes} désignent les opérations \emph{rename distantes} qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
+Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désigne les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
+D'après la relation \emph{priority}, l'époque introduite est plus grande (resp. petite) que l'époque courante du noeud.
+Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Integration time of rename operations}
+  \label{tab:evolution-integration-time-rename}
+  \resizebox{0.7\columnwidth}{!}{
+      \begin{tabular}{lrrrrr}
+          \toprule
+          \multicolumn{2}{c}{Parameters} & \multicolumn{4}{c}{Integration Time (ms)} \\
+          \cmidrule(lr){1-2} \cmidrule(lr){3-6}
+          Type & Nb Ops (k) &   Mean &   Median & 99\textsuperscript{th} Quant. &    Std \\
+          \midrule
+          Local & 30  &    41.75 &    38.74 &      71.68 &   6.84 \\
+                                  & 60  &    78.32 &    78.16 &      81.42 &   1.24 \\
+                                  & 90  &   119.19 &   118.87 &     124.22 &   2.49 \\
+                                  & 120 &   143.75 &   143.57 &     148.59 &   2.16 \\
+                                  & 150 &   158.04 &   157.95 &     164.38 &   2.49 \\
+          \cmidrule(lr){1-6}
+          Direct remote & 30  &   481.32 &   477.13 &     537.30 &  17.11 \\
+                                  & 60  &   981.62 &   978.24 &    1072.83 &  31.54 \\
+                                  & 90  &  1491.28 &  1481.83 &    1657.58 &  51.10 \\
+                                  & 120 &  1670.00 &  1663.85 &    1814.38 &  50.29 \\
+                                  & 150 &  1694.17 &  1675.95 &    1852.55 &  59.94 \\
+          \cmidrule(lr){1-6}
+          Cc. int. greater epoch & 30  &   643.53 &   643.57 &     682.80 &  13.42 \\
+                                  & 60  &  1317.66 &  1316.39 &    1399.55 &  28.67 \\
+                                  & 90  &  1998.23 &  1994.08 &    2111.98 &  45.37 \\
+                                  & 120 &  2239.71 &  2233.22 &    2368.45 &  50.06 \\
+                                  & 150 &  2241.92 &  2233.61 &    2351.02 &  52.20 \\
+          \cmidrule(lr){1-6}
+          Cc. int. lesser epoch & 30  &     1.36 &     1.30 &       3.53 &   0.37 \\
+                                  & 60  &     2.82 &     2.69 &       4.85 &   0.45 \\
+                                  & 90  &     4.45 &     4.23 &       5.81 &   0.71 \\
+                                  & 120 &     5.33 &     5.10 &       8.78 &   0.90 \\
+                                  & 150 &     5.53 &     5.26 &       8.70 &   0.79 \\
+          \bottomrule
+      \end{tabular}
+  }
+\end{table}
+
+Le principal résultat de ces mesures est que les opérations \emph{rename} sont généralement coûteuses quand comparées aux autres types d'opérations, puisque les noeudsd doivent parcourir et renommer leur état courant complet.
+Les opérations \emph{rename} locales s'intègrent en plusieurs centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} peuvent prendre des secondes si retardées trop longtemps.
+Il est donc nécessaire de prendre en compte ce résultat pour concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur.
+
+Un autre résultat intéressant de ces benchmarks est que les opérations \emph{concurrentes introduisant une plus petite époque} sont rapides à intégrer.
+Puisque ces opérations introduisent une époque qui n'est pas sélectionné comme nouvelle époque cible, les noeuds ne procède pas au renommage de leur état.
+L'intégration des opérations \emph{concurrentes introduisant une plus petite époque} consiste simplement à ajouter l'époque introduite et l'\emph{ancien état} correspondant à l'\emph{arbre des époques}.
+Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
+
 \section{Discussion}
 \subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité plus optimales}
