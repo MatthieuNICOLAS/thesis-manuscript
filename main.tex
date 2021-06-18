@@ -394,10 +394,66 @@ qui fut la première de toutes.
 \end{itemize}
 
 \section{LogootSplit}
+
+LogootSplit \cite{AndreCollaborateCom2013} est l'état de l'art des séquences répliquées à identifiants densément ordonnés.
+Comme expliqué précédemment, LogootSplit utilise des identifiants provenant d'un ordre total dense pour positionner les éléments dans la séquence répliquée.
+
 \subsection{Identifiants}
-\subsubsection{Composition}
-\subsubsection{Stratégie d'allocation}
+
+Pour ce faire, LogootSplit assigne des identifiants composés d'une liste de tuples aux éléments.
+Ces tuples sont composés de quatre éléments :
+\begin{enumerate*}[label=(\roman*)]
+  \item une \emph{position}, qui incarne la position souhaitée de l'élément
+  \item un \emph{identifiant de noeud},
+  \item un \emph{numéro séquentiel de noeud} et
+  \item un \emph{offset}, qui sont combinés pour former des identifiants uniques.
+\end{enumerate*}
+En comparant les identifiants en utilisant l'ordre lexicographique, LogootSplit est capable de déterminer la position d'un élément par rapport aux autres.
+Dans ce manuscrit, nous représentons les identifiants par le biais de la notation suivante : \id{position}{node\_id~node\_seq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{node\_id}$ une lettre majuscule et $\trm{node\_seq}$ et $\trm{offset}$ des entiers.
+
 \subsection{Aggrégation dynamique d'élements en blocs}
+
+Au lieu de stocker les identifiants de chaque élément de la séquence, LogootSplit propose d'aggréger de façon dynamique les éléments dans des blocs.
+Rassembler les éléments en blocs permet à LogootSplit d'assigner logiquement un identifiant à chaque élément, en utilisant un interval d'identifiants, tout en ne stockant réellement que la longueur du bloc et l'identifiant de son premier élément.
+LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un bloc.
+Nous appelons \emph{contigus} deux identifiants qui sont identiques, sauf pour leur dernier \emph{offset} et avec les deux \emph{offsets} étant consécutifs.
+Nous représentons l'interval d'identifiants qui composent un bloc à l'aide du formalisme suivant : \id{position}{node\_id~node\_seq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant du bloc et $\trm{end}$ du dernier.
+
+La \autoref{fig:logootsplit-seq} un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
+LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
+
+\begin{figure}[!ht]
+  \centering
+  \subfloat[Elements with their corresponding identifiers]{
+      \begin{minipage}{.48\linewidth}
+      \centering
+          \begin{tikzpicture}
+              \path
+                  node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{1}}] {L}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{2}}] {O};
+          \end{tikzpicture}
+          \label{fig:logootsplit-seq-as-letters}
+      \end{minipage}}
+  \hfil
+  \subfloat[Elements grouped into a block]{
+      \begin{minipage}{.48\linewidth}
+      \centering
+          \begin{tikzpicture}
+              \path
+                  node[block, label=below:{\id{i}{B0}{0..2}}] {HLO};
+          \end{tikzpicture}
+          \label{fig:logootsplit-seq-as-block}
+      \end{minipage}}
+  \caption{Representation of a LogootSplit sequence containing the elements "HLO"}
+  \label{fig:logootsplit-seq}
+\end{figure}
+
+Cette fonctionnalité réduit le nombre d'identifiants stockés au sein de la structure de données, puisque les identifiants sont conservés à l'échelle des blocs plutôt qu'à l'échelle de chaque élément.
+Ceci permet de réduire de manière significative le surcoût en métadonnées de la structure de données.
+
+\subsection{Stratégie d'allocation}
+
 \subsection{Limites}
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
 \subsection{Core-Nebula}
@@ -1288,7 +1344,7 @@ Ces simulations reproduisent le scénario suivant.
 
 \subsubsection{Scénario d'expérimentation}
 
-Plusieurs authors rédigent de manière collaborative un article en temps réel.
+Plusieurs auteurs rédigent de manière collaborative un article en temps réel.
 Dans un premier temps, les auteurs spécifie principalement le contenu de l'article.
 Quelques opérations \emph{remove} sont tout même générées pour simuler des fautes de frappes.
 Une fois que le document atteint une taille arbitrairement définie comme critique, les collaborateurs passent à la seconde phase de la collaboration.
