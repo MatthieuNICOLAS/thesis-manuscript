@@ -1362,7 +1362,51 @@ Pour récapituler les résultats présentés, le mécanisme de renommage introdu
 Mais le surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations \emph{rename} deviennent causalement stables.
 Dans la section \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer le surcoût temporaire en métadonnées.
 
-\subsubsection{Temps d'intégration des opérations "simples"}
+\subsubsection{Temps d'intégration des opérations standards}
+
+Nous avons ensuite comparé l'évolution du temps d'intégration des opérations standards, \ie les opérations \emph{insert} et \emph{remove}, sur des documents LogootSplit et RenamableLogootSplit.
+Puisque les deux types d'opérations partagent la même complexité temporelle, nous avons seulement utilisé des opérations \emph{insert} dans nos benchmarks.
+Nous faisons par contre la différence entre les mises à jours \emph{locales} et \emph{distantes}.
+Conceptuellement, les modifications locales peuvent être décomposées comme présenté dans \cite{baquero2017pure} en les deux étapes suivantes :
+\begin{enumerate*}[label=(\roman*)]
+  \item la génération de l'opération correspondante
+  \item l'application de l'opération correspondante sur l'état local.
+\end{enumerate*}
+Cependant, pour des raisons de performances, nous avons fusionné ces deux étapes dans notre implémentation.
+Nous distinguons donc les résultats des modifications \emph{locales} et des modifications \emph{distantes} dans nos benchmarks.
+La \autoref{fig:evolution-integration-time-insert} présente les résultats obtenus.
+
+\begin{figure}[!ht]
+  \centering
+  \subfloat[Local updates]{
+      \includegraphics[width=0.45\columnwidth]{img/integration-time-boxplot-local-operations-without-outliers.pdf}
+      \label{fig:evolution-integration-time-local-insert}}
+  \hfil
+  \subfloat[Remote updates]{
+      \includegraphics[width=0.45\columnwidth]{img/integration-time-boxplot-remote-operations-without-outliers.pdf}
+      \label{fig:evolution-integration-time-remote-insert}}
+  \caption{Integration time of standard operations}
+  \label{fig:evolution-integration-time-insert}
+\end{figure}
+
+Dans ces figures, les boxplots orange correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleu sur des documents RenamableLogootSplit.
+Bien que les deux mesures soient initialement équivalentes, les temps d'intégration sur des documents RenamableLogootSplit sont ensuite réduits par rapport à ceux de LogootSplit une fois que des opérations \emph{rename} ont été intégrées.
+Cette amélioration s'explique par le fait que l'opération \emph{rename} optimise la représentation interne de la séquence.
+
+Dans le cadre des opérations distantes, nous avons mesuré des temps d'intégration spécifiques à RenamableLogootSplit : le temps d'intégration d'opérations distantes provenant d'époques \emph{parentes} et d'époques \emph{soeurs}, respectivement affiché sous la forme de boxplots blanche et rouge dans la \autoref{fig:evolution-integration-time-remote-insert}.
+
+Les opérations distantes provenant d'époques \emph{parentes} sont des opérations générées de manière concurrente à l'opération \emph{rename} mais appliquées après cette dernière.
+Puisque l'opération doit être transformée au préalable en utilisant \textsc{renameId}, nous observons un surcoût computationnel par rapport aux autres opérations.
+Mais ce surcoût est compensé par l'optimisation de la représentation interne de la séquence effectuée par l'opération \emph{rename}.
+
+Concernant les opérations provenant d'époques \emph{soeurs}, nous observons un surcoût additionnel puisque les noeuds doivent tout d'abord annulé les effets de l'opération \emph{rename} concurrente en utilisant \textsc{revertRenameId}.
+À cause de cette étape supplémentaire, les performances de RenamableLogootSplit pour ces opérations sont comparables à celles de LogootSplit.
+
+Pour récapituler, les fonctions de transformation ajoutent un surcoût aux temps d'intégration des opérations concurrentes aux opérations \emph{rename}.
+Malgré ce surcoût, RenamableLogootSplit obtient de meilleures performances que LogootSplit tant que la distance entre l'époque de génération de l'opération et l'époque courante du noeud reste limité.
+Au fur et à mesure que la distance entre les deux époques augmente, les performances de RenamableLogootSplit diminuent, jusqu'à atteindre des performances moins bonnes que celles de LogootSplit, puisque le surcoût est multiplié.
+Néanmoins, le mécanisme de renommage réduit le temps d'intégration de la majorité des opérations, \ie les opérations générées entre deux séries d'opérations \emph{rename}.
+
 \subsubsection{Temps d'intégration de l'opération de renommage}
 \section{Discussion}
 \subsection{Implémentation alternative à base d'operation-log}
