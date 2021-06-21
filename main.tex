@@ -515,12 +515,12 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 
 Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{nicolas:hal-01932552,nicolas:hal-02526724}.
 Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
-Nous introduisons une opération de renommage qui permet de
+Nous introduisons une opération \emph{rename} qui permet de
 \begin{enumerate*}
   \item réassigner des identifiants plus courts aux différents éléments de la séquence
   \item fusionner les blocs composant la séquence.
 \end{enumerate*}
-Ces deux actions permettent à l'opération de renommage de produire un nouvel état minimisant son surcoût en métadonnées.
+Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en métadonnées.
 
 \section{Modèle du système}
 
@@ -543,12 +543,68 @@ Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie 
 Ce mécanisme permet aux noeuds de se synchroniser par paires, en détectant et ré-échangeant les messages perdus.
 
 \section{Définition de l'opération de renommage}
-\subsection{Objectifs}
-\subsection{Propriétés}
-\subsection{Contraintes} % Non-bloquante, performante (pour un utilisateur)
+
+L'objectif de l'opération \emph{rename} est de réassigner de nouveaux identifiants aux éléments de la séquence répliquée sans modifier son contenu.
+Puisque les identifiants sont des métadonnées utilisées par la structure de données uniquement afin de résoudre les conflits, les utilisateurs ignorent leur existence.
+Les opérations \emph{rename} sont donc des opérations systèmes : elles sont émises et appliquées par les noeuds en coulisses, sans aucune intervention des utilisateurs.
+
+Afin de garantir le respect du modèle de cohérence \ac{SEC}, nous définissons plusieurs propriétés de sécurité que l'opération \emph{rename} doit respecter.
+Ces propriétés sont inspirées principalement par celles proposées dans \cite{zawirski:hal-01248197}.
+
+\begin{property}(Déterminisme)
+  Les opérations \emph{rename} sont intégrées par les noeuds sans aucune coordination.
+  Pour assurer que l'ensemble des noeuds atteigne un état équivalent à terme, une opération \emph{rename} donnée doit toujours générer le même nouvel identifiant à partir de l'identifiant courant.
+\end{property}
+
+\begin{property}(Préservation de l'intention de l'utilisateur)
+  Bien que l'opération \emph{rename} n'est pas elle-même n'incarne pas une intention de l'utilisateur, elle ne doit pas entrer en conflit avec les actions des utilisateurs.
+  Notamment, les opérations \emph{rename} ne doivent pas annuler ou altérer le résultat d'opérations \emph{insert} et \emph{remove} du point de vue des utilisateurs.
+\end{property}
+
+\begin{property}(Séquence bien formée)
+  La séquence répliquée doit être bien formée.
+  Appliquée une opération \emph{rename} sur une séquence bien formée doit produire une nouvelle séquence bien formée.
+  Une séquence bien formée doit respecter les propriétés suivantes :
+  \begin{itemize}[noitemsep]
+    \item[~]
+    \begin{subproperty}(Préservation de l'unicité)
+      Chaque identifiant doit être unique.
+      Donc, pour une opération \emph{rename} donnée, chaque identifiant doit être associé à un nouvel identifiant distinct.
+    \end{subproperty}
+    \item[~]
+    \begin{subproperty}(Préservation de l'ordre)
+      Les éléments de la séquence doivent être triés en fonction de leur identifiants.
+      L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération \emph{renalme}.
+    \end{subproperty}
+  \end{itemize}
+\end{property}
+
+\begin{property}(Commutativité avec les opérations concurrentes)
+  \label{prop:commutativity}
+  Les opérations concurrentes peuvent être délivrées dans des ordres différents à chaque noeud.
+  Afin de garantir la convergence des réplicas, l'ordre d'application d'un ensemble d'opérations concurrentes ne doit pas avoir d'impact sur l'état résultant.
+  L'opération \emph{rename} doit donc être commutative avec n'importe quelle opération concurrente.
+\end{property}
+
+La \autoref{prop:commutativity} est particulièrement difficile à assurer.
+Cette difficulté est dûe au fait que les opérations \emph{rename} modifie les identifiants assignés aux éléments.
+Cependant, les autres opérations telles que les opérations \emph{insert} et \emph{remove} reposent sur ces identifiants pour spécifier où insérer les éléments ou lesquels supprimer.
+Les opérations \emph{rename} sont donc intraséquement incompatibles avec les opérations \emph{insert} et \emph{remove} concurrentes.
+De la même manière, des opérations \emph{rename} concurrentes peuvent réassigner des identifiants différents à des éléments donnés.
+Les opérations \emph{rename} concurrentes ne sont donc pas commutatives.
+Par conséquent, il est nécessaire de concevoir et d'utiliser des méthodes de résolution de conflits pour assurer la \autoref{prop:commutativity}.
+
+Dans un souci de simplicité, la présentation de l'opération \emph{rename} est divisée en deux parties.
+Dans le \autoref{chap:centralised-rls}, nous présentons l'opération \emph{rename} proposée avec l'hypothèse qu'aucune opération \emph{rename} concurrente ne peut être générée.
+Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opération \emph{rename} elle-même ainsi que sur comment gérer les opérations \emph{insert} et \emph{remove} concurrentes.
+Ensuite, dans le \autoref{chap:distributed-rls}, nous supprimons cette hypothèse.
+Nous présentons alors notre approche pour gérer les scénarios avec des opérations \emph{rename} concurrentes.
 
 \NumberThisInToc
 \chapter{Renommage dans un système centralisé}
+
+\label{chap:centralised-rls}
+
 \minitoc
 \section{RenamableLogootSplit}
 \subsection{Opération de renommage proposée}
@@ -848,6 +904,9 @@ De plus, son exécution réduirait le temps d'intégration des prochaines opéra
 
 \NumberThisInToc
 \chapter{Renommage dans un système distribué}
+
+\label{chap:distributed-rls}
+
 \minitoc
 \section{RenamableLogootSplit v2}
 \subsection{Conflits en cas de renommages concurrents}
