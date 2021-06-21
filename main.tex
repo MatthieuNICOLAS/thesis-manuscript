@@ -454,7 +454,51 @@ Ceci permet de réduire de manière significative le surcoût en métadonnées d
 
 \subsection{Stratégie d'allocation}
 
+\mnnote{TODO: Ajouter et dérouler exemple où des noeuds insère dans une séquence répliquée pour illustrer la façon de choisir position, d'append à un bloc, ou de split un bloc}
+
 \subsection{Limites}
+
+Comme indiqué précédemment, la taille des identifiants provenant d'un ordre total dense est variable.
+Quand les noeuds insèrent de nouveaux éléments entre deux autres ayant la même valeur de \emph{position}, LogootSplit n'a pas d'autre choix que d'augmenter la taille de l'identifiant résultant.
+La \autoref{fig:example-split} illustre de tels cas.
+Dans cet exemple, puisque le noeud A insère un nouvel élément entre deux identifiants contigus \id{i}{B0}{0} et \id{i}{B0}{1}, LogootSplit ne peut pas générer un identifiant adapté de la même taille.
+Pour respecter l'ordre souhaité, LogootSplit génère un identifiant en ajoutant un nouveau tuple à l'identifiant du prédecesseur : \id{i}{B0}{0}\id{f}{A0}{0}.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..2}}] (HLO) {HLO}
+          to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (H) {H}
+          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] {LO};
+
+      \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "e"}\\\emph{between}\\\emph{"h" and "l"}} (H);
+  \end{tikzpicture}
+  \caption{Insertion leading to longer identifiers}
+  \label{fig:example-split}
+\end{figure}
+
+Par conséquent, la taille des identifiants a tendance à croître alors que le système progresse.
+Cette croissance impacte négativement les performances de la structure de données sur plusieurs aspects.
+Puisque les identifiants attachés aux éléments deviennent plus long, le surcoût en métadonnées augmente.
+Ceci augmente aussi la consommation en bande-passante puisque les noeuds doivent diffuser les identifiants aux autres.
+
+\mnnote{TODO: Ajouter une phrase pour expliquer que la croissance des identifiants impacte aussi le temps d'intégration des modifications}
+
+De plus, le nombre de blocs composant la séquence répliquée augmente au fil du temps.
+En effet, plusieurs contraintes sur la génération d'identifiants empêchent les noeuds d'ajouter des nouveaux éléments aux blocs existants.
+Par exemple, seul le noeud qui a généré un bloc peut ajouter un élément à ce dernier.
+Ces limitations provoquent la génération de nouveau blocs.
+La séquence se retrouve finalement fragmentée en de nombreux blocs de seulement quelques caractères chacun.
+Cependant, aucun mécanisme pour fusionner les blocs à posteriori n'est fourni.
+L'efficacité de la structure décroît donc puisque chaque bloc entraîne un surcoût.
+
+Comme illustré plus loin, nous avons mesuré au cours de nos évaluations que le contenu représente à terme moins de 1\% de taille de la structure de données.
+Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée.
+Il est donc nécessaire de proposer des mécanismes et techniques afin de mitiger les problèmes soulignés précédemments.
+
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
 \subsection{Core-Nebula}
 \subsection{LSEQ}
@@ -484,7 +528,7 @@ Le système est composé d'un ensemble dynamique de noeuds, les noeuds pouvant r
 Les noeuds collaborent afin de construire et maintenir une séquence à l'aide de RenamableLogootSplit.
 Chaque noeud possède une copie de la séquence et peut l'éditer sans se coordonner avec les autres.
 Les modifications des noeuds prennent la forme d'opérations qui sont appliquées immédiatement à leur copie locale.
-Les opérations sont ensuite transmises de manière asynchrone aux autres noeudds pour qu'ils puissent à leur tour appliquer les modifications à leur copie.
+Les opérations sont ensuite transmises de manière asynchrone aux autres noeuds pour qu'ils puissent à leur tour appliquer les modifications à leur copie.
 
 Les noeuds communiquement par l'intermédiaire d'un réseau \ac{P2P}.
 Ce réseau est non-fiable : les messages peuvent être perdus, ré-ordonnés ou même livrés à plusieurs reprises.
@@ -1007,7 +1051,7 @@ Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le 
 \label{sec:reverting-rename-ops}
 
 Nous présentons maintenant la fonction \textsc{revertRenameId}.
-Décrite dans \autoref{alg:revertRenameId}, cette fonction permet aux noeuds d'annuler une opération \emph{rename} appliquée précéddemment.
+Décrite dans \autoref{alg:revertRenameId}, cette fonction permet aux noeuds d'annuler une opération \emph{rename} appliquée précédemment.
 Pour ce faire, \textsc{revertRenameId} associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
 
 \begin{figure}[!ht]
@@ -1125,7 +1169,7 @@ Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
 \end{figure}
 
 Cette figure reprend le scénario de la \autoref{fig:concurrent-insert-rename-inconsistent}.
-Le noeud A reçoit l'opération \emph{rename} du noeudd B, qui est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
+Le noeud A reçoit l'opération \emph{rename} du noeud B, qui est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
 Selon la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible.
 Il procède donc à ramener son état à un état équivalent à l'époque \epoch{0}, le \ac{LCA} de son époque courante \epoch{A1} et de l'époque cible \epoch{B2}.
 Pour ce faire, il applique \textsc{revertRenameId} à chaque identifiant de son état courant.
@@ -1169,7 +1213,7 @@ Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc 
 Les noeuds stockent les époques et les \emph{anciens états} correspondant pour transformer les identifiants d'une époque à l'autre.
 Au fur et à mesure que le système progresse, certaines époques et métadonnées associées deviennent obsolètes puisque plus aucune opération ne peut être émise depuis ces époques.
 Les noeuds peuvent alors supprimer ces époques.
-Dans cette section, nous présentons un mécanisme permettant aux noeudds de déterminer les époques obsolètes.
+Dans cette section, nous présentons un mécanisme permettant aux noeuds de déterminer les époques obsolètes.
 
 Pour proposer un tel mécanisme, nous nous reposons sur la notion de \emph{stabilité causale des opérations} \cite{10.1007/978-3-662-43352-2_11}.
 Une opération est causalement stable une fois qu'elle a été délivrée à tous les noeuds.
