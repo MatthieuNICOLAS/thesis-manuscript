@@ -883,7 +883,7 @@ Une extension possible est de concevoir \textsc{renameBlock}, une version améli
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
 
 \subsection{Processus d'intégration d'une opération}
-\subsection{Évolution du modèle de cohérence}
+\subsection{Évolution du modèle de livraison}
 
 \mnnote{TODO: Revoir si une livraison causale de l'opération \emph{rename} (et non epoch-based) peut avoir un intérêt}
 
@@ -919,8 +919,20 @@ De plus, son exécution réduirait le temps d'intégration des prochaines opéra
   \item \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
 \end{itemize}
 
-\subsection{Compression de l'opération de renommage}
-\subsection{Limitation de la taille de l'opération de renommage}
+\subsection{Compression et limitation de la taille de l'opération de renommage}
+
+Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
+Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
+En effet, un identifiant peut être caractérisé de manière unique par le triplet composé de l'\emph{identifiant de noeud}, du \emph{numéro séquentiel} et de l'\emph{offset} de son dernier tuple.
+Par conséquent, un bloc peut être identifié de manière unique à partir du triplet signature de son identifiant de début et de sa longueur.
+Cette méthode nous permet de réduire les données à diffuser dans le cadre de l'opération \emph{rename} à un montant fixe par bloc.
+
+Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
+De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
+
+Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
+En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
+
 \section{Conclusion}
 % \include{assets/chapter_baye_approach}
 
