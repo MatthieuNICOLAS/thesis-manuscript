@@ -893,6 +893,22 @@ De plus, son exécution réduirait le temps d'intégration des prochaines opéra
 \subsection{Complexité temporelle}
 \section{Discussion}
 \subsection{Stockage des états précédents sur disque}
+
+Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
+Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
+\begin{enumerate*}[label=(\roman*)]
+  \item des noeuds ont émis récemment des opérations \emph{rename}
+  \item des noeuds se sont récemment reconnectés
+\end{enumerate*}
+Entre deux de ces évènements spécifiques, les \emph{anciens états} ne sont pas nécessaires pour traiter les opérations.
+
+Nous pouvons donc proposer l'optimisation suivante : décharger les \emph{anciens états} sur le disque jusqu'à leur prochaine utilisation ou jusqu'à ce qu'ils puissent être supprimés de manière sûre.
+Décharger les \emph{anciens états} sur le disque permet de mitiger le surcoût en mémoire introduit par le mécanisme de renommage.
+En échange, cela augmente le temps d'intégration des opérations nécessitant un \emph{ancien état} qui a été déchargé précédemment.
+
+Les noeuds peuvent adopter différentes stratégies, en fonction de leurs contraintes, pour déterminer les \emph{anciens états} comme déchargeables et pour les récupérer de manière préemptive.
+La conception de ces stratégies peut reposer sur différentes heuristiques : les époques des noeuds actuellement connectés, le nombre de noeuds pouvant toujours émettre des opérations concurrentes, le temps écoulé depuis la dernière utilisation de l'\emph{ancien état}...
+
 \subsection{Utilisation de l'opération de renommage comme snapshot}
 
 \begin{itemize}
