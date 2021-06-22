@@ -10,7 +10,7 @@
 \usepackage[inline]{enumitem}
 \usepackage[french]{minitoc}
 
-\usepackage{color}
+\usepackage{xcolor}
 \AtBeginDocument{
 \definecolor{pdfurlcolor}{rgb}{0,0,0}
 \definecolor{pdfcitecolor}{rgb}{0,0,0}
@@ -38,7 +38,7 @@
 \newtheorem{subproperty}{Propriété}[property]
 
 \usepackage{algpseudocode}
-
+\usepackage{caption}
 \usepackage{hyperref}
 \hypersetup{hidelinks}
 
@@ -919,7 +919,7 @@ De plus, son exécution réduirait le temps d'intégration des prochaines opéra
   \item \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
 \end{itemize}
 
-\subsection{Compression et limitation de la taille de l'opération de renommage}
+\subsection{Compression et limitation de la taille de l'opération \emph{rename}}
 
 Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
 Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
@@ -1466,6 +1466,27 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
 \section{Validation}
 \subsection{Complexité temporelle}
+
+\begin{table}[!ht]
+  \centering
+  \caption{Complexité temporelle des différentes opérations}
+  \label{tab:time-complexity-operations-with-revertRenameId}
+  %\resizebox{0.5\columnwidth}{!}{
+  \begin{tabular}{lcc}
+      \toprule
+      Type d'opération & \multicolumn{2}{c}{Complexité temporelle} \\
+      \cmidrule(lr){2-3}
+        & Locale &   Distante \\
+      \midrule
+      \emph{insert} & log($n$) & $k$ + $l$ * log($m$) + log($n$) \\
+      \emph{remove} & log($n$) & $k$ + $l$ * log($m$) + log($n$) \\
+      \emph{rename} & $n$ & $k$ * $n$ + $l$ * ($n$ + $m$) \\
+      \bottomrule
+  \end{tabular}
+  \caption*{$n$ : nombre de blocs, $k$ : nombre d'opérations \emph{rename} à inverser, $l$ : nombre d'opérations \emph{rename} à appliquer, $m$ : nombre de blocs de l'\emph{ancien état} de l'opération \emph{rename} à inverser/appliquer}
+  %}
+\end{table}
+
 \subsection{Expérimentations}
 
 Afin de valider l'approche que nous proposons, nous avons procédé à une évaluation expérimentale.
