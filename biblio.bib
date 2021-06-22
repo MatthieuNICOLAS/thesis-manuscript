@@ -49,6 +49,44 @@
   series = {PaPEC '14}
 }
 
+@article{10.1145/2578855.2535848,
+author = {Burckhardt, Sebastian and Gotsman, Alexey and Yang, Hongseok and Zawirski, Marek},
+title = {Replicated Data Types: Specification, Verification, Optimality},
+year = {2014},
+issue_date = {January 2014},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {49},
+number = {1},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/2578855.2535848},
+doi = {10.1145/2578855.2535848},
+abstract = {Geographically distributed systems often rely on replicated eventually consistent data stores to achieve availability and performance. To resolve conflicting updates at different replicas, researchers and practitioners have proposed specialized consistency protocols, called replicated data types, that implement objects such as registers, counters, sets or lists. Reasoning about replicated data types has however not been on par with comparable work on abstract data types and concurrent data types, lacking specifications, correctness proofs, and optimality results.To fill in this gap, we propose a framework for specifying replicated data types using relations over events and verifying their implementations using replication-aware simulations. We apply it to 7 existing implementations of 4 data types with nontrivial conflict-resolution strategies and optimizations (last-writer-wins register, counter, multi-value register and observed-remove set). We also present a novel technique for obtaining lower bounds on the worst-case space overhead of data type implementations and use it to prove optimality of 4 implementations. Finally, we show how to specify consistency of replicated stores with multiple objects axiomatically, in analogy to prior work on weak memory models. Overall, our work provides foundational reasoning tools to support research on replicated eventually consistent stores.},
+journal = {SIGPLAN Not.},
+month = jan,
+pages = {271–284},
+numpages = {14},
+keywords = {eventual consistency, replication, weak memory}
+}
+
+@inproceedings{10.1145/2535838.2535848,
+author = {Burckhardt, Sebastian and Gotsman, Alexey and Yang, Hongseok and Zawirski, Marek},
+title = {Replicated Data Types: Specification, Verification, Optimality},
+year = {2014},
+isbn = {9781450325448},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2535838.2535848},
+doi = {10.1145/2535838.2535848},
+abstract = {Geographically distributed systems often rely on replicated eventually consistent data stores to achieve availability and performance. To resolve conflicting updates at different replicas, researchers and practitioners have proposed specialized consistency protocols, called replicated data types, that implement objects such as registers, counters, sets or lists. Reasoning about replicated data types has however not been on par with comparable work on abstract data types and concurrent data types, lacking specifications, correctness proofs, and optimality results.To fill in this gap, we propose a framework for specifying replicated data types using relations over events and verifying their implementations using replication-aware simulations. We apply it to 7 existing implementations of 4 data types with nontrivial conflict-resolution strategies and optimizations (last-writer-wins register, counter, multi-value register and observed-remove set). We also present a novel technique for obtaining lower bounds on the worst-case space overhead of data type implementations and use it to prove optimality of 4 implementations. Finally, we show how to specify consistency of replicated stores with multiple objects axiomatically, in analogy to prior work on weak memory models. Overall, our work provides foundational reasoning tools to support research on replicated eventually consistent stores.},
+booktitle = {Proceedings of the 41st ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+pages = {271–284},
+numpages = {14},
+keywords = {replication, weak memory, eventual consistency},
+location = {San Diego, California, USA},
+series = {POPL '14}
+}
+
 @misc{baquero2017pure,
   title={Pure Operation-Based Replicated Data Types},
   author={Carlos Baquero and Paulo Sergio Almeida and Ali Shoker},
@@ -85,6 +123,25 @@ isbn="978-3-319-26850-7"
    year={2018},
    month={Jan},
    pages={162–173}
+}
+
+@article{10.1145/3360580,
+  author = {Kaki, Gowtham and Priya, Swarn and Sivaramakrishnan, KC and Jagannathan, Suresh},
+  title = {Mergeable Replicated Data Types},
+  year = {2019},
+  issue_date = {October 2019},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {3},
+  number = {OOPSLA},
+  url = {https://doi.org/10.1145/3360580},
+  doi = {10.1145/3360580},
+  abstract = {Programming geo-replicated distributed systems is challenging given the complexity of reasoning about different evolving states on different replicas. Existing approaches to this problem impose significant burden on application developers to consider the effect of how operations performed on one replica are witnessed and applied on others. To alleviate these challenges, we present a fundamentally different approach to programming in the presence of replicated state. Our insight is based on the use of invertible relational specifications of an inductively-defined data type as a mechanism to capture salient aspects of the data type relevant to how its different instances can be safely merged in a replicated environment. Importantly, because these specifications only address a data type's (static) structural properties, their formulation does not require exposing low-level system-level details concerning asynchrony, replication, visibility, etc. As a consequence, our framework enables the correct-by-construction synthesis of rich merge functions over arbitrarily complex (i.e., composable) data types. We show that the use of a rich relational specification language allows us to extract sufficient conditions to automatically derive merge functions that have meaningful non-trivial convergence properties. We incorporate these ideas in a tool called Quark, and demonstrate its utility via a detailed evaluation study on real-world benchmarks.},
+  journal = {Proc. ACM Program. Lang.},
+  month = oct,
+  articleno = {154},
+  numpages = {29},
+  keywords = {Version Control, Weak Consistency, CRDTs, Git, Replication}
 }
 
 @INPROCEEDINGS{enes2019,
@@ -692,6 +749,42 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   keywords = "Collaborative text editing, Specification, Metadata lower bound, Eventual consistency",
 }
 
+@inproceedings{10.1145/3358504.3361231,
+  author = {Bauwens, Jim and Gonzalez Boix, Elisa},
+  title = {Memory Efficient CRDTs in Dynamic Environments},
+  year = {2019},
+  isbn = {9781450369879},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3358504.3361231},
+  doi = {10.1145/3358504.3361231},
+  abstract = {Modern distributed applications increasingly replicate data in order to guarantee both high availability of systems and an optimal user experience. Conflict-Free Replicated Data Types (CRDTs) are a family of data types specially designed for highly available systems which guarantee some form of eventual consistency. However, memory usage may grow unboundedly in their implementations, as garbage collection of meta-data is not tackled in most approaches.  In this paper, we explore a memory management model for operation-based CRDTs in dynamic setting, where nodes can dynamically join a network, and where the implementation can remove unnecessary meta-data employed by CRDTs used to determine the order of operations applied in different replicas. We first describe how new nodes will be brought up-to-date and fully linked with other replicas, and later we introduce our memory management model which allows meta-data to be removed.  We benchmark the memory usage of an add-wins set using different garbage collection techniques in various situations and show how our approach can be beneficial in comparison to state of the art techniques.},
+  booktitle = {Proceedings of the 11th ACM SIGPLAN International Workshop on Virtual Machines and Intermediate Languages},
+  pages = {48–57},
+  numpages = {10},
+  keywords = {Dynamic networks, CRDTs, Replication, Memory management},
+  location = {Athens, Greece},
+  series = {VMIL 2019}
+}
+
+@inproceedings{10.1145/3380787.3393685,
+  author = {Bauwens, Jim and Boix, Elisa Gonzalez},
+  title = {Flec: A Versatile Programming Framework for Eventually Consistent Systems},
+  year = {2020},
+  isbn = {9781450375245},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3380787.3393685},
+  doi = {10.1145/3380787.3393685},
+  abstract = {Modern distributed applications increasingly replicate data in order to guarantee both high availability of systems and an optimal user experience. Conflict-Free Replicated DataTypes (CRDTs) are a family of data types specially designed for highly available systems which guarantee some form of eventual consistency. However, currently CRDT implementations are hard to integrate with existing applications and/or programming languages. In this extended abstract we describe Flec, a versatile programming framework for operation-based CRDTs that ultimately can be run in any environment supporting WebAssembly.},
+  booktitle = {Proceedings of the 7th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {12},
+  numpages = {4},
+  keywords = {replication, web-assembly, reflection, middleware, CRDTs, eventual consistency},
+  location = {Heraklion, Greece},
+  series = {PaPoC '20}
+}
+
 @inbook{10.1145/3426182.3426183,
   author = {Bauwens, Jim and Gonzalez Boix, Elisa},
   title = {From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs},
@@ -848,6 +941,44 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   pages = {240–247},
   numpages = {8},
   keywords = {replicated data, Availability, mutual consistency, distributed systems, network partitioning, network failures}
+}
+
+% CRDT + OT
+@inproceedings{10.1145/3380787.3393687,
+  author = {Weidner, Matthew and Miller, Heather and Meiklejohn, Christopher},
+  title = {Composing and Decomposing Op-Based CRDTs with Semidirect Products: (Summary)},
+  year = {2020},
+  isbn = {9781450375245},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3380787.3393687},
+  doi = {10.1145/3380787.3393687},
+  abstract = {Operation-based Conflict-free Replicated Data Types (CRDTs) are eventually consistent replicated data types that automatically resolve conflicts between concurrent operations. Opbased CRDTs must be designed differently for each data type, and current designs use ad-hoc techniques to handle concurrent operations that do not naturally commute.We present a new construction, the semidirect product of op-based CRDTs, which combines the operations of two CRDTs into one while handling conflicts between their concurrent operations in a uniform way. We demonstrate the construction's utility by decomposing several existing CRDTs as semidirect products of simpler CRDTs, as well as by using it to construct novel CRDTs. Although it reproduces common CRDT semantics, the semidirect product can be viewed as a restricted kind of operational transformation, thus forming a bridge between the two fields.},
+  booktitle = {Proceedings of the 7th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {14},
+  numpages = {2},
+  keywords = {eventual consistency, CRDTs, operational transformation},
+  location = {Heraklion, Greece},
+  series = {PaPoC '20}
+}
+
+@article{10.1145/3408976,
+  author = {Weidner, Matthew and Miller, Heather and Meiklejohn, Christopher},
+  title = {Composing and Decomposing Op-Based CRDTs with Semidirect Products},
+  year = {2020},
+  issue_date = {August 2020},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {4},
+  number = {ICFP},
+  url = {https://doi.org/10.1145/3408976},
+  doi = {10.1145/3408976},
+  abstract = {Operation-based Conflict-free Replicated Data Types (CRDTs) are eventually consistent replicated data types that automatically resolve conflicts between concurrent operations. Op-based CRDTs must be designed differently for each data type, and current designs use ad-hoc techniques to handle concurrent operations that do not naturally commute. We present a new construction, the semidirect product of op-based CRDTs, which combines the operations of two CRDTs into one while handling conflicts between their concurrent operations in a uniform way. We demonstrate the construction's utility by using it to construct novel CRDTs, as well as decomposing several existing CRDTs as semidirect products of simpler CRDTs. Although it reproduces common CRDT semantics, the semidirect product can be viewed as a restricted kind of operational transformation, thus forming a bridge between these two opposing techniques for constructing replicated data types.},
+  journal = {Proc. ACM Program. Lang.},
+  month = aug,
+  articleno = {94},
+  numpages = {27},
+  keywords = {Eventual Consistency, Operational Transformation, CRDTs}
 }
 
 % Effect of delay
