@@ -1727,6 +1727,18 @@ Les noeuds peuvent donc réduire de manière significative le coût d'intégrati
 \section{Discussion}
 \subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité plus optimales}
+
+Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationel significatif dans certains cas.
+Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
+
+La relation \emph{priority} devrait donc être conçu pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
+Pour concevoir une relation \emph{priority} efficace, nous pourrions incorporer dans les opérations \emph{rename} des métriques qui représentent l'état du système et le travail accumulé sur le document (nombre de noeuds actuellement à l'époque \emph{parente}, nombre d'opérations générées depuis l'époque parente, taille du document...).
+De cette manière, nous pourrions favoriser la branche de l'\emph{arbre des époques} regroupant les collaborateurs les plus actifs et empêcher les noeuds isolés d'imposer leurs opérations \emph{rename}.
+
+Afin d'offrir une plus grande flexibilité dans la conception de la relation \emph{priority}, il est nécessaire de retirer la contrainte interdisant aux noeuds de rejouer une opération \emph{rename}.
+Pour cela, un couple de fonctions réciproques doit être proposée pour \textsc{renameId} et \textsc{revertRenameId}.
+Une solution alternative est de proposer une implémentation du mécanisme de renommage qui repose sur les identifiants originaux plutôt que sur ceux transformés, par exemple en utilisant le log des opérations.
+
 \subsection{Report de la transition vers la nouvelle epoch principale}
 \section{Conclusion}
 % \include{assets/chapter_application_HAL}
