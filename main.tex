@@ -1728,7 +1728,7 @@ Les noeuds peuvent donc réduire de manière significative le coût d'intégrati
 \subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité plus optimales}
 
-Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationel significatif dans certains cas.
+Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
 Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
 
 La relation \emph{priority} devrait donc être conçu pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
@@ -1740,6 +1740,26 @@ Pour cela, un couple de fonctions réciproques doit être proposée pour \textsc
 Une solution alternative est de proposer une implémentation du mécanisme de renommage qui repose sur les identifiants originaux plutôt que sur ceux transformés, par exemple en utilisant le log des opérations.
 
 \subsection{Report de la transition vers la nouvelle epoch principale}
+
+Comme illustré par \autoref{tab:evolution-integration-time-rename}, intégrer des opérations \emph{rename} distantes est généralement coûteux.
+Ce traitement peut générer un surcoût computationnel significatif en cas de multiples opérations \emph{rename} concurrentes.
+En particulier, un noeud peut recevoir et intégrer les opérations \emph{rename} concurrentes dans l'ordre inverse défini par la relation \emph{priority} sur leur époques.
+Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.
+
+En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds délaient le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
+Ce délai réduit la probabilité que les noeuds n'effectuent des traitements inutiles.
+Plusieurs stratégies peuvent être proposées pour calculer le niveau de confiance en l'époque cible.
+Ces stratégies peuvent reposer sur une variété de métriques pour produire le niveau de confiance, tel que le temps écoulé depuis que le noeud a reçu une opération \emph{rename} concurrente et le nombre de noeuds en ligne qui n'ont pas encore reçu l'opération \emph{rename}.
+
+Durant cette période d'incertitude introduite par le report, les noeuds peuvent recevoir des opérations provenant d'époques différentes, notamment de l'époque cible.
+Néanmoins, les noeuds peuvent toujours intégrer les opérations \emph{insert} et \emph{remove} en utilisant \textsc{renameId} et \textsc{revertRenameId} au prix d'un surcoût computationnel pour chaque identifiant.
+Cependant, ce coût est négligeable (plusieurs centaines de microsecondes par identifiant d'après \autoref{fig:evolution-integration-time-remote-insert}) comparé au coût de renommer, de manière inutile, complètement l'état (plusieurs centaines de milliseconds à des secondes complètes d'après \autoref{tab:evolution-integration-time-rename}).
+
+Notons que ce mécanisme nécessite que \textsc{renameId} et \textsc{revertRenameId} soient des fonctions réciproques.
+En effet, au cours de la période d'incertitude, un noeud peut avoir à utiliser \textsc{revertRenameId} pour intégrer les identifiants d'opérations \emph{insert} distantes provenant de l'époque cible.
+Ensuite, le noeud peut devoir renommer son état vers l'époque cible une fois que celle-ci a obtenu le niveau de confiance requis.
+Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment transformés par \textsc{revertRenameId} à leur valeur initiale pour garantir la convergence.
+
 \section{Conclusion}
 % \include{assets/chapter_application_HAL}
 
