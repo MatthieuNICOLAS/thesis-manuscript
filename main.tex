@@ -2,11 +2,15 @@
 %----------------------------------------------------------------------
 %                               Packages
 %----------------------------------------------------------------------
+\usepackage[french]{babel}
 \usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
 \usepackage{biblatex}
 \bibliography{biblio.bib}
-\usepackage{csquotes}
 \usepackage{booktabs} % \toprule, \midrule, \cmidrule, \bottomrule
+\usepackage{caption}
+\usepackage{csquotes}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
 \usepackage[inline]{enumitem}
 \usepackage[french]{minitoc}
 
@@ -38,9 +42,6 @@
 \newtheorem{subproperty}{Propriété}[property]
 
 \usepackage{algpseudocode}
-\usepackage{caption}
-\usepackage{hyperref}
-\hypersetup{hidelinks}
 
 \usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
@@ -319,12 +320,36 @@ qui fut la première de toutes.
   \item Autorise alors les noeuds à diverger temporairement
   \item Permet d'être toujours disponible, de toujours répondre aux requêtes même en cas de partition réseau
   \item Permet aussi, en temps normal, de réduire le temps de réponse (privilégie la latence) \cite{pacelc2012}
-  \item Comme ce modèle autorise les noeuds à modifier la donnée sans se concerter, possible de créer des modifications concurrentes
+  \item Comme ce modèle autorise les noeuds à modifier la donnée sans se coordonner, possible d'effectuer des modifications concurrentes
   \item Généralement, un mécanisme de résolution de conflits est nécessaire afin d'assurer la convergence des noeuds dans une telle situation
   \item Plusieurs approches ont été proposées pour implémenter un tel mécanisme
 \end{itemize}
 
 \section{Transformées opérationnelles}
+
+\begin{itemize}
+  \item Approche permettant de gérer des modifications concurrentes sur un type de données
+  \item Consiste à transformer les opérations par rapport aux effets des opérations concurrentes pour rendre les rendre commutatives.
+    Permet de rendre l'ordre d'intégration des opérations sans importance par rapport à l'état final obtenu
+  \item Se décompose en 2 parties : algorithmes (génériques) et fonctions de transformations (spécifiques au type de données)
+  \item Plusieurs algorithmes OT adoptent une architecture centralisée (trouver citations)
+  \item Cette architecture pose des problèmes de performances (bottleneck), sécurité (SPOF), coût, d'utilisabilité (mode offline), pérennité (disparition du service), vie privée et de résistance à la censure.
+  \item Pour ces raisons, des algorithmes reposant sur une architecture décentralisée ont été proposés
+  \item Mais ne règlent qu'en partie ces limites
+  \item Notamment, ne sont pas adaptés à des systèmes P2P dynamiques
+  \item Besoin de vector clocks sur chaque opération pour détecter la concurrence.
+    Vector clocks adaptés dans systèmes à nombre de pairs fixe, mais pas aux systèmes dynamiques (revoir causal barrier pour p-e nuancer ce propos).
+  \item Néanmoins, cette approche a permis de démocratiser les systèmes collaboratifs via son adoption par des services tels que Google Docs, Overleaf, Framapad
+  \item De plus, dans le cadre de ces travaux, ont été définies les propriétés CCI \cite{10.1145/274444.274447}.
+  \item Remettre en question la propriété Causalité des CCI.
+    Généralement, confond causalité et happen-before et exprime en finalité une contrainte trop forte.
+    Cette contrainte peut réduire la réactivité du système (exemple avec 2 insertions sans liens mais qui force d'attendre la 1ère pour intégrer la 2nde).
+    Causalité pose aussi des problèmes de passage à l'échelle car repose sur vector clocks.
+    IMO, doit relaxer cette propriété pour pouvoir construire systèmes à large échelle.
+\end{itemize}
+
+\mnnote{TODO: Mentionner TP1 et TP2}
+
 \section{Séquences répliquées sans conflits}
 \subsection{Types de données répliquées sans conflits}
 \subsubsection{Principes}
@@ -375,6 +400,7 @@ qui fut la première de toutes.
     \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
     \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
     \item Besoin d'un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
+      \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
     \item Permet de lisser la consommation réseau
     \item Offre des temps d'intégration et de propagation des modifications rapides
     \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
@@ -471,6 +497,8 @@ Ceci permet de réduire de manière significative le surcoût en métadonnées d
 \subsection{Stratégie d'allocation}
 
 \mnnote{TODO: Ajouter et dérouler exemple où des noeuds insère dans une séquence répliquée pour illustrer la façon de choisir position, d'append à un bloc, ou de split un bloc}
+
+\mnnote{TODO: Faire le lien avec DottedLogootSplit}
 
 \subsection{Limites}
 
