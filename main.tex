@@ -560,8 +560,10 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 % \include{assets/chapter_soa_ergm}
 
 \NumberThisInToc
-\chapter{Présentation de l'approche}
+\chapter{Renommage dans une séquence répliquée}
 \minitoc
+
+\section{Présentation de l'approche}
 
 Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{nicolas:hal-01932552,nicolas:hal-02526724}.
 Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
@@ -572,7 +574,7 @@ Nous introduisons une opération \emph{rename} qui permet de
 \end{enumerate*}
 Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en métadonnées.
 
-\section{Modèle du système}
+\subsection{Modèle du système}
 
 Le système est composé d'un ensemble dynamique de noeuds, les noeuds pouvant rejoindre puis quitter la collaboration tout au long de sa durée.
 Les noeuds collaborent afin de construire et maintenir une séquence à l'aide de RenamableLogootSplit.
@@ -592,7 +594,7 @@ Aucune autre contrainte n'existe sur l'ordre de livraison des opérations.
 Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733}.
 Ce mécanisme permet aux noeuds de se synchroniser par paires, en détectant et ré-échangeant les messages perdus.
 
-\section{Définition de l'opération de renommage}
+\subsection{Définition de l'opération de renommage}
 
 L'objectif de l'opération \emph{rename} est de réassigner de nouveaux identifiants aux éléments de la séquence répliquée sans modifier son contenu.
 Puisque les identifiants sont des métadonnées utilisées par la structure de données uniquement afin de résoudre les conflits, les utilisateurs ignorent leur existence.
@@ -645,18 +647,14 @@ Les opérations \emph{rename} concurrentes ne sont donc pas commutatives.
 Par conséquent, il est nécessaire de concevoir et d'utiliser des méthodes de résolution de conflits pour assurer la \autoref{prop:commutativity}.
 
 Dans un souci de simplicité, la présentation de l'opération \emph{rename} est divisée en deux parties.
-Dans le \autoref{chap:centralised-rls}, nous présentons l'opération \emph{rename} proposée avec l'hypothèse qu'aucune opération \emph{rename} concurrente ne peut être générée.
+Dans le \autoref{sec:centralised-rls}, nous présentons l'opération \emph{rename} proposée avec l'hypothèse qu'aucune opération \emph{rename} concurrente ne peut être générée.
 Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opération \emph{rename} elle-même ainsi que sur comment gérer les opérations \emph{insert} et \emph{remove} concurrentes.
-Ensuite, dans le \autoref{chap:distributed-rls}, nous supprimons cette hypothèse.
+Ensuite, dans le \autoref{sec:distributed-rls}, nous supprimons cette hypothèse.
 Nous présentons alors notre approche pour gérer les scénarios avec des opérations \emph{rename} concurrentes.
 
-\NumberThisInToc
-\chapter{Renommage dans un système centralisé}
 
-\label{chap:centralised-rls}
-
-\minitoc
 \section{RenamableLogootSplit}
+\label{sec:centralised-rls}
 \subsection{Opération de renommage proposée}
 
 Notre opération de renommage permet à RenamableLogootSplit de réduire le surcoût en métadonnées des séquences répliquées.
@@ -910,83 +908,12 @@ Une extension possible est de concevoir \textsc{renameBlock}, une version améli
 \textsc{renameBlock} réduirait le temps d'intégration des opérations \emph{rename}, puisque sa complexité temporelle ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
 
-\subsection{Processus d'intégration d'une opération}
 \subsection{Évolution du modèle de livraison}
 
 \mnnote{TODO: Revoir si une livraison causale de l'opération \emph{rename} (et non epoch-based) peut avoir un intérêt}
 
-\subsection{Récupération de la mémoire des états précédents}
-\section{Validation}
-\subsection{Preuve de correction}
-\subsection{Complexité temporelle}
-\section{Discussion}
-\subsection{Stockage des états précédents sur disque}
-
-Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
-Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
-\begin{enumerate*}[label=(\roman*)]
-  \item des noeuds ont émis récemment des opérations \emph{rename}
-  \item des noeuds se sont récemment reconnectés
-\end{enumerate*}
-Entre deux de ces évènements spécifiques, les \emph{anciens états} ne sont pas nécessaires pour traiter les opérations.
-
-Nous pouvons donc proposer l'optimisation suivante : décharger les \emph{anciens états} sur le disque jusqu'à leur prochaine utilisation ou jusqu'à ce qu'ils puissent être supprimés de manière sûre.
-Décharger les \emph{anciens états} sur le disque permet de mitiger le surcoût en mémoire introduit par le mécanisme de renommage.
-En échange, cela augmente le temps d'intégration des opérations nécessitant un \emph{ancien état} qui a été déchargé précédemment.
-
-Les noeuds peuvent adopter différentes stratégies, en fonction de leurs contraintes, pour déterminer les \emph{anciens états} comme déchargeables et pour les récupérer de manière préemptive.
-La conception de ces stratégies peut reposer sur différentes heuristiques : les époques des noeuds actuellement connectés, le nombre de noeuds pouvant toujours émettre des opérations concurrentes, le temps écoulé depuis la dernière utilisation de l'\emph{ancien état}...
-
-\subsection{Utilisation de l'opération de renommage comme snapshot}
-
-\begin{itemize}
-  \item L'opération de renommage embarque la somme de toutes les opérations passées sous la forme du \emph{former state}
-  \item On peut à tout moment re-calculer l'état courant du document à partir de l'opération de renommage primaire, des opérations concurrentes à cette dernière et des opérations générées depuis
-  \item Peut utiliser ce principe pour le mécanisme de synchronisation
-  \item Lorsqu'un nouveau pair rejoint la collaboration, le noeud avec lequel il se synchronise peut lui fournir uniquement ce sous-ensemble des opérations
-  \item De la même manière, on pourrait généraliser l'utilisation de cette méthode de synchronisation
-  \item À la réception d'une demande de synchronisation d'un pair présentant un important retard, le noeud peut choisir d'employer cette méthode
-  \begin{itemize}
-    \item Plutôt que de lui envoyer et de lui faire rejouer l'ensemble des opérations
-  \end{itemize}
-  \item La question étant de comment procéder pour quantifier ce retard et pour définir le seuil à partir duquel ce retard est considéré comme important
-  \item Cette méthode de synchronisation pose néanmoins le problème suivant
-  \item Le pair synchronisé de cette manière ne possède qu'une partie du log des opérations
-  \item S'il reçoit ensuite une demande de synchronisation d'un autre pair, il est possible qu'il ne puisse y répondre
-  \begin{itemize}
-    \item Cas où il manque à l'autre pair juste une opération d'avant le renommage (possible si les dépendances causales ne sont pas requises pour intégrer l'opération de renommage)
-  \end{itemize}
-  \item Dans ce cas, ne peut pas fournir la seule opération manquante au pair qui la demande
-  \begin{itemize}
-    \item \mnnote{NOTE: Mais dans ce cas, le pair peut tout à fait générer un état courant à jour à partir des infos qu'il possède puisque l'opération qui lui manque est intégrée dans l'opé de renommage}
-  \end{itemize}
-  \item \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
-\end{itemize}
-
-\subsection{Compression et limitation de la taille de l'opération \emph{rename}}
-
-Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
-Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
-En effet, un identifiant peut être caractérisé de manière unique par le triplet composé de l'\emph{identifiant de noeud}, du \emph{numéro séquentiel} et de l'\emph{offset} de son dernier tuple.
-Par conséquent, un bloc peut être identifié de manière unique à partir du triplet signature de son identifiant de début et de sa longueur.
-Cette méthode nous permet de réduire les données à diffuser dans le cadre de l'opération \emph{rename} à un montant fixe par bloc.
-
-Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
-De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
-
-Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
-En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
-
-\section{Conclusion}
-% \include{assets/chapter_baye_approach}
-
-\NumberThisInToc
-\chapter{Renommage dans un système distribué}
-
-\label{chap:distributed-rls}
-
-\minitoc
 \section{RenamableLogootSplit v2}
+\label{sec:distributed-rls}
 \subsection{Conflits en cas de renommages concurrents}
 
 Nous considérons à présent les scénarios avec des opérations \emph{rename} concurrentes.
@@ -1344,8 +1271,8 @@ Ce problème est toutefois évité dans notre système grâce à la relation \em
 Puisque la relation \emph{priority} est définie en utilisant l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, les noeuds se déplacent seulement vers l'époque la plus à droite de l'\emph{arbre des époques} lorsqu'ils changent d'époque.
 Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations \emph{rename} correspondantes.
 
-\subsection{Mise à jour du processus d'intégration d'une opération}
-\subsection{Mise à jour des règles de récupération de la mémoire des états précédents}
+\subsection{Processus d'intégration d'une opération}
+\subsection{Règles de récupération de la mémoire des états précédents}
 
 Les noeuds stockent les époques et les \emph{anciens états} correspondant pour transformer les identifiants d'une époque à l'autre.
 Au fur et à mesure que le système progresse, certaines époques et métadonnées associées deviennent obsolètes puisque plus aucune opération ne peut être émise depuis ces époques.
@@ -1509,6 +1436,9 @@ En attendant, les noeuds peuvent en fait décharger les anciens états sur le di
 Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
 \section{Validation}
+
+\subsection{Preuve de correction de \textsc{renameId}}
+
 \subsection{Complexité temporelle}
 
 \begin{table}[!ht]
@@ -1725,6 +1655,64 @@ L'intégration des opérations \emph{concurrentes introduisant une plus petite �
 Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
 
 \section{Discussion}
+
+\subsection{Stockage des états précédents sur disque}
+
+Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
+Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
+\begin{enumerate*}[label=(\roman*)]
+  \item des noeuds ont émis récemment des opérations \emph{rename}
+  \item des noeuds se sont récemment reconnectés
+\end{enumerate*}
+Entre deux de ces évènements spécifiques, les \emph{anciens états} ne sont pas nécessaires pour traiter les opérations.
+
+Nous pouvons donc proposer l'optimisation suivante : décharger les \emph{anciens états} sur le disque jusqu'à leur prochaine utilisation ou jusqu'à ce qu'ils puissent être supprimés de manière sûre.
+Décharger les \emph{anciens états} sur le disque permet de mitiger le surcoût en mémoire introduit par le mécanisme de renommage.
+En échange, cela augmente le temps d'intégration des opérations nécessitant un \emph{ancien état} qui a été déchargé précédemment.
+
+Les noeuds peuvent adopter différentes stratégies, en fonction de leurs contraintes, pour déterminer les \emph{anciens états} comme déchargeables et pour les récupérer de manière préemptive.
+La conception de ces stratégies peut reposer sur différentes heuristiques : les époques des noeuds actuellement connectés, le nombre de noeuds pouvant toujours émettre des opérations concurrentes, le temps écoulé depuis la dernière utilisation de l'\emph{ancien état}...
+
+\subsection{Utilisation de l'opération de renommage comme snapshot}
+
+\begin{itemize}
+  \item L'opération de renommage embarque la somme de toutes les opérations passées sous la forme du \emph{former state}
+  \item On peut à tout moment re-calculer l'état courant du document à partir de l'opération de renommage primaire, des opérations concurrentes à cette dernière et des opérations générées depuis
+  \item Peut utiliser ce principe pour le mécanisme de synchronisation
+  \item Lorsqu'un nouveau pair rejoint la collaboration, le noeud avec lequel il se synchronise peut lui fournir uniquement ce sous-ensemble des opérations
+  \item De la même manière, on pourrait généraliser l'utilisation de cette méthode de synchronisation
+  \item À la réception d'une demande de synchronisation d'un pair présentant un important retard, le noeud peut choisir d'employer cette méthode
+  \begin{itemize}
+    \item Plutôt que de lui envoyer et de lui faire rejouer l'ensemble des opérations
+  \end{itemize}
+  \item La question étant de comment procéder pour quantifier ce retard et pour définir le seuil à partir duquel ce retard est considéré comme important
+  \item Cette méthode de synchronisation pose néanmoins le problème suivant
+  \item Le pair synchronisé de cette manière ne possède qu'une partie du log des opérations
+  \item S'il reçoit ensuite une demande de synchronisation d'un autre pair, il est possible qu'il ne puisse y répondre
+  \begin{itemize}
+    \item Cas où il manque à l'autre pair juste une opération d'avant le renommage (possible si les dépendances causales ne sont pas requises pour intégrer l'opération de renommage)
+  \end{itemize}
+  \item Dans ce cas, ne peut pas fournir la seule opération manquante au pair qui la demande
+  \begin{itemize}
+    \item \mnnote{NOTE: Mais dans ce cas, le pair peut tout à fait générer un état courant à jour à partir des infos qu'il possède puisque l'opération qui lui manque est intégrée dans l'opé de renommage}
+  \end{itemize}
+  \item \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
+\end{itemize}
+
+\subsection{Compression et limitation de la taille de l'opération \emph{rename}}
+
+Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
+Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
+En effet, un identifiant peut être caractérisé de manière unique par le triplet composé de l'\emph{identifiant de noeud}, du \emph{numéro séquentiel} et de l'\emph{offset} de son dernier tuple.
+Par conséquent, un bloc peut être identifié de manière unique à partir du triplet signature de son identifiant de début et de sa longueur.
+Cette méthode nous permet de réduire les données à diffuser dans le cadre de l'opération \emph{rename} à un montant fixe par bloc.
+
+Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
+De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
+
+Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
+En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
+
 \subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité plus optimales}
 
@@ -1762,23 +1750,6 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 
 \section{Conclusion}
 % \include{assets/chapter_application_HAL}
-
-\NumberThisInToc
-\chapter{Stratégies de déclenchement du renommage}
-\minitoc
-\section{Motivation}
-\section{Stratégies proposées}
-\subsection{Propriétés}
-\subsection{Stratégie 1 : ???}
-\subsection{Stratégie 2 : ???}
-
-NOTE: Peut considérer une stratégie où on prend en compte la hauteur de l'epoch tree pour déclencher un renommage : peut attendre qu'on ait plus qu'une epoch pour autoriser un nouveau renommage d'avoir lieu.
-Permettrait d'empêcher le cas où un noeud revient après 6 mois d'absence et doit intégrer 100 renommages avant de pouvoir collaborer.
-Mais dans le cas où un noeud ne rejoint plus la collaboration, bloque le mécanisme de renommage pour les autres
-
-\section{Évaluation}
-\section{Conclusion}
-% \include{assets/chapter_extension}
 
 \NumberThisInToc
 \chapter{MUTE, un éditeur web collaboratif P2P temps réel}
