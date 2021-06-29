@@ -925,7 +925,7 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
 }
 
 % Version-vector based anti-entropy mechanism
-@article{10.1109/TSE.1983.236733,
+@article{1983-anti-entropy-vv,
   author = {Parker, D. S. and Popek, G. J. and Rudisin, G. and Stoughton, A. and Walker, B. J. and Walton, E. and Chow, J. M. and Edwards, D. and Kiser, S. and Kline, C.},
   title = {Detection of Mutual Inconsistency in Distributed Systems},
   year = {1983},
@@ -1147,3 +1147,90 @@ pages={22--25},
 year={2018},
 organization={IEEE}
 }
+
+@inproceedings{2021-access-control-crdts,
+  author = {Yanakieva, Elena and Youssef, Michael and Rezae, Ahmad Hussein and Bieniusa, Annette},
+  title = {Access Control Conflict Resolution in Distributed File Systems Using CRDTs},
+  year = {2021},
+  isbn = {9781450383387},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3447865.3457970},
+  doi = {10.1145/3447865.3457970},
+  abstract = {Distributed file systems have become an essential service for sharing data among users. An important aspect of a file system is its ability to keep its contents secure from unauthorized access. To investigate the interplay of security and consistency in distributed file systems, we formalize the three properties related to data security, namely confidentiality, integrity and accessibility. Based on these properties, we provide an impossibility result that indicates that these properties cannot be achieved together in a highly-available partition-tolerant setting. We further discuss a CRDT-based model, implementing the traditional POSIX access control policy, that guarantees confidentiality and integrity while precluding accessibility only in rare situations. Our conclusion is that the POSIX policies are not suitable in a distributed system setting, but that a more fine-grained model is required to obtain the security semantics that reflect the users' intention.},
+  booktitle = {Proceedings of the 8th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {1},
+  numpages = {3},
+  keywords = {distributed file system, access control, POSIX, conflict-free replicated data type},
+  location = {Online, United Kingdom},
+  series = {PaPoC '21}
+}
+
+@inproceedings{2021-cambria-schema-evolution,
+author = {Litt, Geoffrey and Hardenberg, Peter van and Henry, Orion},
+title = {Cambria: Schema Evolution in Distributed Systems with Edit Lenses},
+year = {2021},
+isbn = {9781450383387},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3447865.3457963},
+doi = {10.1145/3447865.3457963},
+abstract = {Schema evolution is a pervasive challenge in distributed systems. Developers often resort to ad hoc solutions that mix compatibility concerns with application code. We propose a principled replacement: an isolated software layer that uses bidirectional lenses to translate data between schemas on demand to maintain backward and forward compatibility.We have implemented these ideas in a TypeScript library called Cambria, and integrated it with the Automerge CRDT to support peer-to-peer editing. We share reflections from building a decentralized issue tracker application and successfully using Cambria to maintain compatibility across versions. We also present our vision for a "Cambrian Era" for software, where better schema evolution tools enable people to customize their software more freely while preserving the ability to collaborate.},
+booktitle = {Proceedings of the 8th Workshop on Principles and Practice of Consistency for Distributed Data},
+articleno = {8},
+numpages = {9},
+keywords = {CRDTs, schema evolution, bidirectional lenses},
+location = {Online, United Kingdom},
+series = {PaPoC '21}
+}
+
+@inproceedings{2018-trusternity-short,
+  TITLE = {{Trusternity: Auditing Transparent Log Server with Blockchain}},
+  AUTHOR = {Nguyen, Hoang-Long and Ignat, Claudia-Lavinia and Perrin, Olivier},
+  URL = {https://hal.inria.fr/hal-01883589},
+  BOOKTITLE = {{Companion of the The Web Conference 2018}},
+  ADDRESS = {Lyon, France},
+  YEAR = {2018},
+  MONTH = Apr,
+  DOI = {10.1145/3184558.3186938},
+  KEYWORDS = {blockchain ; key transparency ; auditing ; Ethereum},
+  PDF = {https://hal.inria.fr/hal-01883589/file/p79-nguyen%20%281%29.pdf},
+  HAL_ID = {hal-01883589},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{2018-trusternity-long,
+  TITLE = {{Blockchain-Based Auditing of Transparent Log Servers}},
+  AUTHOR = {Nguyen, Hoang-Long and Eisenbarth, Jean-Philippe and Ignat, Claudia-Lavinia and Perrin, Olivier},
+  URL = {https://hal.archives-ouvertes.fr/hal-01917636},
+  NOTE = {Part 1: Administration},
+  BOOKTITLE = {{32th IFIP Annual Conference on Data and Applications Security and Privacy (DBSec)}},
+  ADDRESS = {Bergamo, Italy},
+  EDITOR = {Florian Kerschbaum and Stefano Paraboschi},
+  PUBLISHER = {{Springer International Publishing}},
+  SERIES = {Data and Applications Security and Privacy XXXII},
+  VOLUME = {LNCS-10980},
+  PAGES = {21-37},
+  YEAR = {2018},
+  MONTH = Jul,
+  DOI = {10.1007/978-3-319-95729-6\_2},
+  KEYWORDS = {Authentication ; Public key ; Blockchain ; Auditing ; Ethereum},
+  PDF = {https://hal.archives-ouvertes.fr/hal-01917636/file/DBSec.pdf},
+  HAL_ID = {hal-01917636},
+  HAL_VERSION = {v1},
+}
+
+@InProceedings{1995-diffie-hellman,
+author="Burmester, Mike
+and Desmedt, Yvo",
+editor="De Santis, Alfredo",
+title="A secure and efficient conference key distribution system",
+booktitle="Advances in Cryptology --- EUROCRYPT'94",
+year="1995",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="275--286",
+abstract="We present practical conference key distribution systems based on public keys, which authenticate the users and which are `proven' secure provided the Diffie-Hellman problem is intractable. A certain number of interactions is needed but the overall cost is low. There is a complexity tradeoff. Depending on the network used, we either have a constant (in the number of conference participants) number of rounds (exchanges) or a constant communication and computation overhead. Our technique for authentication can be extended and used as the basis for an authentication scheme which is `proven' secure against any type of attack, provided the Discrete Logarithm problem is intractable.",
+isbn="978-3-540-44717-7"
+}
+

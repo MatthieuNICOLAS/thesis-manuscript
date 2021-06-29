@@ -399,7 +399,7 @@ qui fut la première de toutes.
     \item Nécessite donc généralement d'ajouter une couche \emph{livraison} pour faire le lien entre le réseau et le CRDT
     \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
     \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
-    \item Besoin d'un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
+    \item Besoin d'un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
       \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
     \item Permet de lisser la consommation réseau
     \item Offre des temps d'intégration et de propagation des modifications rapides
@@ -1779,6 +1779,177 @@ Mais dans le cas où un noeud ne rejoint plus la collaboration, bloque le mécan
 \section{Évaluation}
 \section{Conclusion}
 % \include{assets/chapter_extension}
+
+\NumberThisInToc
+\chapter{MUTE, un éditeur web collaboratif P2P temps réel}
+\minitoc
+\section{Présentation}
+\subsection{Objectifs}
+
+\begin{itemize}
+  \item Éditeur collaboratif
+  \item Permettre collaboration synchrone (temps réel) et asynchrone (mode offline)
+  \item À grande échelle
+  \item Respecter privacy, limiter au maximum la confiance qu'on demande aux utilisateurs d'avoir dans l'outil
+  \item Facile d'accès
+  \item Facilement déployable par des tiers
+  \item S'inscrit dans la mouvance Local-First Software \cite{localfirstsoftware2019,pushpin2020}
+\end{itemize}
+
+\subsection{Architecture}
+
+\begin{itemize}
+  \item Pour répondre à ces besoins, a effectué les choix suivants
+  \item Application web
+  \item Utilise CRDT pour représenter le document partagé
+  \item Nous permet de supporter les différents modes de collaboration
+  \item Nous permet aussi d'adopter une architecture P2P garantissant la privacy et le passage à l'échelle
+  \item Mais présence de plusieurs serveurs, aux responsabilités limitées, pour simplifier la collaboration (signaling server, pulsar, bots(?))
+  \item \mnnote{TODO: Insérer schéma de l'architecture d'une collaboration (noeuds, types de noeuds et lien)}
+  \item L'architecture d'un pair se décompose en plusieurs couches
+  \item \mnnote{TODO: Insérer schéma de l'architecture logicielle d'un pair}
+\end{itemize}
+
+\section{Couche interface}
+
+\begin{itemize}
+  \item Éditeur Markdown
+  \item Permet d'incorporer le style des éléments directement dans la séquence représentant le document texte
+  \item Mécanisme de conscience de groupe
+  \begin{itemize}
+    \item Liste des collaborateurs
+    \item Curseurs et sélections des autres collaborateurs
+    \item Indicateur de connexion
+  \end{itemize}
+  \item Stocke au sein du navigateur les données du document (état du document, log des opérations...)
+  \item Glue le reste des couches ensemble
+\end{itemize}
+
+\section{Couche réplication}
+\subsection{Document texte}
+
+\begin{itemize}
+  \item Implémentation de RenamableLogootSplit que nous avons réutilisé dans le cadre de nos simulations et évaluations
+  \item Associée au composant gérant la livraison des opérations
+  \item Mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}
+\end{itemize}
+
+\subsection{Métadonnées}
+
+\begin{itemize}
+  \item Titre (Simple LWW-Register)
+  \item Mode de chiffrement (fixe)
+\end{itemize}
+
+\subsection{Collaborateurs}
+
+\begin{itemize}
+  \item Implémente Swim \cite{swim2002}
+  \item Découple protocole de détection des failures du protocole de diffusion de l'évolution du groupe
+  \item Protocole de détection des failures
+    \begin{itemize}
+      \item Basé sur un système de rounds, basés sur un interval de temps
+      \item À chaque round, chaque pair probe de manière aléatoire un autre pair
+      \item Si pas de réponse, demande à un autre pair de le contacter
+      \item Si pas de réponse par leur intermédiaire, pair devient suspect
+      \item Si toujours pas de nouvelles du pair après un certain temps, le considère déconnecté
+    \end{itemize}
+  \item Protocole de diffusion de l'évolution du groupe
+    \begin{itemize}
+      \item Plutôt que de diffuser chaque évolution du groupe, adopte un modèle de diffusion épidémique
+      \item Piggyback les évolutions aux messages du protocole de détection des failures
+    \end{itemize}
+  \item Modifie le fonctionnement du protocole pour en faire un CRDT
+  \item Afin de permettre un nouveau pair de récupérer instantanément état courant du groupe
+  \item Autorise aussi un pair à se déconnecter puis reconnecter en modifiant l'ordre de priorité entre les différents messages
+  \begin{itemize}
+    \item Dans protocole original, un pair déconnecté doit revenir sous une nouvelle identité
+    \item Afin de maintenir l'identifiant du pair, notamment pour ses opérations sur le document
+  \end{itemize}
+\end{itemize}
+
+\subsection{Curseurs}
+
+\begin{itemize}
+  \item Repose sur des identifiants pour indiquer la position des curseurs
+  \item Vecteur de LWW-Registers, chaque LWW-Register étant associé à un pair actuellement connecté
+\end{itemize}
+
+\section{Couche sécurité}
+\subsection{Authenticité des clés publiques des participants}
+\begin{itemize}
+  \item Trusternity \cite{2018-trusternity-short, 2018-trusternity-long}
+\end{itemize}
+
+\subsection{Établissement de la clé de chiffrement de groupe}
+\begin{itemize}
+  \item n-party Diffie-Hellman \cite{1995-diffie-hellman}
+\end{itemize}
+
+\section{Couche réseau}
+\subsection{Netflux}
+\begin{itemize}
+  \item Réseau P2P
+  \item Interface uniforme permettant d'interagir à la fois avec des navigateurs et des bots
+  \item Connectent les noeuds en utilisant la technologie WebRTC
+  \item Connectent les bots en utilisant la technologie WebSocket
+  \item Repose sur l'utilisation d'un signaling server pour permettre aux pairs de rejoindre la collaboration
+  \item Topologie maillée
+\end{itemize}
+\subsection{Pulsar}
+\begin{itemize}
+  \item Log-based message broker
+  \item Propose plusieurs modes de fonctionnement
+  \item En mode log-based message broker, maintient l'ensemble des messages reçus dans un log
+  \item Permet, lorsque utilisé pour diffuser les opérations, de conserver le log complet des opérations
+  \item Permet alors à un nouveau noeud de récupérer l'ensemble des opérations connues et de reconstruire l'état courant du document, même si actuellement aucun autre pair n'est connecté
+  \item En mode message broker, diffuse seulement les messages aux noeuds actuellement connectés au topic
+  \item Permet de communiquer les messages transients (protocole d'établissement de la clé de groupe, heartbeat de Swim, mécanisme d'anti-entropie du document) sans polluer le log
+  \item Pose néanmoins des questions de sécurité et d'utilisabilité
+  \item Besoin de chiffrer E2E les opérations
+  \item Dans ce cas
+    \begin{itemize}
+      \item comment un nouveau pair peut obtenir la clé de chiffrement si les autres pairs ne sont pas connectés ? (à moins de revenir à un chiffrement à base de passphrase, avec les problèmes qui en découlent)
+      \item comment un nouveau pair peut relire les opérations chiffrer avec l'ancienne clé ?
+    \end{itemize}
+\end{itemize}
+
+\section{Pistes d'amélioration et de recherche}
+
+\subsection{Composition de CRDTs}
+
+\begin{itemize}
+  \item
+\end{itemize}
+
+\subsection{CRDT pour les styles}
+
+\begin{itemize}
+  \item Permettrait de se découpler de Markdown pour gérer le style du document
+  \item Permettrait de supporter un plus grand nombre d'options que Markdown ne le permet actuellement (couleurs, mise en page...)
+\end{itemize}
+
+\subsection{Réseaux}
+\begin{itemize}
+  \item Librairies alternatives (libP2P, hypercore)
+  \item Topologies alternatives (SPRAY)
+\end{itemize}
+\subsection{Évolution de schéma}
+\begin{itemize}
+  \item Cambria \cite{2021-cambria-schema-evolution}
+\end{itemize}
+\subsection{Droits d'accès}
+\begin{itemize}
+  \item Access Control Conflict Resolution in Distributed File Systems \cite{2021-access-control-crdts}
+  \item Travaux de PA
+\end{itemize}
+\subsection{Historique du document}
+\subsection{Rôles et places des bots dans systèmes collaboratifs}
+\begin{itemize}
+  \item Stockage du document pour améliorer sa disponibilité
+  \item Overleaf en P2P ?
+  \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
+\end{itemize}
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
