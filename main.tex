@@ -443,17 +443,43 @@ Comme expliqué précédemment, LogootSplit utilise des identifiants provenant d
 \subsection{Identifiants}
 
 Pour ce faire, LogootSplit assigne des identifiants composés d'une liste de tuples aux éléments.
-Ces tuples sont composés de quatre éléments :
-\begin{enumerate*}[label=(\roman*)]
-  \item une \emph{position}, qui incarne la position souhaitée de l'élément
-  \item un \emph{identifiant de noeud},
-  \item un \emph{numéro séquentiel de noeud} et
-  \item un \emph{offset}, qui sont combinés pour former des identifiants uniques.
-\end{enumerate*}
-En comparant les identifiants en utilisant l'ordre lexicographique, LogootSplit est capable de déterminer la position d'un élément par rapport aux autres.
-Dans ce manuscrit, nous représentons les identifiants par le biais de la notation suivante : \id{position}{node\_id~node\_seq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{node\_id}$ une lettre majuscule et $\trm{node\_seq}$ et $\trm{offset}$ des entiers.
+Les tuples sont définis de la manière suivante :
+
+\begin{definition}[LogootSplit-tuple]
+  Un \emph{LogootSplit-tuple} t est un quadruplet <position, node\_id, node\_seq, offset> où
+  \begin{itemize}
+    \item position incarne la position souhaitée de l'élément.
+    \item node\_id est l'identifiant unique du noeud qui a généré t.
+    \item node\_seq est le numéro de séquence courant du noeud à la génération de t.
+    \item offset indique la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
+  \end{itemize}
+\end{definition}
+
+Dans ce manuscrit, nous représentons les tuples par le biais de la notation suivante : \id{position}{node\_id~node\_seq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{node\_id}$ une lettre majuscule et $\trm{node\_seq}$ et $\trm{offset}$ des entiers, \eg \id{i}{B0}{0}.
+
+À partir de là, les identifiants LogootSplit sont définis de la manière suivante :
+
+\begin{definition}[LogootSplit-id]
+  Un \emph{LogootSplit-id} i est une liste de \emph{LogootSplit-tuple}.
+\end{definition}
+
+Nous représentons les identifiants en listant les tuples qui les composent.
+Par exemple, l'identifiant composé des tuples \emph{<i, B, 0, 0><f, A, 0, 0>} est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
+
+Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
+Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre lexicographique est associée à l'ensemble des identifiants :
+
+\begin{definition}[Relation $<_{id}$]
+  Soient deux LogootSplit-id $id_1$ et $id_2$, la relation $id_1 <_{id} id_2$ est définie si et seulement si
+  \begin{enumerate}[label={(\roman*)}]
+    \item les $i^{emes}$ premiers tuples de $id_1$ et $id_2$ sont égaux, les $j^{emes}$ premiers éléments de leur $i+1$ tuples respectifs sont égaux et le $j+1^{eme}$ élément du $i+1$ tuple de $id_1$ est inférieur au $j+1^{eme}$ du $i+1$ tuple de $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{m}{A0}{0}, \id{i}{A1}{0} $<_{id}$ \id{i}{B0}{0}, \id{i}{A1}{0}\id{f}{A1}{0} $<_{id}$ \id{i}{A1}{0}\id{m}{B1}{0})
+    \item la liste de tuples composant $id_1$ est un préfixe de la liste de tuples composant $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{i}{B0}{0}\id{f}{A0}{0})
+  \end{enumerate}
+\end{definition}
 
 \subsection{Aggrégation dynamique d'élements en blocs}
+
+\label{sec:blocs}
 
 Au lieu de stocker les identifiants de chaque élément de la séquence, LogootSplit propose d'aggréger de façon dynamique les éléments dans des blocs.
 Rassembler les éléments en blocs permet à LogootSplit d'assigner logiquement un identifiant à chaque élément, en utilisant un interval d'identifiants, tout en ne stockant réellement que la longueur du bloc et l'identifiant de son premier élément.
@@ -461,7 +487,7 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
 Nous appelons \emph{contigus} deux identifiants qui sont identiques, sauf pour leur dernier \emph{offset} et avec les deux \emph{offsets} étant consécutifs.
 Nous représentons l'interval d'identifiants qui composent un bloc à l'aide du formalisme suivant : \id{position}{node\_id~node\_seq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant du bloc et $\trm{end}$ du dernier.
 
-La \autoref{fig:logootsplit-seq} un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
+La \autoref{fig:logootsplit-seq} présente un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
 LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
 
 \begin{figure}[!ht]
@@ -493,6 +519,11 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0
 
 Cette fonctionnalité réduit le nombre d'identifiants stockés au sein de la structure de données, puisque les identifiants sont conservés à l'échelle des blocs plutôt qu'à l'échelle de chaque élément.
 Ceci permet de réduire de manière significative le surcoût en métadonnées de la structure de données.
+
+\mnnote{TODO: indiquer que le couple (node\_id), node\_seq) permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
+
+Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet <node\_id, node\_seq, offset> issue de leur dernier Id-tuple.
+Par exemple, le triplet <B, 0, 2> désigne de manière unique l'identifiant \id{i}{B0}{2} dans \autoref{fig:logootsplit-seq}.
 
 \subsection{Stratégie d'allocation}
 
@@ -591,7 +622,7 @@ Puisque RenamableLogootSplit est une extension de LogootSplit, il partage les m�
 La couche de livraison de messages sert donc à livrer les messages à l'application exactement une fois.
 La couche de livraison de messages a aussi pour tâche de garantir la livraison des opérations de suppression après les opérations d'insertion correspondantes.
 Aucune autre contrainte n'existe sur l'ordre de livraison des opérations.
-Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie \cite{10.1109/TSE.1983.236733}.
+Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}.
 Ce mécanisme permet aux noeuds de se synchroniser par paires, en détectant et ré-échangeant les messages perdus.
 
 \subsection{Définition de l'opération de renommage}
@@ -1452,9 +1483,9 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
       \cmidrule(lr){2-3}
         & Locale &   Distante \\
       \midrule
-      \emph{insert} & log($n$) & $k$ + $l$ * log($m$) + log($n$) \\
-      \emph{remove} & log($n$) & $k$ + $l$ * log($m$) + log($n$) \\
-      \emph{rename} & $n$ & $k$ * $n$ + $l$ * ($n$ + $m$) \\
+      \emph{insert} & log($n$) & $k$ + $l$ $\cdot$ log($m$) + log($n$) \\
+      \emph{remove} & log($n$) & $k$ + $l$ $\cdot$ log($m$) + log($n$) \\
+      \emph{rename} & $n$ & $k \cdot n$ + $l$ $\cdot$ ($n$ + $m$) \\
       \bottomrule
   \end{tabular}
   \caption*{$n$ : nombre de blocs, $k$ : nombre d'opérations \emph{rename} à inverser, $l$ : nombre d'opérations \emph{rename} à appliquer, $m$ : nombre de blocs de l'\emph{ancien état} de l'opération \emph{rename} à inverser/appliquer}
@@ -1714,7 +1745,7 @@ Grâce à cette méthode de compression, nous pouvons instaurer une taille maxim
 En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
 
 \subsection{Implémentation alternative à base d'operation-log}
-\subsection{Définition de relations de priorité plus optimales}
+\subsection{Définition de relations de priorité pour minimiser les traitements}
 
 Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
 Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
@@ -1927,7 +1958,7 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \minitoc
 \section{Résumé des contributions}
 \section{Perspectives}
-\subsection{Définition de relations de priorité plus optimales}
+\subsection{Définition de relations de priorité pour minimiser les traitements}
 \subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
 \subsection{Définition de types de données répliquées sans conflits plus complexes}
 % \include{assets/conclusion}
