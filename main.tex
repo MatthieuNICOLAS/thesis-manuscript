@@ -445,26 +445,28 @@ Comme expliqué précédemment, LogootSplit utilise des identifiants provenant d
 Pour ce faire, LogootSplit assigne des identifiants composés d'une liste de tuples aux éléments.
 Les tuples sont définis de la manière suivante :
 
-\begin{definition}[LogootSplit-tuple]
-  Un \emph{LogootSplit-tuple} t est un quadruplet <position, node\_id, node\_seq, offset> où
+\begin{definition}[Tuple]
+  Un \emph{Tuple} est un quadruplet $\langle$position, nodeId, nodeSeq, offset$\rangle$ où
   \begin{itemize}
     \item position incarne la position souhaitée de l'élément.
-    \item node\_id est l'identifiant unique du noeud qui a généré t.
-    \item node\_seq est le numéro de séquence courant du noeud à la génération de t.
+    \item nodeId est l'identifiant unique du noeud qui a généré t.
+    \item nodeSeq est le numéro de séquence courant du noeud à la génération de t.
     \item offset indique la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
   \end{itemize}
 \end{definition}
 
-Dans ce manuscrit, nous représentons les tuples par le biais de la notation suivante : \id{position}{node\_id~node\_seq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{node\_id}$ une lettre majuscule et $\trm{node\_seq}$ et $\trm{offset}$ des entiers, \eg \id{i}{B0}{0}.
+Dans ce manuscrit, nous représentons les tuples par le biais de la notation suivante : \id{position}{nodeId~nodeSeq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{nodeId}$ une lettre majuscule et $\trm{nodeSeq}$ et $\trm{offset}$ des entiers, \eg \id{i}{B0}{0}.
 
 À partir de là, les identifiants LogootSplit sont définis de la manière suivante :
 
-\begin{definition}[LogootSplit-id]
-  Un \emph{LogootSplit-id} i est une liste de \emph{LogootSplit-tuple}.
+\begin{definition}[Identifiant]
+  Un \emph{Identifiant} est une liste de \emph{Tuples}.
 \end{definition}
 
+\mnnote{TODO: Définir la notion de base (et autres fonctions utiles sur les identifiants ? genre isPrefix, concat, getTail...)}
+
 Nous représentons les identifiants en listant les tuples qui les composent.
-Par exemple, l'identifiant composé des tuples \emph{<i, B, 0, 0><f, A, 0, 0>} est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
+Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangle\langle$f, A, 0, 0$\rangle\rangle$ est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
 
 Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
 Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre lexicographique est associée à l'ensemble des identifiants :
@@ -472,7 +474,7 @@ Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre l
 \begin{definition}[Relation $<_{id}$]
   Soient deux LogootSplit-id $id_1$ et $id_2$, la relation $id_1 <_{id} id_2$ est définie si et seulement si
   \begin{enumerate}[label={(\roman*)}]
-    \item les $i^{emes}$ premiers tuples de $id_1$ et $id_2$ sont égaux, les $j^{emes}$ premiers éléments de leur $i+1$ tuples respectifs sont égaux et le $j+1^{eme}$ élément du $i+1$ tuple de $id_1$ est inférieur au $j+1^{eme}$ du $i+1$ tuple de $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{m}{A0}{0}, \id{i}{A1}{0} $<_{id}$ \id{i}{B0}{0}, \id{i}{A1}{0}\id{f}{A1}{0} $<_{id}$ \id{i}{A1}{0}\id{m}{B1}{0})
+    \item les $i^{emes}$ premiers composants de $id_1$ et $id_2$ sont égaux et le $i+1^{eme}$ composant de $id_1$ est inférieur au $i+1^{eme}$ composant de $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{m}{A0}{0}, \id{i}{A1}{0} $<_{id}$ \id{i}{B0}{0}, \id{i}{A1}{0}\id{f}{A1}{0} $<_{id}$ \id{i}{A1}{0}\id{f}{A1}{1})
     \item la liste de tuples composant $id_1$ est un préfixe de la liste de tuples composant $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{i}{B0}{0}\id{f}{A0}{0})
   \end{enumerate}
 \end{definition}
@@ -482,10 +484,21 @@ Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre l
 \label{sec:blocs}
 
 Au lieu de stocker les identifiants de chaque élément de la séquence, LogootSplit propose d'aggréger de façon dynamique les éléments dans des blocs.
-Rassembler les éléments en blocs permet à LogootSplit d'assigner logiquement un identifiant à chaque élément, en utilisant un interval d'identifiants, tout en ne stockant réellement que la longueur du bloc et l'identifiant de son premier élément.
+Pour cela, LogootSplit introduit la notion d'interval d'identifiants :
+
+\begin{definition}[IdInterval]
+  Un \emph{IdInterval} est un couple (idBegin, offsetEnd) où
+  \begin{itemize}
+    \item idBegin est l'identifiant du premier élément de l'interval.
+    \item offsetEnd est l'offset du dernier identifiant de l'interval.
+  \end{itemize}
+\end{definition}
+
+Les intervals d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant réellement que l'identifiant de son premier élément et le dernier offset de son dernier élément.
+
 LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un bloc.
-Nous appelons \emph{contigus} deux identifiants qui sont identiques, sauf pour leur dernier \emph{offset} et avec les deux \emph{offsets} étant consécutifs.
-Nous représentons l'interval d'identifiants qui composent un bloc à l'aide du formalisme suivant : \id{position}{node\_id~node\_seq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant du bloc et $\trm{end}$ du dernier.
+Nous appelons \emph{contigus} deux identifiants qui partagent une même base (\ie qui sont identiques à l'exception de leur dernier offset) et dont les \emph{offsets} sont consécutifs.
+Nous représentons l'interval d'identifiants qui composent un bloc à l'aide du formalisme suivant : \id{position}{nodeId~nodeSeq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant du bloc et $\trm{end}$ du dernier.
 
 La \autoref{fig:logootsplit-seq} présente un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
 LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
@@ -519,15 +532,56 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0
 
 Cette fonctionnalité réduit le nombre d'identifiants stockés au sein de la structure de données, puisque les identifiants sont conservés à l'échelle des blocs plutôt qu'à l'échelle de chaque élément.
 Ceci permet de réduire de manière significative le surcoût en métadonnées de la structure de données.
+L'utilisation de blocs améliore aussi les performances de la structure de données.
+En effet, l'utilisation de blocs permet de parcourir plus efficacement la structure de données.
+Les blocs permettent aussi d'effectuer des modifications à l'échelle de la chaîne de caractères et non plus seulement caractère par caractère.
 
-\mnnote{TODO: indiquer que le couple (node\_id), node\_seq) permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
+\mnnote{TODO: indiquer que le couple (nodeId, nodeSeq) permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
 
-Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet <node\_id, node\_seq, offset> issue de leur dernier Id-tuple.
-Par exemple, le triplet <B, 0, 2> désigne de manière unique l'identifiant \id{i}{B0}{2} dans \autoref{fig:logootsplit-seq}.
+Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet $\langle$nodeId, nodeSeq, offset$\rangle$ issue de leur dernier Id-tuple.
+Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'identifiant \id{i}{B0}{2} dans \autoref{fig:logootsplit-seq}.
+
+\subsection{Modèle de données}
+
+\begin{itemize}
+  \item Structure de données définie de la manière suivante :
+\end{itemize}
+
+\begin{definition}[Séquence LogootSplit]
+  Une séquence \emph{Séquence LogootSplit} est un triplet $\langle$nodeId, nodeSeq, blocks$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant du noeud.
+    \item nodeSeq est le numéro de séquence courant du noeud.
+    \item blocks est une liste de couples (idInterval, elts) correspondant à l'état actuel de la séquence répliquée.
+  \end{itemize}
+\end{definition}
+
+\begin{itemize}
+  \item Plusieurs fonctions disponibles pour permettre de modifier localement la séquence
+  \item Ces fonctions génèrent des opérations à diffuser aux autres noeuds pour qu'ils mettent à jour leur état
+  \item insert(index, elts) qui génère une opération \emph{insert} correspondante
+  \item remove(index, length) qui génère une opéraiton \emph{remove} correspondante
+\end{itemize}
+
+\begin{definition}[insert]
+  Une opération \emph{insert} est un couple (id, elts) où
+  \begin{itemize}
+    \item id est l'identifiant du premier élément inséré par cette opération.
+    \item elts est la liste des éléments insérés par cette opération.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}[remove]
+  Une opération \emph{remove} est une liste de IdInterval où chaque idInterval désigne un ensemble d'éléments à supprimer.
+\end{definition}
+
+\mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}
 
 \subsection{Stratégie d'allocation}
 
-\mnnote{TODO: Ajouter et dérouler exemple où des noeuds insère dans une séquence répliquée pour illustrer la façon de choisir position, d'append à un bloc, ou de split un bloc}
+\mnnote{TODO: Ajouter et dérouler exemple où des noeuds insèrent dans une séquence répliquée pour illustrer la façon de choisir position, d'append à un bloc, ou de split un bloc}
+
+\mnnote{TODO: Montrer que cet ensemble d'identifiants est un ensemble dense}
 
 \mnnote{TODO: Faire le lien avec DottedLogootSplit}
 
@@ -657,7 +711,7 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
     \item[~]
     \begin{subproperty}(Préservation de l'ordre)
       Les éléments de la séquence doivent être triés en fonction de leur identifiants.
-      L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération \emph{renalme}.
+      L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération \emph{rename}.
     \end{subproperty}
   \end{itemize}
 \end{property}
@@ -761,7 +815,23 @@ Cependant, ils ne peuvent pas simplement remplacer leur état courant par l'éta
 En effet, ils peuvent avoir modifié en concurrence leur état.
 Afin de ne pas perdre ces modifications, les noeuds doivent traiter l'opération \emph{rename} eux-mêmes.
 Pour ce faire, le noeud qui a généré l'opération \emph{rename} diffuse son \emph{ancien état} aux autres.
-En utilisant cet état, les autres noeuds calculent le nouvel identifiant de chaque identifiant renommé.
+
+\begin{definition}[Ancien état]
+  Un \emph{ancien état} est la liste des idInterval qui composent l'état courant de la séquence répliquée au moment du renommage.
+\end{definition}
+
+De ce fait, nous définissons l'opération \emph{rename} de la manière suivante :
+
+\begin{definition}[rename]
+  Une opération \emph{rename} est un triplet $\langle$nodeId, nodeSeq, formerState$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant du noeud qui a générée l'opération \emph{rename}.
+    \item nodeSeq est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
+    \item formerState est l'ancien état du noeud au moment du renommage.
+  \end{itemize}
+\end{definition}
+
+En utilisant ces données, les autres noeuds calculent le nouvel identifiant de chaque identifiant renommé.
 Concernant les identifiants insérés de manière concurrente au renommage, nous expliquons dans \autoref{sec:ops-concurrent-to-rename} comment les noeuds peuvent les renommer de manière déterministe.
 
 \subsection{Gestion des opérations concurrentes au renommage}
@@ -810,7 +880,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
   \label{fig:concurrent-insert-rename-inconsistent}
 \end{figure}
 
-Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:renaming}.
+Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
 Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} < \id{i}{B0}{0}\id{m}{B1}{0}) au lieu d'à sa position prévue.
 Comme décrit par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
@@ -825,14 +895,14 @@ Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-in
 
 Au fur et à mesure qu'ils reçoivent des opérations \emph{rename}, les noeuds construisent et maintiennent localement la \emph{chaîne des époques}, une structure de données ordonnant les époques en fonction de leur relation \emph{parent-enfant}.
 De plus, les noeuds marquent chaque opération avec leur époque courante au moment de génération de l'opération.
-À la réception d'une opération, les noeuds compare l'époque de l'opération à la leur.
+À la réception d'une opération, les noeuds comparent l'époque de l'opération à la leur.
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'appliquer.
 Les noeuds déterminent par rapport à quelles opérations \emph{rename} doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.
 Pour ce faire, il est nécessaire d'ajouter la règle suivante aux contraintes existante sur la livraison des opérations : les opérations doivent désormais être livrées après l'opération \emph{rename} qui a introduit leur époque.
 
 Les noeuds utilisent la fonction \textsc{renameId}, décrite dans \autoref{alg:renameId}, pour transformer les opérations \emph{insert} et \emph{remove} par rapport aux opérations \emph{rename}.
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
-L'idée principale de cet algorithm est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
+L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
 Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilises \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
 
@@ -1007,7 +1077,7 @@ Cette opération introduit aussi une nouvelle époque : \epoch{B2}.
 Puisque l'opération \emph{rename} de A n'a pas encore été délivrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
 
 Puisque des époques concurrentes sont générées, les époques forment désormais l'\emph{arbre des époques}.
-Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les neoeuds obtiennent une fois qu'ils se sont synchronisés à terme.
+Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les noeuds obtiennent une fois qu'ils se sont synchronisés à terme.
 Les époques sont representées sous la forme de noeuds de l'arbre et la relation \emph{parent-enfant} entre elles est illustrée sous la forme de flèches noires.
 
 \begin{figure}[!ht]
