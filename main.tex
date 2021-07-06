@@ -1558,9 +1558,13 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
       \emph{rename} & $n$ & $k \cdot n$ + $l$ $\cdot$ ($n$ + $m$) \\
       \bottomrule
   \end{tabular}
-  \caption*{$n$ : nombre de blocs, $k$ : nombre d'opérations \emph{rename} à inverser, $l$ : nombre d'opérations \emph{rename} à appliquer, $m$ : nombre de blocs de l'\emph{ancien état} de l'opération \emph{rename} à inverser/appliquer}
+  \caption*{$n$ : nombre de blocs, $k$ : nombre d'opérations \emph{rename} à inverser, $l$ : nombre d'opérations \emph{rename} à appliquer, $m$ : nombre de blocs de l'\emph{ancien état} de l'opération \emph{rename} à appliquer}
   %}
 \end{table}
+
+\mnnote{TODO: J'ai pas pris en compte le fait que le renommage peut me décomposer le bloc à insérer/supprimer en plusieurs. Modifier les complexités en conséquence.}
+\mnnote{TODO: J'ai pas pris en compte le fait qu'un remove peut contenir plusieurs blocs à supprimer. Modifier les complexités en conséquence.}
+\mnnote{TODO: J'ai pas pris en compte le fait qu'il faut recréer une séquence (\ie insérer les blocs une fois renommés) lors de l'intégration de l'opération rename distante}
 
 \subsection{Expérimentations}
 
@@ -1814,7 +1818,6 @@ De cette manière, ils peuvent retrouver les identifiants complets et reconstrui
 Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
 En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
 
-\subsection{Implémentation alternative à base d'operation-log}
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 
 Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
@@ -1827,6 +1830,51 @@ De cette manière, nous pourrions favoriser la branche de l'\emph{arbre des épo
 Afin d'offrir une plus grande flexibilité dans la conception de la relation \emph{priority}, il est nécessaire de retirer la contrainte interdisant aux noeuds de rejouer une opération \emph{rename}.
 Pour cela, un couple de fonctions réciproques doit être proposée pour \textsc{renameId} et \textsc{revertRenameId}.
 Une solution alternative est de proposer une implémentation du mécanisme de renommage qui repose sur les identifiants originaux plutôt que sur ceux transformés, par exemple en utilisant le log des opérations.
+
+\subsection{Implémentation alternative à base d'operation-log}
+
+\begin{itemize}
+  \item Implémentation du mécanisme de renommage décrite et évaluée dans ce manuscrit consiste à appliquer les fonctions de transformations \textsc{renameId} et \textsc{revertRenameId} à l'ensemble des identifiants composant l'état lors de l'intégration d'une opération \emph{rename}
+  \item Une implémentation alternative se basant sur log des opérations peut être proposée
+  \item Consiste à partir de l'état produit par l'opération \emph{rename}
+  \item Puis à transformer et à intégrer l'ensemble des opérations concurrentes connues par le noeud sur cet état
+  \item Approche présente plusieurs avantages par rapport à l'implémentation actuelle
+  \begin{itemize}
+    \item Réduit le nombre de transformations calculées : ne transforme plus chaque élément (ou blocs si dispose de \textsc{renameBlock}) mais seulement chaque d'opération concurrente.
+      En fonction de la fréquence de déclenchement de l'opération \emph{rename}, ce nombre peut être plus petit de plusieurs ordres de grandeur.
+      Plus la distance entre l'époque courante et l'époque cible est grande, plus cette réduction est significative.
+    \item Récupère et réutilise les identifiants originaux depuis les opérations.
+      Permet d'éviter la situation où un noeud applique \textsc{revertRenameId} puis \textsc{renameId} à un identifiant donné.
+      Retire donc la contrainte de proposer un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId} ou d'avoir une relation \emph{priority} qui prémunit des aller-retours dans l'\emph{arbre des époques} pour garantir la correction du système.
+      Offre donc une plus grande flexibilité pour améliorer ces autres points du mécanisme de renommage.
+  \end{itemize}
+  \item Mais dispose aussi de quelques limites
+  \begin{itemize}
+    \item Besoin de maintenir le log des opérations.
+      Ce défaut est néanmoins à relativiser.
+      Les noeuds ont déjà besoin de maintenir le log des opérations de façon à se synchroniser avec les autres noeuds, que ça soit pour pallier à une perte d'un message ou pour permettre à un noeud qui rejoint la collaboration de se mettre à jour.
+    \item Besoin de parcourir le log des opérations à la recherche d'opérations concurrentes.
+      Là aussi, ce défaut est à relativiser.
+      Afin de supprimer les métadonnées du mécanisme de renommage, les noeuds traquent déjà les informations de progression des autres noeuds.
+      Ces informations permettent de déterminer la stabilité causale des opérations et peuvent être utilisées pour tronquer au fur et à mesure le log et ainsi limiter sa taille.
+      Le parcours du log peut aussi être facilement parallélisé.
+      \mnnote{
+        Est-ce que log peut être plus petit qu'état courant ?
+        Oui, si noeuds tous connectés et que système se stabilise.
+        Est-ce probable ?
+        Pas convaincu.
+      }
+    \item Besoin d'ajouter les informations de causalité pour permettre de détecter les opérations concurrentes.
+      Pour cela, il suffit d'inclure un vecteur de version dans l'opération \emph{rename}.
+      Ainsi, puisque le log ne peut contenir que des opérations précédant l'opération \emph{rename} ou concurrente à cette dernière (d'après la livraison basée sur les époques), il s'ensuit que toute opération présente dans le log et n'étant pas couverte par le vecteur de version est une opération concurrente à l'opération \emph{rename}.
+      Cependant, la taille des vecteurs de version croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
+      Diffuser cette structure de données à l'ensemble des noeuds peut donc avoir un coût significatif dans les collaborations à large échelle.
+      Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
+      Les opérations \emph{rename} étant rares en comparaison, ce surcoût nous paraît acceptable.
+  \end{itemize}
+\end{itemize}
+
+\mnnote{TODO: Ajouter la complexité temporelle de cette implémentation alternative}
 
 \subsection{Report de la transition vers la nouvelle epoch principale}
 
@@ -1982,7 +2030,7 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
   \item Dans ce cas
     \begin{itemize}
       \item comment un nouveau pair peut obtenir la clé de chiffrement si les autres pairs ne sont pas connectés ? (à moins de revenir à un chiffrement à base de passphrase, avec les problèmes qui en découlent)
-      \item comment un nouveau pair peut relire les opérations chiffrer avec l'ancienne clé ?
+      \item comment un nouveau pair peut relire les opérations chiffrées avec l'ancienne clé ?
     \end{itemize}
 \end{itemize}
 
