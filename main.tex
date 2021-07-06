@@ -653,7 +653,7 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{nicolas:hal-01932552,nicolas:hal-02526724}.
 Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
 Nous introduisons une opération \emph{rename} qui permet de
-\begin{enumerate*}
+\begin{enumerate*}[label=(\roman*)]
   \item réassigner des identifiants plus courts aux différents éléments de la séquence
   \item fusionner les blocs composant la séquence.
 \end{enumerate*}
@@ -719,15 +719,15 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
 \begin{property}(Commutativité avec les opérations concurrentes)
   \label{prop:commutativity}
   Les opérations concurrentes peuvent être délivrées dans des ordres différents à chaque noeud.
-  Afin de garantir la convergence des réplicas, l'ordre d'application d'un ensemble d'opérations concurrentes ne doit pas avoir d'impact sur l'état résultant.
+  Afin de garantir la convergence des réplicas, l'ordre d'application d'un ensemble d'opérations concurrentes ne doit pas avoir d'impact sur l'état obtenu.
   L'opération \emph{rename} doit donc être commutative avec n'importe quelle opération concurrente.
 \end{property}
 
 La \autoref{prop:commutativity} est particulièrement difficile à assurer.
-Cette difficulté est dûe au fait que les opérations \emph{rename} modifie les identifiants assignés aux éléments.
+Cette difficulté est dûe au fait que les opérations \emph{rename} modifient les identifiants assignés aux éléments.
 Cependant, les autres opérations telles que les opérations \emph{insert} et \emph{remove} reposent sur ces identifiants pour spécifier où insérer les éléments ou lesquels supprimer.
-Les opérations \emph{rename} sont donc intraséquement incompatibles avec les opérations \emph{insert} et \emph{remove} concurrentes.
-De la même manière, des opérations \emph{rename} concurrentes peuvent réassigner des identifiants différents à des éléments donnés.
+Les opérations \emph{rename} sont donc intrinséquement incompatibles avec les opérations \emph{insert} et \emph{remove} concurrentes.
+De la même manière, des opérations \emph{rename} concurrentes peuvent réassigner des identifiants différents à des mêmes éléments.
 Les opérations \emph{rename} concurrentes ne sont donc pas commutatives.
 Par conséquent, il est nécessaire de concevoir et d'utiliser des méthodes de résolution de conflits pour assurer la \autoref{prop:commutativity}.
 
@@ -736,7 +736,6 @@ Dans le \autoref{sec:centralised-rls}, nous présentons l'opération \emph{renam
 Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opération \emph{rename} elle-même ainsi que sur comment gérer les opérations \emph{insert} et \emph{remove} concurrentes.
 Ensuite, dans le \autoref{sec:distributed-rls}, nous supprimons cette hypothèse.
 Nous présentons alors notre approche pour gérer les scénarios avec des opérations \emph{rename} concurrentes.
-
 
 \section{RenamableLogootSplit}
 \label{sec:centralised-rls}
@@ -803,7 +802,8 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
 
 Son comportement est illustré dans la \autoref{fig:renaming}.
 Dans cet exemple, le noeud A initie une opération \emph{rename} sur son état local.
-Tout d'abord, le noeud A réutilise l'identifiant du premier élément de la séquence (\id{i}{B0}{0}) mais en le modifiant avec son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
+Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}).
+Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
 De plus, son offset est mis à 0.
 Le noeud A réassigne l'identifiant résultant (\id{i}{A1}{0}) au premier élément de la séquence, comme décrit dans \autoref{fig:renaming-first-id}.
 Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A1}{1}, \id{i}{A1}{2}, \id{i}{A1}{3}), comme présenté dans \autoref{fig:renaming-second-id}.
@@ -843,39 +843,41 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}
-      \path
-          node {\textbf{A}}
-          to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-          to ++(0:5 * \widthletter) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                      ] (S1A) {HELO}
-          to ++(0:8 * \widthletter) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                      ] (S2A-left) {HELO}
-          to ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
-                  label={above:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}} }
-                      ] {L};
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            to ++(0:5 * \widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A) {HELO}
+            to ++(0:8 * \widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S2A-left) {HELO}
+            to ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
+                    label={above:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L};
 
-      \path
-          to ++(270:2) node {\textbf{B}}
-          to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-          to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+        \path
+            to ++(270:2) node {\textbf{B}}
+            to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
 
 
-      \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
-      \draw[dotted] (S1A) -- (S2A-left);
-      \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
-      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
+        \draw[dotted] (S1A) -- (S2A-left);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
 
-  \end{tikzpicture}
+    \end{tikzpicture}
+  }
   \caption{Concurrent update leading to inconsistency}
   \label{fig:concurrent-insert-rename-inconsistent}
 \end{figure}
@@ -890,21 +892,26 @@ Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opé
 Pour cela, nous utilisons un système basé sur des \emph{époques}.
 Initialement, la séquence répliquée débute à l'époque \emph{origine} notée \epoch{0}.
 Chaque opération \emph{rename} introduit une nouvelle époque et permet aux noeuds d'y avancer depuis l'époque précédente.
+
+\mnnote{TODO: Ajouter description structure des époques}
+
 L'époque générée est caractérisée en utilisant l'identifiant du noeud et son numéro de séquence courant au moment de la génération de l'opération \emph{rename}.
 Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A1}.
 
 Au fur et à mesure qu'ils reçoivent des opérations \emph{rename}, les noeuds construisent et maintiennent localement la \emph{chaîne des époques}, une structure de données ordonnant les époques en fonction de leur relation \emph{parent-enfant}.
-De plus, les noeuds marquent chaque opération avec leur époque courante au moment de génération de l'opération.
+De plus, les noeuds marquent chaque opération avec l'identifiant de leur époque courante au moment de génération de l'opération.
 À la réception d'une opération, les noeuds comparent l'époque de l'opération à la leur.
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'appliquer.
 Les noeuds déterminent par rapport à quelles opérations \emph{rename} doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.
 Pour ce faire, il est nécessaire d'ajouter la règle suivante aux contraintes existante sur la livraison des opérations : les opérations doivent désormais être livrées après l'opération \emph{rename} qui a introduit leur époque.
+\mnnote{TODO: Reformuler dernière phrase : si époque inconnue, pas possible d'intégrer l'opération. Doit donc ajouter une contrainte sur l'ordre de livraison des opérations : livraison basée sur époque.}
+\mnnote{QUESTION: Indiquer que l'opération \emph{rename} ne nécessite pas de livraison particulière autre que epoch-based?}
 
 Les noeuds utilisent la fonction \textsc{renameId}, décrite dans \autoref{alg:renameId}, pour transformer les opérations \emph{insert} et \emph{remove} par rapport aux opérations \emph{rename}.
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
 L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
-Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilises \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
+Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
 
 \begin{figure}[!ht]
   \footnotesize
@@ -946,47 +953,49 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}
-      \path
-          node {\textbf{A}}
-          to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                      ] (S1A-right) {HELO}
-          to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
-                      ] {HE}
-          to ++(0:\widthblock) node[letter, fill=mylightblue,
-                  label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
-                      ] {L}
-          to ++(0:\widthletter) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
-                      ] {LO};
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {HELO}
+            to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {HE}
+            to ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L}
+            to ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] {LO};
 
-      \path
-          to ++(270:2) node {\textbf{B}}
-          to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+        \path
+            to ++(270:2) node {\textbf{B}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
 
 
-      \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
-      \draw[dotted] (S1A-right) -- (S2A-left);
-      \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
-      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
+        \draw[dotted] (S1A-right) -- (S2A-left);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
 
-  \end{tikzpicture}
+    \end{tikzpicture}
+  }
   \caption{Renaming concurrent update using \textsc{renameId} before applying it to maintain intended order}
   \label{fig:concurrent-insert-rename-fixed}
 \end{figure}
@@ -1009,10 +1018,6 @@ Une extension possible est de concevoir \textsc{renameBlock}, une version améli
 \textsc{renameBlock} réduirait le temps d'intégration des opérations \emph{rename}, puisque sa complexité temporelle ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
 
-\subsection{Évolution du modèle de livraison}
-
-\mnnote{TODO: Revoir si une livraison causale de l'opération \emph{rename} (et non epoch-based) peut avoir un intérêt}
-
 \section{RenamableLogootSplit v2}
 \label{sec:distributed-rls}
 \subsection{Conflits en cas de renommages concurrents}
@@ -1022,7 +1027,8 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
       \path
           node {\textbf{A}}
           to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
@@ -1067,6 +1073,7 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
       \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
 
     \end{tikzpicture}
+  }
   \caption{Concurrent \emph{rename} operations leading to divergent states}
   \label{fig:conflicting-rename-operations}
 \end{figure}
@@ -1281,54 +1288,56 @@ Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
-      \path
-          node {\textbf{A}}
-          to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                      ] (S1A-right) {HELO}
-          to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
-                      ] {HE}
-          to ++(0:\widthblock) node[letter, fill=mylightblue,
-                  label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
-                      ] {L}
-          to ++(0:\widthletter) node[block, fill=mydarkblue,
-                  label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
-                      ] (S2A-right) {LO}
-          to ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
-          to ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
-          to ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
-                  label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
-              ] {HELLO};
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {HELO}
+            to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {HE}
+            to ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L}
+            to ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] (S2A-right) {LO}
+            to ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
+            to ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
+            to ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                    label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+                ] {HELLO};
 
-      \path
-          to ++(270:3) node {\textbf{B}}
-          to ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
-                  label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
-              ] (S2B-right) {HELLO};
+        \path
+            to ++(270:3) node {\textbf{B}}
+            to ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+            to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                    label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+                ] (S2B-right) {HELLO};
 
-      \draw[dotted] (S1A-right) -- (S2A-left);
-      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
-      \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
-      \draw[dotted] (S2A-right) -- (between-S2A-S3A) (S3A-right) -- (S4A-left);
-      \draw[->, dashed, thick] (S2B-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{B2}}} (between-S2A-S3A);
-      \draw[->, loosely dash dot, thick, shorten >= 1] (between-S2A-S3A) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S3A-left);
-      \draw[->, dashed, thick, shorten >= 3] (between-S2A-S3A) edge[bend right] (S4A-left.west);
-  \end{tikzpicture}
+        \draw[dotted] (S1A-right) -- (S2A-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
+        \draw[dotted] (S2A-right) -- (between-S2A-S3A) (S3A-right) -- (S4A-left);
+        \draw[->, dashed, thick] (S2B-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{B2}}} (between-S2A-S3A);
+        \draw[->, loosely dash dot, thick, shorten >= 1] (between-S2A-S3A) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S3A-left);
+        \draw[->, dashed, thick, shorten >= 3] (between-S2A-S3A) edge[bend right] (S4A-left.west);
+    \end{tikzpicture}
+  }
   \caption{Reverting a previously applied \emph{rename} operation}
   \label{fig:revertRenameId}
 \end{figure}
@@ -1524,7 +1533,7 @@ Toute époque connue appartient donc à l'ensemble des \emph{époques requises},
 À terme, une fois que le système devient inactif, les noeuds atteignent la même époque et l'opération \emph{rename} correspondante devient causalement stable.
 Les noeuds peuvent alors supprimer toutes les autres époques et métadonnées associées, supprimant ainsi le surcoût mémoire introduit par le mécanisme de renommage.
 
-Notons que le mécanisme de récupération de mémoire peut être simplifié dans les systèmes empêchant les opérations \emph{rename} concurrenteS.
+Notons que le mécanisme de récupération de mémoire peut être simplifié dans les systèmes empêchant les opérations \emph{rename} concurrentes.
 Puisque les époques forment une chaîne dans de tels systèmes, la dernière époque introduite par une opération \emph{rename} causalement stable devient le \ac{LCA} des \emph{potentielles époques courantes}.
 Il s'ensuit que cette époque et ses descendantes forment l'ensemble des \emph{époques requises}.
 Les noeuds n'ont donc besoin que de suivre les opérations \emph{rename} causalement stables pour déterminer quelles époques peuvent être supprimées dans les systèmes sans opérations \emph{rename} concurrentes.
@@ -1814,6 +1823,7 @@ Cette méthode nous permet de réduire les données à diffuser dans le cadre de
 
 Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
 De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
+\mnnote{TODO: Développer ce paragraphe : noeuds doivent retrouver les blocs renommés à partir des données reçues. Pour cela, parcourent leur état. Suffit de retrouver un identifiant avec le même couple (nodeId, nodeSeq) pour reformer un bloc. Certains couples (nodeId, nodeSeq) peuvent avoir été supprimés en concurrence et ne plus être présent dans la séquence. Donc besoin d'aussi parcourir le log des opérations \emph{remove} concurrentes.}
 
 Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
 En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
@@ -1822,8 +1832,9 @@ En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur
 
 Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
 Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
+\mnnote{TODO: ajouter figure d'un epoch tree où une longue branche se fait remplacer par une époque isolée}
 
-La relation \emph{priority} devrait donc être conçu pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
+La relation \emph{priority} devrait donc être conçue pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
 Pour concevoir une relation \emph{priority} efficace, nous pourrions incorporer dans les opérations \emph{rename} des métriques qui représentent l'état du système et le travail accumulé sur le document (nombre de noeuds actuellement à l'époque \emph{parente}, nombre d'opérations générées depuis l'époque parente, taille du document...).
 De cette manière, nous pourrions favoriser la branche de l'\emph{arbre des époques} regroupant les collaborateurs les plus actifs et empêcher les noeuds isolés d'imposer leurs opérations \emph{rename}.
 
@@ -1882,6 +1893,8 @@ Comme illustré par \autoref{tab:evolution-integration-time-rename}, intégrer d
 Ce traitement peut générer un surcoût computationnel significatif en cas de multiples opérations \emph{rename} concurrentes.
 En particulier, un noeud peut recevoir et intégrer les opérations \emph{rename} concurrentes dans l'ordre inverse défini par la relation \emph{priority} sur leur époques.
 Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.
+
+\mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations \emph{rename} concurrentes et procéde au renommage de son état à chaque fois}
 
 En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds délaient le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
 Ce délai réduit la probabilité que les noeuds n'effectuent des traitements inutiles.
