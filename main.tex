@@ -69,6 +69,10 @@
 
 \newcommand{\id}[3]{$\trm{#1}^{\trm{#2}}_{\trm{#3}}$}
 \newcommand{\epoch}[1]{$\varepsilon_{#1}$}
+\newcommand{\lid}{$<_{id}$~}
+\newcommand{\leqid}{$\leq_{id}$~}
+\newcommand{\lepoch}{$<_{\varepsilon}$~}
+\newcommand{\leqepoch}{$\leq_{\varepsilon}$~}
 
 \newcommand{\widthletter}{2em}
 \newcommand{\widthblock}{3em}
@@ -471,12 +475,10 @@ Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangl
 Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
 Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre lexicographique est associée à l'ensemble des identifiants :
 
-\begin{definition}[Relation $<_{id}$]
-  Soient deux LogootSplit-id $id_1$ et $id_2$, la relation $id_1 <_{id} id_2$ est définie si et seulement si
-  \begin{enumerate}[label={(\roman*)}]
-    \item les $i^{emes}$ premiers composants de $id_1$ et $id_2$ sont égaux et le $i+1^{eme}$ composant de $id_1$ est inférieur au $i+1^{eme}$ composant de $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{m}{A0}{0}, \id{i}{A1}{0} $<_{id}$ \id{i}{B0}{0}, \id{i}{A1}{0}\id{f}{A1}{0} $<_{id}$ \id{i}{A1}{0}\id{f}{A1}{1})
-    \item la liste de tuples composant $id_1$ est un préfixe de la liste de tuples composant $id_2$ (\eg \id{i}{B0}{0} $<_{id}$ \id{i}{B0}{0}\id{f}{A0}{0})
-  \end{enumerate}
+\begin{definition}[Relation \lid]
+  La relation \lid est un ordre total strict sur l'ensemble des identifiants.
+  Elle permet aux noeuds de comparer n'importe quelle paire d'identifiants.
+  Elle est définie en utilisant l'ordre lexicographique sur les composants des différents tuples des identifiants comparés.
 \end{definition}
 
 \subsection{Aggrégation dynamique d'élements en blocs}
@@ -884,7 +886,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
 Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
-Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} < \id{i}{B0}{0}\id{m}{B1}{0}) au lieu d'à sa position prévue.
+Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu d'à sa position prévue.
 Comme décrit par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
 Il est donc nécessaire de traiter les opérations concurrentes aux opérations \emph{rename} de manière particulière.
 
@@ -1016,19 +1018,23 @@ En réassignant cet identifiant à l'élément inséré de manière concurrente,
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
 À la réception de l'opération \emph{rename} du noeud A, le noeud B utilise \textsc{renameId} sur chacun des identifiants de son état pour le renommer et atteindre un état équivalent à celui du noeud A.
 
-\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'interval des identifiants formant l'ancien état ($\trm{firstId} \leq \trm{id} \leq \trm{lastId}$).
-Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet interval ($\trm{id} < \trm{firstId}$ ou $\trm{lastId} < \trm{id}$), sont présentées dans \autoref{app:rename-id}.
+\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'interval des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
+Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet interval ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans \autoref{app:rename-id}.
 
 L'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
 Une extension possible est de concevoir \textsc{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
 \textsc{renameBlock} réduirait le temps d'intégration des opérations \emph{rename}, puisque sa complexité temporelle ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
 
+\subsection{Évolution du modèle de livraison des opérations}
+
 Finalement, considérons le cas où un noeud reçoit une opération marquée d'une époque encore inconnue.
 Il serait incohérent que le noeud l'intègre à leur état.
 En effet, comparer des identifiants d'une époque aux identifiants d'une autre époque n'a pas de sens et provoquerait des anomalies (cf. \autoref{fig:concurrent-insert-rename-inconsistent}).
+\mnnote{TODO: Ajouter nouvel exemple où noeud reçoit déjà des opérations dépendant d'un \emph{rename} avant de recevoir le \emph{rename}}
 Les noeuds devraient plutôt attendre l'opération \emph{rename} permettant de progresser jusqu'à cette époque pour intégrer cette opération.
-Il est donc nécessaire de faire évoluer le modèle de livraison des opérations pour ajouter la contrainte suivante : toute opération doit désormais être livrée après l'opération \emph{rename} qui a introduit son époque de génération.
+Il est donc nécessaire de faire évoluer le modèle de livraison des opérations pour ajouter la contrainte suivante : toute opération doit désormais être livrée après l'opération \emph{rename} qui introduit son époque de génération.
+\mnnote{QUESTION: Récapituler modèle de livraison ? (Epoch-based + causal remove)}
 \mnnote{QUESTION: Indiquer que l'opération \emph{rename} ne nécessite pas de livraison particulière autre que epoch-based?}
 
 \section{RenamableLogootSplit v2}
@@ -1141,8 +1147,8 @@ Nous proposons un algorithme qui remplit cet objectif dans la \autoref{sec:rever
 
 Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation \emph{priority}.
 
-\begin{definition}[Relation \emph{priority}]
-  La relation \emph{priority} est un ordre total strict sur l'ensemble des époques.
+\begin{definition}[Relation \emph{priority} \lepoch]
+  La relation \emph{priority} \lepoch est un ordre total strict sur l'ensemble des époques.
   Elle permet aux noeuds de comparer n'importe quelle paire d'époques.
 \end{definition}
 
@@ -1215,7 +1221,7 @@ La \autoref{fig:priority-example} fournit un exemple.
 \end{figure}
 
 La \autoref{fig:priority-execution} décrit une exécution dans laquelle trois noeuds A, B et C générent plusieurs opérations avant de se synchroniser à terme.
-Comme seules les opérations \emph{rename} sont pertinentes le problème qui nous occupe, seules ces opérations sont représentées dans cette figure.
+Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, seules ces opérations sont représentées dans cette figure.
 Initialement, le noeud A génère une opération \emph{rename} qui introduit l'époque \epoch{A1}.
 Cette opération est délivrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
 De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
@@ -1357,19 +1363,20 @@ Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
 
 Cette figure reprend le scénario de la \autoref{fig:concurrent-insert-rename-inconsistent}.
 Le noeud A reçoit l'opération \emph{rename} du noeud B, qui est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
-Selon la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible.
+Selon la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
 Il procède donc à ramener son état à un état équivalent à l'époque \epoch{0}, le \ac{LCA} de son époque courante \epoch{A1} et de l'époque cible \epoch{B2}.
 Pour ce faire, il applique \textsc{revertRenameId} à chaque identifiant de son état courant.
 
 \textsc{revertRenameId} détermine quelle stratégie appliquer pour restaurer un identifiant donné en utilisant des motifs.
 Par exemple, les identifiants de la forme \id{pos}{nId~nSeq}{offset} (\id{i}{A1}{offset} dans l'exemple courant) correspondent aux nouvelles valeurs des identifiants qui composent l'\emph{ancien état}.
 Pour retrouver les identifiants d'origine, \textsc{revertRenameId} utilise simplement leur offset puisqu'il correspond à leur index dans l'\emph{ancien état}.
+Par exemple, l'identifiant ayant pour offset 0 correspond au premier identifiant dans l'\emph{ancien état} (\id{i}{B0}{0}), celui ayant pour offset 1 au second identifiant (\id{i}{B0}{0}\id{f}{A0}{0}), et ainsi de suite.
 
 Les identifiants de la forme \id{pos}{nId~nSeq}{offset}$\trm{tail}$ (\eg \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}) correspondent à des identifiants qui ont été soit insérés de façon concurrente à l'opération \emph{rename}, soit causalement après.
 Pour traiter ces identifiant, \textsc{revertRenameId} retire tout d'abord le premier tuple (\id{i}{A1}{1}) pour isoler la queue de l'identifiant (\id{i}{B0}{0}\id{m}{B1}{0}).
 En faisant cela, \textsc{revertRenameId} annule la transformation appliquée à l'identifiant par \textsc{renIdFromPredId} si l'identifiant a été inséré de manière concurrente.
 L'algorithme compare ensuite la queue de l'identifiant aux identifiants de l'élément précédant et de l'élément suivant dans l'\emph{ancien état}.
-Dans cette exemple, nous avons \id{i}{B0}{0}\id{f}{A0}{0} < \id{i}{B0}{0}\id{m}{B1}{0} < \id{i}{B0}{1}.
+Dans cet exemple, nous avons \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{0}\id{m}{B1}{0} \lid \id{i}{B0}{1}.
 L'algorithme peut alors retourner la queue comme identifiant résultant tout en préservant l'ordre souhaité, puisque sa valeur est comprise entre celles des identifiants du prédécesseur et du successeur.
 
 Sinon, cela signifie que l'identifiant donné a été inséré de manière causale après l'opération \emph{rename}.
@@ -1381,7 +1388,7 @@ Pour ce faire, \textsc{revertRenameId} génère l'identifiant à partir de l'ide
 Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
 
 Comme pour \autoref{alg:renameId}, \autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
-Il s'agit du cas où l'identifiant à restaurer appartient à l'interval des identifiants renommés $\trm{newFirstId} \leq \trm{id} \leq \trm{newLastId}$).
+Il s'agit du cas où l'identifiant à restaurer appartient à l'interval des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).
 Les fonctions pour gérer les cas restants sont présentées dans \autoref{app:revert-rename-id}.
 
 Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
