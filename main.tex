@@ -1842,6 +1842,8 @@ Les noeuds peuvent donc réduire de manière significative le coût d'intégrati
 
 \subsection{Stockage des états précédents sur disque}
 
+\label{sec:offloading-former-states}
+
 Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
 Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
 \begin{enumerate*}[label=(\roman*)]
@@ -1955,8 +1957,6 @@ Une solution alternative est de proposer une implémentation du mécanisme de re
   \end{itemize}
 \end{itemize}
 
-\mnnote{TODO: Ajouter la complexité temporelle de cette implémentation alternative}
-
 \subsection{Report de la transition vers la nouvelle epoch principale}
 
 Comme illustré par \autoref{tab:evolution-integration-time-rename}, intégrer des opérations \emph{rename} distantes est généralement coûteux.
@@ -1980,13 +1980,54 @@ En effet, au cours de la période d'incertitude, un noeud peut avoir à utiliser
 Ensuite, le noeud peut devoir renommer son état vers l'époque cible une fois que celle-ci a obtenu le niveau de confiance requis.
 Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment transformés par \textsc{revertRenameId} à leur valeur initiale pour garantir la convergence.
 
+\section{Comparaison avec les approches existantes}
+
 \section{Conclusion}
+
+\subsection{Récapitulatif}
+
+\begin{itemize}
+  \item Propose un mécanisme de renommage optimiste adapté à LogootSplit
+  \item Réduit ponctuellement taille des métadonnées grâce à une nouvelle opération, l'opération \emph{rename}
+  \item Réduit métadonnées à un montant fixe à terme (1 seul bloc)
+  \item Ajoute un surcoût computationnel pour les opérations concurrentes aux opérations \emph{rename}
+  \item Mais surcoût compensé par l'optimisation de la structure de données utilisée en interne pour représenter la séquence (réduit taille de l'arbre)
+  \item Et permet de réduire le temps d'intégration des opérations dans le cas général
+\end{itemize}
+
+\subsection{Limites}
+
+\begin{itemize}
+  \item Une limite est la nécessité de stabilité causale pour pouvoir supprimer de manière définitive les métadonnées liées au mécanisme de renommage
+  \item Mais s'agit d'une limite commune avec les autres mécanismes de réduction des métadonnées, à l'exception de LSEQ (GC des tombstones dans RGA, catchup protocole de core et nebula (à re-vérifier, mais je vois pas comment ils feraient autrement))
+  \item Cette limite pose problème dans les systèmes dynamiques puisque nous possédons aucune garantie qu'un noeud va se reconnecter un jour
+  \item S'agit d'un problème encore non-résolu
+  \item Peut mettre en place un mécanisme pour évincer les noeuds inactifs depuis trop longtemps
+  \item Mais mène dans ce cas à des forks
+  \item Une second limite est le surcoût produit par les opérations \emph{rename} concurrentes, aussi bien en termes de métadonnées que de calculs
+  \item Peut être adressée en mettant en place une architecture à la core et nebula dans les systèmes qui le permettent
+  \item Sinon peut mettre en place des stratégies pour limiter le risque de d'opérations \emph{rename} concurrentes (coordination simple au sein de sous-groupe), mais n'offrent aucune garantie forte sur le nombre d'opérations concurrentes possibles
+\end{itemize}
+
+\subsection{Perspectives}
+
+\begin{itemize}
+  \item Définir stratégie pour déclenchement de l'opération \emph{rename}
+  \item Proposer nouvelles relations \emph{priority} \lepoch
+  \item Utiliser combinaison de CRDT et OT pour concevoir structures de données répliquées complexes (move dans Sequence, DFS...)
+\end{itemize}
+
 % \include{assets/chapter_application_HAL}
 
 \NumberThisInToc
 \chapter{MUTE, un éditeur web collaboratif P2P temps réel}
 \minitoc
 \section{Présentation}
+
+\begin{itemize}
+  \item Plateforme d'expérimentation et de démonstration de l'équipe
+\end{itemize}
+
 \subsection{Objectifs}
 
 \begin{itemize}
@@ -2034,6 +2075,8 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \begin{itemize}
   \item Implémentation de RenamableLogootSplit que nous avons réutilisé dans le cadre de nos simulations et évaluations
   \item Associée au composant gérant la livraison des opérations
+  \item \mnnote{TODO: Expliquer comment assure la livraison Causal Remove}
+  \item \mnnote{TODO: Expliquer comment assure la livraison Epoch-based}
   \item Mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}
 \end{itemize}
 
@@ -2076,6 +2119,7 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \begin{itemize}
   \item Repose sur des identifiants pour indiquer la position des curseurs
   \item Vecteur de LWW-Registers, chaque LWW-Register étant associé à un pair actuellement connecté
+    \mnnote{NOTE: C'est vrai ça ? J'ai un doute sur le fait qu'on avait mis en place un CRDT pour cette structure. À vérifier.}
 \end{itemize}
 
 \section{Couche sécurité}
@@ -2164,8 +2208,86 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \subsection{Définition de types de données répliquées sans conflits plus complexes}
 % \include{assets/conclusion}
 
-\Annex{Algorithmes}
+\Annex{Algorithmes \textsc{renameId}}
 % \include{assets/annex_extension}
+
+\label{app:rename-id}
+
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{renIdLessThanFirstId}{id, newFirstId}
+      \If{id < newFirstId}
+          \State \Return id
+      \Else
+          \State pos $\gets$ position(newFirstId)
+          \State nId $\gets$ nodeId(newFirstId)
+          \State nSeq $\gets$ nodeSeq(newFirstId)
+          \State predNewFirstId $\gets$ \new~Id(pos, nId, nSeq, -1)
+          \\
+          \State \Return concat(predNewFirstId, id)
+          \EndIf
+      \EndFunction
+      \\
+      \Function{renIdGreaterThanLastId}{id, newLastId}
+          \If{id < newLastId}
+              \State \Return concat(newLastId, id)
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Remaining functions to rename an identifier}
+  \label{alg:appendix-rename-id}
+\end{figure}
+
+\Annex{Algorithmes \textsc{revertRenameId}}
+
+\label{app:revert-rename-id}
+
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{revRenIdLessThanNewFirstId}{id, firstId, newFirstId}
+          \State predNewFirstId $\gets$ createIdFromBase(newFirstId, -1)
+          \If{isPrefix(predNewFirstId, id)}
+              \State tail $\gets$ getTail(id, 1)
+              \If{tail < firstId}
+                  \State \Return tail
+              \Else
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State offset $\gets$ getLastOffset(firstId)
+                  \State predFirstId $\gets$ createIdFromBase(firstId, offset)
+                  \State \Return concat(predFirstId, MAX\_TUPLE, tail)
+              \EndIf
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+      \\
+      \Function{revRenIdGreaterThanNewLastId}{id, lastId}
+          \If{id < lastId}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State \Return concat(lastId, MIN\_TUPLE, id)
+          \ElsIf{isPrefix(newLastId, id)}
+              \State tail $\gets$ getTail(id, 1)
+              \If{tail < lastId}
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State \Return concat(lastId, MIN\_TUPLE, tail)
+              \ElsIf{tail < newLastId}
+                  \State \Return tail
+              \Else
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State \Return id
+              \EndIf
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Remaining functions to revert an identifier renaming}
+  \label{alg:appendix-revert-rename-id}
+\end{figure}
 
 %
 %%-------------------------------------------------------------------
