@@ -1582,18 +1582,68 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
       \cmidrule(lr){2-3}
         & Locale &   Distante \\
       \midrule
-      \emph{insert} & log($n$) & $k$ + $l$ $\cdot$ log($m$) + log($n$) \\
-      \emph{remove} & log($n$) & $k$ + $l$ $\cdot$ log($m$) + log($n$) \\
-      \emph{rename} & $n$ & $k \cdot n$ + $l$ $\cdot$ ($n$ + $m$) \\
+      \emph{insert} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
+      \emph{remove} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
+      \emph{naive rename} & $n$ & $h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)) \\
+      \emph{rename} & $n$ & $h$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$ \\
       \bottomrule
   \end{tabular}
-  \caption*{$n$ : nombre de blocs, $k$ : nombre d'opérations \emph{rename} à inverser, $l$ : nombre d'opérations \emph{rename} à appliquer, $m$ : nombre de blocs de l'\emph{ancien état} de l'opération \emph{rename} à appliquer}
+  \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $m$ : nombre d'éléments de l'\emph{ancien état} des renommages à appliquer}
   %}
 \end{table}
 
-\mnnote{TODO: J'ai pas pris en compte le fait que le renommage peut me décomposer le bloc à insérer/supprimer en plusieurs. Modifier les complexités en conséquence.}
-\mnnote{TODO: J'ai pas pris en compte le fait qu'un remove peut contenir plusieurs blocs à supprimer. Modifier les complexités en conséquence.}
-\mnnote{TODO: J'ai pas pris en compte le fait qu'il faut recréer une séquence (\ie insérer les blocs une fois renommés) lors de l'intégration de l'opération rename distante}
+\begin{itemize}
+  \item Nous supposons que le nombre d'identifiants dans la séquence $n$ croît au fur et à mesure
+  \item La taille des identifiants est quant à elle réinitialisé périodiquement par l'opération \emph{rename}
+  \item Nous considérons que celle-ci devient négligeable par rapport au nombre d'identifiants.
+  \item Nous ne prenons donc pas en compte la taille des identifiants dans nos complexités.
+    \mnnote{QUESTION: Ai-je le droit de faire ça ?}
+  \item \textsc{renameId} a pour complexité O(log($m$)), où $m$ est le nombre d'éléments de $renamedIds$, l'\emph{ancien état}
+  \begin{itemize}
+    \item Puisque que pire cas consiste à parcourir $renamedIds$ à la recherche du prédecesseur de $id$
+    \item $renamedIds$ étant une liste triée d'identifiants, une recherche binaire peut être effectuée
+  \end{itemize}
+  \item \textsc{revertRenameId} a pour complexité O(1)
+  \begin{itemize}
+    \item Ici, pas de recherche à effectuer
+    \item L'offset du 1er tuple de $id$ permet de retrouver directement ses prédecesseur et successeur dans $renamedIds$
+  \end{itemize}
+  \item Considérons que nous utilisons un AVL comme structure de données pour représenter la séquence
+  \item La complexité d'une opération \emph{insert} locale est en O(log($b$)) (cf. article LogootSplit), puisque cette action est inchangée par rapport à LogootSplit
+  \item La complexité d'une opération \emph{insert} distante, elle, évolue par rapport à LogootSplit
+  \item En effet, l'opération peut être issue d'une autre époque que l'époque courante du noeud
+  \item Pour l'intégrer, doit au prélable déterminer l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante
+  \item Correspond à trouver l'intersection entre deux branches de l'arbre
+  \item S'agit d'un algorithme avec une complexité en O($h$), où $h$ est la hauteur de l'\emph{arbre des époques}
+  \item Ensuite, le noeud doit appliquer successivement $k$ fois \textsc{revertRenameId} sur l'identifiant à insérer
+  \begin{itemize}
+    \item Où $k$ est le nombre d'époques formant la branche entre l'époque de l'opération et l'époque \ac{LCA}
+    \item Permet d'obtenir l'identifiant équivalent à l'époque \ac{LCA}
+  \end{itemize}
+  \item Le noeud applique ensuite $l$ fois \textsc{renameId} sur l'identifiant obtenu
+  \begin{itemize}
+    \item Où $l$ est le nombre d'époques formant la branche entre l'époque \ac{LCA} et l'époque courante
+    \item Permet d'obtenir l'identifiant équivalent à l'époque courante
+  \end{itemize}
+  \item Il ne reste plus qu'au noeud à insérer l'élément dans la séquence
+  \item Nous obtenons donc une complexité de O($h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$)) pour l'opération \emph{insert} distante
+  \item De la même manière, nous obtenons des complexités similaires pour l'opération \emph{remove}, en local et distant
+  \item Concernant l'opération \emph{rename}
+  \item L'opération \emph{rename} locale consiste à parcourir et à linéariser la structure actuelle pour ne garder que les idIntervals courant
+  \item Et à créer une nouvelle séquence équivalente à l'ancienne, composée seulement du nouveau bloc
+  \item Sa complexité est donc de O($n$)
+  \item Pour l'opération \emph{rename} distante, une implémentation naïve consiste à générer le nouvel état en renommant et insérant chaque identifiant de l'état courant d'une manière similaire à l'opération \emph{insert} distante
+  \item On obtient dans ce cas une complexité de O($h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)))
+  \item Mais peut améliorer
+  \item Plutôt que d'effectuer une recherche binaire sur $renamedIds$ pour trouver le prédecesseur de $id$
+  \item Peut tirer parti du fait qu'on va parcourir séquentiellement l'état, qui est une liste triée d'identifiants
+  \item Et parcourir en parallèle, au fur et à mesure, $renamedIds$ pour trouver le prédecesseur du $id$ courant
+  \item Permet de ramener la complexité du renommage des $n$ identifiants de l'époque \ac{LCA} à l'époque courante à O($l$ ($n$ + $m$))
+  \item Plutôt que de générer une nouvelle séquence et d'y insérer un par un les $n$ éléments
+  \item Peut parcourir les $n$ éléments pour reformer $b$ blocs
+  \item Peut ensuite construire l'AVL de manière récursive en parcourant les $b$ blocs obtenus
+  \item Peut donc obtenir une complexité de O($h$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$) pour l'intégration de l'opération \emph{rename} distante
+\end{itemize}
 
 \subsection{Expérimentations}
 
