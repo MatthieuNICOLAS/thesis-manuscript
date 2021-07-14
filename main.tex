@@ -50,6 +50,8 @@
 
 \usepackage{tikz} % \begin{tikzpicture} \end{tikzpicture}
 \usetikzlibrary{calc}
+\usetikzlibrary{graphs}
+\usetikzlibrary{quotes}
 \usetikzlibrary{shapes.misc}
 
 \usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
@@ -439,6 +441,11 @@ qui fut la première de toutes.
   \item Logoot \cite{WeissICDCS09, weiss:hal-00450416}
 \end{itemize}
 
+\mnnote{NOTE: Ajouter LogootSplit de manière sommaire aussi à cet endroit?}
+
+\mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
+
+
 \section{LogootSplit}
 
 LogootSplit \cite{AndreCollaborateCom2013} est l'état de l'art des séquences répliquées à identifiants densément ordonnés.
@@ -453,11 +460,13 @@ Les tuples sont définis de la manière suivante :
   Un \emph{Tuple} est un quadruplet $\langle$position, nodeId, nodeSeq, offset$\rangle$ où
   \begin{itemize}
     \item position incarne la position souhaitée de l'élément.
-    \item nodeId est l'identifiant unique du noeud qui a généré t.
-    \item nodeSeq est le numéro de séquence courant du noeud à la génération de t.
+    \item nodeId est l'identifiant unique du noeud qui a généré le tuple.
+    \item nodeSeq est le numéro de séquence courant du noeud à la génération du tuple.
     \item offset indique la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
   \end{itemize}
 \end{definition}
+
+\mnnote{TODO: Ajouter une relation d'ordre sur les tuples}
 
 Dans ce manuscrit, nous représentons les tuples par le biais de la notation suivante : \id{position}{nodeId~nodeSeq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{nodeId}$ une lettre majuscule et $\trm{nodeSeq}$ et $\trm{offset}$ des entiers, \eg \id{i}{B0}{0}.
 
@@ -473,13 +482,21 @@ Nous représentons les identifiants en listant les tuples qui les composent.
 Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangle\langle$f, A, 0, 0$\rangle\rangle$ est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
 
 Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
-Pour ce faire, une relation d'ordre totale aux identifiants basée sur l'ordre lexicographique est associée à l'ensemble des identifiants :
+Pour ce faire, une relation d'ordre totale aux identifiants est associée à l'ensemble des identifiants :
 
 \begin{definition}[Relation \lid]
   La relation \lid est un ordre total strict sur l'ensemble des identifiants.
   Elle permet aux noeuds de comparer n'importe quelle paire d'identifiants.
   Elle est définie en utilisant l'ordre lexicographique sur les composants des différents tuples des identifiants comparés.
 \end{definition}
+
+\begin{itemize}
+  \item En utilisant cette relation d'ordre, les noeuds peuvent ordonner les éléments grâce à leur identifiant.
+  \item Par exemple, déterminent que \id{i}{A1}{0} \lid \id{i}{B0}{0} car les positions sont identiques et que le \emph{nodeId} (A) du premier est plus petit que le \emph{nodeId} (B) du second
+  \item et que \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second
+\end{itemize}
+
+\mnnote{TODO: Montrer que cet ensemble d'identifiants est un ensemble dense}
 
 \subsection{Aggrégation dynamique d'élements en blocs}
 
@@ -489,7 +506,7 @@ Au lieu de stocker les identifiants de chaque élément de la séquence, LogootS
 Pour cela, LogootSplit introduit la notion d'interval d'identifiants :
 
 \begin{definition}[IdInterval]
-  Un \emph{IdInterval} est un couple (idBegin, offsetEnd) où
+  Un \emph{IdInterval} est un couple $\langle$idBegin, offsetEnd$\rangle$ où
   \begin{itemize}
     \item idBegin est l'identifiant du premier élément de l'interval.
     \item offsetEnd est l'offset du dernier identifiant de l'interval.
@@ -498,9 +515,20 @@ Pour cela, LogootSplit introduit la notion d'interval d'identifiants :
 
 Les intervals d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant réellement que l'identifiant de son premier élément et le dernier offset de son dernier élément.
 
-LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un bloc.
+LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un interval.
 Nous appelons \emph{contigus} deux identifiants qui partagent une même base (\ie qui sont identiques à l'exception de leur dernier offset) et dont les \emph{offsets} sont consécutifs.
-Nous représentons l'interval d'identifiants qui composent un bloc à l'aide du formalisme suivant : \id{position}{nodeId~nodeSeq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant du bloc et $\trm{end}$ du dernier.
+Nous représentons un interval d'identifiants à l'aide du formalisme suivant : \id{position}{nodeId~nodeSeq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant de l'interval et $\trm{end}$ du dernier.
+
+LogootSplit
+
+\begin{definition}[Bloc]
+  Un \emph{Bloc} est un quadruplet $\langle$idInterval, elts, isAppendable, isPrependable$\rangle$ où
+  \begin{itemize}
+    \item idInterval est l'interval d'identifiants formant le bloc
+    \item elts sont les éléments contenus dans le bloc
+    \item isAppendable (resp. isPrependable) est un booléen indiquant si l'auteur du bloc peut ajouter un nouvel élément en fin (resp. début) de bloc
+  \end{itemize}
+\end{definition}
 
 La \autoref{fig:logootsplit-seq} présente un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
 LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
@@ -538,9 +566,9 @@ L'utilisation de blocs améliore aussi les performances de la structure de donn�
 En effet, l'utilisation de blocs permet de parcourir plus efficacement la structure de données.
 Les blocs permettent aussi d'effectuer des modifications à l'échelle de la chaîne de caractères et non plus seulement caractère par caractère.
 
-\mnnote{TODO: indiquer que le couple (nodeId, nodeSeq) permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
+\mnnote{TODO: indiquer que le couple $\langle$nodeId, nodeSeq$\rangle$ permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
 
-Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet $\langle$nodeId, nodeSeq, offset$\rangle$ issue de leur dernier Id-tuple.
+Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet $\langle$nodeId, nodeSeq, offset$\rangle$ issue de leur dernier Tuple.
 Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'identifiant \id{i}{B0}{2} dans \autoref{fig:logootsplit-seq}.
 
 \subsection{Modèle de données}
@@ -554,7 +582,7 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   \begin{itemize}
     \item nodeId est l'identifiant du noeud.
     \item nodeSeq est le numéro de séquence courant du noeud.
-    \item blocks est une liste de couples (idInterval, elts) correspondant à l'état actuel de la séquence répliquée.
+    \item blocks est une liste de Blocs correspondant à l'état actuel de la séquence répliquée.
   \end{itemize}
 \end{definition}
 
@@ -562,11 +590,11 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   \item Plusieurs fonctions disponibles pour permettre de modifier localement la séquence
   \item Ces fonctions génèrent des opérations à diffuser aux autres noeuds pour qu'ils mettent à jour leur état
   \item insert(index, elts) qui génère une opération \emph{insert} correspondante
-  \item remove(index, length) qui génère une opéraiton \emph{remove} correspondante
+  \item remove(index, length) qui génère une opération \emph{remove} correspondante
 \end{itemize}
 
 \begin{definition}[insert]
-  Une opération \emph{insert} est un couple (id, elts) où
+  Une opération \emph{insert} est un couple $\langle$id, elts$\rangle$ où
   \begin{itemize}
     \item id est l'identifiant du premier élément inséré par cette opération.
     \item elts est la liste des éléments insérés par cette opération.
@@ -577,13 +605,94 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   Une opération \emph{remove} est une liste de IdInterval où chaque idInterval désigne un ensemble d'éléments à supprimer.
 \end{definition}
 
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0A) {HRLO}
+            to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1A-left) {H}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S1A-right) {LO}
+            to ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2A-left) {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S2A-right) {LO}
+            to ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S3A-left) {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] {LO!};
+
+
+        \path
+            to ++(270:4) node {\textbf{B}}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0B) {HRLO}
+            to ++(0:5 * \widthletter) node[block, label=below:{\id{i}{B0}{0..4}}] (S1B) {HRLO!}
+            to ++(0:7 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2B-left) {H}
+            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] (S2B-right) {LO!}
+            to ++(0:7 * \widthletter) node[letter, label=above:{\id{i}{B0}{0}}] (S3B-left) {H}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=below:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{2..4}}] {LO!};
+
+        \draw[->, thick]
+          (S0A) edge node[above, align=center]{\emph{remove "r"}} (S1A-left)
+          (S1A-right) edge node[above, align=center]{\emph{insert "e"}\\\emph{between}\\\emph{"h" and "l"}} (S2A-left)
+          (S0B) edge node[below, align=center]{\emph{insert "!"}\\\emph{at the end}} (S1B);
+
+        \draw[dotted]
+          (S2A-right) -- (S3A-left)
+          (S1B) -- (S2B-left)
+          (S2B-right) -- (S3B-left);
+
+        \draw[dashed, ->, thick, shorten >= 3]
+          (S1A-right.east) edge node[right, align=center]{\emph{remove} \id{i}{B0}{1}}  (S2B-left.west)
+          (S2A-right.east) edge node[below right, align=center]{\emph{insert "e" at} {\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}} (S3B-left.west)
+          (S1B.east) edge node[below right, near end, align=center]{\emph{insert "!" at} \id{i}{B0}{4}} (S3A-left.west);
+
+
+        % \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
+        % \draw[dotted] (S1A) -- (S2A-left);
+        % \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
+        % \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+
+    \end{tikzpicture}
+  }
+  \caption{TODO}
+  \label{fig:logootsplit-example}
+\end{figure}
+
+\begin{itemize}
+  \item Figure décrit scénario suivant
+  \item Deux noeuds, A et B, répliquent et éditent collaborativement un document texte.
+  \item Ils partagent initialement le même état, composé d'un seul bloc associant les identifiants \id{i}{B0}{0..3} aux éléments "HRLO".
+  \item Puis les noeuds se mettent à éditer le document.
+  \item Le noeud A commence par supprimer l'élément "r".
+  \item LogootSplit génère l'opération \emph{remove} correspondante à diffuser aux autres noeuds de la collaboration en utilisant l'identifiant de l'élément supprimé (\id{i}{B0}{1}).
+  \item Le noeud A insère ensuite un élément "e" dans la séquence, entre le "h" et le "l"
+  \item LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément
+  \item Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} \lid $id$ \lid \id{i}{B0}{2}
+  \item Le noeud A ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre
+  \item Le noeud A génère alors $id$ en recopiant le premier tuple (\id{i}{B0}{0}) et en y ajoutant un nouveau tuple (\id{f}{A0}{0})
+  \item LogootSplit génère l'opération \emph{insert} correspondante
+  \item En parallèle, le noeud B insère un élément "!" à la fin de la séquence
+  \item Comme le noeud B est l'auteur du bloc \id{i}{B0}{0..3}, il peut y append ou prepend de nouveaux éléments (en supposant qu'il s'agisse bien des bornes minimales et maximales du bloc qui n'aient jamais existées)
+  \item L'identifiant \id{i}{B0}{4} est donc associé à l'élément "!" et celui-ci est ajouté au bloc existant
+  \item Les noeuds se synchronisent ensuite
+  \item Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4} issue de B
+  \item Grâce à l'identifiant, le noeud A est capable d'insérer cet élément à l'emplacement voulu
+  \item De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove}
+\end{itemize}
+
 \mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}
 
-\subsection{Stratégie d'allocation}
+\subsection{Modèle de livraison}
 
-\mnnote{TODO: Ajouter et dérouler exemple où des noeuds insèrent dans une séquence répliquée pour illustrer la façon de choisir position, d'append à un bloc, ou de split un bloc}
-
-\mnnote{TODO: Montrer que cet ensemble d'identifiants est un ensemble dense}
+\begin{itemize}
+  \item Livraison exactly-once des opérations
+  \item Une opération \emph{remove} doit être livrée après l'opération \emph{insert} correspondante
+  \item Des opérations \emph{insert} peuvent elles arriver dans des ordres arbitraires
+  \begin{itemize}
+    \item Même celles causalement liées
+  \end{itemize}
+\end{itemize}
 
 \mnnote{TODO: Faire le lien avec DottedLogootSplit}
 
@@ -906,7 +1015,7 @@ Nous définissons les époques de la manière suivante :
   \end{itemize}
 \end{definition}
 
-Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple (nodeId, nodeSeq).
+Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle$nodeId, nodeSeq$\rangle$.
 
 Au fur et à mesure que les noeuds reçoivent des opérations \emph{rename}, ils construisent et maintiennent localement la \emph{chaîne des époques}, une structure de données ordonnant les époques en fonction de leur relation \emph{parent-enfant}.
 De plus, les noeuds marquent chaque opération avec l'identifiant de leur époque courante au moment de génération de l'opération.
@@ -1895,7 +2004,7 @@ Cette méthode nous permet de réduire les données à diffuser dans le cadre de
 
 Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
 De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
-\mnnote{TODO: Développer ce paragraphe : noeuds doivent retrouver les blocs renommés à partir des données reçues. Pour cela, parcourent leur état. Suffit de retrouver un identifiant avec le même couple (nodeId, nodeSeq) pour reformer un bloc. Certains couples (nodeId, nodeSeq) peuvent avoir été supprimés en concurrence et ne plus être présent dans la séquence. Donc besoin d'aussi parcourir le log des opérations \emph{remove} concurrentes.}
+\mnnote{TODO: Développer ce paragraphe : noeuds doivent retrouver les blocs renommés à partir des données reçues. Pour cela, parcourent leur état. Suffit de retrouver un identifiant avec le même couple $\langle$nodeId, nodeSeq$\rangle$ pour reformer un bloc. Certains couples $\langle$nodeId, nodeSeq$\rangle$ peuvent avoir été supprimés en concurrence et ne plus être présent dans la séquence. Donc besoin d'aussi parcourir le log des opérations \emph{remove} concurrentes.}
 
 Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
 En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.

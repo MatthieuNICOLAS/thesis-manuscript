@@ -413,6 +413,52 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   HAL_VERSION = {v2},
 }
 
+% Autres Sequence CRDTs
+@inproceedings{2012-string-wise,
+  author = {Yu, Weihai},
+  title = {A String-Wise CRDT for Group Editing},
+  year = {2012},
+  isbn = {9781450314862},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/2389176.2389198},
+  doi = {10.1145/2389176.2389198},
+  abstract = {Real-time group editing has been envisioned as an important application for group collaboration. Operational transformation (OT) has been the concurrency control mechanism for group editing, due to its potential for high responsiveness to local editing operations. OT algorithms are generally very sophisticated and computation intensive. Recently, commutative replicated data types (CRDT) have appeared as viable substitutes of OT. Existing OT and CRDT work suffers from serious limitations. This note presents a CRDT that addresses some of these limitations.},
+  booktitle = {Proceedings of the 17th ACM International Conference on Supporting Group Work},
+  pages = {141–144},
+  numpages = {4},
+  keywords = {selective undo, real-time collaborative editor, commutative replicated data type},
+  location = {Sanibel Island, Florida, USA},
+  series = {GROUP '12}
+}
+
+@inproceedings{2020-chronofold,
+  author = {Grishchenko, Victor and Patrakeev, Mikhail},
+  title = {Chronofold: A Data Structure for Versioned Text},
+  year = {2020},
+  isbn = {9781450375245},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3380787.3393680},
+  doi = {10.1145/3380787.3393680},
+  abstract = {Chronofold is a replicated data structure for versioned text, based on the extended
+  Causal Tree model. Past models of this kind either retrofitted local linear orders
+  to a distributed system (the OT approach) or employed distributed data models locally
+  (the CRDT approach). That caused either extreme fragility in a distributed setting
+  or egregious overheads in local use. Overall, that local/distributed impedance mismatch
+  is cognitively taxing and causes lots of complexity. We solve that by using subjective
+  linear orders locally at each replica, while inter-replica communication uses a distributed
+  model. A separate translation layer insulates local data structures from the distributed
+  environment. We modify the Lamport timestamping scheme to make that translation as
+  trivial as possible. We believe our approach has applications beyond the domain of
+  collaborative editing.},
+  booktitle = {Proceedings of the 7th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {7},
+  numpages = {9},
+  location = {Heraklion, Greece},
+  series = {PaPoC '20}
+}
+
 % Éditeurs collaboratifs à base de CRDTs
 % --------
 
@@ -1234,20 +1280,17 @@ series = {PaPoC '21}
   isbn="978-3-540-44717-7"
 }
 
-@inproceedings{10.1145/2389176.2389198,
-  author = {Yu, Weihai},
-  title = {A String-Wise CRDT for Group Editing},
-  year = {2012},
-  isbn = {9781450314862},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  url = {https://doi.org/10.1145/2389176.2389198},
-  doi = {10.1145/2389176.2389198},
-  abstract = {Real-time group editing has been envisioned as an important application for group collaboration. Operational transformation (OT) has been the concurrency control mechanism for group editing, due to its potential for high responsiveness to local editing operations. OT algorithms are generally very sophisticated and computation intensive. Recently, commutative replicated data types (CRDT) have appeared as viable substitutes of OT. Existing OT and CRDT work suffers from serious limitations. This note presents a CRDT that addresses some of these limitations.},
-  booktitle = {Proceedings of the 17th ACM International Conference on Supporting Group Work},
-  pages = {141–144},
-  numpages = {4},
-  keywords = {selective undo, real-time collaborative editor, commutative replicated data type},
-  location = {Sanibel Island, Florida, USA},
-  series = {GROUP '12}
+% Causal barrier
+@article{1997-causal-barrier,
+  title = {An Adaptive Causal Ordering Algorithm Suited to Mobile Computing Environments},
+  journal = {Journal of Parallel and Distributed Computing},
+  volume = {41},
+  number = {2},
+  pages = {190-204},
+  year = {1997},
+  issn = {0743-7315},
+  doi = {https://doi.org/10.1006/jpdc.1996.1300},
+  url = {https://www.sciencedirect.com/science/article/pii/S0743731596913003},
+  author = {Ravi Prakash and Michel Raynal and Mukesh Singhal},
+  abstract = {Causal message ordering is required for several distributed applications. In order to preserve causal ordering, only direct dependency information between messages, with respect to the destination process(es), need be sent with each message. By eliminating other kinds of control information from the messages, the communication overheads can be significantly reduced. In this paper we present an algorithm that uses this knowledge to efficiently enforce causal ordering of messages. The proposed algorithm does not require any prior knowledge of the network topology or communication pattern. As computation proceeds, it acquires knowledge of the communication pattern and is capable of handling dynamically changing multicast communication groups, and minimizing the communication overheads. With regard to communication overheads, the algorithm is optimal for the broadcast communication case. Extensive simulation experiments demonstrate that the algorithm imposes lower communication overheads than previous causal ordering algorithms. The algorithm can be employed in a variety of distributed computing environments. Its energy efficiency and low bandwidth requirement make it especially suitable for mobile computing systems. We show how to employ the algorithm for causally ordered multicasting of messages in mobile computing environments.}
 }
