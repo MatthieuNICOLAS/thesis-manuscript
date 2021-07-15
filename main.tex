@@ -448,7 +448,7 @@ qui fut la première de toutes.
 
 \section{LogootSplit}
 
-LogootSplit \cite{AndreCollaborateCom2013} est l'état de l'art des séquences répliquées à identifiants densément ordonnés.
+LogootSplit \cite{2013-logootsplit} est l'état de l'art des séquences répliquées à identifiants densément ordonnés.
 Comme expliqué précédemment, LogootSplit utilise des identifiants provenant d'un ordre total dense pour positionner les éléments dans la séquence répliquée.
 
 \subsection{Identifiants}
@@ -519,7 +519,8 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
 Nous appelons \emph{contigus} deux identifiants qui partagent une même base (\ie qui sont identiques à l'exception de leur dernier offset) et dont les \emph{offsets} sont consécutifs.
 Nous représentons un interval d'identifiants à l'aide du formalisme suivant : \id{position}{nodeId~nodeSeq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant de l'interval et $\trm{end}$ du dernier.
 
-LogootSplit
+Les blocs permettent d'associer un interval d'identifiants aux éléments correspondant.
+Les blocs sont définis de la manière suivante :
 
 \begin{definition}[Bloc]
   Un \emph{Bloc} est un quadruplet $\langle$idInterval, elts, isAppendable, isPrependable$\rangle$ où
@@ -531,7 +532,7 @@ LogootSplit
 \end{definition}
 
 La \autoref{fig:logootsplit-seq} présente un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
-LogootSplit est donc capable de regrouper ces éléments en un bloc \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
+LogootSplit est donc capable de regrouper ces éléments en un bloc représentant l'interval d'identifiants \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
 
 \begin{figure}[!ht]
   \centering
@@ -573,9 +574,7 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
 
 \subsection{Modèle de données}
 
-\begin{itemize}
-  \item Structure de données définie de la manière suivante :
-\end{itemize}
+\textcite{2013-logootsplit} définissent une séquence LogootSplit de la manière suivante :
 
 \begin{definition}[Séquence LogootSplit]
   Une séquence \emph{Séquence LogootSplit} est un triplet $\langle$nodeId, nodeSeq, blocks$\rangle$ où
@@ -586,11 +585,12 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   \end{itemize}
 \end{definition}
 
+Plusieurs fonctions sont définies sur cette structure de données et permettent de l'interroger et de la modifier :
+
 \begin{itemize}
-  \item Plusieurs fonctions disponibles pour permettre de modifier localement la séquence
-  \item Ces fonctions génèrent des opérations à diffuser aux autres noeuds pour qu'ils mettent à jour leur état
-  \item insert(index, elts) qui génère une opération \emph{insert} correspondante
-  \item remove(index, length) qui génère une opération \emph{remove} correspondante
+  \item ins(S, index, elts) permet d'insérer les éléments elts à la position index dans la séquence S.
+    Cette fonction génère et associe un interval d'identifiants valide aux éléments insérés
+    Elle retourne une opération \emph{insert} permettant aux autres noeuds d'intégrer la modification à leur état.
 \end{itemize}
 
 \begin{definition}[insert]
@@ -601,9 +601,17 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   \end{itemize}
 \end{definition}
 
+\begin{itemize}
+  \item rem(S, index, length) permet de supprimer length éléments à partir la position index dans la séquence S.
+  Cette fonction répertorie les éléments supprimés sous la forme d'intervals d'identifiants.
+  Elle retourne une opération \emph{remove} permettant aux autres noeuds d'intégrer la modification à leur état.
+\end{itemize}
+
 \begin{definition}[remove]
   Une opération \emph{remove} est une liste de IdInterval où chaque idInterval désigne un ensemble d'éléments à supprimer.
 \end{definition}
+
+Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisation de cette séquence répliquée.
 
 \begin{figure}[!ht]
   \centering
@@ -643,7 +651,7 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
           (S2B-right) -- (S3B-left);
 
         \draw[dashed, ->, thick, shorten >= 3]
-          (S1A-right.east) edge node[right, align=center]{\emph{remove} \id{i}{B0}{1}}  (S2B-left.west)
+          (S1A-right.east) edge node[right, align=center]{\emph{remove} \id{i}{B0}{1..1}}  (S2B-left.west)
           (S2A-right.east) edge node[below right, align=center]{\emph{insert "e" at} {\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}} (S3B-left.west)
           (S1B.east) edge node[below right, near end, align=center]{\emph{insert "!" at} \id{i}{B0}{4}} (S3A-left.west);
 
@@ -659,22 +667,28 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
   \label{fig:logootsplit-example}
 \end{figure}
 
+Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement un document texte en utilisant LogootSplit.
+Ils partagent initialement le même état : une séquence composée d'un seul bloc associant les identifiants \id{i}{B0}{0..3} aux éléments "HRLO".
+Les noeuds se mettent ensuite à éditer le document.
+
+Le noeud A commence par supprimer l'élément "r" de la séquence.
+LogootSplit génère l'opération \emph{remove} correspondante en utilisant l'identifiant de l'élément supprimé (\id{i}{B0}{1}).
+Cette opération est envoyée au noeud B pour qu'il intègre cette modification.
+
+Le noeud A insère ensuite un élément "e" dans la séquence, entre le "h" et le "l".
+LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément.
+Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} \lid $id$ \lid \id{i}{B0}{2}.
+Cependant, LogootSplit ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre.
+LogootSplit génère alors $id$ en recopiant le premier tuple (\id{i}{B0}{0}) et en y ajoutant un nouveau tuple (\id{f}{A0}{0}).
+LogootSplit génère l'opération \emph{insert} correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
+Cette opération est ensuite diffusée sur le réseau.
+
+En parallèle, le noeud B insère un élément "!" à la fin de la séquence.
+Comme le noeud B est l'auteur du bloc \id{i}{B0}{0..3}, il peut y ajouter de nouveaux éléments.
+LogootSplit associe donc l'identifiant \id{i}{B0}{4} à l'élément "!" et l'ajoute au bloc existant.
+
+
 \begin{itemize}
-  \item Figure décrit scénario suivant
-  \item Deux noeuds, A et B, répliquent et éditent collaborativement un document texte.
-  \item Ils partagent initialement le même état, composé d'un seul bloc associant les identifiants \id{i}{B0}{0..3} aux éléments "HRLO".
-  \item Puis les noeuds se mettent à éditer le document.
-  \item Le noeud A commence par supprimer l'élément "r".
-  \item LogootSplit génère l'opération \emph{remove} correspondante à diffuser aux autres noeuds de la collaboration en utilisant l'identifiant de l'élément supprimé (\id{i}{B0}{1}).
-  \item Le noeud A insère ensuite un élément "e" dans la séquence, entre le "h" et le "l"
-  \item LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément
-  \item Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} \lid $id$ \lid \id{i}{B0}{2}
-  \item Le noeud A ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre
-  \item Le noeud A génère alors $id$ en recopiant le premier tuple (\id{i}{B0}{0}) et en y ajoutant un nouveau tuple (\id{f}{A0}{0})
-  \item LogootSplit génère l'opération \emph{insert} correspondante
-  \item En parallèle, le noeud B insère un élément "!" à la fin de la séquence
-  \item Comme le noeud B est l'auteur du bloc \id{i}{B0}{0..3}, il peut y append ou prepend de nouveaux éléments (en supposant qu'il s'agisse bien des bornes minimales et maximales du bloc qui n'aient jamais existées)
-  \item L'identifiant \id{i}{B0}{4} est donc associé à l'élément "!" et celui-ci est ajouté au bloc existant
   \item Les noeuds se synchronisent ensuite
   \item Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4} issue de B
   \item Grâce à l'identifiant, le noeud A est capable d'insérer cet élément à l'emplacement voulu
