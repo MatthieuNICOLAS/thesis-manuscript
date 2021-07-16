@@ -356,6 +356,8 @@ qui fut la première de toutes.
 
 \mnnote{TODO: Mentionner TP1 et TP2}
 
+\mnnote{TODO: Spécification faible et forte des séquences répliquées}
+
 \section{Séquences répliquées sans conflits}
 \subsection{Types de données répliquées sans conflits}
 \subsubsection{Principes}
@@ -444,7 +446,6 @@ qui fut la première de toutes.
 \mnnote{NOTE: Ajouter LogootSplit de manière sommaire aussi à cet endroit?}
 
 \mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
-
 
 \section{LogootSplit}
 
@@ -687,13 +688,15 @@ En parallèle, le noeud B insère un élément "!" à la fin de la séquence.
 Comme le noeud B est l'auteur du bloc \id{i}{B0}{0..3}, il peut y ajouter de nouveaux éléments.
 LogootSplit associe donc l'identifiant \id{i}{B0}{4} à l'élément "!" et l'ajoute au bloc existant.
 
+Les noeuds se synchronisent ensuite.
+Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4}.
+Le noeud A détermine que cet élément doit être inséré à la fin de la séquence (puisque \id{i}{B0}{3} \lid \id{i}{B0}{4}) et qu'il peut être ajouté au bloc \id{i}{B0}{2..3} (puisque \id{i}{B0}{3} et \id{i}{B0}{4} sont contigus).
 
-\begin{itemize}
-  \item Les noeuds se synchronisent ensuite
-  \item Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4} issue de B
-  \item Grâce à l'identifiant, le noeud A est capable d'insérer cet élément à l'emplacement voulu
-  \item De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove}
-\end{itemize}
+De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove} des éléments identifiés par l'interval \id{i}{B0}{1..1}, \ie l'élément attaché à l'identifiant \id{i}{B0}{1}.
+Le noeud B supprime donc l'élément "r" de son état.
+
+Il reçoit ensuite l'opération \emph{insert} de l'élément "e" à la position \id{i}{B0}{0}\id{f}{A0}{0}.
+Le noeud B insère cet élément entre les éléments "h" et "l" (puisque \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
 
 \mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}
 
