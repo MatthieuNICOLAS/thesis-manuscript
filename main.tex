@@ -857,13 +857,18 @@ Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livrais
 
 \mnnote{QUESTION: Même que pour la exactly-once delivery, est-ce que j'explique ici comment assurer cette contrainte plus en détails (Ajout des dots des opérations \emph{insert} en dépendances de l'opération \emph{remove}, vérification que dots présents dans dot store avant de passer l'opération \emph{remove} à la structure de données) ou je garde ça pour le chapitre sur MUTE ?}
 
-Nous définissons donc le modèle de livraison suivant :
+\subsubsection{Définition du modèle de livraison}
+
+À partir de ces contraintes, nous définissons le modèle de livraison suivant :
 
 \begin{definition}[Exactly-once + Causal remove]
-
+  TODO
 \end{definition}
 
-\mnnote{TODO: Faire le lien avec DottedLogootSplit}
+Dans ses travaux de thèse, \textcite{2021-these-vic} propose Dotted LogootSplit, un nouveau Sequence \ac{CRDT} basée sur les différences.
+Inspiré de Logoot et LogootSplit, ce nouveau \ac{CRDT} associe une séquence à identifiants densément ordonnés à un contexte causal.
+Le contexte causal est une structure de données permettant à Dotted LogootSplit de représenter et de maintenir efficacement les informations des modifications déjà intégrées à l'état courant.
+Cette association permet à Dotted LogootSplit de fonctionner de manière autonome, sans imposer de contraintes particulières à la couche livraison autres que la livraison à terme.
 
 \subsection{Limites}
 
