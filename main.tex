@@ -914,16 +914,31 @@ Les 99\% restants correspondent aux métadonnées utilisées par la séquence r�
 Il est donc nécessaire de proposer des mécanismes et techniques afin de mitiger les problèmes soulignés précédemments.
 
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
-\subsection{Core-Nebula}
-\subsection{LSEQ}
 
-\mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
-
-\subsection{Eager stability determination}
-
-\mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{10.1145/3358504.3361231, 10.1145/3380787.3393685, 10.1145/3426182.3426183} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
-
-\mnnote{Vois pas par contre où je pourrais aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment de sens de comparer les approches à ce stade. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
+\begin{itemize}
+  \item Plusieurs approches ont été proposées pour réduire croissance des métadonnées dans Sequence CRDT
+  \item RGA (et RGASplit) propose un mécanisme de GC des pierres tombales.
+    Nécessite cependant stabilité causale des opérations de suppression.
+    S'agit d'une contrainte forte, peu adaptée aux systèmes dynamiques à large échelle.
+    \mnnote{TODO: Trouver référence sur la stabilité causale dans systèmes dynamiques}
+  \item Core \& Nebula propose un mécanisme de ré-équilibrage de l'arbre pour Treedoc.
+    Le ré-équilibrage a pour effet de supprimer des potentielles pierres tombales et de réduire la taille des identifiants.
+    Repose sur un algorithme de consensus.
+    S'agit de nouveau d'une contrainte forte pour systèmes dynamique à large échelle.
+    Pour y pallier, propose de séparer les pairs entre deux ensembles : Core et Nebula.
+    Permet de limiter le nombre participant au consensus.
+    Un protocole de rattrapage permet aux noeuds de la Nebula de mettre à jour leurs modifications concurrentes à un ré-équilibrage.
+  \item LSEQ adopte une autre approche.
+    Part du constat que les identifiants dans Logoot croissent de manière linéaire.
+    Vise une croissance logarithmique des identifiants.
+    Pour cela, propose de nouvelles fonctions d'allocation des identifiants visant à maximiser le nombre d'identifiants insérés avant de devoir augmenter la taille de l'identifiant.
+    Propose aussi d'utiliser une base exponentielle pour la valeur \emph{position} des identifiants.
+    Atteint ainsi la croissance polylogarithmique des identifiants, sans coordination requise entre les noeuds et mécanisme supplémentaire.
+    Solution adaptée aux systèmes distribués à large échelle.
+    Conjecture cependant que cette approche se marie mal avec les Sequence \acp{CRDT} utilisant des blocs.
+    En effet, ajoute une raison supplémentaire à la croissance des identifiants : l'insertion entre identifiants contigus.
+    Force alors la croissance des identifiants.
+\end{itemize}
 
 \section{Synthèse}
 
@@ -2264,6 +2279,17 @@ Ensuite, le noeud peut devoir renommer son état vers l'époque cible une fois q
 Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment transformés par \textsc{revertRenameId} à leur valeur initiale pour garantir la convergence.
 
 \section{Comparaison avec les approches existantes}
+
+\subsection{Core-Nebula}
+\subsection{LSEQ}
+
+\mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
+
+\subsection{Eager stability determination}
+
+\mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{10.1145/3358504.3361231, 10.1145/3380787.3393685, 10.1145/3426182.3426183} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
+
+\mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
 
 \section{Conclusion}
 
