@@ -702,19 +702,84 @@ Le noeud B insère cet élément entre les éléments "h" et "l" (puisque \id{i}
 
 \subsection{Modèle de livraison}
 
-\begin{itemize}
-  \item Afin de garantir la cohérence du système, LogootSplit doit être associé à une couche
-  \item Livraison exactly-once des opérations
-  \item Une opération \emph{remove} doit être livrée après l'opération \emph{insert} correspondante
-  \item Des opérations \emph{insert} peuvent elles arriver dans des ordres arbitraires
-  \begin{itemize}
-    \item Même celles causalement liées
-  \end{itemize}
-\end{itemize}
-
 Afin de garantir son bon fonctionnement, LogootSplit doit être associé à une couche de livraison de messages garantissant plusieurs propriétés.
 
-Tout d'abord, les opérations \emph{remove} doit être livrées au \ac{CRDT} après les opérations \emph{insert} correspondante.
+\subsubsection{Livraison des opérations en exactement un exemplaire}
+
+Tout d'abord, la couche de livraison de messages doit assurer que toutes les opérations soient délivrées aux noeuds, mais qu'une seule et unique fois.
+La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la nécessité de cette contrainte.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+            to ++(0:21 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+
+        \path
+            to ++(270:4) node {\textbf{B}}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+            to ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+            to ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S3B-left) {O}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+        \draw[->, thick]
+          (S0A) edge node[above, align=center]{\emph{insert "i"}\\\emph{between}\\\emph{"o" and "g"}} (S1A-left)
+          (S1B-right) edge node[above, align=center]{\emph{remove "i"}} (S2B-left);
+
+        \draw[dotted]
+          (S1A-right) -- (S2A-left)
+          (S0B) -- (S1B-left)
+          (S2B-right) -- (S3B-left);
+
+        \draw[dashed, ->, thick, shorten >= 3]
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
+          (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
+    \end{tikzpicture}
+  }
+  \caption{TODO}
+  \label{fig:why-exactly-once-delivery}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement une séquence.
+La séquence répliquée contient initialement les éléments "ognon", qui sont associés à l'interval d'identifiants \id{p}{A0}{0..4}.
+
+Le noeud A commence par insérer un nouvel élément, "i", dans la séquence entre les éléments "o" et "g".
+L'opération \emph{insert} résultante, insérant l'élément "i" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée au noeud B.
+
+À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
+Puis il supprime dans la foulée ce nouvel élément.
+L'opération \emph{remove} générée est envoyée au noeud A.
+
+Le noeud A intègre l'opération \emph{remove}, ce qui a pour effet de supprimer l'élément "i" associé à l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
+Il obtient alors un état équivalent à celui du noeud B.
+
+Cependant, l'opération \emph{insert} insérant l'élément "i" à la position \id{p}{A0}{0}\id{m}{A1}{0} est de nouveau délivrée au noeud B.
+De multiples raisons peuvent être à l'origine de cette nouvelle livraison : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
+Le noeud B ré-intègre alors l'opération \emph{insert}, ce qui fait revenir l'élément "i" et l'identifiant associé.
+L'état du noeud B diverge désormais de celui-ci du noeud A.
+
+Pour se prémunir de ce type de scénarios, LogootSplit requiert que la couche de livraison des messages assure une livraison en exactement un exemplaire des opérations.
+Cette contrainte permet d'éviter que d'anciens éléments et identifiants ressurgissent après leur suppression chez certains noeuds uniquement à cause d'une livraison multiple de l'opération \emph{insert} correspondante.
+
+\mnnote{QUESTION: Ajouter quelques lignes ici sur comment faire ça en pratique (Ajout d'un dot aux opérations, maintien d'un dot store au niveau de la couche livraison, vérification que dot pas encore présent dans dot store avant de passer opération à la structure de données) ? Ou je garde ça pour le chapitre sur MUTE ?}
+
+\subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+
+Une autre propriété que doit assurer la couche de livraison de messages est que les opérations \emph{remove} doivent être livrées au \ac{CRDT} après les opérations \emph{insert} correspondantes.
 La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrainte.
 
 \begin{figure}[!ht]
@@ -790,9 +855,11 @@ Ainsi, l'état du noeud C diverge de celui-ci des autres noeuds à terme, et cel
 Ce résultat transgresse la propriété de \ac{SEC} que doivent assurer les \acp{CRDT}.
 Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations \emph{remove} par rapport aux opérations \emph{insert} correspondantes.
 
+\mnnote{QUESTION: Même que pour la exactly-once delivery, est-ce que j'explique ici comment assurer cette contrainte plus en détails (Ajout des dots des opérations \emph{insert} en dépendances de l'opération \emph{remove}, vérification que dots présents dans dot store avant de passer l'opération \emph{remove} à la structure de données) ou je garde ça pour le chapitre sur MUTE ?}
+
 Nous définissons donc le modèle de livraison suivant :
 
-\begin{definition}[Exactly-once causal remove]
+\begin{definition}[Exactly-once + Causal remove]
 
 \end{definition}
 
