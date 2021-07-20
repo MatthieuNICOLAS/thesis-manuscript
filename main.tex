@@ -916,7 +916,7 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
 
 \begin{itemize}
-  \item Plusieurs approches ont été proposées pour réduire croissance des métadonnées dans Sequence CRDT
+  \item Plusieurs approches ont été proposées pour réduire croissance des métadonnées dans Sequence \acp{CRDT}
   \item RGA (et RGASplit) propose un mécanisme de GC des pierres tombales.
     Nécessite cependant stabilité causale des opérations de suppression.
     S'agit d'une contrainte forte, peu adaptée aux systèmes dynamiques à large échelle.
@@ -1700,6 +1700,50 @@ Puisque la relation \emph{priority} est définie en utilisant l'ordre lexicograp
 Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations \emph{rename} correspondantes.
 
 \subsection{Processus d'intégration d'une opération}
+
+\begin{itemize}
+  \item Distingue plusieurs cas.
+  \item 1er cas de figure est si l'opération que l'on reçoit est une opération \emph{insert} ou \emph{remove}.
+  \item Intégration de ces opérations se décompose en plusieurs étapes.
+  \item Tout d'abord, compare l'époque de l'opération avec l'époque courante de la séquence.
+  \item Si les époques correspondent, intègre l'opération de manière standard.
+  \item Sinon, besoin de transformer l'opération avant de pouvoir l'intégrer.
+  \item Besoin d'identifier les transformations à appliquer à l'opération.
+  \item Pour cela, calcule le chemin entre l'époque de l'opération et l'époque courante.
+    Utilise pour cela l'algorithme suivant :
+    Calcule le chemin entre l'époque de l'opération et la racine.
+    Calcule le chemin entre l'époque courante et la racine.
+    Calcule la première intersection entre ces deux chemins.
+    S'agit du \ac{LCA} entre ces deux époques.
+  \item Le chemin entre l'époque de l'opération et l'époque \ac{LCA} correspond aux renommages dont on doit annuler les effets sur l'opération.
+    Applique successivement \textsc{revertRenameId} sur chaque identifiant de l'opération.
+  \item Le chemin entre l'époque \ac{LCA} et l'époque courante correspond aux renommages dont on doit appliquer les effets sur l'opération.
+    Applique successivement \textsc{renameId} sur chaque identifiant de l'opération.
+  \item Obtient alors la liste des identifiants concernés par l'opération
+    Doit alors intégrer une opération pour chacun d'entre eux.
+  \item Pour minimiser le nombre de parcours de la séquence, aggrège les identifiants en intervals d'identifiants au préalable.
+    Pour cela, parcourt la liste des identifiants et vérifient s'ils sont contigus.
+  \item Recréé à partir des intervals d'identifiants obtenus une liste d'opérations.
+    Intègre successivement chacune d'entre elles à la séquence.
+  \item 2nd cas de figure est si l'opération à intégrer est une opération \emph{rename}.
+  \item Commence par ajouter l'époque introduite par l'opération \emph{rename} à l'\emph{arbre des époques}.
+  \item Compare ensuite l'époque introduite avec l'époque courante de la séquence.
+  \item Ici, de nouveaux 2 cas de figure différents.
+  \item 1er cas de figure : si époque de l'opération plus grande que l'époque courante d'après \lepoch, doit renommer son état en accordance.
+  \item Pour cela, calcule le chemin entre l'époque de l'opération et l'époque courante, comme indiqué précédemment.
+  \item Procéde ensuite au renommage de chaque identifiant de la séquence.
+  \item Obtient alors la liste des identifiants correspondant à ceux de l'état courant, mais à la nouvelle époque courante.
+  \item Doit alors construire une nouvelle séquence avec ces nouveaux identifiants.
+  \item Pour limiter le nombre de traitements, commence déjà par aggréger les identifiants en intervals d'identifiants.
+  \item Génère ensuite les blocs de la future séquence à partir de la liste d'intervals d'identifiants obtenus et du contenu de la séquence courante.
+  \item Puis génère une nouvelle séquence à partir de cette liste de blocs.
+    Remplace la séquence actuelle par cette dernière.
+    Met à jour l'époque courante de la séquence.
+  \item 2nd cas de figure : si époque introduite par l'opération \emph{rename} plus petite que l'époque d'après \lepoch.
+  \item Dans ce cas, aucun traitement supplémentaire n'est nécessaire.
+    Intégration de cette opération \emph{rename} s'arrête là.
+\end{itemize}
+
 \subsection{Règles de récupération de la mémoire des états précédents}
 
 Les noeuds stockent les époques et les \emph{anciens états} correspondant pour transformer les identifiants d'une époque à l'autre.
