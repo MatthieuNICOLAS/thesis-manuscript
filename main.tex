@@ -2490,6 +2490,28 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \item permettrait de supprimer la contrainte de livraison FIFO tout en permettant de compacter efficacement la représentation des opérations reçues par le noeud à terme
 \end{itemize}
 
+\subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+
+\begin{itemize}
+  \item Pour livrer une opération \emph{remove} après opérations \emph{insert} correspondantes
+  \begin{itemize}
+    \item besoin d'identifier les opérations \emph{insert} concernées
+    \item de les ajouter en dépendances de l'opération \emph{remove}
+    \item pour cela, ajoute leur dot à l'opération
+    \item à la livraison de l'opération, vérifie que les dots des opérations \emph{insert} concernées sont présents dans version vector en plus de vérifier le dot de l'opération \emph{remove} elle-même
+    \item si un dot est manquant, met l'opération en attente
+  \end{itemize}
+  \item Pour identifier opérations \emph{insert} correspondantes, plusieurs façons de procéder
+  \item manière la plus précise est de parcourir le log des opérations à la recherche des opérations \emph{insert} ajoutant les identifiants supprimés
+  \item mais s'avère coûteux
+  \item et incompatible avec un mécanisme tronquant le log des opérations en utilisant la stabilité
+  \item dans MUTE, nous préférons ajouter le dot le plus récent du noeud auteur de l'identifiant supprimé comme dépendance de l'opération
+  \item nous permet de réduire le surcoût computationnel du calcul des dépendances d'une opération \emph{remove}
+  \item en contrepartie, il s'agit de dépendances approximatives
+  \item retarde probablement la livraison de l'opération par rapport aux dépendances véritables
+  \item mais là aussi, nous paraît un compromis acceptable entre surcoût du mécanisme de livraison et expérience utilisateur
+\end{itemize}
+
 \subsection{Métadonnées}
 
 \begin{itemize}
