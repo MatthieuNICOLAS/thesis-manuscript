@@ -2512,6 +2512,34 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \item mais là aussi, nous paraît un compromis acceptable entre surcoût du mécanisme de livraison et expérience utilisateur
 \end{itemize}
 
+\subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
+
+\begin{itemize}
+  \item Afin de livrer les opérations après l'opération \emph{rename} qui introduit leur époque
+  \begin{itemize}
+    \item besoin d'ajouter son dot en dépendance des opérations
+    \item pour cela, nécessaire de garder le dot l'opération \emph{rename} qui a introduit l'époque courante et de l'ajouter à chaque nouvelle opé
+    \item mais historiquement, \texttt{DocService} et \texttt{Sync} complètement séparés
+    \item \texttt{Sync} n'a pas moyen d'interroger \texttt{DocService} pour récupérer l'époque courante
+    \item a dû donc trouver une alternative
+    \item a implémenté la solution suivante
+    \item maintient un vecteur de dots des dernières opérations \emph{rename}
+    \item ajoute le contexte causale d'une opération \emph{rename} en tant que dépendances
+    \item lors de la livraison d'une opération \emph{rename}, utilise ce contexte causale pour retirer du vecteur de dots des opés \emph{rename} les dots qui sont couverts par l'opération
+    \item puis ajoute le dot de la nouvelle opé \emph{rename}
+    \item lors de l'émission d'une opération \emph{insert} ou \emph{remove}, ajoute en dépendances les dots du vecteur d'opérations \emph{rename}
+  \end{itemize}
+  \item Garantit ainsi livraison \emph{epoch-based} des opérations, sans reposer sur \lepoch
+  \item mais nécessite livraison causale des opérations \emph{rename}
+  \item ces opérations étant rares, le surcoût en métadonnées et le potentiel délai introduit paraissent acceptables
+\end{itemize}
+
+\mnnote{
+  TODO: Voir pour une autre implémentation.
+  Implémentation actuelle dûe à la séparation entre \texttt{DocService} et \texttt{Sync} : \texttt{Sync} n'a pas de moyen de connaître l'époque courante.
+  Donc peut pas cibler et ajouter uniquement le dot de l'opération \emph{rename} correspondante.
+}
+
 \subsection{Métadonnées}
 
 \begin{itemize}
