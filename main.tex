@@ -702,6 +702,8 @@ Le noeud B insère cet élément entre les éléments "h" et "l" (puisque \id{i}
 
 \subsection{Modèle de livraison}
 
+\label{sec:logootsplit-delivery-model}
+
 Afin de garantir son bon fonctionnement, LogootSplit doit être associé à une couche de livraison de messages garantissant plusieurs propriétés.
 
 \subsubsection{Livraison des opérations en exactement un exemplaire}
@@ -1330,6 +1332,8 @@ Une extension possible est de concevoir \textsc{renameBlock}, une version améli
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
 
 \subsection{Évolution du modèle de livraison des opérations}
+
+\label{sec:renamablelogootsplit-delivery-model}
 
 Finalement, considérons le cas où un noeud reçoit une opération marquée d'une époque encore inconnue.
 Il serait incohérent que le noeud l'intègre à leur état.
@@ -2428,14 +2432,62 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \end{itemize}
 
 \section{Couche réplication}
-\subsection{Document texte}
+
+\subsection{Modèle de données du document texte}
+
+MUTE propose plusieurs alternatives pour représenter le document texte.
+MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}}.
+Ce choix est effectué via une valeur de configuration de l'application choisie au moment de son déploiement.
+
+Le modèle de données utilisé interagit avec l'éditeur de texte par l'intermédiaire de d'opérations textes.
+Lorsque l'utilisateur effectue des modifications locales, celles-ci sont détectées et mises sous la forme d'opérations textes.
+Elles sont transmises au modèle de données, qui les intègre alors à la structure de données répliquées.
+Le \ac{CRDT} retourne en résultat l'opération distante à propager aux autres noeuds.
+
+De manière complémentaire, lorsqu'une opération distante est délivrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
+Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.
+
+\subsection{Module de livraison des opérations}
 
 \begin{itemize}
-  \item Implémentation de RenamableLogootSplit que nous avons réutilisé dans le cadre de nos simulations et évaluations
   \item Associée au composant gérant la livraison des opérations
   \item \mnnote{TODO: Expliquer comment assure la livraison Causal Remove}
   \item \mnnote{TODO: Expliquer comment assure la livraison Epoch-based}
   \item Mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}
+\end{itemize}
+
+Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
+Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
+Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{sec:logootsplit-delivery-model} et la \autoref{sec:renamablelogootsplit-delivery-model}.
+
+\subsubsection{Livraison des opérations en exactement un exemplaire}
+
+\begin{itemize}
+  \item Afin de respecter l'exactly-once delivery, doit identifier de manière unique chaque opération
+  \item Pour cela, ajoute un dot à chaque opération
+  \item dot est formé de l'identifiant du pair et d'un numéro séquentiel
+  \begin{itemize}
+    \item numéro séquentiel différent de celui-ci utilisé par le CRDT, puisque celui doit augmenter avec chaque opération
+  \end{itemize}
+  \item doit alors maintenir une structure de données représentant l'ensemble des opérations reçues par le pair
+  \item à la réception d'une opération, vérifie si son dot est présent dans cette structure
+  \item si absent, peut délivrer l'opération
+  \item sinon, opération déjà délivrée précédemment, peut l'ignorer sans risque
+  \item pour maintenir l'ensemble des opérations reçues, plusieurs structures de données adaptées
+  \item dans le cadre de MUTE, avons fait le choix d'utiliser un version vector
+  \item nous permet de réduire à un dot par pair le surcoût en métadonnées du mécanisme
+  \begin{itemize}
+    \item maintient seulement le dot le plus récent
+  \end{itemize}
+  \item à la réception d'une opération, vérifie qu'il s'agit de la prochaine opération attendue, \ie que son le numéro séquentiel de son dot est le successeur du dernier dot enregistré pour ce pair
+  \item si c'est le cas, délivre l'opération et met à jour l'entrée du pair dans le version vector avec ce nouveau numéro séquentiel
+  \item si le dot est un dot futur, met en attente l'opération en attendant d'avoir reçu et délivré les opérations manquantes de ce pair
+  \item sinon, si dot est déjà présent dans le version vector, ignore l'opération
+  \item ce fonctionnement se traduit dans les faits par une livraison FIFO des opérations par noeud
+  \item ajoute une contrainte non-nécessaire qui peut introduire des délais dans livraison des opérations si perd juste une opération d'un noeud
+  \item nous paraît un compromis acceptable entre le surcoût du mécanisme de livraison et son impact sur l'expérience utilisateur
+  \item une extension possible serait de remplacer cette structure par \mnnote{TODO: Retrouver nom de la structure couplant à un version vector un ensemble de dots}
+  \item permettrait de supprimer la contrainte de livraison FIFO tout en permettant de compacter efficacement la représentation des opérations reçues par le noeud à terme
 \end{itemize}
 
 \subsection{Métadonnées}
@@ -2481,14 +2533,45 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 \end{itemize}
 
 \section{Couche sécurité}
-\subsection{Authenticité des clés publiques des participants}
+
+\begin{itemize}
+  \item Propose deux modes de fonctionnement
+  \item Mode secret partagé
+  \item Mode clé de chiffrement de groupe
+\end{itemize}
+
+\subsection{Mode secret partagé}
+
+\subsubsection{Avantages et limites}
+
+\begin{itemize}
+  \item Peu coûteux
+  \item Simple
+  \item Ne permet pas de respecter la forward/backward secrecy
+\end{itemize}
+
+\subsection{Mode clé de chiffrement de groupe}
+
+\subsubsection{Authenticité des clés publiques des participants}
 \begin{itemize}
   \item Trusternity \cite{2018-trusternity-short, 2018-trusternity-long}
 \end{itemize}
 
-\subsection{Établissement de la clé de chiffrement de groupe}
+\subsubsection{Établissement de la clé de chiffrement de groupe}
+
 \begin{itemize}
   \item n-party Diffie-Hellman \cite{1995-diffie-hellman}
+\end{itemize}
+
+\subsubsection{Avantages et limites}
+
+\begin{itemize}
+  \item Forward/backward secrecy
+  \item Mais besoin de regénérer une nouvelle clé de groupe à chaque modification du groupe
+  \item Nécessite pour cela la participation de l'ensemble des membres du groupe
+  \item Peut être fait de manière asynchrone (\mnnote{TODO: Vérifier cette affirmation})
+  \item Mais quid de la collaboration pendant ce temps ?
+  \item Adapté aux groupes contrôlés
 \end{itemize}
 
 \section{Couche réseau}
