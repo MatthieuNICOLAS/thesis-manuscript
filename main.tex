@@ -2212,6 +2212,8 @@ La conception de ces stratégies peut reposer sur différentes heuristiques : le
 
 \subsection{Utilisation de l'opération de renommage comme snapshot}
 
+\label{sec:rename-as-snapshot}
+
 \begin{itemize}
   \item L'opération de renommage embarque la somme de toutes les opérations passées sous la forme du \emph{former state}
   \item On peut à tout moment re-calculer l'état courant du document à partir de l'opération de renommage primaire, des opérations concurrentes à cette dernière et des opérations générées depuis
@@ -2539,6 +2541,30 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   Implémentation actuelle dûe à la séparation entre \texttt{DocService} et \texttt{Sync} : \texttt{Sync} n'a pas de moyen de connaître l'époque courante.
   Donc peut pas cibler et ajouter uniquement le dot de l'opération \emph{rename} correspondante.
 }
+
+\subsubsection{Mécanisme d'anti-entropie}
+
+\begin{itemize}
+  \item Réseau peut perdre des messages.
+    Doit rediffuser les messages perdus pour assurer la livraison à terme.
+    Pour cela, implémente le mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
+  \item Consiste à synchroniser deux à deux les pairs.
+    De manière périodique, noeud choisit un autre pair de manière aléatoire.
+    Lui envoie une représentation de son état courant, \ie son version vector.
+  \item À la réception de ce message, le second pair compare le version vector reçu par rapport au sien.
+    Identifie de cette manière les dots des opérations qu'il a reçues mais qui sont inconnues pour l'initiateur de la synchronisation et récupère les opérations correspondantes depuis le log des opérations.
+    Identifie aussi les dots des opérations connues par l'initiateur de la synchronisation mais pas par lui pour les demander en retour.
+    Renvoie alors une réponse composée des opérations récupérées et des dots des opérations demandées.
+  \item À la réception de la réponse, le noeud initiateur intègre les opérations reçues.
+    Parcourt son log des opérations à la recherche des opérations demandées par le second pair et les rediffuse sur le réseau.
+  \item Mécanisme d'anti-entropie permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser opérations perdues.
+    Sert aussi comme mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer le travail effectué depuis sa dernière connexion.
+  \item Avantages sont sa simplicité et que réexploite le causal context.
+  \item Principale limite est que nécessite par contre de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
+    Complexité en espace dépend du nombre de noeuds et du nombre d'opérations.
+    Peut pas tronquer les opérations du log car nécessaire pour mettre à niveau les nouveaux pairs (à moins d'un mécanisme de snapshot comme évoqué dans \autoref{sec:rename-as-snapshot}).
+  \item Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree \mnnote{TODO: retrouver ref}, synchronisation par états (state/delta-based \acp{CRDT}).
+\end{itemize}
 
 \subsection{Métadonnées}
 
