@@ -2451,13 +2451,6 @@ Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à 
 
 \subsection{Module de livraison des opérations}
 
-\begin{itemize}
-  \item Associée au composant gérant la livraison des opérations
-  \item \mnnote{TODO: Expliquer comment assure la livraison Causal Remove}
-  \item \mnnote{TODO: Expliquer comment assure la livraison Epoch-based}
-  \item Mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}
-\end{itemize}
-
 Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
 Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
 Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{sec:logootsplit-delivery-model} et la \autoref{sec:renamablelogootsplit-delivery-model}.
@@ -2488,7 +2481,7 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \item ce fonctionnement se traduit dans les faits par une livraison FIFO des opérations par noeud
   \item ajoute une contrainte non-nécessaire qui peut introduire des délais dans livraison des opérations si perd juste une opération d'un noeud
   \item nous paraît un compromis acceptable entre le surcoût du mécanisme de livraison et son impact sur l'expérience utilisateur
-  \item une extension possible serait de remplacer cette structure par \mnnote{TODO: Retrouver nom de la structure couplant à un version vector un ensemble de dots}
+  \item une extension possible serait de remplacer cette structure par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}, qui rend possible la livraison dans le désordre
   \item permettrait de supprimer la contrainte de livraison FIFO tout en permettant de compacter efficacement la représentation des opérations reçues par le noeud à terme
 \end{itemize}
 
