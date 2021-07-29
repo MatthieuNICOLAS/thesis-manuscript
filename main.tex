@@ -2603,44 +2603,77 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
 
 \section{Couche sécurité}
 
+\subsection{Objectifs}
+
 \begin{itemize}
-  \item Propose deux modes de fonctionnement
-  \item Mode secret partagé
-  \item Mode clé de chiffrement de groupe
+  \item Souhaite garantir confidentialité, authenticité et intégrité des messages.
+    Pour cela, vise chiffrement de bout en bout.
+  \item Souhaite aussi garantir backward et forward secrecies.
+    Backward : nouveau pair ne peut pas déchiffrer les messages précédemments envoyés.
+    Forward : ancien pair ne peut pas déchiffrer les messages envoyés après son départ.
+  \item Besoin de mettre à jour clé au fur et à mesure des évolutions du groupe.
+    Comment procéder à l'évolution de la clé en distribué ?
 \end{itemize}
 
-\subsection{Mode secret partagé}
-
-\subsubsection{Avantages et limites}
+\subsection{Approche choisie}
 
 \begin{itemize}
-  \item Peu coûteux
-  \item Simple
-  \item Ne permet pas de respecter la forward/backward secrecy
+  \item Intègre un mécanisme de chiffrement à base de clé de groupe.
+    Implémente protocole Burmester - Desmedt pour établir la clé de chiffrement de groupe.
+    Nécessite clés publiques des différents participants.
+    Besoin d'authentifier les clés publiques pour éviter man-in-the-middle attack.
 \end{itemize}
 
-\subsection{Mode clé de chiffrement de groupe}
+\subsubsection{Trusternity}
 
-\subsubsection{Authenticité des clés publiques des participants}
 \begin{itemize}
-  \item Trusternity \cite{2018-trusternity-short, 2018-trusternity-long}
+  \item Mécanisme d'audit des PKI. \cite{2018-trusternity-short, 2018-trusternity-long}
 \end{itemize}
 
-\subsubsection{Établissement de la clé de chiffrement de groupe}
+\subsubsection{Protocole Burmester-Desmedt}
 
 \begin{itemize}
-  \item n-party Diffie-Hellman \cite{1995-diffie-hellman}
+  \item Permet d'établir la clé de chiffrement de groupe. \cite{1995-burmester-desmedt}.
 \end{itemize}
 
-\subsubsection{Avantages et limites}
+\subsection{Limites}
 
 \begin{itemize}
-  \item Forward/backward secrecy
-  \item Mais besoin de regénérer une nouvelle clé de groupe à chaque modification du groupe
-  \item Nécessite pour cela la participation de l'ensemble des membres du groupe
-  \item Peut être fait de manière asynchrone (\mnnote{TODO: Vérifier cette affirmation})
-  \item Mais quid de la collaboration pendant ce temps ?
-  \item Adapté aux groupes contrôlés
+  \item Plusieurs limites à ce protocole.
+  \item Computationnellement lourd.
+    \mnnote{TODO: Limite provenant d'une slide de JP, voir ce qui justifie cette remarque}
+  \item Requiert participation de l'ensemble des noeuds lors évolution du groupe.
+    Peut être effectué de manière asynchrone.
+    Mais que faire en attendant que l'ensemble des noeuds ?
+    Peu adapté dans un système hautement dynamique.
+    Va passer son temps à regénérer une nouvelle clé.
+  \item Pour éviter ce problème, considère que le groupe est l'ensemble des noeuds connectés.
+    Mais implique de générer une nouvelle clé à chaque connexion et déconnexion.
+    Peu efficace pour les collaborations où le groupe est stable, mais avec des connexions/déconnexions.
+\end{itemize}
+
+\subsection{Perspectives}
+
+\subsubsection{Contrôle d'accès}
+
+\begin{itemize}
+  \item Pour le moment, n'importe quel utilisateur ayant l'URL du document peut y accéder dans MUTE
+  \item Pour des raisons de confidentialité, peut vouloir contrôler quels utilisateurs ont accès à un document
+  \item Nécessite l'implémentation de liste de contrôle d'accès
+  \item Mais s'agit d'une tâche complexe dans le cadre d'un système distribué
+  \item Peut s'inspirer des travaux réalisés au sein de la communautée \acp{CRDT} \cite{2021-access-control-crdts} pour cela
+\end{itemize}
+
+\subsubsection{Détection et éviction de pairs malhonnêtes}
+
+\begin{itemize}
+  \item À l'heure actuelle, MUTE suppose qu'ensemble des collaborateurs honnêtes
+  \item Vulnérable à plusieurs types d'attaques par des adversaires byzantins, tel que l'équivoque
+  \item Ce type d'attaque peut provoquer des divergences durables et faire échouer des collaborations
+  \item Dans \cite{2018-prunable-authenticated-log, 2021-these-vic}, \citeauthor{2021-these-vic} propose un mécanisme permettant de maintenir des logs authentifiés dans un système distribué
+  \item Les logs authentifiés permettent de mettre en lumière les comportements malveillants des adversaires et de limiter le nombre d'actions malveillantes qu'ils peuvent effectuer avant d'être évincer
+  \item Implémenter ce mécanisme permettrait de rendre compatible MUTE avec des environnements avec adversaires byzantins
+  \item Nécessiterait tout de même de faire évoluer le \ac{CRDT} pour résoudre les équivoques détectés
 \end{itemize}
 
 \section{Couche réseau}
