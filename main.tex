@@ -1429,7 +1429,82 @@ Nous obtenons donc le modèle de livraison suivant :
   \end{enumerate}
 \end{definition}
 
-\mnnote{TODO: Expliquer qu'opération \emph{rename} ne nécessite pas de livraison causale}
+Il est cependant intéressant de noter que la livraison de l'opération \emph{rename} ne requiert pas de contraintes supplémentaires.
+Notamment, une opération \emph{rename} peut être livrée dans le désordre par rapport aux opérations \emph{insert} et \emph{remove} dont elle dépend causalement.
+La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
+
+            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            to ++(0:\widthletter) node[letter, fill=mydarkorange,
+                    label=below:{\color{mydarkorange}\id{m}{A1}{0}}] {X}
+            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S1A-right) {D}
+
+            to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
+                        ] (S2A-right) {ABXCD};
+
+        \path
+            to ++(270:4) node {\textbf{B}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
+
+            to ++(0:21 * \widthletter) node[epoch] (S1B-left) {\epoch{A2}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {AB}
+            to ++(0:\widthblock) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{3..4}} }
+                        ] (S1B-right) {CD}
+
+            to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{A2}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
+                        ] (S2B-right) {ABXCD};
+
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S1A-left);
+        \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S2A-left);
+        \draw[dotted] (S0B-right) -- (S1B-left);
+        \draw[dotted] (S1B-right) -- (S2B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[left, near end, align=center]{\emph{rename to \epoch{A2}}} (S1B-left.west);
+        \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[above right, near end, align=center]{\emph{insert "x" at} {\color{mydarkorange}\id{m}{A1}{0}}} (S2B-left.west);
+
+    \end{tikzpicture}
+  }
+  \caption{TODO}
+  \label{fig:rls-out-of-order-rename}
+\end{figure}
+
+Dans cet exemple, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "abcd".
+Le noeud A commence par insérer un nouvel élément, "x", entre les éléments "b" et "c".
+Puis il procède au renommage de son état.
+Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
+
+Cependant, suite à un aléa du réseau, le noeud B reçoit les deux opérations \emph{insert} et \emph{rename} dans le désordre.
+L'opération \emph{rename} est donc livrée en première au noeud B.
+En utilisant les informations contenues dans l'opération, le noeud B est renomme chaque identifiant composant son état.
+
+Ensuite, le noeud B reçoit l'opération \emph{insert}.
+Comme l'époque de génération de l'opération \emph{insert} (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
+\id{m}{A1}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A2} (\id{i}{A2}{2}).
+Le noeud B insère l'élément "x" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
 
 \section{RenamableLogootSplit v2}
 \label{sec:distributed-rls}
