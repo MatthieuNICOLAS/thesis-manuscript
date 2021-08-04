@@ -864,6 +864,7 @@ Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livrais
 Pour résumer, la couche de livraison des opérations associée à LogootSplit doit respecter le modèle de livraison suivant :
 
 \begin{definition}[Exactly-once + Causal remove]
+  \label{def:ls-delivery-model}
   Le modèle de livraison \emph{Exactly-once + Causal remove} définit les 3 règles suivantes sur la livraison des opérations :
   \begin{enumerate}
     \item Une opération doit être délivrée à l'ensemble des noeuds à terme,
@@ -1335,14 +1336,100 @@ De plus, son exécution réduirait le temps d'intégration des prochaines opéra
 
 \label{sec:renamablelogootsplit-delivery-model}
 
-Finalement, considérons le cas où un noeud reçoit une opération marquée d'une époque encore inconnue.
-Il serait incohérent que le noeud l'intègre à leur état.
-En effet, comparer des identifiants d'une époque aux identifiants d'une autre époque n'a pas de sens et provoquerait des anomalies (cf. \autoref{fig:concurrent-insert-rename-inconsistent}).
-\mnnote{TODO: Ajouter nouvel exemple où noeud reçoit déjà des opérations dépendant d'un \emph{rename} avant de recevoir le \emph{rename}}
-Les noeuds devraient plutôt attendre l'opération \emph{rename} permettant de progresser jusqu'à cette époque pour intégrer cette opération.
-Il est donc nécessaire de faire évoluer le modèle de livraison des opérations pour ajouter la contrainte suivante : toute opération doit désormais être livrée après l'opération \emph{rename} qui introduit son époque de génération.
-\mnnote{QUESTION: Récapituler modèle de livraison ? (Epoch-based + causal remove)}
-\mnnote{QUESTION: Indiquer que l'opération \emph{rename} ne nécessite pas de livraison particulière autre que epoch-based?}
+L'introduction de l'opération \emph{rename} nécessite de faire évoluer le modèle de livraison des opérations associé à RenamableLogootSplit.
+Afin d'illustrer cette nécessité, considérons l'exemple suivant :
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
+
+            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {ABCD}
+
+            to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {AB}
+            to ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{f}{A2}{0}} }
+                        ] {X}
+            to ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] (S2A-right) {CD};
+
+        \path
+            to ++(270:2) node {\textbf{B}}
+            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
+
+            to ++(0:21 * \widthletter) node (S1B) {?};
+
+        \path
+          to ++(270:1)
+          to ++ (0:14 * \widthletter) node[cross] (fail) {};
+
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
+        \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+        \draw[dotted] (S0B-right) -- (S1B);
+        \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- (fail);
+        \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{f}{A2}{0}}} (S1B.west);
+
+    \end{tikzpicture}
+  }
+  \caption{TODO}
+  \label{fig:rls-invalid-delivery-order}
+\end{figure}
+
+Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "abcd".
+Tout d'abord, le noeud A procède au renommage de cet état.
+Puis il insère un nouvel élément, "x", entre "b" et "c".
+Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
+
+Cependant, l'opération \emph{rename} n'est pas livrée au noeud B, par exemple suite à un problème réseau.
+L'opération \emph{insert} est quant à elle correctement livrée à ce dernier.
+Le noeud B doit alors intégrer dans son état un élément et l'identifiant qui lui est attaché.
+Mais cet identifiant est issu d'une époque (\epoch{A1}) différente de son époque actuelle (\epoch{0}) et dont le noeud n'avait pas encore connaissance.
+Il convient de s'interroger sur l'état à produire dans cette situation.
+
+Comme nous l'avions déjà illustré par la \autoref{fig:concurrent-insert-rename-inconsistent}, les identifiants d'une époque ne peuvent être comparés qu'aux identifiants de la même époque.
+Tenter d'intégrer une opération \emph{insert} ou \emph{remove} provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur.
+Il est donc nécessaire d'empêcher ce scénario de se produire.
+
+Pour cela, nous proposons de faire évoluer le modèle de livraison des opérations de RenamableLogootSplit.
+Celui-ci repose sur celui de LogootSplit, que nous avions défini dans la \autoref{def:ls-delivery-model}.
+Pour rappel, ce modèle requiert que
+\begin{enumerate*}[label=(\roman*)]
+  \item les opérations soient livrées qu'une seule et unique fois au \ac{CRDT},
+  \item les opérations \emph{remove} soient livrées au \ac{CRDT} qu'après les opérations \emph{insert} ajoutant les éléments supprimés.
+\end{enumerate*}
+
+Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations dépendant causalement dessus.
+Nous obtenons donc le modèle de livraison suivant :
+
+\begin{definition}[Exactly-once + Causal remove + Epoch-based]
+  Le modèle de livraison \emph{Exactly-once + Causal remove + Epoch-based} définit les 4 règles suivantes sur la livraison des opérations :
+  \begin{enumerate}
+    \item Une opération doit être délivrée à l'ensemble des noeuds à terme,
+    \item Une opération doit être délivrée qu'une seule et unique fois aux noeuds,
+    \item Une opération \emph{remove} doit être délivrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été délivrées à ce dernier.
+    \item Une opération doit être délivrée à un noeud une fois que l'opération \emph{rename} une fois que l'opération \emph{rename} qui introduit son époque de génération a été delivrée à ce dernier.
+  \end{enumerate}
+\end{definition}
+
+\mnnote{TODO: Expliquer qu'opération \emph{rename} ne nécessite pas de livraison causale}
 
 \section{RenamableLogootSplit v2}
 \label{sec:distributed-rls}
