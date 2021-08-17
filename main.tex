@@ -1872,9 +1872,15 @@ Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc 
 
 \subsection{Processus d'intégration d'une opération}
 
+Le processus d'intégration d'une opération distante distingue deux cas différents :
+\begin{enumerate*}[label=(\roman*)]
+  \item le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}
+  \item le cas de figure où l'opération reçue est une opération \emph{rename}.
+\end{enumerate*}
+
+\subsubsection{Intégration d'une opération \emph{insert} ou \emph{remove} distante}
+
 \begin{itemize}
-  \item Distingue plusieurs cas.
-  \item 1er cas de figure est si l'opération que l'on reçoit est une opération \emph{insert} ou \emph{remove}.
   \item Intégration de ces opérations se décompose en plusieurs étapes.
   \item Tout d'abord, compare l'époque de l'opération avec l'époque courante de la séquence.
   \item Si les époques correspondent, intègre l'opération de manière standard.
@@ -1896,6 +1902,141 @@ Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc 
     Pour cela, parcourt la liste des identifiants et vérifient s'ils sont contigus.
   \item Recréé à partir des intervals d'identifiants obtenus une liste d'opérations.
     Intègre successivement chacune d'entre elles à la séquence.
+\end{itemize}
+
+\begin{figure}[t!]
+  \subfloat[Execution]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{0..3}} }
+                              ] (S1A-right) {ABCD}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{0..1}} }
+                              ] {AB}
+                  to ++(0:\widthblock) node[letter, fill=mylightblue,
+                          label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}} }
+                              ] {X}
+                  to ++(0:\widthletter) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{2..3}} }
+                              ] (S2A-right) {CD};
+
+              \path
+                  to ++(270:2) node {\textbf{B}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
+                              ] (S1B-right) {ABCD}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
+                              ] (S2B-right) {ABCD}
+
+                  to ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
+                              ] {AB}
+                  to ++(0:\widthblock) node[letter,
+                          label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
+                              ] {X}
+                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
+                              ] (S3B-right) {CD};
+
+              \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S1A-left);
+              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+              \draw[->, thick] (S0B-right) -- node[above, align=center]{\emph{rename to \epoch{B2}}} (S1B-left);
+              \draw[dotted] (S1B-right) -- (S2B-left) (S2B-right) -- (S3B-left);
+              \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[right, align=center]{\emph{rename to \epoch{A2}}} (S2B-left.west);
+              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[above right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
+            \end{tikzpicture}}
+          \label{fig:integration-process-insert-op-execution}
+      \end{minipage}}
+  \hfil
+  \subfloat[Epoch tree of B]{
+    \begin{minipage}{\linewidth}
+        \centering
+        \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+            \path
+                node[op] (e0) {\epoch{0}}
+                to ++(225:2) node[op] (eA1) {\epoch{A2}};
+            \path
+                to ++(315:2) node[op] (eB2) {\epoch{B2}};
+
+            \draw[->, thick] (e0) edge (eA1) (e0) edge (eB2);
+            \draw[->, dashed, thick, red] (eB2.180) -- (eA1.0) (eA1.0) -- (e0.270);
+        \end{tikzpicture}
+        \label{fig:integration-process-insert-op-epoch-tree}
+    \end{minipage}}
+  \caption{TODO}
+  \label{fig:integration-process-insert-op}
+\end{figure}
+
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{insRemote}{seq, epochTree, currentEpoch, insOp}
+          \If{currentEpoch $\neq$ opEpoch }
+            \State insertedIdInterval $\gets$ getInsertedIdInterval(insOp)
+            \State ids $\gets$ expand(insertedIdInterval)
+            \\
+            \State opEpoch $\gets$ getEpoch(insOp)
+            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, opEpoch, currentEpoch)
+            \\
+            \For{epoch in epochsToRevert}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial})
+            \EndFor
+            \\
+            \For{epoch in epochsToApply}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, renameId\textsubscript{partial})
+            \EndFor
+            \\
+            \State content $\gets$ getContent(insOp)
+            \State newIdIntervals $\gets$ aggregate(ids)
+            \State insertOps $\gets$ generateInsertOps(newIdIntervals, content)
+            \For{insertOp in insertOps}
+              \State execute(seq, insertOp)
+            \EndFor
+          \Else
+            \State execute(seq, insertOp)
+        \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{TODO}
+  \label{alg:insertRemote}
+\end{figure}
+
+\subsubsection{Intégration d'une opération \emph{rename} distante}
+
+\begin{itemize}
   \item 2nd cas de figure est si l'opération à intégrer est une opération \emph{rename}.
   \item Commence par ajouter l'époque introduite par l'opération \emph{rename} à l'\emph{arbre des époques}.
   \item Compare ensuite l'époque introduite avec l'époque courante de la séquence.
