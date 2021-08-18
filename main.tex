@@ -1880,29 +1880,52 @@ Le processus d'intégration d'une opération distante distingue deux cas différ
 
 \subsubsection{Intégration d'une opération \emph{insert} ou \emph{remove} distante}
 
-\begin{itemize}
-  \item Intégration de ces opérations se décompose en plusieurs étapes.
-  \item Tout d'abord, compare l'époque de l'opération avec l'époque courante de la séquence.
-  \item Si les époques correspondent, intègre l'opération de manière standard.
-  \item Sinon, besoin de transformer l'opération avant de pouvoir l'intégrer.
-  \item Besoin d'identifier les transformations à appliquer à l'opération.
-  \item Pour cela, calcule le chemin entre l'époque de l'opération et l'époque courante.
-    Utilise pour cela l'algorithme suivant :
-    Calcule le chemin entre l'époque de l'opération et la racine.
-    Calcule le chemin entre l'époque courante et la racine.
-    Calcule la première intersection entre ces deux chemins.
-    S'agit du \ac{LCA} entre ces deux époques.
-  \item Le chemin entre l'époque de l'opération et l'époque \ac{LCA} correspond aux renommages dont on doit annuler les effets sur l'opération.
-    Applique successivement \textsc{revertRenameId} sur chaque identifiant de l'opération.
-  \item Le chemin entre l'époque \ac{LCA} et l'époque courante correspond aux renommages dont on doit appliquer les effets sur l'opération.
-    Applique successivement \textsc{renameId} sur chaque identifiant de l'opération.
-  \item Obtient alors la liste des identifiants concernés par l'opération
-    Doit alors intégrer une opération pour chacun d'entre eux.
-  \item Pour minimiser le nombre de parcours de la séquence, aggrège les identifiants en intervals d'identifiants au préalable.
-    Pour cela, parcourt la liste des identifiants et vérifient s'ils sont contigus.
-  \item Recréé à partir des intervals d'identifiants obtenus une liste d'opérations.
-    Intègre successivement chacune d'entre elles à la séquence.
-\end{itemize}
+Dans \autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'une opération \emph{insert} distante dans RenamableLogootSplit.
+
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}[5]
+      \Function{insRemote}{seq, epochTree, currentEpoch, insOp}
+          \If{currentEpoch $=$ opEpoch}
+            \State insert(seq, getIdBegin(insertOp), getContent(insertOp)) \label{alg:insertRemote-insert-1}
+          \Else
+            \State insertedIdInterval $\gets$ getInsertedIdInterval(insOp) \label{alg:insertRemote-get-ids}
+            \State ids $\gets$ expand(insertedIdInterval)
+            \\
+            \State opEpoch $\gets$ getEpoch(insOp)
+            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, opEpoch, currentEpoch) \label{alg:insertRemote-get-path}
+            \\
+            \For{epoch in epochsToRevert}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch) \label{alg:insertRemote-retrieve-rename-data-1}
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch) \label{alg:insertRemote-retrieve-rename-data-2}
+              \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial}) \label{alg:insertRemote-revertRenameId}
+            \EndFor
+            \\
+            \For{epoch in epochsToApply} \label{alg:insertRemote-renameId-1}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, renameId\textsubscript{partial})
+            \EndFor \label{alg:insertRemote-renameId-2}
+            \\
+            \State content $\gets$ getContent(insOp)
+            \State newIdIntervals $\gets$ aggregate(ids) \label{alg:insertRemote-aggregate}
+            \State insertOps $\gets$ generateInsertOps(newIdIntervals, content) \label{alg:insertRemote-generate}
+            \For{insertOp in insertOps}
+              \State insert(seq, getIdBegin(insertOp), getContent(insertOp)) \label{alg:insertRemote-insert-2}
+            \EndFor
+        \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{TODO}
+  \label{alg:insertRemote}
+\end{figure}
+
+Cet algorithme se décompose en de multiples étapes.
+Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté par la \autoref{fig:integration-process-insert-op}.
 
 \begin{figure}[t!]
   \subfloat[Execution]{
@@ -1973,7 +1996,7 @@ Le processus d'intégration d'une opération distante distingue deux cas différ
           \label{fig:integration-process-insert-op-execution}
       \end{minipage}}
   \hfil
-  \subfloat[Epoch tree of B]{
+  \subfloat[Arbre des époques de B à la réception de l'opération \emph{insert}]{
     \begin{minipage}{\linewidth}
         \centering
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -1992,47 +2015,59 @@ Le processus d'intégration d'une opération distante distingue deux cas différ
   \label{fig:integration-process-insert-op}
 \end{figure}
 
-\begin{figure}[!ht]
-  \footnotesize
-  \begin{algorithmic}
-      \Function{insRemote}{seq, epochTree, currentEpoch, insOp}
-          \If{currentEpoch $\neq$ opEpoch }
-            \State insertedIdInterval $\gets$ getInsertedIdInterval(insOp)
-            \State ids $\gets$ expand(insertedIdInterval)
-            \\
-            \State opEpoch $\gets$ getEpoch(insOp)
-            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, opEpoch, currentEpoch)
-            \\
-            \For{epoch in epochsToRevert}
-              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
-              \State nId $\gets$ getNodeId(epochTree, epoch)
-              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
-              \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
-              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial})
-            \EndFor
-            \\
-            \For{epoch in epochsToApply}
-              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
-              \State nId $\gets$ getNodeId(epochTree, epoch)
-              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
-              \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
-              \State ids $\gets$ map(ids, renameId\textsubscript{partial})
-            \EndFor
-            \\
-            \State content $\gets$ getContent(insOp)
-            \State newIdIntervals $\gets$ aggregate(ids)
-            \State insertOps $\gets$ generateInsertOps(newIdIntervals, content)
-            \For{insertOp in insertOps}
-              \State execute(seq, insertOp)
-            \EndFor
-          \Else
-            \State execute(seq, insertOp)
-        \EndIf
-      \EndFunction
-  \end{algorithmic}
-  \caption{TODO}
-  \label{alg:insertRemote}
-\end{figure}
+\mnnote{TODO: Remplacer \autoref{fig:integration-process-insert-op} par un exemple avec plus d'opérations \emph{rename} pour mieux faire apparaître les calculs et manipulations effectués sur les chemins dans l'\emph{arbre des époques}}
+
+Dans la \autoref{fig:integration-process-insert-op-execution}, deux noeuds A et B éditent une séquence répliquée via RenamableLogootSplit.
+Initialement, les deux noeuds possèdent des répliques identiques.
+Le noeud A commence par effectuer une opération \emph{rename}.
+Il génère alors l'état équivalent à son état précédent, à la nouvelle époque \epoch{A2}.
+Puis il effectue une opération \emph{insert}, insérant un nouvel élément "x" entre les éléments "b" et "c".
+L'identifiant \id{i}{A2}{1}\id{f}{A3}{0} est attribué à ce nouvel élément.
+Chacune des opérations du noeud A est diffusée sur le réseau.
+
+De son côté, le noeud B génère en concurrence sa propre opération \emph{rename} sur l'état initial.
+Il obtient alors un état équivalent, à l'époque \epoch{B2}.
+Il reçoit ensuite l'opération \emph{rename} du noeud A, qu'il intègre.
+Puisque \epoch{A2} \lepoch \epoch{B2}, le noeud B ne modifie pas son époque courante (\epoch{B2}).
+Le noeud B obtient toutefois l'\emph{arbre des époques} représenté dans la \autoref{fig:integration-process-insert-op-epoch-tree}.
+
+Puis le noeud B reçoit l'opération \emph{insert} de l'élément "x" à la position \id{i}{A2}{1}\id{f}{A3}{0}.
+C'est le traitement de cette opération que nous allons détailler ici.
+
+Tout d'abord, le noeud B compare l'époque de l'opération avec l'époque courante de la séquence.
+Si les deux époques correspondaient, le noeud B pourrait intégrer l'opération directement en utilisant l'algorithme de LogootSplit dénommé ici \textsc{insert}.
+Mais dans le cas présent, l'époque de l'opération (\epoch{A2}) est différente de l'époque courante (\epoch{B2}).
+Il lui est donc nécessaire de transformer l'opération avant de pouvoir l'appliquer.
+
+Pour cela, le noeud doit identifier les transformations à appliquer à l'opération.
+Pour ce faire, le noeud calcule le chemin entre l'époque de l'opération et l'époque courante à l'aide de la fonction \textsc{getPathBetweenEpochs} (ligne \ref{alg:insertRemote-get-path}).
+
+La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
+\begin{enumerate*}[label=(\roman*)]
+  \item elle calcule le chemin entre l'époque de l'opération et la racine de l'\emph{arbre des époques} ([\epoch{A2}, \epoch{0}])
+  \item elle calcule le chemin entre l'époque courante et la racine de l'\emph{arbre des époques} ([\epoch{B2}, \epoch{0}])
+  \item elle détermine la première intersection entre ces deux chemins (\epoch{0}).
+    Cette époque correspond au \acf{LCA} entre l'époque de l'opération et l'époque courante.
+  \item elle tronque les deux chemins au niveau du \ac{LCA} ([\epoch{A2}] et [\epoch{B2}])
+  \item elle inverse l'ordre des époques du chemin entre l'époque courante et la racine ([\epoch{B2}])
+  \item elle retourne les deux chemins obtenus ($\langle$[\epoch{A2}], [\epoch{B2}]$\rangle$).
+\end{enumerate*}
+
+Le chemin entre l'époque de l'opération et l'époque \ac{LCA} ([\epoch{A2}]) correspond aux renommages dont les effets doivent être retirés de l'opération.
+Pour cela, le noeud récupère les informations de chaque renommage via l'\emph{arbre des époques} (lignes \ref{alg:insertRemote-retrieve-rename-data-1}-\ref{alg:insertRemote-retrieve-rename-data-2}).
+Puis il applique \textsc{revertRenameId} sur chaque identifiant de l'opération (ligne \ref{alg:insertRemote-revertRenameId}).
+Le noeud procède ensuite de manière similaire pour les époques appartenant au chemin entre l'époque \ac{LCA} et l'époque courante ([\epoch{B2}]), qui correspondent aux renommages dont les effets doivent être intégrés à l'opération (lignes \ref{alg:insertRemote-renameId-1}-\ref{alg:insertRemote-renameId-2}).
+
+À ce stade, le noeud obtient la liste des identifiants à insérer à l'époque courante.
+Il peut alors réutiliser la fonction \textsc{insert} pour les intégrer à son état.
+Pour minimiser le nombre de parcours de la séquence, le noeud aggrège les identifiants en intervals d'identifiants au préalable à l'aide de la fonction \textsc{aggregate} (ligne \ref{alg:insertRemote-aggregate}).
+Cette fonction regroupe simplement les identifiants contigus en intervals d'identifiants et retourne la liste des intervals obtenus.
+
+À partir des intervals d'identifiants obtenus et du contenu initial de l'opération \emph{insert}, le noeud regénère une liste d'opérations \emph{insert}.
+Ces opérations sont ensuite successivement intégrées à la séquence.
+
+L'algorithme d'intégration d'une opération \emph{remove} distante est très similaire à l'algorithme d'intégration d'une opération \emph{insert} que nous venons de présenter.
+Seules les lignes permettant de récupérer les identifiants supprimés (\ref{alg:insertRemote-get-ids}), de générer l'opération \emph{remove} transformée (\ref{alg:insertRemote-generate}) et de l'appliquer (\ref{alg:insertRemote-insert-1} et \ref{alg:insertRemote-insert-2}) diffèrent.
 
 \subsubsection{Intégration d'une opération \emph{rename} distante}
 
