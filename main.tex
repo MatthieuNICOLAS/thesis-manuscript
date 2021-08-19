@@ -1782,8 +1782,14 @@ Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
             node {\textbf{A}}
             to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
             to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                        ] (S1A-right) {HELO}
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {HE}
+            to ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L}
+            to ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] (S1A-right) {LO}
             to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
             to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
@@ -2004,7 +2010,7 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
                 node[op] (e0) {\epoch{0}}
                 to ++(225:2) node[op] (eA1) {\epoch{A2}};
             \path
-                to ++(315:2) node[op] (eB2) {\epoch{B2}};
+                to ++(315:2) node[op, red] (eB2) {\epoch{B2}};
 
             \draw[->, thick] (e0) edge (eA1) (e0) edge (eB2);
             \draw[->, dashed, thick, red] (eB2.180) -- (eA1.0) (eA1.0) -- (e0.270);
@@ -2071,6 +2077,9 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
 
 \subsubsection{Intégration d'une opération \emph{rename} distante}
 
+L'autre cas de figure que RenamableLogootSplit doit gérer est l'intégration d'une opération \emph{rename} distante.
+Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans la \autoref{alg:renameRemote}.
+
 \begin{figure}[!ht]
   \footnotesize
   \begin{algorithmic}[5]
@@ -2078,37 +2087,40 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
           \State opEpoch $\gets$ getEpoch(renOp)
           \State introducedEpoch $\gets$ getIntroducedpoch(renOp)
           \\
-          \State addEpoch(epochTree, introducedEpoch, opEpoch)
+          \State addEpoch(epochTree, introducedEpoch, opEpoch) \label{alg:renameRemote-addEpoch}
           \\
           \If{introducedEpoch \lepoch currentEpoch}
-            \State \Return $\langle$seq, currentEpoch$\rangle$
+            \State \Return $\langle$seq, currentEpoch$\rangle$ \label{alg:renameRemote-return-1}
           \Else
-            \State idIntervals $\gets$ getIdIntervals(seq)
-            \State ids $\gets$ flatMap(idIntervals, expand)
+            \State idIntervals $\gets$ getIdIntervals(seq) \label{alg:renameRemote-getIdIntervals}
+            \State ids $\gets$ flatMap(idIntervals, expand) \label{alg:renameRemote-getIds}
             \\
             \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, currentEpoch, introducedEpoch) \label{alg:renameRemote-get-path}
             \\
-            \For{epoch in epochsToRevert}
-              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch) \label{alg:renameRemote-retrieve-rename-data-1}
+            \For{epoch in epochsToRevert} \label{alg:renameRemote-rename-1}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
               \State nId $\gets$ getNodeId(epochTree, epoch)
-              \State nSeq $\gets$ getNodeSeq(epochTree, epoch) \label{alg:renameRemote-retrieve-rename-data-2}
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
               \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
-              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial}) \label{alg:renameRemote-revertRenameId}
+              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial})
             \EndFor
             \\
-            \For{epoch in epochsToApply} \label{alg:renameRemote-renameId-1}
+            \For{epoch in epochsToApply}
               \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
               \State nId $\gets$ getNodeId(epochTree, epoch)
               \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
               \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
               \State ids $\gets$ map(ids, renameId\textsubscript{partial})
-            \EndFor \label{alg:renameRemote-renameId-2}
+            \EndFor \label{alg:renameRemote-rename-2}
             \\
             \State nId $\gets$ getNodeId(seq)
             \State nSeq $\gets$ getNodeSeq(seq)
-            \State newIdIntervals $\gets$ aggregate(ids) \label{alg:renameRemote-aggregate}
+            \State newIdIntervals $\gets$ aggregate(ids)
             \State content $\gets$ getContent(seq)
-            \State \Return $\langle$\new~LogootSplit(nId, nSeq, newIdIntervals, content), introducedEpoch$\rangle$
+            \State blocks $\gets$ generateBlocks(newIdIntervals, content)
+            \State newSeq $\gets$ \new~LogootSplit(nId, nSeq, blocks) \label{alg:renameRemote-newSeq}
+            \\
+            \State \Return $\langle$newSeq, introducedEpoch$\rangle$ \label{alg:renameRemote-return-2}
         \EndIf
       \EndFunction
   \end{algorithmic}
@@ -2116,25 +2128,144 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
   \label{alg:renameRemote}
 \end{figure}
 
-\begin{itemize}
-  \item 2nd cas de figure est si l'opération à intégrer est une opération \emph{rename}.
-  \item Commence par ajouter l'époque introduite par l'opération \emph{rename} à l'\emph{arbre des époques}.
-  \item Compare ensuite l'époque introduite avec l'époque courante de la séquence.
-  \item Ici, de nouveaux 2 cas de figure différents.
-  \item 1er cas de figure : si époque de l'opération plus grande que l'époque courante d'après \lepoch, doit renommer son état en accordance.
-  \item Pour cela, calcule le chemin entre l'époque de l'opération et l'époque courante, comme indiqué précédemment.
-  \item Procéde ensuite au renommage de chaque identifiant de la séquence.
-  \item Obtient alors la liste des identifiants correspondant à ceux de l'état courant, mais à la nouvelle époque courante.
-  \item Doit alors construire une nouvelle séquence avec ces nouveaux identifiants.
-  \item Pour limiter le nombre de traitements, commence déjà par aggréger les identifiants en intervals d'identifiants.
-  \item Génère ensuite les blocs de la future séquence à partir de la liste d'intervals d'identifiants obtenus et du contenu de la séquence courante.
-  \item Puis génère une nouvelle séquence à partir de cette liste de blocs.
-    Remplace la séquence actuelle par cette dernière.
-    Met à jour l'époque courante de la séquence.
-  \item 2nd cas de figure : si époque introduite par l'opération \emph{rename} plus petite que l'époque d'après \lepoch.
-  \item Dans ce cas, aucun traitement supplémentaire n'est nécessaire.
-    Intégration de cette opération \emph{rename} s'arrête là.
-\end{itemize}
+Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:integration-process-rename-op} pour présenter le fonctionnement de cet algorithme.
+
+\begin{figure}[t!]
+  \subfloat[Execution]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{0..3}} }
+                              ] (S1A-right) {ABCD}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{0..1}} }
+                              ] {AB}
+                  to ++(0:\widthblock) node[letter, fill=mylightblue,
+                          label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}} }
+                              ] {X}
+                  to ++(0:\widthletter) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{i}{A2}{2..3}} }
+                              ] (S2A-right) {CD}
+
+                  to ++(0:3.7 * \widthletter) node[epoch] (S3A-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
+                              ] {AB}
+                  to ++(0:\widthblock) node[letter,
+                          label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
+                              ] {X}
+                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
+                              ] (S3A-right) {CD};
+
+              \path
+                  to ++(270:5) node {\textbf{B}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
+                              ] (S1B-right) {ABCD}
+
+                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
+                              ] (S2B-right) {ABCD}
+
+                  to ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
+                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
+                              ] {AB}
+                  to ++(0:\widthblock) node[letter,
+                          label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
+                              ] {X}
+                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                          label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
+                              ] (S3B-right) {CD};
+
+              \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S1A-left);
+              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+              \draw[->, thick] (S0B-right) -- node[above, align=center]{\emph{rename to \epoch{B2}}} (S1B-left);
+              \draw[dotted] (S2A-right) -- (S3A-left) (S1B-right) -- (S2B-left) (S2B-right) -- (S3B-left);
+              \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[right, align=center]{\emph{rename to \epoch{A2}}} (S2B-left.west);
+              \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[near end, below right, align=center]{\emph{rename to \epoch{B2}}} (S3A-left.west);
+              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[below right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
+            \end{tikzpicture}}
+          \label{fig:integration-process-rename-op-execution}
+      \end{minipage}}
+  \hfil
+  \subfloat[Arbre des époques de A avant la réception de l'opération \emph{rename} vers l'époque \epoch{B2}]{
+    \begin{minipage}{0.5 \linewidth}
+        \centering
+        \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+            \path
+                node[op] (e0) {\epoch{0}}
+                to ++(270:1.8) node[op, red] (eA2) {\epoch{A2}};
+
+            \draw[->, thick] (e0) edge (eA2);
+            \draw[->, dashed, thick, red] (eA2.120) -- (e0.240);
+        \end{tikzpicture}
+        \label{fig:integration-process-rename-op-epoch-tree-before}
+    \end{minipage}}
+  \subfloat[Arbre des époques de A après la réception de l'opération \emph{rename} vers l'époque \epoch{B2}]{
+    \begin{minipage}{0.5 \linewidth}
+        \centering
+        \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+            \path
+                node[op] (e0) {\epoch{0}}
+                to ++(225:2) node[op] (eA1) {\epoch{A2}};
+            \path
+                to ++(315:2) node[op, red] (eB2) {\epoch{B2}};
+
+            \draw[->, thick] (e0) edge (eA1) (e0) edge (eB2);
+            \draw[->, dashed, thick, red] (eB2.180) -- (eA1.0) (eA1.0) -- (e0.270);
+        \end{tikzpicture}
+        \label{fig:integration-process-rename-op-epoch-tree-after}
+    \end{minipage}}
+  \caption{TODO}
+  \label{fig:integration-process-rename-op}
+\end{figure}
+
+La \autoref{fig:integration-process-rename-op} reprend le scénario décrit précédemment dans la \autoref{fig:integration-process-insert-op}.
+Elle complète ce dernier en faisant apparaître la réception de l'opération \emph{rename} vers l'époque \epoch{B2} par le noeud A.
+C'est sur ce point que nous allons nous focaliser ici.
+
+À la réception de l'opération \emph{rename} vers l'époque \epoch{B2}, le noeud A utilise \textsc{renRemote} pour intégrer cette opération.
+Tout d'abord, le noeud A ajoute l'époque \epoch{B2} et les métadonnées associées (ancien état, auteur de l'opération \emph{rename}, numéro de séquence de l'auteur de l'opération \emph{rename}) à son propre arbre des époques (ligne \ref{alg:renameRemote-addEpoch}).
+
+Le noeud compare ensuite l'époque introduite (\epoch{B2}) à son époque courante (\epoch{A2}) en utilisant la relation \lepoch.
+Si l'époque introduite était plus petite que l'époque courante, aucun traitement supplémentaire ne serait nécessaire.
+\textsc{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées (ligne \ref{alg:renameRemote-return-1}).
+
+Dans le cas présent, on a \epoch{A2} \lepoch \epoch{B2}.
+\epoch{B2} devient donc la nouvelle époque courante.
+Le noeud A procède au renommage de son état vers cette nouvelle époque.
+
+Pour cela, le noeud récupère l'ensemble des identifiants formant son état courant (lignes \ref{alg:renameRemote-getIdIntervals}-\ref{alg:renameRemote-getIds}).
+Puis, comme dans \textsc{insRemote}, le noeud récupère le chemin entre son époque courante et l'époque cible à l'aide de \textsc{getPathBetweenEpochs} puis renomme chaque identifiant à travers les différents époques (lignes \ref{alg:renameRemote-rename-1}-\ref{alg:renameRemote-rename-2}).
+
+Le noeud obtient alors la liste des identifiants courant, à la nouvelle époque cible.
+Il ne lui reste plus qu'à construire une nouvelle séquence à partir de ces identifiants.
+Pour cela, le noeud regénère des blocs à partir des intervals d'identifiants obtenus et du contenu de la séquence courante.
+Le noeud utilise ensuite ces données pour instancier une nouvelle séquence équivalente à l'époque cible (ligne \ref{alg:renameRemote-newSeq}).
+Finalement, \textsc{renRemote} renvoie cette nouvelle séquence ainsi que la nouvelle époque courante.
 
 \subsection{Règles de récupération de la mémoire des états précédents}
 
