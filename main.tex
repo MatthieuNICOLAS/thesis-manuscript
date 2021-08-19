@@ -2071,6 +2071,51 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
 
 \subsubsection{Intégration d'une opération \emph{rename} distante}
 
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}[5]
+      \Function{renRemote}{seq, epochTree, currentEpoch, renOp}
+          \State opEpoch $\gets$ getEpoch(renOp)
+          \State introducedEpoch $\gets$ getIntroducedpoch(renOp)
+          \\
+          \State addEpoch(epochTree, introducedEpoch, opEpoch)
+          \\
+          \If{introducedEpoch \lepoch currentEpoch}
+            \State \Return $\langle$seq, currentEpoch$\rangle$
+          \Else
+            \State idIntervals $\gets$ getIdIntervals(seq)
+            \State ids $\gets$ flatMap(idIntervals, expand)
+            \\
+            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, currentEpoch, introducedEpoch) \label{alg:renameRemote-get-path}
+            \\
+            \For{epoch in epochsToRevert}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch) \label{alg:renameRemote-retrieve-rename-data-1}
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch) \label{alg:renameRemote-retrieve-rename-data-2}
+              \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial}) \label{alg:renameRemote-revertRenameId}
+            \EndFor
+            \\
+            \For{epoch in epochsToApply} \label{alg:renameRemote-renameId-1}
+              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
+              \State nId $\gets$ getNodeId(epochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
+              \State ids $\gets$ map(ids, renameId\textsubscript{partial})
+            \EndFor \label{alg:renameRemote-renameId-2}
+            \\
+            \State nId $\gets$ getNodeId(seq)
+            \State nSeq $\gets$ getNodeSeq(seq)
+            \State newIdIntervals $\gets$ aggregate(ids) \label{alg:renameRemote-aggregate}
+            \State content $\gets$ getContent(seq)
+            \State \Return $\langle$\new~LogootSplit(nId, nSeq, newIdIntervals, content), introducedEpoch$\rangle$
+        \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{TODO}
+  \label{alg:renameRemote}
+\end{figure}
+
 \begin{itemize}
   \item 2nd cas de figure est si l'opération à intégrer est une opération \emph{rename}.
   \item Commence par ajouter l'époque introduite par l'opération \emph{rename} à l'\emph{arbre des époques}.
@@ -2273,8 +2318,8 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
       \midrule
       \emph{insert} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
       \emph{remove} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
-      \emph{naive rename} & $n$ & $h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)) \\
-      \emph{rename} & $n$ & $h$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$ \\
+      \emph{naive rename} & $b$ & $h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)) \\
+      \emph{rename} & $n$ & $b$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$ \\
       \bottomrule
   \end{tabular}
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $m$ : nombre d'éléments de l'\emph{ancien état} des renommages à appliquer}
@@ -2320,7 +2365,7 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
   \item Concernant l'opération \emph{rename}
   \item L'opération \emph{rename} locale consiste à parcourir et à linéariser la structure actuelle pour ne garder que les idIntervals courant
   \item Et à créer une nouvelle séquence équivalente à l'ancienne, composée seulement du nouveau bloc
-  \item Sa complexité est donc de O($n$)
+  \item Sa complexité est donc de O($b$)
   \item Pour l'opération \emph{rename} distante, une implémentation naïve consiste à générer le nouvel état en renommant et insérant chaque identifiant de l'état courant d'une manière similaire à l'opération \emph{insert} distante
   \item On obtient dans ce cas une complexité de O($h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)))
   \item Mais peut améliorer
