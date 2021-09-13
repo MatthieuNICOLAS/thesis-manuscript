@@ -2929,38 +2929,41 @@ Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent a
 
 \section{Conclusion}
 
-\subsection{Récapitulatif}
+Dans ce chapitre, nous avons présenté un nouvel Sequence \ac{CRDT} : RenamableLogootSplit.
+Ce nouveau type de données répliquées associe à LogootSplit un mécanisme de renommage optimiste permettant de réduire ponctuellement les métadonnées stockées et d'optimiser l'état interne de la structure de données.
 
-\begin{itemize}
-  \item Propose un mécanisme de renommage optimiste adapté à LogootSplit
-  \item Réduit ponctuellement taille des métadonnées grâce à une nouvelle opération, l'opération \emph{rename}
-  \item Réduit métadonnées à un montant fixe à terme (1 seul bloc)
-  \item Ajoute un surcoût computationnel pour les opérations concurrentes aux opérations \emph{rename}
-  \item Mais surcoût compensé par l'optimisation de la structure de données utilisée en interne pour représenter la séquence (réduit taille de l'arbre)
-  \item Et permet de réduire le temps d'intégration des opérations dans le cas général
-\end{itemize}
+Ce mécanisme prend la forme d'une nouvelle opération, l'opération \emph{rename}, qui peut être émise à tout moment par n'importe quel noeud.
+Cette opération génère une nouvelle séquence LogootSplit, équivalente à l'état précédent, avec une empreinte minimale en métadonnées.
+L'opération \emph{rename} transporte aussi suffisamment d'informations pour que les noeuds puissent intégrer les opérations concurrentes à l'opération \emph{rename} dans le nouvel état.
 
-\subsection{Limites}
+En cas d'opérations \emph{rename} concurrentes, la relation d'ordre total stricte \lepoch permet aux noeuds de décider quelle opération \emph{rename} utiliser, sans coordination.
+Les autres opérations \emph{rename} sont quant à elles ignorées.
+Seules leurs informations sont stockées par RenamableLogootSplit, afin de gérer les opérations concurrentes potentielles.
 
-\begin{itemize}
-  \item Une limite est la nécessité de stabilité causale pour pouvoir supprimer de manière définitive les métadonnées liées au mécanisme de renommage
-  \item Mais s'agit d'une limite commune avec les autres mécanismes de réduction des métadonnées, à l'exception de LSEQ (GC des tombstones dans RGA, catchup protocole de core et nebula (à re-vérifier, mais je vois pas comment ils feraient autrement))
-  \item Cette limite pose problème dans les systèmes dynamiques puisque nous possédons aucune garantie qu'un noeud va se reconnecter un jour
-  \item S'agit d'un problème encore non-résolu
-  \item Peut mettre en place un mécanisme pour évincer les noeuds inactifs depuis trop longtemps
-  \item Mais mène dans ce cas à des forks
-  \item Une second limite est le surcoût produit par les opérations \emph{rename} concurrentes, aussi bien en termes de métadonnées que de calculs
-  \item Peut être adressée en mettant en place une architecture à la core et nebula dans les systèmes qui le permettent
-  \item Sinon peut mettre en place des stratégies pour limiter le risque de d'opérations \emph{rename} concurrentes (coordination simple au sein de sous-groupe), mais n'offrent aucune garantie forte sur le nombre d'opérations concurrentes possibles
-\end{itemize}
+Une fois qu'une opération \emph{rename} a été propagée à l'ensemble des noeuds, elle devient causalement stable.
+À partir de ce point, il n'est plus possible qu'un noeud émette une opération concurrente à cette dernière.
+Les informations incluses dans l'opération \emph{rename} pour intégrer les opérations concurrentes potentielles peuvent donc être supprimées par l'ensemble des noeuds.
 
-\subsection{Perspectives}
+Ainsi, le mécanisme de renommage permet à RenamableLogootSplit d'offrir de meilleures performances que LogootSplit.
+La génération du nouvel état minimal et la suppression à terme des métadonnées du mécanisme de renommage divisent par 100 la taille de la structure de données répliquée.
+L'optimisation de l'état interne représentant la séquence réduit aussi le coût d'intégration des opérations suivantes, amortissant ainsi le coût de transformation et d'intégration des opérations concurrentes à l'opération \emph{rename}.
 
-\begin{itemize}
-  \item Définir stratégie pour déclenchement de l'opération \emph{rename}
-  \item Proposer nouvelles relations \emph{priority} \lepoch
-  \item Utiliser combinaison de CRDT et OT pour concevoir structures de données répliquées complexes (move dans Sequence, DFS...)
-\end{itemize}
+RenamableLogootSplit souffre néanmoins de plusieurs limitations.
+La première d'entre elles est le besoin d'observer la stabilité causale des opérations \emph{rename} pour supprimer de manière définitive les métadonnées associées.
+Il s'agit d'une contrainte forte, notamment dans les systèmes dynamiques à grande échelle dans lesquels nous n'avons aucune garantie et aucun contrôle sur les noeuds.
+Il est donc possible qu'un noeud déconnecté ne se reconnecte jamais, bloquant ainsi la progression de la stabilité causale pour l'ensemble des opérations.
+Il s'agit toutefois d'une limite partagée avec les autres mécanismes de réduction des métadonnées pour Sequence \acp{CRDT} proposés dans la littérature \cite{ROH2011354, zawirski:hal-01248197}, à l'exception de l'approche LSEQ \cite{lseq2017}.
+En pratique, il serait intéressant d'étudier la mise en place d'un mécanisme d'éviction des noeuds inactifs pour répondre à ce problème.
+% Pour gérer le cas où des noeuds inactifs empêche la stabilité causale des opérations d'être atteinte, une solution possible serait de mettre en place un mécanisme d'éviction des noeuds inactifs.
+% La collaboration poursuivrait alors uniquement avec les noeuds
+% Cette solution est néanmoins imparfaite, car elle peut conduire à des forks,
+
+La seconde limitation de RenamableLogootSplit concerne la génération d'opérations \emph{rename} concurrentes.
+Chaque opération \emph{rename} est coûteuse, aussi bien en terme de métadonnées à stocker et diffuser qu'en terme de traitements à effectuer.
+Il est donc important de chercher à minimiser le nombre d'opérations \emph{rename} concurrentes émises par les noeuds.
+Une approche possible est d'adopter une architecture à la Core et Nebula \cite{zawirski:hal-01248197}.
+Mais pour les systèmes incompatibles avec ce type d'architecture système, il serait intéressant de proposer d'autres approches ne nécessitant aucune coordination entre les noeuds.
+Mais par définition, ces approches ne pourraient offrir de garanties fortes sur le nombre d'opérations concurrentes possibles.
 
 % \include{assets/chapter_application_HAL}
 
