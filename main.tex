@@ -2078,6 +2078,8 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
 
 \subsubsection{Intégration d'une opération \emph{rename} distante}
 
+\label{sec:integration-process-rename-op}
+
 L'autre cas de figure que RenamableLogootSplit doit gérer est l'intégration d'une opération \emph{rename} distante.
 Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans la \autoref{alg:renameRemote}.
 
@@ -2269,6 +2271,8 @@ Le noeud utilise ensuite ces données pour instancier une nouvelle séquence éq
 Finalement, \textsc{renRemote} renvoie cette nouvelle séquence ainsi que la nouvelle époque courante.
 
 \subsection{Règles de récupération de la mémoire des états précédents}
+
+\label{sec:gc-mechanism}
 
 Les noeuds stockent les époques et les \emph{anciens états} correspondant pour transformer les identifiants d'une époque à l'autre.
 Au fur et à mesure que le système progresse, certaines époques et métadonnées associées deviennent obsolètes puisque plus aucune opération ne peut être émise depuis ces époques.
@@ -2836,53 +2840,77 @@ Par exemple, le pair ne peut pas fournir des opérations faisant partie des dép
 
 Une solution possible dans ce cas de figure est de rediriger le second pair vers un troisième pour qu'il se synchronise avec lui.
 Cependant, cette solution pose des problèmes de latence/temps de réponse si le troisième pair s'avère indisponible à ce moment.
-Une autre approche est de généraliser le processus de synchronisation que nous avons présenté ici (opération \emph{rename} comme état initial puis application des autres opérations) à l'ensemble des pairs, et non plus seulement aux nouveaux pairs.
+Une autre approche possible est de généraliser le processus de synchronisation que nous avons présenté ici (opération \emph{rename} comme état initial puis application des autres opérations) à l'ensemble des pairs, et non plus seulement aux nouveaux pairs.
 Nous présentons les avantages et inconvénients de cette approche dans la sous-section suivante.
 
 \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
 
-\subsection{Implémentation alternative à base d'operation-log}
+\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le log d'opérations}
 
-\begin{itemize}
-  \item Implémentation du mécanisme de renommage décrite et évaluée dans ce manuscrit consiste à appliquer les fonctions de transformations \textsc{renameId} et \textsc{revertRenameId} à l'ensemble des identifiants composant l'état lors de l'intégration d'une opération \emph{rename}
-  \item Une implémentation alternative se basant sur log des opérations peut être proposée
-  \item Consiste à partir de l'état produit par l'opération \emph{rename}
-  \item Puis à transformer et à intégrer l'ensemble des opérations concurrentes connues par le noeud sur cet état
-  \item Approche présente plusieurs avantages par rapport à l'implémentation actuelle
-  \begin{itemize}
-    \item Réduit le nombre de transformations calculées : ne transforme plus chaque élément (ou blocs si dispose de \textsc{renameBlock}) mais seulement chaque d'opération concurrente.
-      En fonction de la fréquence de déclenchement de l'opération \emph{rename}, ce nombre peut être plus petit de plusieurs ordres de grandeur.
-      Plus la distance entre l'époque courante et l'époque cible est grande, plus cette réduction est significative.
-    \item Récupère et réutilise les identifiants originaux depuis les opérations.
-      Permet d'éviter la situation où un noeud applique \textsc{revertRenameId} puis \textsc{renameId} à un identifiant donné.
-      Retire donc la contrainte de proposer un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId} ou d'avoir une relation \emph{priority} qui prémunit des aller-retours dans l'\emph{arbre des époques} pour garantir la correction du système.
-      Offre donc une plus grande flexibilité pour améliorer ces autres points du mécanisme de renommage.
-  \end{itemize}
-  \item Mais dispose aussi de quelques limites
-  \begin{itemize}
-    \item Besoin de maintenir le log des opérations.
-      Ce défaut est néanmoins à relativiser.
-      Les noeuds ont déjà besoin de maintenir le log des opérations de façon à se synchroniser avec les autres noeuds, que ça soit pour pallier à une perte d'un message ou pour permettre à un noeud qui rejoint la collaboration de se mettre à jour.
-    \item Besoin de parcourir le log des opérations à la recherche d'opérations concurrentes.
-      Là aussi, ce défaut est à relativiser.
-      Afin de supprimer les métadonnées du mécanisme de renommage, les noeuds traquent déjà les informations de progression des autres noeuds.
-      Ces informations permettent de déterminer la stabilité causale des opérations et peuvent être utilisées pour tronquer au fur et à mesure le log et ainsi limiter sa taille.
-      Le parcours du log peut aussi être facilement parallélisé.
-      \mnnote{
-        Est-ce que log peut être plus petit qu'état courant ?
-        Oui, si noeuds tous connectés et que système se stabilise.
-        Est-ce probable ?
-        Pas convaincu.
-      }
-    \item Besoin d'ajouter les informations de causalité pour permettre de détecter les opérations concurrentes.
-      Pour cela, il suffit d'inclure un vecteur de version dans l'opération \emph{rename}.
-      Ainsi, puisque le log ne peut contenir que des opérations précédant l'opération \emph{rename} ou concurrente à cette dernière (d'après la livraison basée sur les époques), il s'ensuit que toute opération présente dans le log et n'étant pas couverte par le vecteur de version est une opération concurrente à l'opération \emph{rename}.
-      Cependant, la taille des vecteurs de version croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
-      Diffuser cette structure de données à l'ensemble des noeuds peut donc avoir un coût significatif dans les collaborations à large échelle.
-      Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
-      Les opérations \emph{rename} étant rares en comparaison, ce surcoût nous paraît acceptable.
-  \end{itemize}
-\end{itemize}
+Nous avons décrit précédemment dans \autoref{sec:integration-process-rename-op}, et plus précisément dans \autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
+Pour rappel, le processus consiste à
+\begin{enumerate*}[label=(\roman*)]
+  \item identifier le chemin entre l'époque courante et l'époque cible
+  \item appliquer les fonctions de transformations \textsc{revertRenameId} et \textsc{renameId} à l'ensemble des identifiants composant l'état courant
+  \item re-créer une séquence à partir des nouveaux identifiants calculés et du contenu courant.
+\end{enumerate*}
+
+Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération \emph{rename}.
+Cette implémentation repose sur le log des opérations.
+
+Cette implémentation se base sur les observations suivantes :
+\begin{enumerate*}[label=(\roman*)]
+  \item L'état courant est obtenu en intégrant successivement l'ensemble des opérations.
+  \item L'opération \emph{rename} est une opération subsumant les opérations passées : elle prend un état donné (l'\emph{ancien état}), somme des opérations précédentes, et génère un nouvel état équivalent compacté.
+  \item L'ordre d'intégration des opérations concurrentes n'a pas d'importance sur l'état final obtenu.
+\end{enumerate*}
+
+Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
+\begin{enumerate*}[label=(\roman*)]
+  \item générer l'état correspondant au renommage de l'\emph{ancien état}
+  \item identifier le chemin entre l'époque courante et l'époque cible
+  \item identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son log
+  \item transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état
+\end{enumerate*}
+
+Cet algorithme est équivalent à ré-ordonner le log des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
+
+Cette approche présente plusieurs avantages par rapport à l'implémentation décrite dans \autoref{sec:integration-process-rename-op}.
+Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
+La version décrite dans \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si on dispose de \textsc{renameBlock}) de l'état courant.
+La version présentée ici effectue une transformation pour chaque opération du log concurrente à l'opération \emph{rename} à intégrer.
+Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
+
+Un autre avantage de cette approche est qu'elle permet de récupérer et de réutiliser les identifiants originaux des opérations.
+Lorsqu'une suite de transformations est appliquée sur les identifiants d'une opération, elle est appliquée sur les identifiants originaux et non plus sur leur équivalents présents dans l'état courant.
+Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération \emph{rename} sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération \emph{rename}.
+Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \textsc{renameId} et \textsc{revertRenameId}.
+
+Cette implémentation dispose néanmoins de plusieurs limites.
+Tout d'abord, elle nécessite que chaque noeud maintienne localement le log des opérations.
+Les métadonnées accumulées par la structure de données répliquées vont alors croître avec le nombre d'opérations effectuées.
+Cependant, ce défaut est à nuancer.
+En effet, les noeuds doivent déjà maintenir le log des opérations pour le mécanisme d'anti-entropie, afin de renvoyer une opération passée à un noeud l'ayant manquée.
+Plus globalement, les noeuds doivent aussi conserver le log des opérations pour permettre à un nouveau noeud de rejoindre la collaboration et de calculer l'état courant en rejouant l'ensemble des opérations.
+Il s'agit donc d'une contrainte déjà imposée aux noeuds pour d'autres fonctionnalités du système.
+
+Un autre défaut de cette implémentation est qu'elle nécessite de détecter les opérations concurrentes à l'opération \emph{rename} à intégrer.
+Cela implique d'ajouter des informations de causalité à l'opération \emph{rename}, tel qu'un vecteur de version.
+Cependant, la taille des vecteurs de version croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
+Diffuser cette information à l'ensemble des noeuds peut donc représenter un coût significatif dans les collaborations à large échelle.
+Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
+Les opérations \emph{rename} étant rares en comparaison, ce surcoût nous paraît acceptable.
+
+Finalement, cette approche implique aussi de parcourir le log des opérations à la recherche d'opérations concurrentes.
+Comme dit précédemment, la taille du log croît de façon monotone au fur et à mesure que les noeuds émettent des opérations.
+Cette étape du nouvel algorithme d'intégration de l'opération \emph{rename} devient donc de plus en plus coûteuse.
+Des méthodes permettent néanmoins de réduire son coût computationnel.
+Notamment, chaque noeud traquent les informations de progression des autres noeuds afin de supprimer les métadonnées du mécanisme de renommage (cf. \autoref{sec:gc-mechanism}).
+Ces informations permettent de déterminer la stabilité causale des opérations et donc d'identifier les opérations qui ne peuvent plus être concurrentes à une nouvelle opération \emph{rename}.
+Les noeuds peuvent ainsi maintenir, en plus du log complet des opérations, un log composé uniquement des opérations non stables causalement.
+Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent alors parcourir ce log réduit à la recherche des opérations concurrentes.
+
+\mnnote{TODO: Ajouter conclusion à cette sous-section}
 
 \section{Comparaison avec les approches existantes}
 
