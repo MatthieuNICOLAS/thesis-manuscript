@@ -318,6 +318,8 @@ qui fut la première de toutes.
 \chapter{État de l'art}
 \minitoc
 
+\section{Systèmes distribués}
+
 \begin{itemize}
   \item Contexte des systèmes distribués à large échelle
   \item Réplique les données afin de pouvoir supporter les pannes
@@ -2455,7 +2457,7 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
       \emph{insert} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
       \emph{remove} & log($b$) & $h$ + $k$ + $l$ $\cdot$ log($m$) + log($b$) \\
       \emph{naive rename} & $b$ & $h$ + $n$ ($k$ + $l$ $\cdot$ log($m$) + log($b$)) \\
-      \emph{rename} & $n$ & $b$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$ \\
+      \emph{rename} & $b$ & $b$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $m$) + $n$ + $b$ \\
       \bottomrule
   \end{tabular}
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $m$ : nombre d'éléments de l'\emph{ancien état} des renommages à appliquer}
@@ -3180,6 +3182,24 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
     \mnnote{NOTE: C'est vrai ça ? J'ai un doute sur le fait qu'on avait mis en place un CRDT pour cette structure. À vérifier.}
 \end{itemize}
 
+% \subsection{Composition de CRDTs}
+
+% \begin{itemize}
+%   \item
+% \end{itemize}
+
+% \subsection{CRDT pour les styles}
+
+% \begin{itemize}
+%   \item Permettrait de se découpler de Markdown pour gérer le style du document
+%   \item Permettrait de supporter un plus grand nombre d'options que Markdown ne le permet actuellement (couleurs, mise en page...)
+% \end{itemize}
+
+% \subsection{Évolution de schéma}
+% \begin{itemize}
+%   \item Cambria \cite{2021-cambria-schema-evolution}
+% \end{itemize}
+
 \section{Couche sécurité}
 
 \subsection{Objectifs}
@@ -3283,36 +3303,16 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
     \end{itemize}
 \end{itemize}
 
+% \begin{itemize}
+%   \item Librairies alternatives (libP2P, hypercore)
+%   \item Topologies alternatives (SPRAY)
+% \end{itemize}
+
 \section{Pistes d'amélioration et de recherche}
 
-\subsection{Composition de CRDTs}
+% \subsection{Historique du document}
+\subsection{Fusion de versions distantes d'un document collaboratif}
 
-\begin{itemize}
-  \item
-\end{itemize}
-
-\subsection{CRDT pour les styles}
-
-\begin{itemize}
-  \item Permettrait de se découpler de Markdown pour gérer le style du document
-  \item Permettrait de supporter un plus grand nombre d'options que Markdown ne le permet actuellement (couleurs, mise en page...)
-\end{itemize}
-
-\subsection{Réseaux}
-\begin{itemize}
-  \item Librairies alternatives (libP2P, hypercore)
-  \item Topologies alternatives (SPRAY)
-\end{itemize}
-\subsection{Évolution de schéma}
-\begin{itemize}
-  \item Cambria \cite{2021-cambria-schema-evolution}
-\end{itemize}
-\subsection{Droits d'accès}
-\begin{itemize}
-  \item Access Control Conflict Resolution in Distributed File Systems \cite{2021-access-control-crdts}
-  \item Travaux de PA
-\end{itemize}
-\subsection{Historique du document}
 \subsection{Rôles et places des bots dans systèmes collaboratifs}
 \begin{itemize}
   \item Stockage du document pour améliorer sa disponibilité
@@ -3320,11 +3320,20 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
 \end{itemize}
 
+\section{Conclusion}
+
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
 \minitoc
 \section{Résumé des contributions}
 \section{Perspectives}
+
+% \begin{itemize}
+%   \item Définir stratégie pour déclenchement de l'opération \emph{rename}
+%   \item Proposer nouvelles relations \emph{priority} \lepoch
+%   \item Utiliser combinaison de CRDT et OT pour concevoir structures de données répliquées complexes (move dans Sequence, DFS...)
+% \end{itemize}
+
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 \subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
 \subsection{Définition de types de données répliquées sans conflits plus complexes}
