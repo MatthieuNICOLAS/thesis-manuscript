@@ -2776,7 +2776,7 @@ Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integrati
           \toprule
           \multicolumn{2}{c}{Parameters} & \multicolumn{4}{c}{Integration Time (ms)} \\
           \cmidrule(lr){1-2} \cmidrule(lr){3-6}
-          Type & Nb Ops (k) &   Mean &   Median & 99\textsuperscript{th} Quant. &    Std \\
+          Type & Nb Ops (k) &   Mean &   Median & 99\textsuperscript{ème} Quant. &    Std \\
           \midrule
           Local & 30  &    41.75 &    38.74 &      71.68 &   6.84 \\
                                   & 60  &    78.32 &    78.16 &      81.42 &   1.24 \\
@@ -2833,6 +2833,61 @@ Cette tendance est davantage prononcé dans les scénarios avec des opérations 
 Dans un cas réel d'utilisation, ce scénario (\ie rejouer l'entièreté du log) ne correspondra au scénario principal et pourra être mitigé, par exemple en utilisant un mécanisme de compression du log d'opérations.
 Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur l'opération \emph{rename}.
 
+\subsubsection{Impact de la fréquence de l'opération \emph{rename} sur les performances}
+
+Pour évaluer l'impact de la fréquence de l'opération \emph{rename} sur les performances, nous avons réalisé un benchmark supplémentaire.
+Ce benchmark consiste à rejouer les logs d'opérations des simulations en utilisant divers \acp{CRDT} et configurations : LogootSplit, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 30k opérations, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 7,5k opérations.
+Au fur et à mesure que le benchmark rejoue le log des opérations, il mesure le temps d'intégration des opérations ainsi que leur taille.
+Les résultats de ce benchmark sont présentés dans \autoref{tab:impact-frequency}.
+
+\begin{table}[!ht]
+  \centering
+  \resizebox{.8\linewidth}{!}{
+    \begin{tabular}{llrrrrrrrrrr}
+      \toprule
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration ($\trm{\mu}$s)}  & \multicolumn{5}{c}{Taille (B)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Quant. & 99\textsuperscript{ème} Quant. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Quant. & 99\textsuperscript{ème} Quant. \\
+      \midrule
+      insert & LS &  471 &    460 &  130 &        224 &         768 &    593 &    584 & 184 &        216 &        1136 \\
+      & RLS - 30k &  397 &    323 & 66.7 &        171 &         587 &    442 &    378 &  92 &        314 &         958 \\
+      & RLS - 7.5k &  393 &    265 & 54.5 &        133 &         381 &    389 &    378 &   0 &        314 &         590 \\
+      remove & LS &  280 &    270 & 71.4 &        140 &         435 &    632 &    618 & 184 &        250 &        1170 \\
+      & RLS - 30k &  247 &    181 &   39 &       97.9 &         308 &    434 &    412 &   0 &        320 &         900 \\
+      & RLS - 7.5k &  296 &    151 & 34.8 &       74.9 &         214 &    401 &    412 &   0 &        320 &         596 \\
+      \midrule
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)}  & \multicolumn{5}{c}{Taille (KB)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Quant. & 99\textsuperscript{ème} Quant. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Quant. & 99\textsuperscript{ème} Quant. \\
+      \midrule
+      rename & RLS - 30k & 1022 &   1188 &  425 &        540 &        1276 &   1366 &   1258 & 514 &        635 &        3373 \\
+      & RLS - 7.5k &  861 &    974 &  669 &        123 &        1445 &    273 &    302 & 132 &        159 &         542 \\
+      \bottomrule
+    \end{tabular}
+  }
+  \caption{Temps d'intégration et taille des opérations par type et par fréquence d'opérations \emph{rename}}
+  \label{tab:impact-frequency}
+\end{table}
+
+Concernant les temps d'intégration, nous observons des opérations \emph{rename} plus fréquentes permettent d'améliorer les temps d'intégration des opérations \emph{insert} et \emph{remove}.
+Cela confirme les résultats attendus puisque l'opération \emph{rename} réduit la taille des identifiants de la structure ainsi que le nombre de blocs composant la séquence.
+
+Nous remarquons aussi que la fréquence n'a aucun impact significatif sur le temps d'intégration des opérations \emph{rename}.
+Il s'agit là aussi d'un résultat attendu puisque la complexité en temps de l'implémentation de l'opération \emph{rename} dépend du nombre d'éléments dans la séquence, un facteur qui n'est pas impacté par les opérations \emph{rename}.
+
+Concernant la taille des opérations, nous observons que les opérations \emph{insert} et \emph{remove} de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit, notamment car elles intègrent leur époque de génération comme donnée additionnelle.
+Mais alors que la taille des opérations de LogootSplit augmentent indéfiniment, celle des opérations de RenamableLogootSplit est bornée.
+La valeur de cette borne est définit par la fréquence de l'opération \emph{rename}.
+Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.
+
+D'un autre côté, le coût des opérations \emph{rename} est bien plus important (1000x) que celui des autres types d'opérations.
+Ceci s'explique par le fait que l'opération \emph{rename} intègre l'\emph{ancien état}, \ie la liste de tous les blocs composant l'état de la séquence au moment de la génération de l'opération.
+Cependant, nous observons le même phénomène pour les opérations \emph{rename} que pour les autres opérations : la fréquence des opérations \emph{rename} permet d'établir une borne pour la taille des opérations \emph{rename}.
+Nous pouvons donc choisir d'émettre fréquemment des opérations \emph{rename} pour limiter leur taille respective.
+Ceci implique néanmoins un surcoût en computations pour chaque opération \emph{rename} dans l'implémentation actuelle.
+Nous présentons une autre approche possible pour limiter la taille des opérations \emph{rename} dans la \autoref{sec:compression-rename}.
+Cette approche consiste à implémenter un mécanisme de compression pour les opérations \emph{rename} pour ne transmettre que les composants nécessaires à l'identifiant de chaque bloc de l'\emph{ancien état}.
+
 \section{Discussion}
 
 \subsection{Stockage des états précédents sur disque}
@@ -2855,6 +2910,8 @@ Les noeuds peuvent adopter différentes stratégies, en fonction de leurs contra
 La conception de ces stratégies peut reposer sur différentes heuristiques : les époques des noeuds actuellement connectés, le nombre de noeuds pouvant toujours émettre des opérations concurrentes, le temps écoulé depuis la dernière utilisation de l'\emph{ancien état}...
 
 \subsection{Compression et limitation de la taille de l'opération \emph{rename}}
+
+\label{sec:compression-rename}
 
 Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
 Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
