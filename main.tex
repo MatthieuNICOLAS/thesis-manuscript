@@ -2557,6 +2557,12 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
 
 \subsubsection{Complexité en temps du mécanisme de récupération de mémoire des époques}
 
+\mnnote{
+  NOTE: Dans \autoref{sec:gc-mechanism}, je présente le principe du mécanisme de GC.
+  Dans cette partie, je décris l'algo correspondant et l'évalue.
+  Rédiger l'algo ? Dans quelle partie l'insérer dans ce cas ?
+}
+
 Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
 
 L'algorithme du mécanisme de récupération de la mémoire se compose des étapes suivantes.
