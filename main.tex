@@ -2445,7 +2445,7 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
 \subsection{Preuve de correction de \textsc{renameId}}
 
-\subsection{Complexité en temps}
+\subsection{Complexité en temps des opérations}
 
 Afin d'évaluer RenamableLogootSplit, nous analysons tout d'abord la complexité en temps de ses opérations.
 Ces complexités dépendent de plusieurs paramètres : nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants, structure de données utilisée...
@@ -2554,6 +2554,67 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments de l'état courant et des \emph{anciens états}, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $s$ : nombre d'éléments insérés/supprimés par l'opération}
   %}
 \end{table}
+
+\subsubsection{Complexité en temps du mécanisme de récupération de mémoire des époques}
+
+Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
+
+L'algorithme du mécanisme de récupération de la mémoire se compose des étapes suivantes.
+Tout d'abord, il établit le vecteur de version des opérations causalement stables.
+Pour cela, chaque noeud doit maintenir une matrice des vecteurs de version de tous les noeuds.
+L'algorithme génère le vecteur de version des opérations causalement stable en récupérant pour chaque noeud la valeur minimale qui y est associée dans la matrice des vecteurs de version.
+Cette étape correspond à fusionner $n$ vecteurs de version contenant $n$ entrées, elle s'exécute donc en \bigO{n^2} instructions.
+
+La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre définit par la relation \emph{priority}.
+Ce parcours se poursuit jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération \emph{rename} associée est causalement stable.
+Pour chaque époque parcourue, le mécanisme de récupération de mémoire calcule et stocke son chemin jusqu'à la racine.
+Cette étape s'exécute donc en \bigO{e \cdot h}, avec $e$ le nombre d'époques composant l'arbre des époques et $h$ la hauteur de l'arbre.
+
+À partir de ces chemins, le mécanisme calcule le \ac{LCA}.
+Pour ce faire, l'algorithme calcule de manière successive la dernière intersection entre le chemin de la racine jusqu'au \ac{LCA} courant et les chemins précédemment calculés.
+Le \ac{LCA} est la dernière époque du chemin résultant.
+Cette étape s'exécute aussi en \bigO{e \cdot h}.
+
+L'algorithme peut alors calculer l'ensemble des \emph{époques requises}.
+Pour cela, il parcourt les chemins calculés au cours de la seconde étape.
+Pour chaque chemin, il ajoute les époques se trouvant après le \ac{LCA} à l'ensemble des \emph{époques requises}.
+De nouveau, cette étape s'exécute en \bigO{e \cdot h}.
+
+Après avoir déterminé l'ensemble des \emph{époques requises}, le mécanisme peut supprimer les époques obsolètes.
+Il parcourt l'arbre des époques et supprime toute époque qui n'appartient pas à cet ensemble.
+Cette étape finale s'exécute en \bigO{e}.
+
+Ainsi, nous obtenons que la complexité en temps du mécanisme de récupération de mémoire des époques est en \bigO{n^2 + e \cdot h}.
+Nous récapitulons ce résultat dans \autoref{tab:time-complexity-gc-mechanism-epochs}.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Complexité en temps du mécanisme de récupération de mémoire des époques}
+  \label{tab:time-complexity-gc-mechanism-epochs}
+  \resizebox{.7\columnwidth}{!}{
+      \begin{tabular}{lc}
+          \toprule
+          Étape & Temps \\
+          \midrule
+          \emph{calculer le vecteur de version des opérations causalement stables} & $n^2$ \\
+          \emph{calculer les chemins de la racine aux \emph{potentielles époques courantes}} & $e \cdot h$ \\
+          \emph{identifier le \ac{LCA}} & $e \cdot h$ \\
+          \emph{calculer l'ensembe des \emph{époques requises}} & $e \cdot h$ \\
+          \emph{supprimer les époques obsolètes} & $e$ \\
+          \midrule
+          \emph{total} & $n^2 + e \cdot h$ \\
+          \bottomrule
+      \end{tabular}
+  }
+  \caption*{$n$: nombre de noeuds du système, $e$: nombre d'époques dans l'\emph{arbre des époques}, $h$: hauteur de l'\emph{arbre des époques}}
+\end{table}
+
+Malgré sa complexité en temps, le mécanisme de récupération de mémoire des époques devrait avoir un impact limité sur les performances de l'application.
+En effet, ce mécanisme n'appartient pas au chemin critique de l'application, \ie l'intégration des modifications.
+Il peut être déclenché occasionnellement, en tâche de fond.
+Nous pouvons même viser des fenêtres spécifiques pour le déclencher, \eg pendant les périodes d'inactivité.
+Ainsi, nous avons pas étudié plus en détails cette partie de RenamableLogootSplit dans le cadre de cette thèse.
+Des améliorations de ce mécanisme doivent donc être possibles.
 
 \subsection{Expérimentations}
 
