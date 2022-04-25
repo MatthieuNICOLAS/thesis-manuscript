@@ -2815,6 +2815,24 @@ Puisque ces opérations introduisent une époque qui n'est pas sélectionné com
 L'intégration des opérations \emph{concurrentes introduisant une plus petite époque} consiste simplement à ajouter l'époque introduite et l'\emph{ancien état} correspondant à l'\emph{arbre des époques}.
 Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
 
+\subsubsection{Temps pour rejouer le log d'opérations}
+
+Afin de comparer les performances de RenamableLogootSplit et de LogootSplit de manière globale, nous avons mesuré le temps nécessaire pour un nouveau noeud pour rejouer l'entièreté du log d'opérations d'une session de collaboration.
+Nous présentons les résultats obtenus dans \autoref{fig:time-to-replay-log}.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{img/replay-log-30k-with-legend.png}
+  \caption{Évolution du temps nécessaire pour rejouer le log d'opérations}
+  \label{fig:time-to-replay-log}
+\end{figure}
+
+Nous observons que le gain sur le temps d'intégration des opérations \emph{insert} et \emph{remove} permet initialement de contrebalancer le surcoût lié aux opérations \emph{rename}.
+Mais au fur et à mesure que la collaboration progresse, le temps nécessaire pour intégrer les opérations \emph{rename} augmente car plus d'éléments sont impliqués.
+Cette tendance est davantage prononcé dans les scénarios avec des opérations \emph{rename} concurrentes.
+Dans un cas réel d'utilisation, ce scénario (\ie rejouer l'entièreté du log) ne correspondra au scénario principal et pourra être mitigé, par exemple en utilisant un mécanisme de compression du log d'opérations.
+Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur l'opération \emph{rename}.
+
 \section{Discussion}
 
 \subsection{Stockage des états précédents sur disque}
