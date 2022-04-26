@@ -1197,8 +1197,8 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
 Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
-Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu d'à sa position prévue.
-Comme décrit par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
+Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position désirée.
+Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
 Il est donc nécessaire de traiter les opérations concurrentes aux opérations \emph{rename} de manière particulière.
 
 Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opérations \emph{rename}.
@@ -1209,18 +1209,18 @@ Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-in
 Nous définissons les époques de la manière suivante :
 
 \begin{definition}[Époque]
-  Une époque est un triplet $\langle$nodeId, nodeSeq, formerState$\rangle$ où
+  Une époque est un couple $\langle$nodeId, nodeSeq$\rangle$ où
   \begin{itemize}
     \item nodeId est l'identifiant du noeud qui a générée cette époque.
     \item nodeSeq est le numéro de séquence du noeud au moment de la génération de cette époque.
-    \item formerState est l'ancien état du noeud de la génération de cette époque.
   \end{itemize}
 \end{definition}
 
 Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle$nodeId, nodeSeq$\rangle$.
 
-Au fur et à mesure que les noeuds reçoivent des opérations \emph{rename}, ils construisent et maintiennent localement la \emph{chaîne des époques}, une structure de données ordonnant les époques en fonction de leur relation \emph{parent-enfant}.
-De plus, les noeuds marquent chaque opération avec l'identifiant de leur époque courante au moment de génération de l'opération.
+Au fur et à mesure que les noeuds reçoivent des opérations \emph{rename}, ils construisent et maintiennent localement la \emph{chaîne des époques}.
+Cette structure de données ordonne les époques en fonction de leur relation \emph{parent-enfant} et associe à chaque époque l'\emph{ancien état} correspondant (\ie l'\emph{ancien état} inclus dans l'opération \emph{rename} qui a généré cette époque).
+De plus, les noeuds marquent chaque opération avec leur époque courante au moment de génération de l'opération.
 À la réception d'une opération, les noeuds comparent l'époque de l'opération à l'époque courante de leur séquence.
 
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'intégrer.
@@ -1418,10 +1418,10 @@ Celui-ci repose sur celui de LogootSplit, que nous avions défini dans la \autor
 Pour rappel, ce modèle requiert que
 \begin{enumerate*}[label=(\roman*)]
   \item les opérations soient livrées qu'une seule et unique fois au \ac{CRDT},
-  \item les opérations \emph{remove} soient livrées au \ac{CRDT} qu'après les opérations \emph{insert} ajoutant les éléments supprimés.
+  \item les opérations \emph{remove} soient livrées au \ac{CRDT} qu'après les opérations \emph{insert} ajoutant les éléments à supprimer.
 \end{enumerate*}
 
-Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations dépendant causalement dessus.
+Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations qui ont une dépendance causale vers ces dernières.
 Nous obtenons donc le modèle de livraison suivant :
 
 \begin{definition}[Exactly-once + Causal remove + Epoch-based]
@@ -1606,7 +1606,7 @@ Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sor
 
 Tout d'abord, les noeuds doivent se mettre d'accord sur une époque commune de l'\emph{arbre des époques} comme époque cible.
 Afin d'éviter des problèmes de performances dûs à une coordination synchrone, les noeuds doivent sélectionner cette époque de manière non-coordonnée, \ie en utilisant seulement les données présentes dans l'\emph{arbre des époques}.
-Nous présentons un tel mécanisme dans \autoref{sec:priority}.
+Nous présentons un tel mécanisme dans la \autoref{sec:priority}.
 
 Ensuite, les noeuds doivent se déplacer à travers l'\emph{arbre des époques} afin d'atteindre l'époque cible.
 La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre.
@@ -1695,7 +1695,7 @@ La \autoref{fig:priority-example} fournit un exemple.
 \end{figure}
 
 La \autoref{fig:priority-execution} décrit une exécution dans laquelle trois noeuds A, B et C générent plusieurs opérations avant de se synchroniser à terme.
-Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, seules ces opérations sont représentées dans cette figure.
+Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, nous représentons seulement ces opérations dans cette figure.
 Initialement, le noeud A génère une opération \emph{rename} qui introduit l'époque \epoch{A1}.
 Cette opération est délivrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
 De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
@@ -1710,6 +1710,7 @@ Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-co
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
 Par exemple, \emph{priority} pourrait reposer sur des métriques intégrées au sein des opérations \emph{rename} pour représenter le travail accumulé sur le document.
 Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le plus de collaborateurs actifs pour minimiser la quantité globale de calculs effectués par les noeuds du système.
+Nous approfondissons ce sujet dans la \autoref{sec:alt-priority-relation}.
 
 \subsection{Algorithme d'annulation de l'opération de renommage}
 
@@ -2438,7 +2439,7 @@ Pour déterminer qu'une opération \emph{rename} donnée est causalement stable,
 Un protocole de gestion de groupe tel que \cite{swim2002,lifeguard2018} est donc requis.
 
 La stabilité causale peut prendre un certain temps à atteinte.
-En attendant, les noeuds peuvent en fait décharger les anciens états sur le disque dur puis qu'ils sont seulement nécessaires pour traiter les opérations concurrentes aux opérations \emph{rename}.
+En attendant, les noeuds peuvent néanmoins décharger les anciens états sur le disque dur puisqu'ils ne sont seulement nécessaires que pour traiter les opérations concurrentes aux opérations \emph{rename}.
 Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
 \section{Validation}
@@ -2930,6 +2931,8 @@ En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur
 
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 
+\label{sec:alt-priority-relation}
+
 Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
 Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
 \mnnote{TODO: ajouter figure d'un epoch tree où une longue branche se fait remplacer par une époque isolée}
@@ -3101,7 +3104,7 @@ Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent a
 \subsection{Core-Nebula}
 
 L'approche \emph{core-nebula}\cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{5158449}.
-Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeudds de réassigner des identifiants plus courts aux éléments du document.
+Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
 Cependant, cette opération \emph{rebalance} n'est ni commutative avec les opérations \emph{insert} et \emph{remove}, ni avec elle-même.
 Pour assurer la convergence à terme \cite{10.1145/224057.224070}, l'approche \emph{core-nebula} empêche la génération d'opérations \emph{rebalance} concurrentes.
 Pour ce faire, l'approche requiert un consensus entre les noeuds pour générer les opérations \emph{rebalance}.
