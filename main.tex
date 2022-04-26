@@ -2667,6 +2667,8 @@ Dans un but de reproductibilité, nous avons mis à disposition notre code, nos 
 
 \subsection{Résultats}
 
+\label{sec:evaluation-results}
+
 En utilisant les instantanés générés, nous avons effectué plusieurs benchmarks.
 Ces benchmarks évaluent les performances de RenamableLogootSplit et les compare à celles de LogootSplit.
 Les résultats sont présentés et analysés ci-dessous.
@@ -3097,6 +3099,32 @@ Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent a
 \section{Comparaison avec les approches existantes}
 
 \subsection{Core-Nebula}
+
+L'approche \emph{core-nebula}\cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{5158449}.
+Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeudds de réassigner des identifiants plus courts aux éléments du document.
+Cependant, cette opération \emph{rebalance} n'est ni commutative avec les opérations \emph{insert} et \emph{remove}, ni avec elle-même.
+Pour assurer la convergence à terme \cite{10.1145/224057.224070}, l'approche \emph{core-nebula} empêche la génération d'opérations \emph{rebalance} concurrentes.
+Pour ce faire, l'approche requiert un consensus entre les noeuds pour générer les opérations \emph{rebalance}.
+Des opérations \emph{insert} et \emph{remove} sont elles toujours générées sans coordination entre les noeuds et peuvent donc être concurrentes aux opérations \emph{rebalance}.
+Pour gérer les opérations concurrentes aux opérations \emph{rebalance}, les auteurs proposent de transformer les opérations concernées par rapport aux effets des opérations \emph{rebalance}, à l'aide un mécanisme de \emph{catch-up}, avant de les appliquer.
+
+Cependant, les protocoles de consensus ne passent pas à l'échelle et ne sont pas adaptés aux systèmes distribués à large échelle.
+Pour pallier ce problème, l'approche \emph{core-nebula} propose de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
+Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
+Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
+Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations \emph{insert} et \emph{remove}.
+
+Notre travail peut être vu comme une extension de celui présenté dans \emph{core-nebula}.
+Avec RenamableLogootSplit, nous adaptons l'opération \emph{rebalance} et le mécanisme de \emph{catch-up} à LogootSplit pour tirer partie de la fonctionnalité offerte par les blocs.
+De plus, nous proposons un mécanisme pour supporter les opérations \emph{rename} concurrentes, ce qui supprime la nécessité de l'utilisation d'un protocole de consensus.
+Notre contribution est donc une approche plus générique puisque RenamableLogootSplit est utilisable dans des systèmes composés d'un \emph{core} et d'une \emph{nebula}, ainsi que dans les systèmes ne disposant pas de noeuds stables pour former un \emph{core}.
+
+Dans les systèmes disposant d'un \emph{core}, nous pouvons donc combiner RenamableLogootSplit avec un protocole de consensus pour éviter la génération d'opérations \emph{rename} concurrentes.
+Cette approche offre plusieurs avantages.
+Elle permet de se passer de tout ce qui à attrait au support d'opérations \emph{rename} concurrentes, \ie la définition d'une relation \emph{priority} et l'implémentation de \textsc{revertRenameId}.
+Elle permet aussi de simplifier l'implémentation du mécanisme de récupération de mémoire des époques et \emph{anciens états} pour reposer seulement sur la stabilité causale des opérations.
+Concernant ses performances, cette approche se comporte de manière similaire à RenamableLogootSplit avec un seul \emph{renaming bot} (cf. \autoref{sec:evaluation-results}), mais avec un surcoût correspondant au coût du protocole de consensus sélectionné.
+
 \subsection{LSEQ}
 
 \mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
