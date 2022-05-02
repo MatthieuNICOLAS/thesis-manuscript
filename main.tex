@@ -2438,7 +2438,7 @@ Les noeuds n'ont donc besoin que de suivre les opérations \emph{rename} causale
 Pour déterminer qu'une opération \emph{rename} donnée est causalement stable, les noeuds doivent être conscients des autres et de leur avancement.
 Un protocole de gestion de groupe tel que \cite{swim2002,lifeguard2018} est donc requis.
 
-La stabilité causale peut prendre un certain temps à atteinte.
+La stabilité causale peut prendre un certain temps à être atteinte.
 En attendant, les noeuds peuvent néanmoins décharger les anciens états sur le disque dur puisqu'ils ne sont seulement nécessaires que pour traiter les opérations concurrentes aux opérations \emph{rename}.
 Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
@@ -2449,7 +2449,7 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 \subsection{Complexité en temps des opérations}
 
 Afin d'évaluer RenamableLogootSplit, nous analysons tout d'abord la complexité en temps de ses opérations.
-Ces complexités dépendent de plusieurs paramètres : nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants, structure de données utilisée...
+Ces complexités dépendent de plusieurs paramètres : nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants, structures de données utilisées...
 
 \subsubsection{Hypothèses}
 
@@ -2458,22 +2458,11 @@ Nous supposons que le nombre $n$ d'identifiants présents dans la séquence a te
 Nous considérons que la taille des identifiants, qui elle croît avec le nombre d'insertions mais qui est réinitialisée à chaque renommage, devient négligeable par rapport au nombre d'identifiants.
 Nous ne prenons donc pas en considération ce paramètre dans nos complexités et considérons que les manipulations d'identifiants (comparaison, génération) s'effectuent en temps constant.
 Afin de simplifier les complexités, nous considérons que les \emph{anciens états} associés aux époques contiennent aussi $n$ identifiants.
-Finalement, nous considérons qu'un arbre AVL est utilisé comme structure de données pour représenter l'état interne de la séquence et que des tableaux sont utilisés pour représenter les \emph{anciens états}.
-
-\mnnote{
-  TODO: Trouver structure de données adaptée à l'\emph{arbre des époques}.
-  Besoin de pouvoir établir rapidement le chemin entre la racine et une époque.
-  Pour cela, le mieux serait d'avoir accès directement à l'époque et qu'elle référencie l'époque parente.
-}
-
-\mnnote{
-  NOTE: Une table de hachage correspond bien (ce que j'utilise dans l'implem).
-  Mais pas le plus adapté pour la garbage collection des époques obsolètes (besoin de parcourir l'ensemble des clés et de supprimer celles n'appartenant plus aux \emph{époques requises}).
-}
+Finalement, nous considérons que nous utilisons comme structures de données un arbre AVL pour représenter l'état interne de la séquence, des tableaux pour les \emph{anciens états} et une table de hachage pour l'\emph{arbre des époques}.
 
 \subsubsection{Complexité en temps des opérations \emph{insert} et \emph{remove}}
 
-À partir de ces hypothèses, nous établissons les complexités des opérations.
+À partir de ces hypothèses, nous établissons les complexités en temps des opérations.
 Pour chaque opération, nous distinguons deux complexités : une complexité pour l'intégration de l'opération locale, une pour l'intégration de l'opération distante.
 
 La complexité de l'intégration de l'opération \emph{insert} locale est inchangée par rapport à celle obtenue pour LogootSplit.
@@ -2499,7 +2488,7 @@ Aucun parcours de l'\emph{ancien état} n'est nécessaire.
 Le reste de \textsc{revertRenameId} consistant en des comparaisons et manipulations d'identifiants, nous obtenons que \textsc{revertRenameId} s'effectue en \bigO{1}.
 
 Pour inclure les effets des renommages à appliquer, le noeud utilise ensuite \textsc{renameId}.
-De manière similaire à \textsc{revertRenameId}, \textsc{renameId} genère pour un identifiant donné un nouvel identifiant équivalent à l'époque suivante en se basant sur son prédecesseur.
+De manière similaire à \textsc{revertRenameId}, \textsc{renameId} génère pour un identifiant donné un nouvel identifiant équivalent à l'époque suivante en se basant sur son prédecesseur.
 Cependant, il est nécessaire ici de faire une recherche pour déterminer le prédecesseur de l'identifiant donné dans l'\emph{ancien état}.
 L'\emph{ancien état} étant un tableau trié d'identifiants, il est possible de procéder à une recherche dichotomique.
 Cela permet de trouver le prédecesseur en \bigO{\log{}n}, où $n$ correspond ici au nombre d'identifiants composant l'\emph{ancien état}.
@@ -2535,10 +2524,12 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
 
 \subsubsection{Récapitulatif}
 
+Nous récapitulons les complexités en temps présentées précédemment dans le \autoref{tab:time-complexity-operations}.
+
 \begin{table}[!ht]
   \centering
   \caption{Complexité en temps des différentes opérations}
-  \label{tab:time-complexity-operations-with-revertRenameId}
+  \label{tab:time-complexity-operations}
   %\resizebox{0.5\columnwidth}{!}{
   \begin{tabular}{lcc}
       \toprule
@@ -2548,8 +2539,8 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
       \midrule
       \emph{insert} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
       \emph{remove} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
-      \emph{naive rename} & $n$ & $h + n (k + l \cdot \log{}n + \log{}b)$ \\
-      \emph{rename} & $n$ & $b + n (k + 2 \cdot l + 1) + b$ \\
+      \emph{naive rename} & $b$ & $h + n (k + l \cdot \log{}n + \log{}b)$ \\
+      \emph{rename} & $b$ & $b + n (k + 2 \cdot l) + b$ \\
       \bottomrule
   \end{tabular}
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments de l'état courant et des \emph{anciens états}, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $s$ : nombre d'éléments insérés/supprimés par l'opération}
@@ -2572,19 +2563,19 @@ Pour cela, chaque noeud doit maintenir une matrice des vecteurs de version de to
 L'algorithme génère le vecteur de version des opérations causalement stable en récupérant pour chaque noeud la valeur minimale qui y est associée dans la matrice des vecteurs de version.
 Cette étape correspond à fusionner $n$ vecteurs de version contenant $n$ entrées, elle s'exécute donc en \bigO{n^2} instructions.
 
-La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre définit par la relation \emph{priority}.
-Ce parcours se poursuit jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération \emph{rename} associée est causalement stable.
+La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre défini par la relation \emph{priority}.
+Ce parcours s'effectue jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération \emph{rename} associée est causalement stable.
 Pour chaque époque parcourue, le mécanisme de récupération de mémoire calcule et stocke son chemin jusqu'à la racine.
 Cette étape s'exécute donc en \bigO{e \cdot h}, avec $e$ le nombre d'époques composant l'arbre des époques et $h$ la hauteur de l'arbre.
 
-À partir de ces chemins, le mécanisme calcule le \ac{LCA}.
-Pour ce faire, l'algorithme calcule de manière successive la dernière intersection entre le chemin de la racine jusqu'au \ac{LCA} courant et les chemins précédemment calculés.
-Le \ac{LCA} est la dernière époque du chemin résultant.
+À partir de ces chemins, le mécanisme calcule l'époque \ac{LCA}.
+Pour ce faire, l'algorithme calcule de manière successive la dernière intersection entre le chemin de la racine jusqu'à l'époque \ac{LCA} courante et les chemins précédemment calculés.
+L'époque \ac{LCA} est la dernière époque du chemin résultant.
 Cette étape s'exécute aussi en \bigO{e \cdot h}.
 
 L'algorithme peut alors calculer l'ensemble des \emph{époques requises}.
 Pour cela, il parcourt les chemins calculés au cours de la seconde étape.
-Pour chaque chemin, il ajoute les époques se trouvant après le \ac{LCA} à l'ensemble des \emph{époques requises}.
+Pour chaque chemin, il ajoute les époques se trouvant après l'époque \ac{LCA} à l'ensemble des \emph{époques requises}.
 De nouveau, cette étape s'exécute en \bigO{e \cdot h}.
 
 Après avoir déterminé l'ensemble des \emph{époques requises}, le mécanisme peut supprimer les époques obsolètes.
@@ -2634,35 +2625,42 @@ Les objectifs de cette évaluation étaient de mesurer
 \end{enumerate*}
 
 Par le biais de simulations, nous avons généré le jeu de données utilisé par nos benchmarks.
-Ces simulations reproduisent le scénario suivant.
+Ces simulations suivent le scénario suivant.
 
 \subsubsection{Scénario d'expérimentation}
 
-Plusieurs auteurs rédigent de manière collaborative un article en temps réel.
-Dans un premier temps, les auteurs spécifie principalement le contenu de l'article.
+Le scénario reproduit la rédaction d'un article par plusieurs pairs de manière collaborative, en temps réel.
+La collaboration ainsi décrite se décompose en 2 phases.
+
+Dans un premier temps, les pairs spécifient principalement le contenu de l'article.
 Quelques opérations \emph{remove} sont tout même générées pour simuler des fautes de frappes.
-Une fois que le document atteint une taille arbitrairement définie comme critique, les collaborateurs passent à la seconde phase de la collaboration.
-Au cours de cette phase, les auteurs arrêtent d'ajouter du nouveau contenu mais se concentre à la place sur le remaniement du contenu existant.
+Une fois que le document atteint une taille critique (définie de manière arbitraire), les pairs passent à la seconde phase de la collaboration.
+Lors de cette seconde phase, les pairs arrêtent d'ajouter du nouveau contenu mais se concentre à la place sur la reformulation et l'amélioration du contenu existant.
 Ceci est simulé en équilibrant le ratio entre les opérations \emph{insert} et \emph{remove}.
-Chaque auteur doit émettre un nombre donné d'opérations \emph{insert} et \emph{remove}.
-La simulation prend fin une fois que tous les collaborateurs ont reçu toutes les opérations.
-Au cours de la simulation, nous prenons des instantanés de l'état des pairs à des points donnés pour suivre leur évolution.
+
+Chaque pair doit émettre un nombre donné d'opérations \emph{insert} et \emph{remove}.
+La simulation prend fin une fois que tous les pairs ont reçu toutes les opérations.
+Pour suivre l'évolution de l'état des pairs, nous prenons des instantanés de leur état à plusieurs points donnés de la simulation.
 
 \subsubsection{Implémentation des simulations}
 
 Nous avons effectué nos simulations avec les paramètres expérimentaux suivants : nous avons déployé 10 bots à l'aide de conteneurs Docker sur une même machine.
-Chaque conteneur correspond à un processus Node.js mono-threadé et permet de simuler un auteur.
-Les bots partagent et éditent de façon collaborative le document en utilisant soit LogootSplit soit RenamableLogootSplit en fonction de la session.
-Dans chaque cas, chaque bot génère localement une opération \emph{insert} ou \emph{remove} toutes les 200 $\pm$ 50ms et la diffuse immédiatement aux autres noeuds via un réseau P2P maillé.
-Au cours de la première phase, la probabilité d'émetter une opération \emph{insert} (resp. \emph{remove}) est de 80\% (resp. 20\%).
-Une fois que le document atteint 60k caractères (environ 15 pages), les bots passent à la seconde phase et mettent chaque probabilité à 50\%.
-Après chaque opération locale, le bot peut déplacer son curseur à une autre position aléatoire dans le document avec une probabilité de 5\%.
-Chaque bot génère 15k opérations \emph{insert} ou \emph{remove} et s'arrête une fois qu'il a observé 150k opérations.
-Des instantanés de l'état du bot sont pris de façon périodique, toutes les 10k opérations observées.
+Chaque conteneur correspond à un processus Node.js mono-threadé et permet de simuler un pair.
+Les bots sont connectés entre eux par le biais d'un réseau P2P maillé entièrement connecté.
+Enfin, ils partagent et éditent le document de manière collaborative en utilisant soit LogootSplit soit RenamableLogootSplit en fonction des paramètres de la session.
+
+Toutes les 200 $\pm$ 50ms, chaque bot génère localement une opération \emph{insert} ou \emph{remove} et la diffuse immédiatement aux autres noeuds.
+Au cours de la première phase, la probabilité d'émettre une opération \emph{insert} (resp. \emph{remove}) est de 80\% (resp. 20\%).
+Une fois que leur copie locale du document atteint 60k caractères (environ 15 pages), les bots basculent à la seconde phase et redéfinissent chaque probabilité à 50\%.
+De plus, tout au long de la collaboration, les bots ont une probabilité de 5\% de déplacer leur curseur à une position aléatoire dans le document après chaque opération locale.
+
+Chaque bot doit générer 15k opérations \emph{insert} ou \emph{remove}, et s'arrête donc une fois qu'il a observé les 150k opérations.
+Pour chaque bot, nous enregistrons un instantané de son état toutes les 10k opérations observées.
+Nous enregistrons aussi son log des opérations à l'issue de la simulation.
 
 De plus, dans le cas de RenamableLogootSplit, 1 à 4 bots sont désignés de façon arbitraire comme des \emph{renaming bots} en fonction de la session.
-Les \emph{renaming bots} génèrent des opérations \emph{rename} toutes les 30k opérations qu'ils observent.
-Ces opérations \emph{rename} sont générées de façon à assurer qu'elles soient concurrentes.
+Les \emph{renaming bots} génèrent des opérations \emph{rename} toutes les 7,5k ou toutes les 30k opérations qu'ils observent, en fonction des paramètres de la simulation.
+Ces opérations \emph{rename} sont générées de manière à assurer qu'elles soient concurrentes.
 
 Dans un but de reproductibilité, nous avons mis à disposition notre code, nos benchmarks et les résultats à l'adresse suivante : \url{https://github.com/coast-team/mute-bot-random/}.
 
@@ -2670,8 +2668,9 @@ Dans un but de reproductibilité, nous avons mis à disposition notre code, nos 
 
 \label{sec:evaluation-results}
 
-En utilisant les instantanés générés, nous avons effectué plusieurs benchmarks.
-Ces benchmarks évaluent les performances de RenamableLogootSplit et les compare à celles de LogootSplit.
+En utilisant les instantanés et les logs d'opérations générés, nous avons effectué plusieurs benchmarks.
+Ces benchmarks évaluent les performances de RenamableLogootSplit et les comparent à celles de LogootSplit.
+Sauf mention contraire, les benchmarks utilisent les données issues des simulations au cours desquelles les opérations \emph{rename} étaient générées toutes les 30k opérations.
 Les résultats sont présentés et analysés ci-dessous.
 
 \subsubsection{Convergence}
@@ -2700,20 +2699,20 @@ Pour chaque graphique dans la \autoref{fig:evolution-document-size}, nous repré
 La ligne pointillée bleue correspond à la taille du contenu du document, \ie du texte, tandis que la ligne continue rouge représente la taille complète du document LogootSplit.
 
 La ligne verte en pointillés représente la taille du document RenamableLogootSplit dans son meilleur cas.
-Dans ce scénario, les noeuds considèrent que les opérations \emph{rename} sont supprimables dès qu'ils les reçoivent.
+Dans ce scénario, les noeuds considèrent que les opérations \emph{rename} sont causalement stables dès qu'ils les reçoivent.
 Les noeuds peuvent alors bénéficier des effets du mécanisme de renommage tout en supprimant les métadonnées qu'il introduit : les \emph{anciens états} et époques.
 Ce faisant, les noeuds peuvent minimiser de manière périodique le surcoût en métadonnées de la structure de données, indépendamment du nombre de \emph{renaming bots} et d'opérations \emph{rename} concurrentes générées.
 
 La ligne pointillée orange représente la taille du document RenamableLogootSplit dans son pire cas.
-Dans ce scénario, les noeuds considèrent que les opérations \emph{rename} ne deviennent jamais causalement stables et qu'elles ne peuvent donc jamais être supprimées.
+Dans ce scénario, les noeuds considèrent que les opérations \emph{rename} ne deviennent jamais causalement stables.
 Les noeuds doivent alors conserver de façon permanente les métadonnées introduites par le mécanisme de renommage.
-Les performances de RenamableLogootSplit diminuent donc à mesure que le nombre de \emph{renaming bots} et d'opérations \emph{rename} générées augmente.
-Néanmoins, nous observons que RenamableLogootSplit peut surpasser les performances de LogootSplit tant que le nombre de \emph{renaming bots} reste faible (1 ou 2).
-Ce résultat s'explique par le fait que le mécanisme de renommage permet aux noeuds de supprimer les métadonnées de la structure de données utilisée en interne pour représenter la séquence.
+Les performances de RenamableLogootSplit diminuent donc au fur et à mesure que le nombre de \emph{renaming bots} et d'opérations \emph{rename} générées augmente.
+Néanmoins, même dans ces conditions, nous observons que RenamableLogootSplit offre de meilleures performances que LogootSplit tant que le nombre de \emph{renaming bots} reste faible (1 ou 2).
+Ce résultat s'explique par le fait que le mécanisme de renommage permet aux noeuds de supprimer les métadonnées de la structure de données utilisée en interne pour représenter la séquence (\ie l'arbre AVL).
 
 Pour récapituler les résultats présentés, le mécanisme de renommage introduit un surcoût temporaire en métadonnées qui augmente avec chaque opération \emph{rename}.
-Mais le surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations \emph{rename} deviennent causalement stables.
-Dans la section \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer le surcoût temporaire en métadonnées.
+Mais ce surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations \emph{rename} deviennent causalement stables.
+Dans la section \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer l'impact du surcoût temporaire en métadonnées.
 
 \subsubsection{Temps d'intégration des opérations standards}
 
@@ -2742,31 +2741,35 @@ La \autoref{fig:evolution-integration-time-insert} présente les résultats obte
   \label{fig:evolution-integration-time-insert}
 \end{figure}
 
-Dans ces figures, les boxplots orange correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleu sur des documents RenamableLogootSplit.
-Bien que les deux mesures soient initialement équivalentes, les temps d'intégration sur des documents RenamableLogootSplit sont ensuite réduits par rapport à ceux de LogootSplit une fois que des opérations \emph{rename} ont été intégrées.
-Cette amélioration s'explique par le fait que l'opération \emph{rename} optimise la représentation interne de la séquence.
+Dans ces figures, les boxplots oranges correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleues sur des documents RenamableLogootSplit.
+Bien que les temps d'intégration soient initialement équivalents, les temps d'intégration sur des documents RenamableLogootSplit sont ensuite réduits par rapport à ceux de LogootSplit une fois que des opérations \emph{rename} ont été intégrées.
+Cette amélioration s'explique par le fait que l'opération \emph{rename} optimise la représentation interne de la séquence (\ie elle réduit le nombre de blocs stockés dans l'arbre AVL).
 
-Dans le cadre des opérations distantes, nous avons mesuré des temps d'intégration spécifiques à RenamableLogootSplit : le temps d'intégration d'opérations distantes provenant d'époques \emph{parentes} et d'époques \emph{soeurs}, respectivement affiché sous la forme de boxplots blanche et rouge dans la \autoref{fig:evolution-integration-time-remote-insert}.
+Dans le cadre des opérations distantes, nous avons mesuré des temps d'intégration spécifiques à RenamableLogootSplit : le temps d'intégration d'opérations distantes provenant d'époques \emph{parentes} et d'époques \emph{soeurs}, respectivement affiché sous la forme de boxplots blanches et rouges dans la \autoref{fig:evolution-integration-time-remote-insert}.
 
 Les opérations distantes provenant d'époques \emph{parentes} sont des opérations générées de manière concurrente à l'opération \emph{rename} mais appliquées après cette dernière.
 Puisque l'opération doit être transformée au préalable en utilisant \textsc{renameId}, nous observons un surcoût computationnel par rapport aux autres opérations.
 Mais ce surcoût est compensé par l'optimisation de la représentation interne de la séquence effectuée par l'opération \emph{rename}.
 
-Concernant les opérations provenant d'époques \emph{soeurs}, nous observons un surcoût additionnel puisque les noeuds doivent tout d'abord annulé les effets de l'opération \emph{rename} concurrente en utilisant \textsc{revertRenameId}.
+Concernant les opérations provenant d'époques \emph{soeurs}, nous observons de nouveau un surcoût puisque les noeuds doivent tout d'abord annuler les effets de l'opération \emph{rename} concurrente en utilisant \textsc{revertRenameId}.
 À cause de cette étape supplémentaire, les performances de RenamableLogootSplit pour ces opérations sont comparables à celles de LogootSplit.
 
 Pour récapituler, les fonctions de transformation ajoutent un surcoût aux temps d'intégration des opérations concurrentes aux opérations \emph{rename}.
-Malgré ce surcoût, RenamableLogootSplit obtient de meilleures performances que LogootSplit tant que la distance entre l'époque de génération de l'opération et l'époque courante du noeud reste limité.
-Au fur et à mesure que la distance entre les deux époques augmente, les performances de RenamableLogootSplit diminuent, jusqu'à atteindre des performances moins bonnes que celles de LogootSplit, puisque le surcoût est multiplié.
-Néanmoins, le mécanisme de renommage réduit le temps d'intégration de la majorité des opérations, \ie les opérations générées entre deux séries d'opérations \emph{rename}.
+Malgré ce surcoût, RenamableLogootSplit offre de meilleures performances que LogootSplit pour intégrer ces opérations grâce aux réductions de la taille de l'état effectuées par les opérations \emph{rename}.
+Cependant, cette affirmation n'est vraie que tant que la distance entre l'époque de génération de l'opération et l'époque courante du noeud reste limitée, puisque les performances de RenamableLogootSplit dépendent linéairement de cette dernière (cf. \autoref{tab:time-complexity-operations}).
+Néanmoins, ce surcoût ne concerne que les opérations concurrentes aux opérations \emph{rename}.
+Il ne concerne pas la majorité des opérations, \ie les opérations générées entre deux séries d'opérations \emph{rename}.
+Ces opérations, elles, ne souffrent d'aucun surcoût tout en bénéficiant des réductions de taille de l'état.
 
 \subsubsection{Temps d'intégration de l'opération de renommage}
 
-Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations depuis l'opération \emph{rename} précédente.
+Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations émises précédemment, \ie en fonction de la taille de l'état.
 Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.
-Le cas des opérations \emph{rename distantes} se sous-divise en trois catégories.
+
+Nous rappellons que le traitement d'une opération \emph{rename} dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
+Le cas des opérations \emph{rename distantes} se décompose donc en trois catégories.
 Les opérations \emph{distantes directes} désignent les opérations \emph{rename distantes} qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
-Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désigne les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
+Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désignent les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
 D'après la relation \emph{priority}, l'époque introduite est plus grande (resp. petite) que l'époque courante du noeud.
 Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
 
@@ -2809,19 +2812,25 @@ Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integrati
   }
 \end{table}
 
-Le principal résultat de ces mesures est que les opérations \emph{rename} sont généralement coûteuses quand comparées aux autres types d'opérations, puisque les noeuds doivent parcourir et renommer leur état courant complet.
-Les opérations \emph{rename} locales s'intègrent en plusieurs centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} peuvent prendre des secondes si retardées trop longtemps.
-Il est donc nécessaire de prendre en compte ce résultat pour concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur.
+Le principal résultat de ces mesures est que les opérations \emph{rename} sont particulièrement coûteuses quand comparées aux autres types d'opérations.
+Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse ~40k éléments.
+Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
+Il est donc nécessaire de prendre en compte ce résultat et de
+\begin{enumerate*}[label=(\roman*)]
+  \item concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur
+  \item proposer des versions améliorées des algorithmes \texttt{renameId} et \texttt{revertRenameId} pour réduire ces temps d'intégration.
+\end{enumerate*}
 
 Un autre résultat intéressant de ces benchmarks est que les opérations \emph{concurrentes introduisant une plus petite époque} sont rapides à intégrer.
-Puisque ces opérations introduisent une époque qui n'est pas sélectionné comme nouvelle époque cible, les noeuds ne procède pas au renommage de leur état.
+Puisque ces opérations introduisent une époque qui n'est pas sélectionnée comme nouvelle époque cible, les noeuds ne procèdent pas au renommage de leur état.
 L'intégration des opérations \emph{concurrentes introduisant une plus petite époque} consiste simplement à ajouter l'époque introduite et l'\emph{ancien état} correspondant à l'\emph{arbre des époques}.
 Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
+Nous développons ce sujet dans la \autoref{sec:report-transition-to-target-epoch}.
 
 \subsubsection{Temps pour rejouer le log d'opérations}
 
-Afin de comparer les performances de RenamableLogootSplit et de LogootSplit de manière globale, nous avons mesuré le temps nécessaire pour un nouveau noeud pour rejouer l'entièreté du log d'opérations d'une session de collaboration.
-Nous présentons les résultats obtenus dans \autoref{fig:time-to-replay-log}.
+Afin de comparer les performances de RenamableLogootSplit et de LogootSplit de manière globale, nous avons mesuré le temps nécessaire pour un nouveau noeud pour rejouer l'entièreté du log d'opérations d'une session de collaboration, en fonction du nombre de \emph{renaming bots} de la session.
+Nous présentons les résultats obtenus dans la \autoref{fig:time-to-replay-log}.
 
 \begin{figure}[!ht]
   \centering
@@ -2830,18 +2839,19 @@ Nous présentons les résultats obtenus dans \autoref{fig:time-to-replay-log}.
   \label{fig:time-to-replay-log}
 \end{figure}
 
-Nous observons que le gain sur le temps d'intégration des opérations \emph{insert} et \emph{remove} permet initialement de contrebalancer le surcoût lié aux opérations \emph{rename}.
+Nous observons que le gain sur le temps d'intégration des opérations \emph{insert} et \emph{remove} permet initialement de contrebalancer le surcoût des opérations \emph{rename}.
 Mais au fur et à mesure que la collaboration progresse, le temps nécessaire pour intégrer les opérations \emph{rename} augmente car plus d'éléments sont impliqués.
-Cette tendance est davantage prononcé dans les scénarios avec des opérations \emph{rename} concurrentes.
-Dans un cas réel d'utilisation, ce scénario (\ie rejouer l'entièreté du log) ne correspondra au scénario principal et pourra être mitigé, par exemple en utilisant un mécanisme de compression du log d'opérations.
-Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur l'opération \emph{rename}.
+Cette tendance est accentuée dans les scénarios avec des opérations \emph{rename} concurrentes.
+
+Dans un cas réel d'utilisation, ce scénario (\ie rejouer l'entièreté du log) ne correspond pas au scénario principal et peut être mitigé, par exemple en utilisant un mécanisme de compression du log d'opérations.
+Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur les possibilités offertes par l'opération \emph{rename}.
 
 \subsubsection{Impact de la fréquence de l'opération \emph{rename} sur les performances}
 
 Pour évaluer l'impact de la fréquence de l'opération \emph{rename} sur les performances, nous avons réalisé un benchmark supplémentaire.
 Ce benchmark consiste à rejouer les logs d'opérations des simulations en utilisant divers \acp{CRDT} et configurations : LogootSplit, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 30k opérations, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 7,5k opérations.
 Au fur et à mesure que le benchmark rejoue le log des opérations, il mesure le temps d'intégration des opérations ainsi que leur taille.
-Les résultats de ce benchmark sont présentés dans \autoref{tab:impact-frequency}.
+Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-frequency}.
 
 \begin{table}[!ht]
   \centering
@@ -2880,7 +2890,7 @@ Il s'agit là aussi d'un résultat attendu puisque la complexité en temps de l'
 
 Concernant la taille des opérations, nous observons que les opérations \emph{insert} et \emph{remove} de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit, notamment car elles intègrent leur époque de génération comme donnée additionnelle.
 Mais alors que la taille des opérations de LogootSplit augmentent indéfiniment, celle des opérations de RenamableLogootSplit est bornée.
-La valeur de cette borne est définit par la fréquence de l'opération \emph{rename}.
+La valeur de cette borne est définie par la fréquence de l'opération \emph{rename}.
 Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.
 
 D'un autre côté, le coût des opérations \emph{rename} est bien plus important (1000x) que celui des autres types d'opérations.
@@ -2946,6 +2956,8 @@ Pour cela, un couple de fonctions réciproques doit être proposée pour \textsc
 Une solution alternative est de proposer une implémentation du mécanisme de renommage qui repose sur les identifiants originaux plutôt que sur ceux transformés, par exemple en utilisant le log des opérations.
 
 \subsection{Report de la transition vers la nouvelle epoch principale}
+
+\label{sec:report-transition-to-target-epoch}
 
 Comme illustré par \autoref{tab:evolution-integration-time-rename}, intégrer des opérations \emph{rename} distantes est généralement coûteux.
 Ce traitement peut générer un surcoût computationnel significatif en cas de multiples opérations \emph{rename} concurrentes.
