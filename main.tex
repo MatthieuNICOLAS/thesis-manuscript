@@ -2820,8 +2820,16 @@ Ces résultats s'expliquent facilement par la complexité en temps de l'opérati
 Il est donc nécessaire de prendre en compte ce résultat et de
 \begin{enumerate*}[label=(\roman*)]
   \item concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur
-  \item proposer des versions améliorées des algorithmes \texttt{renameId} et \texttt{revertRenameId} pour réduire ces temps d'intégration.
+  \item proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration :
 \end{enumerate*}
+
+\begin{itemize}
+  \item Au lieu d'utiliser \textsc{renameId}, qui renomme l'état identifiant par identifiant, nous pourrions définir et utiliser \textsc{renameBlock}.
+    Cette fonction permettrait de renommer l'état bloc par bloc, offrant ainsi une meilleur complexité en temps.
+    De plus, puisque les opérations \emph{rename} fusionnent les blocs existants en un unique bloc, \textsc{renameBlock} permettrait de mettre en place un cercle vertueux où chaque opération \emph{rename} réduirait le temps d'exécution de la suivante.
+  \item Puisque chaque appel à \textsc{revertRenameId} et \textsc{revertRenameId} est indépendant des autres, ces fonctions sont adaptées à la programmation parallèle.
+    Au lieu de renommer les identifiants (ou blocs) de manière séquentielle, nous pourrions diviser la séquence en plusieurs parties et les renommer en parallèle.
+\end{itemize}
 
 Un autre résultat intéressant de ces benchmarks est que les opérations \emph{concurrentes introduisant une plus petite époque} sont rapides à intégrer.
 Puisque ces opérations introduisent une époque qui n'est pas sélectionnée comme nouvelle époque cible, les noeuds ne procèdent pas au renommage de leur état.
