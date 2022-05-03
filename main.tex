@@ -487,10 +487,10 @@ Nous représentons les identifiants en listant les tuples qui les composent.
 Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangle\langle$f, A, 0, 0$\rangle\rangle$ est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
 
 Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
-Pour ce faire, une relation d'ordre totale aux identifiants est associée à l'ensemble des identifiants :
+Pour ce faire, une relation d'ordre total aux identifiants est associée à l'ensemble des identifiants :
 
 \begin{definition}[Relation \lid]
-  La relation \lid est un ordre total strict sur l'ensemble des identifiants.
+  La relation \lid est un ordre strict total sur l'ensemble des identifiants.
   Elle permet aux noeuds de comparer n'importe quelle paire d'identifiants.
   Elle est définie en utilisant l'ordre lexicographique sur les composants des différents tuples des identifiants comparés.
 \end{definition}
@@ -1624,7 +1624,7 @@ Nous proposons un algorithme qui remplit cet objectif dans la \autoref{sec:rever
 Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation \emph{priority}.
 
 \begin{definition}[Relation \emph{priority} \lepoch]
-  La relation \emph{priority} \lepoch est un ordre total strict sur l'ensemble des époques.
+  La relation \emph{priority} \lepoch est un ordre strict total sur l'ensemble des époques.
   Elle permet aux noeuds de comparer n'importe quelle paire d'époques.
 \end{definition}
 
@@ -2905,11 +2905,11 @@ Cette approche consiste à implémenter un mécanisme de compression pour les op
 
 \section{Discussion}
 
-\subsection{Génération des opérations \emph{rename}}
+\subsection{Stratégie de génération des opérations \emph{rename}}
 
 Comme indiqué dans la \autoref{sec:def-rename-op}, les opérations \emph{rename} sont des opérations systèmes.
 C'est donc aux concepteurs de systèmes qu'incombe la responsabilité de déterminer quand les noeuds devraient générer des opérations \emph{rename} et de définir une stratégie correspondante.
-Il n'existe cependant de solution miracle, chaque système ayant ses particuliarités et contraintes.
+Il n'existe cependant pas de solution universelle, chaque système ayant ses particuliarités et contraintes.
 
 Plusieurs aspects doivent être pris en compte lors de la définition de la stratégie de génération des opérations \emph{rename}.
 Le premier porte sur la taille de la structure de données.
@@ -3020,8 +3020,8 @@ Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment
 
 \label{sec:rename-as-compression-mechanism}
 
-Lorsqu'un nouveau pair rejoint la collaboration, il doit tout d'abord récupérer l'état courant du document avant de pouvoir travailler.
-Le nouveau pair repose sur un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour récupérer l'ensemble des opérations via un autre pair.
+Lorsqu'un nouveau pair rejoint la collaboration, il doit tout d'abord récupérer l'état courant du document avant de pouvoir participer.
+Le nouveau pair utilise un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour récupérer l'ensemble des opérations via un autre pair.
 Puis il reconstruit l'état courant en appliquant successivement chacune des opérations.
 Ce processus peut néanmoins s'avérer coûteux pour les documents comprenant des milliers d'opérations.
 
@@ -3189,13 +3189,13 @@ Concernant ses performances, cette approche se comporte de manière similaire à
 \section{Conclusion}
 
 Dans ce chapitre, nous avons présenté un nouvel Sequence \ac{CRDT} : RenamableLogootSplit.
-Ce nouveau type de données répliquées associe à LogootSplit un mécanisme de renommage optimiste permettant de réduire ponctuellement les métadonnées stockées et d'optimiser l'état interne de la structure de données.
+Ce nouveau type de données répliquées associe à LogootSplit un mécanisme de renommage optimiste permettant de réduire périodiquemment les métadonnées stockées et d'optimiser l'état interne de la structure de données.
 
 Ce mécanisme prend la forme d'une nouvelle opération, l'opération \emph{rename}, qui peut être émise à tout moment par n'importe quel noeud.
 Cette opération génère une nouvelle séquence LogootSplit, équivalente à l'état précédent, avec une empreinte minimale en métadonnées.
 L'opération \emph{rename} transporte aussi suffisamment d'informations pour que les noeuds puissent intégrer les opérations concurrentes à l'opération \emph{rename} dans le nouvel état.
 
-En cas d'opérations \emph{rename} concurrentes, la relation d'ordre total stricte \lepoch permet aux noeuds de décider quelle opération \emph{rename} utiliser, sans coordination.
+En cas d'opérations \emph{rename} concurrentes, la relation d'ordre strict total \lepoch permet aux noeuds de décider quelle opération \emph{rename} utiliser, sans coordination.
 Les autres opérations \emph{rename} sont quant à elles ignorées.
 Seules leurs informations sont stockées par RenamableLogootSplit, afin de gérer les opérations concurrentes potentielles.
 
