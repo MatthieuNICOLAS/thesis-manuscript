@@ -1024,6 +1024,7 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
     \end{subproperty}
     \item[~]
     \begin{subproperty}(Préservation de l'ordre)
+      \label{prop:order}
       Les éléments de la séquence doivent être triés en fonction de leur identifiants.
       L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération \emph{rename}.
     \end{subproperty}
@@ -1602,7 +1603,7 @@ Les époques sont representées sous la forme de noeuds de l'arbre et la relatio
 
 À l'issue du scénario décrit dans la \autoref{fig:conflicting-rename-operations}, les noeuds A et B sont respectivement aux époques \epoch{A1} et \epoch{B2}.
 Pour converger, tous les noeuds devraient atteindre la même époque à terme.
-Cependant, la fonction \textsc{renameId} décrite dans \autoref{alg:renameId} permet seulement au noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
+Cependant, la fonction \textsc{renameId} décrite dans \autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
 Le noeud A (resp. B) est donc dans l'incapacité de progresser vers l'époque du noeud B (resp. A).
 Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.
 
@@ -1615,7 +1616,7 @@ La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre
 Les cas restants à gérer sont ceux où les noeuds se trouvent actuellement à une époque \emph{soeur} ou \emph{cousine} de l'époque cible.
 Dans ces cas, les noeuds doivent être capable de remonter dans l'\emph{arbre des époques} pour retourner au \ac{LCA} de l'époque courante et l'époque cible.
 Ce déplacement est en fait similaire à annuler l'effet des opérations \emph{rename} précédemment appliquées.
-Nous proposons un algorithme qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.
+Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.
 
 \subsection{Relation de priorité entre renommages}
 
@@ -1706,7 +1707,7 @@ Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des 
 Dans cette figure, la flèche pointillé rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
 
 Pour déterminer l'époque cible, les noeuds reposent sur la relation \emph{priority}.
-D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0} < \epoch{0}\epoch{A1} < \epoch{0}\epoch{A1}\epoch{C6} < \epoch{0}\epoch{B2} < \epoch{0}\epoch{B2}\epoch{B7}.
+D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~\lepoch~\epoch{0}\epoch{A1}~\lepoch~\epoch{0}\epoch{A1}\epoch{C6}~\lepoch~\epoch{0}\epoch{B2}~\lepoch~\epoch{0}\epoch{B2}\epoch{B7}.
 Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
 
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
@@ -1718,69 +1719,12 @@ Nous approfondissons ce sujet dans la \autoref{sec:alt-priority-relation}.
 
 \label{sec:reverting-rename-ops}
 
-Nous présentons maintenant la fonction \textsc{revertRenameId}.
-Décrite dans \autoref{alg:revertRenameId}, cette fonction permet aux noeuds d'annuler une opération \emph{rename} appliquée précédemment.
-Pour ce faire, \textsc{revertRenameId} associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
-
-\begin{figure}[!ht]
-  \footnotesize
-  \begin{algorithmic}
-      \Function{revertRenameId}{id, renamedIds, nId, nSeq}
-          % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
-          % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
-          % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
-          % \Statex \LeftComment{$nSeq}$ is $node~seq}$ of the node which issued the \emph{rename} op}
-          % \\
-          \State length $\gets$ renamedIds.length
-          \State firstId $\gets$ renamedIds[0]
-          \State lastId $\gets$ renamedIds[length - 1]
-          \State pos $\gets$ position(firstId)
-          \\
-          \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
-          \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
-          \\
-          \If{id < newFirstId}
-              \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
-          \ElsIf{isRenamedId(id, pos, nId, nSeq, length)}
-              \State index $\gets$ getFirstOffset(id)
-              \State \Return renamedIds[index]
-          \ElsIf{newLastId < id}
-              \State \Return revRenIdGreaterThanNewLastId(id, lastId)
-          \Else
-              % Ajouter commentaire sur cas
-              \State index $\gets$ getFirstOffset(id)
-              \State \Return revRenIdfromPredId(id, renamedIds, index)
-          \EndIf
-      \EndFunction
-      \\
-      \Function{revRenIdfromPredId}{id, renamedIds, index}
-          \State predId $\gets$ renamedIds[index]
-          \State succId $\gets$ renamedIds[index + 1]
-          \State tail $\gets$ getTail(id, 1)
-          \\
-          \If{tail < predId}
-              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-              \State \Return concat(predId, MIN\_TUPLE, tail)
-          \ElsIf{succId < tail}
-              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-              \State offset $\gets$ getLastOffset(succId) - 1
-              \State predOfSuccId $\gets$ createIdFromBase(succId, offset)
-              \State \Return concat(predOfSuccId, MAX\_TUPLE, tail)
-          \Else
-              \State \Return tail
-          \EndIf
-      \EndFunction
-  \end{algorithmic}
-  \caption{Main functions to revert an identifier renaming}
-  \label{alg:revertRenameId}
-\end{figure}
-
-Les objectifs de \textsc{revertRenameId} sont les suivants :
-\begin{enumerate*}[label=(\roman*)]
-  \item Restaurer à leur ancienne valeur les identifiants générés causalement avant ou de manière concurrente à l'opération \emph{rename} annulée
-  \item Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
-\end{enumerate*}
-Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
+À présent, nous développons le scénario présenté dans la \autoref{fig:conflicting-rename-operations}.
+Dans la \autoref{fig:revertRenameId}, le noeud A reçoit l'opération \emph{rename} du noeud B.
+Cette opération est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
+D'après la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
+Mais pour pouvoir renommer son état vers l'époque \epoch{B2}, il doit au préalable faire revenir son état courant de l'époque \epoch{A1} à un état équivalent à l'époque \epoch{0}.
+Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'une opération \emph{rename} appliquée précédemment.
 
 \begin{figure}[!ht]
   \centering
@@ -1844,27 +1788,104 @@ Nous illustrons son comportement à l'aide de la \autoref{fig:revertRenameId}.
   \label{fig:revertRenameId}
 \end{figure}
 
-Cette figure reprend le scénario de la \autoref{fig:concurrent-insert-rename-inconsistent}.
-Le noeud A reçoit l'opération \emph{rename} du noeud B, qui est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
-Selon la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
-Il procède donc à ramener son état à un état équivalent à l'époque \epoch{0}, le \ac{LCA} de son époque courante \epoch{A1} et de l'époque cible \epoch{B2}.
-Pour ce faire, il applique \textsc{revertRenameId} à chaque identifiant de son état courant.
+C'est précisément le but de \textsc{revertRenameId}, qui associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
+Nous décrivons cette fonction dans \autoref{alg:revertRenameId}.
 
-\textsc{revertRenameId} détermine quelle stratégie appliquer pour restaurer un identifiant donné en utilisant des motifs.
-Par exemple, les identifiants de la forme \id{pos}{nId~nSeq}{offset} (\id{i}{A1}{offset} dans l'exemple courant) correspondent aux nouvelles valeurs des identifiants qui composent l'\emph{ancien état}.
-Pour retrouver les identifiants d'origine, \textsc{revertRenameId} utilise simplement leur offset puisqu'il correspond à leur index dans l'\emph{ancien état}.
-Par exemple, l'identifiant ayant pour offset 0 correspond au premier identifiant dans l'\emph{ancien état} (\id{i}{B0}{0}), celui ayant pour offset 1 au second identifiant (\id{i}{B0}{0}\id{f}{A0}{0}), et ainsi de suite.
+\begin{figure}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{revertRenameId}{id, renamedIds, nId, nSeq}
+          % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
+          % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
+          % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
+          % \Statex \LeftComment{$nSeq}$ is $node~seq}$ of the node which issued the \emph{rename} op}
+          % \\
+          \State length $\gets$ renamedIds.length
+          \State firstId $\gets$ renamedIds[0]
+          \State lastId $\gets$ renamedIds[length - 1]
+          \State pos $\gets$ position(firstId)
+          \\
+          \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
+          \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
+          \\
+          \If{id < newFirstId}
+              \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
+          \ElsIf{isRenamedId(id, pos, nId, nSeq, length)}
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return renamedIds[index]
+          \ElsIf{newLastId < id}
+              \State \Return revRenIdGreaterThanNewLastId(id, lastId)
+          \Else
+              % Ajouter commentaire sur cas
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return revRenIdfromPredId(id, renamedIds, index)
+          \EndIf
+      \EndFunction
+      \\
+      \Function{revRenIdfromPredId}{id, renamedIds, index}
+          \State predId $\gets$ renamedIds[index]
+          \State succId $\gets$ renamedIds[index + 1]
+          \State tail $\gets$ getTail(id, 1)
+          \\
+          \If{tail < predId}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State \Return concat(predId, MIN\_TUPLE, tail)
+          \ElsIf{succId < tail}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State offset $\gets$ getLastOffset(succId) - 1
+              \State predOfSuccId $\gets$ createIdFromBase(succId, offset)
+              \State \Return concat(predOfSuccId, MAX\_TUPLE, tail)
+          \Else
+              \State \Return tail
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Main functions to revert an identifier renaming}
+  \label{alg:revertRenameId}
+\end{figure}
 
-Les identifiants de la forme \id{pos}{nId~nSeq}{offset}$\trm{tail}$ (\eg \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}) correspondent à des identifiants qui ont été soit insérés de façon concurrente à l'opération \emph{rename}, soit causalement après.
-Pour traiter ces identifiant, \textsc{revertRenameId} retire tout d'abord le premier tuple (\id{i}{A1}{1}) pour isoler la queue de l'identifiant (\id{i}{B0}{0}\id{m}{B1}{0}).
-En faisant cela, \textsc{revertRenameId} annule la transformation appliquée à l'identifiant par \textsc{renIdFromPredId} si l'identifiant a été inséré de manière concurrente.
-L'algorithme compare ensuite la queue de l'identifiant aux identifiants de l'élément précédant et de l'élément suivant dans l'\emph{ancien état}.
-Dans cet exemple, nous avons \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{0}\id{m}{B1}{0} \lid \id{i}{B0}{1}.
-L'algorithme peut alors retourner la queue comme identifiant résultant tout en préservant l'ordre souhaité, puisque sa valeur est comprise entre celles des identifiants du prédécesseur et du successeur.
+Les objectifs de \textsc{revertRenameId} sont les suivants :
+\begin{enumerate*}[label=(\roman*)]
+  \item \label{item:revert-rename-1}
+    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée
+  \item \label{item:revert-rename-2}
+    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération \emph{rename} annulée
+  \item \label{item:revert-rename-3}
+    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
+\end{enumerate*}
 
-Sinon, cela signifie que l'identifiant donné a été inséré de manière causale après l'opération \emph{rename}.
-Puisqu'aucun identifiant correspondant n'existe encore à l'époque \emph{parente}, \textsc{revertRenameId} peut retourner n'importe quel identifiant tant qu'il préserve l'ordre souhaité.
-Pour ce faire, \textsc{revertRenameId} génère l'identifiant à partir de l'identifiant du prédecesseur ou du successeur, et en utilisant des tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$.
+Le cas \ref{item:revert-rename-1} est le plus trivial.
+Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de $\trm{offset}$ de $\trm{newId}$.
+En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
+
+Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
+Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
+Deux invariants sont associés à ce motif.
+D'après la \autoref{prop:order}, nous avons :
+\[\trm{newId} \in ]\trm{newPredId}, \trm{newSuccId}[\]
+et nous devons obtenir :
+\[\trm{id} \in ]\trm{predId}, \trm{succId}[\]
+
+Le premier sous-cas se produit quand nous avons $\trm{tail} \in ]\trm{predId}, \trm{succId}[$.
+Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurrent à l'opération \emph{rename} (\ie Cas \ref{item:revert-rename-2}).
+Nous avons alors $\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[$.
+Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
+Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre voulu et restaurer à sa valeur initiale l'identifiant.
+
+Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
+$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération \emph{rename} (\ie \autoref{item:revert-rename-3}).
+Nous avons alors $\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[$.
+Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de constrainte sur la valeur à retourner autre que la \autoref{prop:order}.
+Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$.
+Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
+En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre voulu (avec $\trm{id} = \trm{predId~MIN\_TUPLE~tail}$).
+
+Le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
+Nous avons alors $\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[$.
+La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre voulu.
+Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}$ and $MAX\_TUPLE$.
+$\trm{predOfSuccId}$ est obtenue en décrémentant le dernier $\trm{offset}$ de $\trm{succId}$.
+Ainsi, pour préserver l'ordre voulu, \textsc{revertRenameId} renvoie $\trm{id}$ with $\trm{id} = \trm{predOfSuccId~MAX\_TUPLE~tail}$.
 
 \mnnote{TODO: Modifier exemple pour illustrer le cas de figure où on a besoin de MIN/MAX\_TUPLE}
 
