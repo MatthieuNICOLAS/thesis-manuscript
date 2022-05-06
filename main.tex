@@ -541,7 +541,7 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
 
 \begin{figure}[!ht]
   \centering
-  \subfloat[Elements with their corresponding identifiers]{
+  \subfloat[Éléments avec leur identifiant correspondant]{
       \begin{minipage}{.48\linewidth}
       \centering
           \begin{tikzpicture}
@@ -553,7 +553,7 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
           \label{fig:logootsplit-seq-as-letters}
       \end{minipage}}
   \hfil
-  \subfloat[Elements grouped into a block]{
+  \subfloat[Éléments regroupés en un bloc]{
       \begin{minipage}{.48\linewidth}
       \centering
           \begin{tikzpicture}
@@ -562,7 +562,7 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
           \end{tikzpicture}
           \label{fig:logootsplit-seq-as-block}
       \end{minipage}}
-  \caption{Representation of a LogootSplit sequence containing the elements "HLO"}
+  \caption{Représentation d'une séquence LogootSplit contenant les éléments "HLO"}
   \label{fig:logootsplit-seq}
 \end{figure}
 
@@ -668,7 +668,7 @@ Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisat
 
     \end{tikzpicture}
   }
-  \caption{TODO}
+  \caption{Modifications concurrentes d'une séquence répliquée LogootSplit}
   \label{fig:logootsplit-example}
 \end{figure}
 
@@ -756,7 +756,7 @@ La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la 
           (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
     \end{tikzpicture}
   }
-  \caption{TODO}
+  \caption{Résurgence d'un élément supprimé suite à la relivraison de son opération \emph{insert}}
   \label{fig:why-exactly-once-delivery}
 \end{figure}
 
@@ -837,7 +837,7 @@ La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrai
           (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C-left.west);
     \end{tikzpicture}
   }
-  \caption{TODO}
+  \caption{Non-effet de l'opération \emph{remove} car reçue avant l'opération \emph{insert} correspondante}
   \label{fig:why-causal-remove}
 \end{figure}
 
@@ -902,7 +902,7 @@ Pour respecter l'ordre souhaité, LogootSplit génère un identifiant en ajoutan
 
       \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "e"}\\\emph{between}\\\emph{"h" and "l"}} (H);
   \end{tikzpicture}
-  \caption{Insertion leading to longer identifiers}
+  \caption{Insertion menant à une augmentation de la taille des identifiants}
   \label{fig:example-split}
 \end{figure}
 
@@ -1061,7 +1061,7 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
 
 \begin{figure}[t!]
   \centering
-  \subfloat[Selecting the new identifier of the first element]{
+  \subfloat[Choix du nouvel identifiant pour le premier élément]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}
@@ -1077,7 +1077,7 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \label{fig:renaming-first-id}
       \end{minipage}}
   \hfil
-  \subfloat[Selecting the new identifiers of the remaining ones]{
+  \subfloat[Choix des nouveaux identifiants pour les éléments restants]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}
@@ -1096,7 +1096,7 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \label{fig:renaming-second-id}
       \end{minipage}}
   \hfil
-  \subfloat[Final state obtained]{
+  \subfloat[État final obtenu]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}
@@ -1111,7 +1111,7 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \end{tikzpicture}
           \label{fig:renaming-final-state}
       \end{minipage}}
-  \caption{Renaming the sequence on node \emph{A}}
+  \caption{Renommage de la séquence sur le noeud \emph{A}}
   \label{fig:renaming}
 \end{figure}
 
@@ -1194,7 +1194,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
     \end{tikzpicture}
   }
-  \caption{Concurrent update leading to inconsistency}
+  \caption{Modifications concurrentes menant à une anomalie}
   \label{fig:concurrent-insert-rename-inconsistent}
 \end{figure}
 
@@ -1269,7 +1269,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
           \State \Return concat(newPredId, id)
       \EndFunction
   \end{algorithmic}
-  \caption{Main functions to rename an identifier}
+  \caption{Fonctions principales pour renommer un identifiant}
   \label{alg:renameId}
 \end{figure}
 
@@ -1318,7 +1318,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 
     \end{tikzpicture}
   }
-  \caption{Renaming concurrent update using \textsc{renameId} before applying it to maintain intended order}
+  \caption{Renommage de la modification concurrente avant son intégration en utilisant \textsc{renameId} afin de maintenir l'ordre souhaité}
   \label{fig:concurrent-insert-rename-fixed}
 \end{figure}
 
@@ -1397,7 +1397,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
 
     \end{tikzpicture}
   }
-  \caption{TODO}
+  \caption{Livraison d'une opération \emph{insert} sans avoir reçu l'opération \emph{rename} précédente}
   \label{fig:rls-invalid-delivery-order}
 \end{figure}
 
@@ -1496,7 +1496,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
 
     \end{tikzpicture}
   }
-  \caption{TODO}
+  \caption{Livraison désordonnée d'une opération \emph{rename} et de l'opération \emph{insert} qui la précède}
   \label{fig:rls-out-of-order-rename}
 \end{figure}
 
@@ -1570,7 +1570,7 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
 
     \end{tikzpicture}
   }
-  \caption{Concurrent \emph{rename} operations leading to divergent states}
+  \caption{Opérations \emph{rename} concurrentes menant à des états divergents}
   \label{fig:conflicting-rename-operations}
 \end{figure}
 
@@ -1597,7 +1597,7 @@ Les époques sont representées sous la forme de noeuds de l'arbre et la relatio
       \draw[thick, ->] (e0) -- (eA1);
       \draw[thick, ->] (e0) -- (eB2);
   \end{tikzpicture}
-  \caption{The \emph{epoch tree} corresponding to the scenario of \autoref{fig:conflicting-rename-operations}}
+  \caption{\emph{Arbre des époques} correspondant au scénario décrit dans la \autoref{fig:conflicting-rename-operations}}
   \label{fig:epoch-tree}
 \end{figure}
 
@@ -1641,7 +1641,7 @@ Dans le cadre de ce travail, nous utilisons l'ordre lexicographique sur le chemi
 La \autoref{fig:priority-example} fournit un exemple.
 
 \begin{figure}[!ht]
-  \subfloat[Example of execution with concurrent \emph{rename} operations]{
+  \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -1676,7 +1676,7 @@ La \autoref{fig:priority-example} fournit un exemple.
           \label{fig:priority-execution}
       \end{minipage}}
   \hfil
-  \subfloat[Corresponding epoch tree with \emph{priority} relation shown]{
+  \subfloat[\emph{Arbre des époques} final correspondant avec la relation \emph{priority} illustrée]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -1693,7 +1693,7 @@ La \autoref{fig:priority-example} fournit un exemple.
           \end{tikzpicture}
           \label{fig:priority-epoch-tree}
       \end{minipage}}
-  \caption{Selecting target epoch from execution with concurrent \emph{rename} operations}
+  \caption{Sélectionner l'époque cible d'une exécution d'opérations \emph{rename} concurrentes}
   \label{fig:priority-example}
 \end{figure}
 
@@ -1784,7 +1784,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
         \draw[->, dashed, thick, shorten >= 3] (between-S2A-S3A) edge[bend right] (S4A-left.west);
     \end{tikzpicture}
   }
-  \caption{Reverting a previously applied \emph{rename} operation}
+  \caption{Annuler une opération \emph{rename} intégrée précèdemment}
   \label{fig:revertRenameId}
 \end{figure}
 
@@ -1840,7 +1840,7 @@ Nous décrivons cette fonction dans \autoref{alg:revertRenameId}.
           \EndIf
       \EndFunction
   \end{algorithmic}
-  \caption{Main functions to revert an identifier renaming}
+  \caption{Fonctions principales pour annuler le renommage appliqué précèdemment à un identifiant}
   \label{alg:revertRenameId}
 \end{figure}
 
@@ -1957,7 +1957,7 @@ Dans \autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'
         \EndIf
       \EndFunction
   \end{algorithmic}
-  \caption{TODO}
+  \caption{Algorithme d'intégration d'une opération \emph{insert} distante}
   \label{alg:insertRemote}
 \end{figure}
 
@@ -1965,7 +1965,7 @@ Cet algorithme se décompose en de multiples étapes.
 Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté par la \autoref{fig:integration-process-insert-op}.
 
 \begin{figure}[t!]
-  \subfloat[Execution]{
+  \subfloat[Exécution nécessitant l'intégration d'une opération \emph{insert} provenant d'une époque concurrente]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\columnwidth}{!}{
@@ -2048,7 +2048,7 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
         \end{tikzpicture}
         \label{fig:integration-process-insert-op-epoch-tree}
     \end{minipage}}
-  \caption{TODO}
+  \caption{Intégration d'une opération \emph{insert} distante}
   \label{fig:integration-process-insert-op}
 \end{figure}
 
@@ -2157,14 +2157,14 @@ Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans la \auto
         \EndIf
       \EndFunction
   \end{algorithmic}
-  \caption{TODO}
+  \caption{Algorithme d'intégration d'une opération \emph{rename} distante}
   \label{alg:renameRemote}
 \end{figure}
 
 Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:integration-process-rename-op} pour présenter le fonctionnement de cet algorithme.
 
 \begin{figure}[t!]
-  \subfloat[Execution]{
+  \subfloat[Exécution nécessitant l'intégration d'opérations \emph{rename} concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\columnwidth}{!}{
@@ -2272,7 +2272,7 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
         \end{tikzpicture}
         \label{fig:integration-process-rename-op-epoch-tree-after}
     \end{minipage}}
-  \caption{TODO}
+  \caption{Intégration d'une opération \emph{rename} distante}
   \label{fig:integration-process-rename-op}
 \end{figure}
 
@@ -2331,7 +2331,7 @@ Il s'ensuit que toute époque qui n'appartient pas à l'ensemble des \emph{époq
 La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récupération de mémoire proposé.
 
 \begin{figure}[!ht]
-  \subfloat[Execution]{
+  \subfloat[Exécution d'opérations \emph{rename}]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -2370,7 +2370,7 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
           \label{fig:GC-execution}
       \end{minipage}}
   \hfil
-  \subfloat[States of respective epoch trees with \emph{potential current epochs} and \emph{required epochs} displayed]{
+  \subfloat[\emph{Arbres des époques} respectifs avec les ensembles \emph{potentielles époques courantes} et \emph{époques requises} illustrés]{
       \begin{minipage}{\linewidth}
           \centering
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -2415,7 +2415,7 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
           \end{tikzpicture}
           \label{fig:GC-epoch-trees}
       \end{minipage}}
-  \caption{Garbage collecting epochs and corresponding \emph{former states}}
+  \caption{Suppression des époques obsolètes et récupération de la mémoire des \emph{anciens états} associés}
   \label{fig:GC-epochs}
 \end{figure}
 
@@ -2740,7 +2740,7 @@ Nous présentons les résultats obtenus dans la \autoref{fig:evolution-document-
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.7\columnwidth]{img/snapshot-sizes-alt-legende-v2.png}
-  \caption{Evolution of the size of the document}
+  \caption{Évolution de la taille du document en fonction du \ac{CRDT} utilisé et du nombre de \emph{renaming bots} dans la collaboration}
   \label{fig:evolution-document-size}
 \end{figure}
 
@@ -2779,14 +2779,14 @@ La \autoref{fig:evolution-integration-time-insert} présente les résultats obte
 
 \begin{figure}[!ht]
   \centering
-  \subfloat[Local updates]{
+  \subfloat[Modifications locales]{
       \includegraphics[width=0.45\columnwidth]{img/integration-time-boxplot-local-operations-without-outliers.pdf}
       \label{fig:evolution-integration-time-local-insert}}
   \hfil
-  \subfloat[Remote updates]{
+  \subfloat[Modifications distantes]{
       \includegraphics[width=0.45\columnwidth]{img/integration-time-boxplot-remote-operations-without-outliers.pdf}
       \label{fig:evolution-integration-time-remote-insert}}
-  \caption{Integration time of standard operations}
+  \caption{Temps d'intégration des opérations standards}
   \label{fig:evolution-integration-time-insert}
 \end{figure}
 
@@ -2824,7 +2824,7 @@ Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integrati
 
 \begin{table}[!ht]
   \centering
-  \caption{Integration time of rename operations}
+  \caption{Temps d'intégration de l'opération \emph{rename}}
   \label{tab:evolution-integration-time-rename}
   \resizebox{0.7\columnwidth}{!}{
       \begin{tabular}{lrrrrr}
@@ -2892,7 +2892,7 @@ Nous présentons les résultats obtenus dans la \autoref{fig:time-to-replay-log}
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.7\columnwidth]{img/replay-log-30k-with-legend.png}
-  \caption{Évolution du temps nécessaire pour rejouer le log d'opérations}
+  \caption{Progression du nombre d'opérations du log rejouées en fonction du temps}
   \label{fig:time-to-replay-log}
 \end{figure}
 
