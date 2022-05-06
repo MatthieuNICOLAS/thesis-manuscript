@@ -646,8 +646,8 @@ Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisat
             to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{2..4}}] {LO!};
 
         \draw[->, thick]
-          (S0A) edge node[above, align=center]{\emph{remove "r"}} (S1A-left)
-          (S1A-right) edge node[above, align=center]{\emph{insert "e"}\\\emph{between}\\\emph{"h" and "l"}} (S2A-left)
+          (S0A) edge node[above, align=center]{\emph{remove "R"}} (S1A-left)
+          (S1A-right) edge node[above, align=center]{\emph{insert "E"}\\\emph{between}\\\emph{"H" and "L"}} (S2A-left)
           (S0B) edge node[below, align=center]{\emph{insert "!"}\\\emph{at the end}} (S1B);
 
         \draw[dotted]
@@ -657,7 +657,7 @@ Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisat
 
         \draw[dashed, ->, thick, shorten >= 3]
           (S1A-right.east) edge node[right, align=center]{\emph{remove} \id{i}{B0}{1..1}}  (S2B-left.west)
-          (S2A-right.east) edge node[below right, align=center]{\emph{insert "e" at} {\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}} (S3B-left.west)
+          (S2A-right.east) edge node[below right, align=center]{\emph{insert "E" at} {\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}} (S3B-left.west)
           (S1B.east) edge node[below right, near end, align=center]{\emph{insert "!" at} \id{i}{B0}{4}} (S3A-left.west);
 
 
@@ -676,11 +676,11 @@ Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement u
 Ils partagent initialement le même état : une séquence composée d'un seul bloc associant les identifiants \id{i}{B0}{0..3} aux éléments "HRLO".
 Les noeuds se mettent ensuite à éditer le document.
 
-Le noeud A commence par supprimer l'élément "r" de la séquence.
+Le noeud A commence par supprimer l'élément "R" de la séquence.
 LogootSplit génère l'opération \emph{remove} correspondante en utilisant l'identifiant de l'élément supprimé (\id{i}{B0}{1}).
 Cette opération est envoyée au noeud B pour qu'il intègre cette modification.
 
-Le noeud A insère ensuite un élément "e" dans la séquence, entre le "h" et le "l".
+Le noeud A insère ensuite un élément "E" dans la séquence, entre le "H" et le "L".
 LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément.
 Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} \lid $id$ \lid \id{i}{B0}{2}.
 Cependant, LogootSplit ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre.
@@ -697,10 +697,10 @@ Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position 
 Le noeud A détermine que cet élément doit être inséré à la fin de la séquence (puisque \id{i}{B0}{3} \lid \id{i}{B0}{4}) et qu'il peut être ajouté au bloc \id{i}{B0}{2..3} (puisque \id{i}{B0}{3} et \id{i}{B0}{4} sont contigus).
 
 De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove} des éléments identifiés par l'interval \id{i}{B0}{1..1}, \ie l'élément attaché à l'identifiant \id{i}{B0}{1}.
-Le noeud B supprime donc l'élément "r" de son état.
+Le noeud B supprime donc l'élément "R" de son état.
 
-Il reçoit ensuite l'opération \emph{insert} de l'élément "e" à la position \id{i}{B0}{0}\id{f}{A0}{0}.
-Le noeud B insère cet élément entre les éléments "h" et "l" (puisque \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
+Il reçoit ensuite l'opération \emph{insert} de l'élément "E" à la position \id{i}{B0}{0}\id{f}{A0}{0}.
+Le noeud B insère cet élément entre les éléments "H" et "L" (puisque \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
 
 \mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}
 
@@ -742,8 +742,8 @@ La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la 
             to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
         \draw[->, thick]
-          (S0A) edge node[above, align=center]{\emph{insert "i"}\\\emph{between}\\\emph{"o" and "g"}} (S1A-left)
-          (S1B-right) edge node[above, align=center]{\emph{remove "i"}} (S2B-left);
+          (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+          (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
 
         \draw[dotted]
           (S1A-right) -- (S2A-left)
@@ -751,8 +751,8 @@ La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la 
           (S2B-right) -- (S3B-left);
 
         \draw[dashed, ->, thick, shorten >= 3]
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
           (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
     \end{tikzpicture}
   }
@@ -763,19 +763,19 @@ La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la 
 Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement une séquence.
 La séquence répliquée contient initialement les éléments "ognon", qui sont associés à l'interval d'identifiants \id{p}{A0}{0..4}.
 
-Le noeud A commence par insérer un nouvel élément, "i", dans la séquence entre les éléments "o" et "g".
-L'opération \emph{insert} résultante, insérant l'élément "i" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée au noeud B.
+Le noeud A commence par insérer un nouvel élément, "I", dans la séquence entre les éléments "O" et "G".
+L'opération \emph{insert} résultante, insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée au noeud B.
 
 À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
 Puis il supprime dans la foulée ce nouvel élément.
 L'opération \emph{remove} générée est envoyée au noeud A.
 
-Le noeud A intègre l'opération \emph{remove}, ce qui a pour effet de supprimer l'élément "i" associé à l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
+Le noeud A intègre l'opération \emph{remove}, ce qui a pour effet de supprimer l'élément "I" associé à l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
 Il obtient alors un état équivalent à celui du noeud B.
 
-Cependant, l'opération \emph{insert} insérant l'élément "i" à la position \id{p}{A0}{0}\id{m}{A1}{0} est de nouveau délivrée au noeud B.
+Cependant, l'opération \emph{insert} insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0} est de nouveau délivrée au noeud B.
 De multiples raisons peuvent être à l'origine de cette nouvelle livraison : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
-Le noeud B ré-intègre alors l'opération \emph{insert}, ce qui fait revenir l'élément "i" et l'identifiant associé.
+Le noeud B ré-intègre alors l'opération \emph{insert}, ce qui fait revenir l'élément "I" et l'identifiant associé.
 L'état du noeud B diverge désormais de celui-ci du noeud A.
 
 Pour se prémunir de ce type de scénarios, LogootSplit requiert que la couche de livraison des messages assure une livraison en exactement un exemplaire des opérations.
@@ -821,8 +821,8 @@ La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrai
             to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
         \draw[->, thick]
-          (S0A) edge node[above, align=center]{\emph{insert "i"}\\\emph{between}\\\emph{"o" and "g"}} (S1A-left)
-          (S1B-right) edge node[above, align=center]{\emph{remove "i"}} (S2B-left);
+          (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+          (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
 
         \draw[dotted]
           (S1A-right) -- (S2A-left)
@@ -831,8 +831,8 @@ La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrai
           (S1C-right) -- (S2C-left);
 
         \draw[dashed, ->, thick, shorten >= 3]
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-          (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "i" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+          (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
           (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
           (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C-left.west);
     \end{tikzpicture}
@@ -842,15 +842,15 @@ La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrai
 \end{figure}
 
 Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
-Le noeud A commence par insérer un nouvel élément, "i", dans la séquence entre les éléments "o" et "g".
-L'opération \emph{insert} résultante, insérant l'élément "i" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée aux autres noeuds.
+Le noeud A commence par insérer un nouvel élément, "I", dans la séquence entre les éléments "O" et "G".
+L'opération \emph{insert} résultante, insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée aux autres noeuds.
 
 À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
 Cependant, le noeud B supprime dans la foulée l'élément nouvellement ajouté.
 Il diffuse ensuite l'opération \emph{remove} générée.
 
-Toutefois, suite à un aléa du réseau, l'opération \emph{remove} supprimant l'élément "i" est livrée au noeud C avant l'opération \emph{insert} l'ajoutant à son état.
-Lorsque le noeud C reçoit l'opération \emph{remove}, il parcourt son état à la recherche de l'élément "i" pour le supprimer.
+Toutefois, suite à un aléa du réseau, l'opération \emph{remove} supprimant l'élément "I" est livrée au noeud C avant l'opération \emph{insert} l'ajoutant à son état.
+Lorsque le noeud C reçoit l'opération \emph{remove}, il parcourt son état à la recherche de l'élément "I" pour le supprimer.
 Cependant, celui-ci n'est pas présent dans son état courant.
 L'intégration de l'opération s'achève donc sans effectuer de modification.
 
@@ -900,7 +900,7 @@ Pour respecter l'ordre souhaité, LogootSplit génère un identifiant en ajoutan
           to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
           to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] {LO};
 
-      \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "e"}\\\emph{between}\\\emph{"h" and "l"}} (H);
+      \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "E"}\\\emph{between}\\\emph{"H" and "L"}} (H);
   \end{tikzpicture}
   \caption{Insertion menant à une augmentation de la taille des identifiants}
   \label{fig:example-split}
@@ -1189,8 +1189,8 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
         \draw[dotted] (S1A) -- (S2A-left);
-        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
-        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
 
     \end{tikzpicture}
   }
@@ -1313,8 +1313,8 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
         \draw[dotted] (S1A-right) -- (S2A-left);
-        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
-        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
 
     \end{tikzpicture}
   }
@@ -1390,10 +1390,10 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
           to ++ (0:14 * \widthletter) node[cross] (fail) {};
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
-        \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+        \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "X"}\\\emph{between}\\\emph{"B" and "C"}} (S2A-left);
         \draw[dotted] (S0B-right) -- (S1B);
         \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- (fail);
-        \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{f}{A2}{0}}} (S1B.west);
+        \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[right, align=center]{\emph{insert "X" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{f}{A2}{0}}} (S1B.west);
 
     \end{tikzpicture}
   }
@@ -1403,7 +1403,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
 
 Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "abcd".
 Tout d'abord, le noeud A procède au renommage de cet état.
-Puis il insère un nouvel élément, "x", entre "b" et "c".
+Puis il insère un nouvel élément, "X", entre "B" et "C".
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
 Cependant, l'opération \emph{rename} n'est pas livrée au noeud B, par exemple suite à un problème réseau.
@@ -1487,12 +1487,12 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
                         ] (S2B-right) {ABXCD};
 
-        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S1A-left);
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{insert "X"}\\\emph{between}\\\emph{"B" and "C"}} (S1A-left);
         \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S2A-left);
         \draw[dotted] (S0B-right) -- (S1B-left);
         \draw[dotted] (S1B-right) -- (S2B-left);
         \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[left, near end, align=center]{\emph{rename to \epoch{A2}}} (S1B-left.west);
-        \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[above right, near end, align=center]{\emph{insert "x" at} {\color{mydarkorange}\id{m}{A1}{0}}} (S2B-left.west);
+        \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[above right, near end, align=center]{\emph{insert "X" at} {\color{mydarkorange}\id{m}{A1}{0}}} (S2B-left.west);
 
     \end{tikzpicture}
   }
@@ -1501,7 +1501,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
 \end{figure}
 
 Dans cet exemple, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "abcd".
-Le noeud A commence par insérer un nouvel élément, "x", entre les éléments "b" et "c".
+Le noeud A commence par insérer un nouvel élément, "X", entre les éléments "B" et "C".
 Puis il procède au renommage de son état.
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
@@ -1512,7 +1512,7 @@ En utilisant les informations contenues dans l'opération, le noeud B est renomm
 Ensuite, le noeud B reçoit l'opération \emph{insert}.
 Comme l'époque de génération de l'opération \emph{insert} (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
 \id{m}{A1}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A2} (\id{i}{A2}{2}).
-Le noeud B insère l'élément "x" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
+Le noeud B insère l'élément "X" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
 
 \section{RenamableLogootSplit v2}
 \label{sec:distributed-rls}
@@ -1564,8 +1564,8 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
 
       \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
       \draw[dotted] (S1A-right) -- (S2A-left); % (S2A-right) -- (A-sync) (S2B-right) -- (B-sync);
-      \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
-      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+      \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
       \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
 
     \end{tikzpicture}
@@ -1776,7 +1776,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 ] (S2B-right) {HELLO};
 
         \draw[dotted] (S1A-right) -- (S2A-left);
-        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
         \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
         \draw[dotted] (S2A-right) -- (between-S2A-S3A) (S3A-right) -- (S4A-left);
         \draw[->, dashed, thick] (S2B-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{B2}}} (between-S2A-S3A);
@@ -2024,11 +2024,11 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
                               ] (S3B-right) {CD};
 
               \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S1A-left);
-              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "X"}\\\emph{between}\\\emph{"B" and "C"}} (S2A-left);
               \draw[->, thick] (S0B-right) -- node[above, align=center]{\emph{rename to \epoch{B2}}} (S1B-left);
               \draw[dotted] (S1B-right) -- (S2B-left) (S2B-right) -- (S3B-left);
               \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[right, align=center]{\emph{rename to \epoch{A2}}} (S2B-left.west);
-              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[above right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
+              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[above right, align=center]{\emph{insert "X" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
             \end{tikzpicture}}
           \label{fig:integration-process-insert-op-execution}
       \end{minipage}}
@@ -2058,7 +2058,7 @@ Dans la \autoref{fig:integration-process-insert-op-execution}, deux noeuds A et 
 Initialement, les deux noeuds possèdent des répliques identiques.
 Le noeud A commence par effectuer une opération \emph{rename}.
 Il génère alors l'état équivalent à son état précédent, à la nouvelle époque \epoch{A2}.
-Puis il effectue une opération \emph{insert}, insérant un nouvel élément "x" entre les éléments "b" et "c".
+Puis il effectue une opération \emph{insert}, insérant un nouvel élément "X" entre les éléments "B" et "C".
 L'identifiant \id{i}{A2}{1}\id{f}{A3}{0} est attribué à ce nouvel élément.
 Chacune des opérations du noeud A est diffusée sur le réseau.
 
@@ -2068,7 +2068,7 @@ Il reçoit ensuite l'opération \emph{rename} du noeud A, qu'il intègre.
 Puisque \epoch{A2} \lepoch \epoch{B2}, le noeud B ne modifie pas son époque courante (\epoch{B2}).
 Le noeud B obtient toutefois l'\emph{arbre des époques} représenté dans la \autoref{fig:integration-process-insert-op-epoch-tree}.
 
-Puis le noeud B reçoit l'opération \emph{insert} de l'élément "x" à la position \id{i}{A2}{1}\id{f}{A3}{0}.
+Puis le noeud B reçoit l'opération \emph{insert} de l'élément "X" à la position \id{i}{A2}{1}\id{f}{A3}{0}.
 C'est le traitement de cette opération que nous allons détailler ici.
 
 Tout d'abord, le noeud B compare l'époque de l'opération avec l'époque courante de la séquence.
@@ -2234,12 +2234,12 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
                               ] (S3B-right) {CD};
 
               \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S1A-left);
-              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"b" and "c"}} (S2A-left);
+              \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "x"}\\\emph{between}\\\emph{"B" and "C"}} (S2A-left);
               \draw[->, thick] (S0B-right) -- node[above, align=center]{\emph{rename to \epoch{B2}}} (S1B-left);
               \draw[dotted] (S2A-right) -- (S3A-left) (S1B-right) -- (S2B-left) (S2B-right) -- (S3B-left);
               \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[right, align=center]{\emph{rename to \epoch{A2}}} (S2B-left.west);
               \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[near end, below right, align=center]{\emph{rename to \epoch{B2}}} (S3A-left.west);
-              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[below right, align=center]{\emph{insert "x" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
+              \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[below right, align=center]{\emph{insert "X" at} {\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}}} (S3B-left.west);
             \end{tikzpicture}}
           \label{fig:integration-process-rename-op-execution}
       \end{minipage}}
