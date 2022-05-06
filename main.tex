@@ -3035,8 +3035,100 @@ En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur
 \label{sec:alt-priority-relation}
 
 Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} est simple et garantit que tous les noeuds désignent la même époque comme époque cible, elle introduit un surcoût computationnel significatif dans certains cas.
-Notamment, cette relation \emph{priority} autorise le cas où un simple noeud, déconnecté de la collaboration depuis longtemps, force l'ensemble des autres noeuds à annuler les opérations \emph{rename} qu'ils ont effectué pendant ce temps car sa propre opération \emph{rename} introduit la nouvelle époque cible.
-\mnnote{TODO: ajouter figure d'un epoch tree où une longue branche se fait remplacer par une époque isolée}
+La \autoref{fig:worst-case-priority} présente un tel cas.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{.7\linewidth}{!}{
+            \begin{tikzpicture}
+              \path
+                node {\textbf{A}}
+                to ++(0:0.5) node (a0) {}
+                to ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                to ++(0:2) node (a-receives-b7) {}
+                to ++(0:1) node [point, label=above:{rename to \epoch{A10}}] (a10) {}
+                to ++(0:1) node (a11) {}
+                to ++(0:1) node (a99) {}
+                to ++(0:1) node[point, label=above:{rename to \epoch{A100}}] (a100) {}
+                to ++(0:1.5) node (a-receives-c1) {}
+                to ++(0:1.5) node (a-end) {};
+
+              \draw[thick] (a0) --  (a1) -- (a10) -- (a11);
+              \draw[dotted] (a11) -- (a99);
+              \draw[->, thick] (a99) -- (a100) -- (a-end);
+
+              \path
+                  to ++(270:2) node {\textbf{B}}
+                  to ++(0:0.5) node (b0) {}
+                  to ++(0:2) node (b-receives-a1) {}
+                  to ++(0:0.5) node[point, label=below:{rename to \epoch{B2}}] (b7) {}
+                  to ++(0:2.5) node (b8) {}
+                  to ++(0:1) node (b99) {}
+                  to ++(0:2.5) node (b-receives-a100) {}
+                  to ++(0:1.5) node (b-end) {};
+
+              \draw[thick] (b0) -- (b7) -- (b8);
+              \draw[dotted] (b8) -- (b99);
+              \draw[->, thick] (b99) -- (b-end);
+
+              \path
+                  to ++(270:4) node {\textbf{C}}
+                  to ++(0:0.5) node (c0) {}
+                  to ++(0:2) node[point, label=below:{rename to \epoch{C1}}] (c1) {}
+                  to ++(0:3) node (c2) {}
+                  to ++(0:1) node (c99) {}
+                  to ++(0:4) node (c-end) {};
+
+                \draw[thick] (c0) -- (c1) -- (c2);
+                \draw[dotted] (c2) -- (c99);
+                \draw[->, thick] (c99) -- (c-end);
+
+              \draw[->, dashed, shorten >= 1] (a1) -- (b-receives-a1);
+              \draw[->, dashed, shorten >= 1] (b7) -- (a-receives-b7);
+              % \draw[->, dashed, shorten >= 1] (a100) -- (b-receives-a100);
+              \draw[->, dashed, shorten >= 1] (c1) -- (a-receives-c1);
+            \end{tikzpicture}
+          }
+          \label{fig:worst-case-priority-execution}
+      \end{minipage}}
+  \hfil
+  \subfloat[\emph{Arbre des époques} final correspondant avec la relation \emph{priority} illustrée]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{.15\linewidth}{!}{
+            \begin{tikzpicture}
+                \path
+                    node[op] (e0) {\epoch{0}}
+                    to ++(225:1.5) node[op] (eA1) {\epoch{A1}}
+                    to ++(270:1.5) node[op] (eB7) {\epoch{B7}}
+                    to ++(270:1.5) node[op] (eA10) {\epoch{A10}}
+                    to ++(270:1) node (eA11) {}
+                    to ++(270:0.5) node (eA99) {}
+                    to ++(270:1) node[op] (eA100) {\epoch{A100}};
+                \path
+                    to ++(315:1.5) node[op, red] (eC1) {\epoch{C1}};
+
+                \draw[->, thick] (e0) edge (eA1) (eA1) edge (eB7) (eB7) edge (eA10) (eA10) edge (eA11) (eA99) edge(eA100) (e0) edge (eC1);
+                \draw[dotted] (eA11) edge (eA99);
+                \draw[->, dashed, thick, red] (eC1.270) -- (eA100.45) (eA100.50) -- (eA10.315) (eA10.45) -- (eB7.315) (eB7.45) -- (eA1.315) (eA1.0) -- (e0.270);
+            \end{tikzpicture}
+          }
+          \label{fig:worst-case-priority-tree}
+      \end{minipage}}
+  \caption{Livraison d'une opération \emph{rename} d'un noeud }
+  \label{fig:worst-case-priority}
+\end{figure}
+
+Dans cet exemple, les noeuds A et B éditent en collaboration un document.
+Au fur et à mesure de leur collaboration, ils effectuent plusieurs opérations \emph{rename}.
+Cependant, après un nombre conséquent de modifications de leur part, un autre noeud C se reconnecte.
+Celui-ci leur transmet sa propre opération \emph{rename}, concurrente à toutes leurs opérations.
+D'après la relation \emph{priority}, nous avons \epoch{0}~\lepoch~\epoch{A1}~\lepoch~...~\lepoch~\epoch{A100}~\lepoch~\epoch{C1}.
+La nouvelle époque cible étant \epoch{C1}, les noeuds A et B doivent pour l'atteindre annuler successivement l'ensemble des opérations \emph{rename} composant leur branche de l'\emph{arbre des époques}.
+Ainsi, un noeud isolé peut forcer l'ensemble des noeuds à effectuer un lourd calcul.
+Il serait plus efficace que, dans cette situation, ce soit seulement le noeud isolé qui doive se mettre à jour.
 
 La relation \emph{priority} devrait donc être conçue pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
 Pour concevoir une relation \emph{priority} efficace, nous pourrions incorporer dans les opérations \emph{rename} des métriques qui représentent l'état du système et le travail accumulé sur le document (nombre de noeuds actuellement à l'époque \emph{parente}, nombre d'opérations générées depuis l'époque parente, taille du document...).
