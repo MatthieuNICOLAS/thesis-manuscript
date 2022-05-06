@@ -2527,23 +2527,49 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
 
 \subsubsection{Complexité en temps de l'opération \emph{rename}}
 
-\begin{itemize}
-  \item Concernant l'opération \emph{rename}
-  \item L'opération \emph{rename} locale consiste à parcourir et à linéariser la structure actuelle pour ne garder que les idIntervals courant
-  \item Et à créer une nouvelle séquence équivalente à l'ancienne, composée seulement du nouveau bloc
-  \item Sa complexité est donc de O($b$)
-  \item Pour l'opération \emph{rename} distante, une implémentation naïve consiste à générer le nouvel état en renommant et insérant chaque identifiant de l'état courant d'une manière similaire à l'opération \emph{insert} distante
-  \item On obtient dans ce cas une complexité de O($h$ + $n$ ($k$ + $l$ $\cdot$ log($n$) + log($b$)))
-  \item Mais peut améliorer
-  \item Plutôt que d'effectuer une recherche binaire sur $renamedIds$ pour trouver le prédecesseur de $id$
-  \item Peut tirer parti du fait qu'on va parcourir séquentiellement l'état, qui est une liste triée d'identifiants
-  \item Et parcourir en parallèle, au fur et à mesure, $renamedIds$ pour trouver le prédecesseur du $id$ courant
-  \item Permet de ramener la complexité du renommage des $n$ identifiants de l'époque \ac{LCA} à l'époque courante à O($l$ ($n$ + $n$))
-  \item Plutôt que de générer une nouvelle séquence et d'y insérer un par un les $n$ éléments
-  \item Peut parcourir les $n$ éléments pour reformer $b$ blocs
-  \item Peut ensuite construire l'AVL de manière récursive en parcourant les $b$ blocs obtenus
-  \item Peut donc obtenir une complexité de O($h$ + $k$ $\cdot$ $n$ + $l$ ($n$ + $n$) + $n$ + $b$) pour l'intégration de l'opération \emph{rename} distante
-\end{itemize}
+Étudions à présent la complexité en temps de l'opération \emph{rename}.
+
+L'opération \emph{rename} locale se décompose en 2 étapes :
+\begin{enumerate*}[label=(\roman*)]
+  \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op})
+  \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
+\end{enumerate*}
+La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les \texttt{IdInterval}.
+Elle s'effectue donc en \bigO{b}.
+La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'idInterval \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
+Cette seconde étape s'effectue en \bigO{1}.
+L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
+
+L'intégration de l'opération \emph{rename} se décompose en les étapes suivantes :
+\begin{enumerate*}[label=(\roman*)]
+  \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}
+  \item La récupération des $n$ identifiants formant l'état courant
+  \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible
+  \item L'identification des $k$ opérations \emph{rename} à inverser et des $l$ opérations \emph{rename} à jouer
+  \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}
+  \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence
+\end{enumerate*}
+L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
+La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque idInterval en Identifiers, ce qui nécessite \bigO{n} instructions.
+
+Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations \emph{insert} distantes analysé précédemment.
+Ces étapes s'effectuent donc en \bigO{n(k + l \cdot \log{}n + \log{}b)}.
+
+Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération \emph{rename} distante.
+
+Nous pouvons néanmoins améliorer ce premier résultat.
+Notamment, nous pouvons tirer parti des faits suivantes :
+\begin{enumerate*}[label=(\roman*)]
+  \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe
+  \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
+\end{enumerate*}
+Ainsi, plutôt que d'effectuer une recherche dichotomique sur l'\emph{ancien état} pour trouver le prédecesseur de l'identifiant à renommer, nous pouvons parcourir les deux listes en parallèle.
+Ceci nous permet de renommer l'intégralité des identifiants en un seul parcours de l'état courant et de l'\emph{ancien état}, \ie en \bigO{n} instructions.
+Ensuite, plutôt que d'insérer les identifiants un à un dans la nouvelle séquence, nous pouvons recomposer au préalable les différents blocs en parcourant la liste des identifiants et en les aggrégeant au fur et à mesure.
+Il ne reste plus qu'à constituer la nouvelle séquence à partir des blocs obtenus.
+Ces actions s'effectuent respectivement en \bigO{n} et \bigO{b} instructions.
+
+Ainsi, ces améliorations nous permettent d'obtenir une complexité en temps en \bigO{h + n (k + l) + b} pour le traitement de l'opération \emph{rename} distante.
 
 \subsubsection{Récapitulatif}
 
@@ -2563,7 +2589,7 @@ Nous récapitulons les complexités en temps présentées précédemment dans le
       \emph{insert} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
       \emph{remove} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
       \emph{naive rename} & $b$ & $h + n (k + l \cdot \log{}n + \log{}b)$ \\
-      \emph{rename} & $b$ & $b + n (k + 2 \cdot l) + b$ \\
+      \emph{rename} & $b$ & $h + n (k + l) + b$ \\
       \bottomrule
   \end{tabular}
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments de l'état courant et des \emph{anciens états}, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $s$ : nombre d'éléments insérés/supprimés par l'opération}
@@ -2790,8 +2816,8 @@ Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opérat
 Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.
 
 Nous rappellons que le traitement d'une opération \emph{rename} dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
-Le cas des opérations \emph{rename distantes} se décompose donc en trois catégories.
-Les opérations \emph{distantes directes} désignent les opérations \emph{rename distantes} qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
+Le cas des opérations \emph{rename} distantes se décompose donc en trois catégories.
+Les opérations \emph{distantes directes} désignent les opérations \emph{rename} distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
 Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désignent les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
 D'après la relation \emph{priority}, l'époque introduite est plus grande (resp. petite) que l'époque courante du noeud.
 Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
@@ -2947,7 +2973,7 @@ En utilisant les opérations \emph{rename}, les noeuds peuvent supprimer les mé
 Pour déterminer quand générer des opérations \emph{rename}, les noeuds peuvent donc monitorer le nombre d'opérations effectuées depuis la dernière opération \emph{rename}, le nombre de blocs qui composent la séquence ou encore la taille des identifiants.
 
 Un second aspect à prendre en compte est le temps d'intégration des opérations \emph{rename}.
-Comme indiqué dans le \autoref{tab:evolution-integration-time-rename}, l'intégration des opérations \emph{rename distantes} peut nécessiter des secondes si elles sont retardées trop longtemps.
+Comme indiqué dans le \autoref{tab:evolution-integration-time-rename}, l'intégration des opérations \emph{rename} distantes peut nécessiter des secondes si elles sont retardées trop longtemps.
 Bien que les opérations \emph{rename} travaillent en coulisses, elles peuvent néanmoins impacter négativement l'expérience utilisateur.
 Notamment, les noeuds ne peuvent pas intégrer d'autres opérations \emph{distantes} tant qu'ils sont en train de traiter des opérations \emph{rename}.
 Du point de vue des utilisateurs, les opérations \emph{rename} peuvent alors être perçues comme des pics de latence.
