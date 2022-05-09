@@ -1062,7 +1062,7 @@ Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opér
 Ensuite, dans le \autoref{sec:distributed-rls}, nous supprimons cette hypothèse.
 Nous présentons alors notre approche pour gérer les scénarios avec des opérations \emph{rename} concurrentes.
 
-\section{RenamableLogootSplit}
+\section{Introduction de l'opération \emph{rename}}
 \label{sec:centralised-rls}
 \subsection{Opération de renommage proposée}
 
@@ -1524,7 +1524,7 @@ Comme l'époque de génération de l'opération \emph{insert} (\epoch{0}) est di
 \id{m}{A1}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A2} (\id{i}{A2}{2}).
 Le noeud B insère l'élément "X" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
 
-\section{RenamableLogootSplit v2}
+\section{Gestion des opérations \emph{rename} concurrentes}
 \label{sec:distributed-rls}
 \subsection{Conflits en cas de renommages concurrents}
 
@@ -1714,7 +1714,7 @@ Cette opération est délivrée au noeud C, qui génère ensuite sa propre opér
 De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
 
 Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des époques} représenté dans la \autoref{fig:priority-epoch-tree}.
-Dans cette figure, la flèche pointillé rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
+Dans cette figure, la flèche tireté rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
 
 Pour déterminer l'époque cible, les noeuds reposent sur la relation \emph{priority}.
 D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~\lepoch~\epoch{0}\epoch{A1}~\lepoch~\epoch{0}\epoch{A1}\epoch{C6}~\lepoch~\epoch{0}\epoch{B2}~\lepoch~\epoch{0}\epoch{B2}\epoch{B7}.
@@ -2432,9 +2432,7 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
 Dans la \autoref{fig:GC-execution}, nous représentons une exécution au cours de laquelle deux noeuds A et B génère respectivement plusieurs opérations \emph{rename}.
 Dans la \autoref{fig:GC-epoch-trees}, nous représentons les \emph{arbre des époques} respectifs de chaque noeud.
 Les époques introduites par des opérations \emph{rename} causalement stables sont representées en utilisant des doubles cercles.
-L'ensemble des \emph{potentielles époques courantes} est montré sous la forme d'un rectangle noir pointillé, tandis que l'ensemble des \emph{époques requises} est représenté par un rectangle vert pointillé.
-
-\mnnote{TODO: Trouver un autre terme que pointillé pour dotted}
+L'ensemble des \emph{potentielles époques courantes} est montré sous la forme d'un rectangle noir tireté, tandis que l'ensemble des \emph{époques requises} est représenté par un rectangle vert pointillé.
 
 Le noeud A génère tout d'abord une opération \emph{rename} vers \epoch{A1} et ensuite une opération \emph{rename} vers \epoch{A8}.
 Il reçoit ensuite une opération \emph{rename} du noeud B qui introduit \epoch{B2}.
@@ -2755,9 +2753,9 @@ Nous présentons les résultats obtenus dans la \autoref{fig:evolution-document-
 \end{figure}
 
 Pour chaque graphique dans la \autoref{fig:evolution-document-size}, nous représentons 4 données différentes.
-La ligne pointillée bleue correspond à la taille du contenu du document, \ie du texte, tandis que la ligne continue rouge représente la taille complète du document LogootSplit.
+La ligne tiretée bleue correspond à la taille du contenu du document, \ie du texte, tandis que la ligne continue rouge représente la taille complète du document LogootSplit.
 
-La ligne verte en pointillés représente la taille du document RenamableLogootSplit dans son meilleur cas.
+La ligne verte pointillée-tiretée représente la taille du document RenamableLogootSplit dans son meilleur cas.
 Dans ce scénario, les noeuds considèrent que les opérations \emph{rename} sont causalement stables dès qu'ils les reçoivent.
 Les noeuds peuvent alors bénéficier des effets du mécanisme de renommage tout en supprimant les métadonnées qu'il introduit : les \emph{anciens états} et époques.
 Ce faisant, les noeuds peuvent minimiser de manière périodique le surcoût en métadonnées de la structure de données, indépendamment du nombre de \emph{renaming bots} et d'opérations \emph{rename} concurrentes générées.
