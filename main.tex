@@ -3018,17 +3018,19 @@ La conception de ces stratégies peut reposer sur différentes heuristiques : le
 \label{sec:compression-rename}
 
 Pour limiter la consommation en bande passante des opérations \emph{rename}, nous proposons la technique de compression suivante.
-Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les blocs.
-En effet, un identifiant peut être caractérisé de manière unique par le triplet composé de l'\emph{identifiant de noeud}, du \emph{numéro séquentiel} et de l'\emph{offset} de son dernier tuple.
-Par conséquent, un bloc peut être identifié de manière unique à partir du triplet signature de son identifiant de début et de sa longueur.
-Cette méthode nous permet de réduire les données à diffuser dans le cadre de l'opération \emph{rename} à un montant fixe par bloc.
+Au lieu de diffuser les identifiants complets formant l'\emph{ancien état}, les noeuds peuvent diffuser seulement les éléments nécessaires pour identifier de manière unique les intervalles d'identifiants.
+En effet, un identifiant peut être caractérisé de manière unique par le triplet composé de l'\emph{identifiant de noeud}, du \emph{numéro de séquence} et de l'\emph{offset} de son dernier tuple.
+Par conséquent, un intervalle d'identifiants peut être identifié de manière unique à partir du triplet signature de son identifiant de début et de sa longueur, \ie du quadruplet $\langle\trm{nodeId}, \trm{nodeSeq}, \trm{offsetBegin}, \trm{offsetEnd}\rangle$.
+Cette méthode nous permet de réduire les données à diffuser dans le cadre de l'opération \emph{rename} à un montant fixe par intervalle.
 
-Pour décompresser l'opération reçue, les noeuds parcourent leur état courant ainsi que leur log des opérations \emph{remove} concurrentes.
-De cette manière, ils peuvent retrouver les identifiants complets et reconstruire l'opération \emph{rename} originale.
-\mnnote{TODO: Développer ce paragraphe : noeuds doivent retrouver les blocs renommés à partir des données reçues. Pour cela, parcourent leur état. Suffit de retrouver un identifiant avec le même couple $\langle$nodeId, nodeSeq$\rangle$ pour reformer un bloc. Certains couples $\langle$nodeId, nodeSeq$\rangle$ peuvent avoir été supprimés en concurrence et ne plus être présent dans la séquence. Donc besoin d'aussi parcourir le log des opérations \emph{remove} concurrentes.}
+Pour décompresser l'opération reçue, les noeuds doivent reformer les intervalles d'identifiants correspondant aux quadruplets reçus.
+Pour cela, ils parcourent leur état.
+Lorsqu'ils rencontrent un identifiant partageant le même couple $\langle\trm{nodeId}, \trm{nodeSeq}\rangle$ qu'un des intervalles de l'opération \emph{rename}, les noeuds disposent de l'ensemble des informations requises pour le reconstruire.
+Cependant, certains couples $\langle\trm{nodeId}, \trm{nodeSeq}\rangle$ peuvent avoir été supprimés en concurrence et ne plus être présents dans la séquence.
+Dans ce cas, il est nécessaire de parcourir le log des opérations \emph{remove} concurrentes pour retrouver les identifiants correspondants et reconstruire l'opération \emph{rename} originale.
 
 Grâce à cette méthode de compression, nous pouvons instaurer une taille maximale à l'opération \emph{rename}.
-En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné de blocs, bornant ainsi la taille du message à diffuser.
+En effet, les noeuds peuvent émettre une opération \emph{rename} dès que leur état courant atteint un nombre donné d'intervalles d'identifiants, bornant ainsi la taille du message à diffuser.
 
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 
