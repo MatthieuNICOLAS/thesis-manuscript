@@ -41,7 +41,8 @@
 \newtheorem{property}{Propriété}
 \newtheorem{subproperty}{Propriété}[property]
 
-\usepackage{algpseudocode}
+\usepackage{algorithm, algpseudocode}
+\floatname{algorithm}{Algorithme} % Renomme caption de "Algorithm" -> "Algorithme"
 
 \usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
@@ -82,6 +83,15 @@
 \newcommand{\widthblock}{3em}
 \newcommand{\widthoriginepoch}{1.33em}
 \newcommand{\widthepoch}{1.65em}
+
+% Définit noms pour \autoref
+%---------
+\newcommand{\algorithmautorefname}{Algorithme}
+\newcommand{\annexautorefname}{Annexe}
+\newcommand{\definitionautorefname}{Définition}
+\newcommand{\propertyautorefname}{Propriété}
+\newcommand{\subfigureautorefname}{Figure}
+\newcommand{\subpropertyautorefname}{Propriété}
 
 % Tikz styles
 \tikzset{
@@ -1229,13 +1239,13 @@ De plus, les noeuds marquent chaque opération avec leur époque courante au mom
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'intégrer.
 Les noeuds déterminent par rapport à quelles opérations \emph{rename} doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.
 
-Les noeuds utilisent la fonction \textsc{renameId}, décrite dans \autoref{alg:renameId}, pour transformer les opérations \emph{insert} et \emph{remove} par rapport aux opérations \emph{rename}.
+Les noeuds utilisent la fonction \textsc{renameId}, décrite dans l'\autoref{alg:renameId}, pour transformer les opérations \emph{insert} et \emph{remove} par rapport aux opérations \emph{rename}.
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
 L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
 Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
       \Function {renameId}{id, renamedIds, nId, nSeq}
@@ -1271,7 +1281,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
   \end{algorithmic}
   \caption{Fonctions principales pour renommer un identifiant}
   \label{alg:renameId}
-\end{figure}
+\end{algorithm}
 
 \begin{figure}[!ht]
   \centering
@@ -1332,8 +1342,8 @@ En réassignant cet identifiant à l'élément inséré de manière concurrente,
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
 À la réception de l'opération \emph{rename} du noeud A, le noeud B utilise \textsc{renameId} sur chacun des identifiants de son état pour le renommer et atteindre un état équivalent à celui du noeud A.
 
-\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
-Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans \autoref{app:rename-id}.
+L'\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
+Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans l'\autoref{app:rename-id}.
 
 L'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
 Une extension possible est de concevoir \textsc{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
@@ -1603,7 +1613,7 @@ Les époques sont representées sous la forme de noeuds de l'arbre et la relatio
 
 À l'issue du scénario décrit dans la \autoref{fig:conflicting-rename-operations}, les noeuds A et B sont respectivement aux époques \epoch{A1} et \epoch{B2}.
 Pour converger, tous les noeuds devraient atteindre la même époque à terme.
-Cependant, la fonction \textsc{renameId} décrite dans \autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
+Cependant, la fonction \textsc{renameId} décrite dans l'\autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
 Le noeud A (resp. B) est donc dans l'incapacité de progresser vers l'époque du noeud B (resp. A).
 Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.
 
@@ -1789,9 +1799,9 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
 \end{figure}
 
 C'est précisément le but de \textsc{revertRenameId}, qui associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
-Nous décrivons cette fonction dans \autoref{alg:revertRenameId}.
+Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
       \Function{revertRenameId}{id, renamedIds, nId, nSeq}
@@ -1842,7 +1852,7 @@ Nous décrivons cette fonction dans \autoref{alg:revertRenameId}.
   \end{algorithmic}
   \caption{Fonctions principales pour annuler le renommage appliqué précèdemment à un identifiant}
   \label{alg:revertRenameId}
-\end{figure}
+\end{algorithm}
 
 Les objectifs de \textsc{revertRenameId} sont les suivants :
 \begin{enumerate*}[label=(\roman*)]
@@ -1891,9 +1901,9 @@ Ainsi, pour préserver l'ordre voulu, \textsc{revertRenameId} renvoie $\trm{id}$
 
 Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
 
-Comme pour \autoref{alg:renameId}, \autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
+Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
 Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).
-Les fonctions pour gérer les cas restants sont présentées dans \autoref{app:revert-rename-id}.
+Les fonctions pour gérer les cas restants sont présentées dans l'\autoref{app:revert-rename-id}.
 
 Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
 \textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération \emph{rename}.
@@ -1917,9 +1927,9 @@ Le processus d'intégration d'une opération distante distingue deux cas différ
 
 \label{sec:integration-process-insert-remove-op}
 
-Dans \autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'une opération \emph{insert} distante dans RenamableLogootSplit.
+Dans l'\autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'une opération \emph{insert} distante dans RenamableLogootSplit.
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[5]
       \Function{insRemote}{seq, epochTree, currentEpoch, insOp}
@@ -1959,7 +1969,7 @@ Dans \autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'
   \end{algorithmic}
   \caption{Algorithme d'intégration d'une opération \emph{insert} distante}
   \label{alg:insertRemote}
-\end{figure}
+\end{algorithm}
 
 Cet algorithme se décompose en de multiples étapes.
 Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté par la \autoref{fig:integration-process-insert-op}.
@@ -2111,9 +2121,9 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
 \label{sec:integration-process-rename-op}
 
 L'autre cas de figure que RenamableLogootSplit doit gérer est l'intégration d'une opération \emph{rename} distante.
-Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans la \autoref{alg:renameRemote}.
+Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autoref{alg:renameRemote}.
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[5]
       \Function{renRemote}{seq, epochTree, currentEpoch, renOp}
@@ -2159,7 +2169,7 @@ Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans la \auto
   \end{algorithmic}
   \caption{Algorithme d'intégration d'une opération \emph{rename} distante}
   \label{alg:renameRemote}
-\end{figure}
+\end{algorithm}
 
 Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:integration-process-rename-op} pour présenter le fonctionnement de cet algorithme.
 
@@ -3194,7 +3204,7 @@ En réponse à une demande de synchronisation d'un nouveau pair, un pair peut do
   \item les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
 \end{enumerate*}
 
-Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (Définition \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
+Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (\autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
 En effet, les données incluses (\emph{ancien état} au moment du renommage, identifiant du noeud auteur de l'opération \emph{rename} et son numéro de séquence au moment de la génération) nous permettent seulement de recréer la structure de la séquence après le renommage.
 Mais le contenu de la séquence est omis, celui-ci n'étant jusqu'ici d'aucune utilité pour l'opération \emph{rename}.
 Afin de pouvoir utiliser l'opération \emph{rename} comme état initial, il est nécessaire d'y inclure cette information.
@@ -3231,7 +3241,7 @@ Nous présentons les avantages et inconvénients de cette approche dans la sous-
 
 \subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le log d'opérations}
 
-Nous avons décrit précédemment dans \autoref{sec:integration-process-rename-op}, et plus précisément dans \autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
+Nous avons décrit précédemment dans \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
 \begin{enumerate*}[label=(\roman*)]
   \item identifier le chemin entre l'époque courante et l'époque cible
@@ -3775,7 +3785,7 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
 
 \label{app:rename-id}
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
       \Function{renIdLessThanFirstId}{id, newFirstId}
@@ -3801,13 +3811,13 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \end{algorithmic}
   \caption{Remaining functions to rename an identifier}
   \label{alg:appendix-rename-id}
-\end{figure}
+\end{algorithm}
 
 \Annex{Algorithmes \textsc{revertRenameId}}
 
 \label{app:revert-rename-id}
 
-\begin{figure}[!ht]
+\begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
       \Function{revRenIdLessThanNewFirstId}{id, firstId, newFirstId}
@@ -3849,7 +3859,7 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \end{algorithmic}
   \caption{Remaining functions to revert an identifier renaming}
   \label{alg:appendix-revert-rename-id}
-\end{figure}
+\end{algorithm}
 
 %
 %%-------------------------------------------------------------------
