@@ -1744,15 +1744,9 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
             node {\textbf{A}}
             to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
             to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
-                        ] {HE}
-            to ++(0:\widthblock) node[letter, fill=mylightblue,
-                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
-                        ] {L}
-            to ++(0:\widthletter) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
-                        ] (S1A-right) {LO}
-            to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {HELO}
+            to ++(0:10 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
             to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                         ] {HE}
@@ -1866,7 +1860,7 @@ Les objectifs de \textsc{revertRenameId} sont les suivants :
 
 Le cas \ref{item:revert-rename-1} est le plus trivial.
 Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de $\trm{offset}$ de $\trm{newId}$.
-En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
+En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$, \eg $\trm{renamedIds[0]} =$ \id{i}{B0}{0}).
 
 Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
 Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
@@ -1877,25 +1871,190 @@ et nous devons obtenir :
 \[\trm{id} \in ]\trm{predId}, \trm{succId}[\]
 
 Le premier sous-cas se produit quand nous avons $\trm{tail} \in ]\trm{predId}, \trm{succId}[$.
-Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurrent à l'opération \emph{rename} (\ie Cas \ref{item:revert-rename-2}).
-Nous avons alors $\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[$.
-Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
+Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurrent à l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-2}).
+Nous avons alors :
+\[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
+\eg
+\[i^{A1}_{1}i^{B0}_{0}m^{B1}_{0} \in ]i^{A1}_{1}i^{B0}_{0}f^{A0}_{0}, i^{A1}_{1}i^{B0}_{1}]\]
+
+Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$ (\eg $\trm{id} = $ \id{i}{B0}{0}\id{m}{B1}{0}).
 Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre voulu et restaurer à sa valeur initiale l'identifiant.
 
 Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
-$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération \emph{rename} (\ie \autoref{item:revert-rename-3}).
+$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-3}).
 Nous avons alors $\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[$.
-Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de constrainte sur la valeur à retourner autre que la \autoref{prop:order}.
-Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$.
+Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
+Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$, notés respectivement $\bot$ et $\top$.
 Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
-En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre voulu (avec $\trm{id} = \trm{predId~MIN\_TUPLE~tail}$).
+En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre voulu (avec $\trm{id} = \trm{predId~\bot~tail}$).
+
+\begin{figure}[!ht]
+  \subfloat[Génération d'une opération \emph{insert} dépendante causalement d'une opération \emph{rename}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{C}}
+                to ++(0:0.5 * \widthletter) node[epoch] (S1C-left) {\epoch{0}}
+                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                to ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                to ++(0:\widthletter) node[letter,
+                          label={below:{\id{o}{D1}{0}} }
+                              ] (S1C-right) {D}
+                to ++(0:3 * \widthblock) node[epoch] (S2C-left) {\epoch{C1}}
+                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..2}} }
+                              ] (S2C-right) {WOD}
+                to ++(0:4 * \widthblock) node[epoch] (S3C-left) {\epoch{C1}}
+                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                to ++(0:\widthblock) node[letter, fill=mylightblue,
+                          label={above:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S3C-right) {D}
+                to ++(0:3 * \widthblock) node[epoch] (S4C-left) {\epoch{C1}}
+                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                to ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
+                              ] {R}
+                to ++(0:\widthletter) node[letter, fill=mylightblue,
+                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S4C-right) {D};
+
+            \path
+                to ++(270:3) node {\textbf{D}}
+
+                to ++(0:0.5 * \widthletter) node[epoch] (S1D-left) {\epoch{0}}
+                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                to ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                to ++(0:\widthletter) node[letter,
+                          label={below:{\id{o}{D1}{0}} }
+                              ] (S1D-right) {D}
+
+                to ++(0:3 * \widthblock) node[epoch] (S2D-left) {\epoch{0}}
+                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                to ++(0:\widthletter) node[letter,
+                          label={above:{\id{n}{C0}{0}} }
+                              ] {O}
+                to ++(0:\widthletter) node[letter, fill=mylightorange,
+                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                to ++(0:\widthletter) node[letter,
+                          label={above:{\id{o}{D1}{0}} }
+                              ] (S2D-right) {D}
+
+                to ++(0:4 * \widthblock) node[epoch] (S3D-left) {\epoch{D3}}
+                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
+                              ] (S3D-right) {WOLD};
+
+
+            \draw[->, thick] (S1C-right) -- node[above, align=center]{\emph{rename to \epoch{C1}}} (S2C-left);
+            \draw[dotted] (S2C-right) -- (S3C-left);
+            \draw[->, thick] (S3C-right) -- node[above, align=center]{\emph{insert "R"}\\ \emph{between}\\ \emph{"O" and "L"}} (S4C-left);
+
+            \draw[->, thick] (S1D-right) -- node[below, align=center]{\emph{insert "L"}\\ \emph{between}\\ \emph{"O" and "D"}} (S2D-left);
+            \draw[->, thick] (S2D-right) -- node[below, align=center]{\emph{rename to \epoch{D3}}} (S3D-left);
+
+
+            \draw[dashed, ->, thick, shorten >= 3] (S2D-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}}} (S3C-left.west);
+        \end{tikzpicture}
+        }
+    \end{minipage}}
+  \hfil
+  \subfloat[Annulation de l'opération \emph{rename} précédente au profit d'une opération \emph{rename} concurrente]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{C}}
+                to ++(0:0.5 * \widthletter) node[epoch] (S4C-left) {\epoch{C1}}
+                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                to ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
+                              ] {R}
+                to ++(0:\widthletter) node[letter, fill=mylightblue,
+                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S4C-right) {D}
+                to ++(0:2 * \widthblock) node[point] (between-S4C-S5C) {}
+                to ++(0:3 * \widthletter) node[epoch] (S5C-left) {\epoch{0}}
+                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                to ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                to ++(0:\widthletter) node[letter, fill=mydarkorange,
+                          label={above:{\color{mydarkorange}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
+                              ] {R}
+                to ++(0:\widthletter) node[letter, fill=mylightorange,
+                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                to ++(0:\widthletter) node[letter,
+                          label={above:{\id{o}{D1}{0}} }
+                              ] (S5C-right) {D}
+                to ++(0:2 * \widthblock) node[epoch] (S6C-left) {\epoch{D3}}
+                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..1}} }
+                              ] {WO}
+                to ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{D3}{1}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
+                              ] {R}
+                to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{2..3}} }
+                              ] {LD};
+
+            \path
+                to ++(270:3) node {\textbf{D}}
+
+                to ++(0:0.5 * \widthletter) node[epoch] (S3D-left) {\epoch{D3}}
+                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
+                              ] (S3D-right) {WOLD};
+
+            \draw[dotted] (S4C-right) -- (between-S4C-S5C) (S5C-right) -- (S6C-left);
+            \draw[->, loosely dash dot, thick, shorten >= 1] (between-S4C-S5C) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S5C-left);
+
+            \draw[->, dashed, thick] (S3D-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{D3}}} (between-S4C-S5C);
+            \draw[->, dashed, thick, shorten >= 3] (between-S4C-S5C) edge[bend right] (S6C-left.west);
+        \end{tikzpicture}
+        }
+    \end{minipage}}
+  \caption{TODO}
+  \label{fig:revertRenameId-mintuple}
+\end{figure}
 
 Le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
 Nous avons alors $\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[$.
 La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre voulu.
 Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}$ and $MAX\_TUPLE$.
 $\trm{predOfSuccId}$ est obtenue en décrémentant le dernier $\trm{offset}$ de $\trm{succId}$.
-Ainsi, pour préserver l'ordre voulu, \textsc{revertRenameId} renvoie $\trm{id}$ with $\trm{id} = \trm{predOfSuccId~MAX\_TUPLE~tail}$.
+Ainsi, pour préserver l'ordre voulu, \textsc{revertRenameId} renvoie $\trm{id}$ with $\trm{id} = \trm{predOfSuccId~\top~tail}$.
 
 \mnnote{TODO: Modifier exemple pour illustrer le cas de figure où on a besoin de MIN/MAX\_TUPLE}
 
@@ -2997,7 +3156,7 @@ Par exemple, les noeuds peuvent monitorer à quels autres noeuds ils sont connec
 
 Pour récapituler, nous pouvons proposer plusieurs stragégies de génération des opérations \emph{rename}, pour minimiser de manière individuelle chacun des paramètres présentés.
 Mais bien que certaines de ces stratégies convergent (minimiser la taille de la structure de données et minimiser le temps d'intégration des opérations \emph{rename}), d'autres entrent en conflit (générer une opération \emph{rename} dès qu'un seuil est atteint vs. minimiser le nombre d'opérations \emph{rename} concurrentes générées).
-Les concepteurs de systèmes doivent proposer un compromis entre les différents paramètres en fonction des constraintes du système concerné (application temps réel ou asynchrone, limitations matérielles des noeuds...).
+Les concepteurs de systèmes doivent proposer un compromis entre les différents paramètres en fonction des contraintes du système concerné (application temps réel ou asynchrone, limitations matérielles des noeuds...).
 Il est donc nécessaire d'analyser le système pour évaluer ses performances sur chaque aspect, ses usages et trouver le bon compromis entre tous les paramètres de la stratégie de renommage.
 Par exemple, dans le contexte des systèmes d'édition collaborative temps réel, \cite{ignat:hal-01088815} a montré que le délai diminue la qualité de la collaboration.
 Dans de tels systèmes, nous viserions donc à conserver le temps d'intégration des opérations (en incluant les opérations \emph{rename}) en dessous du temps limite correspondant à leur perception par les utilisateurs.
