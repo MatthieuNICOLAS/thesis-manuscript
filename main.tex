@@ -3160,7 +3160,7 @@ Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite co
 \mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations \emph{rename} concurrentes et procéde au renommage de son état à chaque fois}
 
 En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds délaient le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
-Ce délai réduit la probabilité que les noeuds n'effectuent des traitements inutiles.
+Ce délai réduit la probabilité que les noeuds effectuent des traitements inutiles.
 Plusieurs stratégies peuvent être proposées pour calculer le niveau de confiance en l'époque cible.
 Ces stratégies peuvent reposer sur une variété de métriques pour produire le niveau de confiance, tel que le temps écoulé depuis que le noeud a reçu une opération \emph{rename} concurrente et le nombre de noeuds en ligne qui n'ont pas encore reçu l'opération \emph{rename}.
 
@@ -3209,18 +3209,18 @@ Afin de pouvoir utiliser l'opération \emph{rename} comme état initial, il est 
 
 De plus, des informations de causalité doivent être intégrées à l'opération \emph{rename}.
 Ces informations doivent permettre aux noeuds d'identifier les opérations supplémentaires nécessaires pour obtenir l'état courant, \ie toutes les opérations desquelles l'opération \emph{rename} ne dépend pas causalement.
-L'ajout à l'opération \emph{rename} d'un \emph{vecteur d'état}, structure représentant l'ensemble des opérations observées par l'auteur de l'opération \emph{rename} au moment de sa génération, permettrait cela.
+L'ajout à l'opération \emph{rename} d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations observées par l'auteur de l'opération \emph{rename} au moment de sa génération, permettrait cela.
 
 Nous définissons donc de la manière suivante l'opération \emph{rename} enrichie compatible avec ce mécanisme de compression du log :
 
 \begin{definition}[rename enrichie]
   \label{def:-rich-rename-op}
-  Une opération \emph{rename enrichie} est un quintuplet $\langle$nodeId, nodeSeq, formerState, stateVector, content$\rangle$ où
+  Une opération \emph{rename enrichie} est un quintuplet $\langle$nodeId, nodeSeq, formerState, versionVector, content$\rangle$ où
   \begin{itemize}
     \item nodeId est l'identifiant du noeud qui a générée l'opération \emph{rename}.
     \item nodeSeq est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
     \item formerState est l'ancien état du noeud au moment du renommage.
-    \item stateVector est le vecteur d'état représentant l'ancien état du noeud au moment du renommage.
+    \item versionVector est le vecteur de version représentant l'ancien état du noeud au moment du renommage.
     \item content est le contenu du document au moment du renommage.
   \end{itemize}
 \end{definition}
