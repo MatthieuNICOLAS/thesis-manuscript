@@ -623,7 +623,7 @@ Plusieurs fonctions sont définies sur cette structure de données et permettent
 \end{itemize}
 
 \begin{definition}[remove]
-  Une opération \emph{remove} est une liste de IdInterval où chaque idInterval désigne un ensemble d'éléments à supprimer.
+  Une opération \emph{remove} est une liste d'intervalles d'identifiants où chaque intervalle désigne un ensemble d'éléments à supprimer.
 \end{definition}
 
 Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisation de cette séquence répliquée.
@@ -1142,7 +1142,7 @@ Afin de ne pas perdre ces modifications, les noeuds doivent traiter l'opération
 Pour ce faire, le noeud qui a généré l'opération \emph{rename} diffuse son \emph{ancien état} aux autres.
 
 \begin{definition}[Ancien état]
-  Un \emph{ancien état} est la liste des idInterval qui composent l'état courant de la séquence répliquée au moment du renommage.
+  Un \emph{ancien état} est la liste des intervalles d'identifiants qui composent l'état courant de la séquence répliquée au moment du renommage.
 \end{definition}
 
 De ce fait, nous définissons l'opération \emph{rename} de la manière suivante :
@@ -2544,7 +2544,7 @@ L'opération \emph{rename} locale se décompose en 2 étapes :
 \end{enumerate*}
 La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les \texttt{IdInterval}.
 Elle s'effectue donc en \bigO{b}.
-La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'idInterval \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
+La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
 Cette seconde étape s'effectue en \bigO{1}.
 L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
 
@@ -2558,7 +2558,7 @@ L'intégration de l'opération \emph{rename} se décompose en les étapes suivan
   \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence
 \end{enumerate*}
 L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
-La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque idInterval en Identifiers, ce qui nécessite \bigO{n} instructions.
+La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque intervalle d'identifiants en liste d'identifiants, ce qui nécessite \bigO{n} instructions.
 
 Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations \emph{insert} distantes analysé précédemment.
 Ces étapes s'effectuent donc en \bigO{n(k + l \cdot \log{}n + \log{}b)}.
