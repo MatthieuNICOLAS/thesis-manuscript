@@ -2266,7 +2266,7 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
   \label{fig:integration-process-insert-op}
 \end{figure}
 
-\mnnote{TODO: Remplacer \autoref{fig:integration-process-insert-op} par un exemple avec plus d'opérations \emph{rename} pour mieux faire apparaître les calculs et manipulations effectués sur les chemins dans l'\emph{arbre des époques}}
+% \mnnote{TODO: Remplacer \autoref{fig:integration-process-insert-op} par un exemple avec plus d'opérations \emph{rename} pour mieux faire apparaître les calculs et manipulations effectués sur les chemins dans l'\emph{arbre des époques}}
 
 Dans la \autoref{fig:integration-process-insert-op-execution}, deux noeuds A et B éditent une séquence répliquée via RenamableLogootSplit.
 Initialement, les deux noeuds possèdent des répliques identiques.
@@ -2679,7 +2679,7 @@ Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.
 
 \section{Validation}
 
-\subsection{Preuve de correction de \textsc{renameId}}
+% \subsection{Preuve de correction de \textsc{renameId}}
 
 \subsection{Complexité en temps des opérations}
 
@@ -2810,11 +2810,11 @@ Nous récapitulons les complexités en temps présentées précédemment dans le
 
 \subsubsection{Complexité en temps du mécanisme de récupération de mémoire des époques}
 
-\mnnote{
-  NOTE: Dans \autoref{sec:gc-mechanism}, je présente le principe du mécanisme de GC.
-  Dans cette partie, je décris l'algo correspondant et l'évalue.
-  Rédiger l'algo ? Dans quelle partie l'insérer dans ce cas ?
-}
+% \mnnote{
+%   NOTE: Dans \autoref{sec:gc-mechanism}, je présente le principe du mécanisme de GC.
+%   Dans cette partie, je décris l'algo correspondant et l'évalue.
+%   Rédiger l'algo ? Dans quelle partie l'insérer dans ce cas ?
+% }
 
 Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
 
@@ -3361,7 +3361,7 @@ Ce traitement peut générer un surcoût computationnel significatif en cas de m
 En particulier, un noeud peut recevoir et intégrer les opérations \emph{rename} concurrentes dans l'ordre inverse défini par la relation \emph{priority} sur leur époques.
 Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.
 
-\mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations \emph{rename} concurrentes et procéde au renommage de son état à chaque fois}
+% \mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations \emph{rename} concurrentes et procéde au renommage de son état à chaque fois}
 
 En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds délaient le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
 Ce délai réduit la probabilité que les noeuds effectuent des traitements inutiles.
@@ -3439,7 +3439,7 @@ Cependant, cette solution pose des problèmes de latence/temps de réponse si le
 Une autre approche possible est de généraliser le processus de synchronisation que nous avons présenté ici (opération \emph{rename} comme état initial puis application des autres opérations) à l'ensemble des pairs, et non plus seulement aux nouveaux pairs.
 Nous présentons les avantages et inconvénients de cette approche dans la sous-section suivante.
 
-\mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
+% \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
 
 \subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le log d'opérations}
 
@@ -3506,7 +3506,7 @@ Ces informations permettent de déterminer la stabilité causale des opérations
 Les noeuds peuvent ainsi maintenir, en plus du log complet des opérations, un log composé uniquement des opérations non stables causalement.
 Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent alors parcourir ce log réduit à la recherche des opérations concurrentes.
 
-\mnnote{TODO: Ajouter conclusion à cette sous-section}
+% \mnnote{TODO: Ajouter conclusion à cette sous-section}
 
 \section{Comparaison avec les approches existantes}
 
@@ -3559,13 +3559,13 @@ Ces deux approches sont néanmoins orthogonales et peuvent, comme avec l'approch
 Le système résultant réinitialiserait périodiquement les métadonnées de la séquence répliquée à l'aide de l'opération \emph{rename} tandis que les stratégies d'allocation d'identifiants de LSEQ réduiraient leur croissance entretemps.
 Cela permettrait aussi de réduire la fréquence de l'opération \emph{rename}, réduisant ainsi les calculs effectués par le système de manière globale.
 
-\mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
+% \mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
 
-\subsection{Eager stability determination}
+% \subsection{Eager stability determination}
 
-\mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{10.1145/3358504.3361231, 10.1145/3380787.3393685, 10.1145/3426182.3426183} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
+% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{10.1145/3358504.3361231, 10.1145/3380787.3393685, 10.1145/3426182.3426183} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
 
-\mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
+% \mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
 
 \section{Conclusion}
 
