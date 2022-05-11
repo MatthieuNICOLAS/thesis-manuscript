@@ -994,7 +994,7 @@ Ce réseau est non-fiable : les messages peuvent être perdus, ré-ordonnés ou 
 Le réseau peut aussi être sujet à des partitions, qui séparent alors les noeuds en des sous-groupes disjoints.
 Afin de compenser les limitations du réseau, les noeuds reposent sur une couche de livraison de messages.
 
-Puisque RenamableLogootSplit est une extension de LogootSplit, il partage les mêmes contraintes sur la livraison de messages.
+Puisque RenamableLogootSplit est une extension de LogootSplit, cette structure de données partage les mêmes contraintes sur la livraison de messages.
 La couche de livraison de messages sert donc à livrer les messages à l'application exactement une fois.
 La couche de livraison de messages a aussi pour tâche de garantir la livraison des opérations de suppression après les opérations d'insertion correspondantes.
 Aucune autre contrainte n'existe sur l'ordre de livraison des opérations.
@@ -1130,8 +1130,8 @@ Dans cet exemple, le noeud A initie une opération \emph{rename} sur son état l
 Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}).
 Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
 De plus, son offset est mis à 0.
-Le noeud A réassigne l'identifiant résultant (\id{i}{A1}{0}) au premier élément de la séquence, comme décrit dans \autoref{fig:renaming-first-id}.
-Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A1}{1}, \id{i}{A1}{2}, \id{i}{A1}{3}), comme présenté dans \autoref{fig:renaming-second-id}.
+Le noeud A réassigne l'identifiant résultant (\id{i}{A1}{0}) au premier élément de la séquence, comme décrit dans la \autoref{fig:renaming-first-id}.
+Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A1}{1}, \id{i}{A1}{2}, \id{i}{A1}{3}), comme présenté dans la \autoref{fig:renaming-second-id}.
 Comme nous assignons des identifiants consécutifs à tous les éléments de la séquence, nous pouvons au final aggréger ces éléments en un seul bloc, comme illustré en \autoref{fig:renaming-final-state}.
 Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs et de minimiser le surcoût en métadonnés de l'état résultat.
 
@@ -1158,7 +1158,7 @@ De ce fait, nous définissons l'opération \emph{rename} de la manière suivante
 \end{definition}
 
 En utilisant ces données, les autres noeuds calculent le nouvel identifiant de chaque identifiant renommé.
-Concernant les identifiants insérés de manière concurrente au renommage, nous expliquons dans \autoref{sec:ops-concurrent-to-rename} comment les noeuds peuvent les renommer de manière déterministe.
+Concernant les identifiants insérés de manière concurrente au renommage, nous expliquons dans la \autoref{sec:ops-concurrent-to-rename} comment les noeuds peuvent les renommer de manière déterministe.
 
 \subsection{Gestion des opérations concurrentes au renommage}
 
@@ -1210,7 +1210,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
 Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
-Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position désirée.
+Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position souhaitée.
 Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
 Il est donc nécessaire de traiter les opérations concurrentes aux opérations \emph{rename} de manière particulière.
 
@@ -1335,7 +1335,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 L'algorithme procède de la manière suivante.
 Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B0}{0}\id{m}{B1}{0} dans l'ancien état : \id{i}{B0}{0}\id{f}{A0}{0}.
 Ensuite, il calcule l'équivalent de \id{i}{B0}{0}\id{f}{A0}{0} dans l'état renommé : \id{i}{A1}{1}.
-Finalement, le noeud A concatène cet identifiant et l'identifiant donné pour générer l'identifiant correspondant l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}.
+Finalement, le noeud A concatène cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}.
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
 
 \textsc{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations \emph{rename} distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
@@ -1411,7 +1411,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
   \label{fig:rls-invalid-delivery-order}
 \end{figure}
 
-Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "abcd".
+Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "ABCD".
 Tout d'abord, le noeud A procède au renommage de cet état.
 Puis il insère un nouvel élément, "X", entre "B" et "C".
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
@@ -1717,7 +1717,7 @@ Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des 
 Dans cette figure, la flèche tireté rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
 
 Pour déterminer l'époque cible, les noeuds reposent sur la relation \emph{priority}.
-D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~\lepoch~\epoch{0}\epoch{A1}~\lepoch~\epoch{0}\epoch{A1}\epoch{C6}~\lepoch~\epoch{0}\epoch{B2}~\lepoch~\epoch{0}\epoch{B2}\epoch{B7}.
+D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~<~\epoch{0}\epoch{A1}~<~\epoch{0}\epoch{A1}\epoch{C6}~<~\epoch{0}\epoch{B2}~<~\epoch{0}\epoch{B2}\epoch{B7}.
 Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
 
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
@@ -1859,9 +1859,9 @@ Les objectifs de \textsc{revertRenameId} sont les suivants :
 \end{enumerate*}
 
 Le cas \ref{item:revert-rename-1} est le plus trivial.
-Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de $\trm{offset}$ de $\trm{newId}$.
+Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
 En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
-Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A1}{0} a pour $\trm{offset}$ 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B0}{0}.
+Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A1}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B0}{0}.
 
 Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
 Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
@@ -1876,7 +1876,7 @@ Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurr
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
 Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
-Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre voulu et restaurer à sa valeur initiale l'identifiant.
+Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
 Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans \autoref{fig:revertRenameId}.
 Pour cet identifiant, nous avons :
 \begin{itemize}
@@ -1897,7 +1897,7 @@ Nous avons alors :
 Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
 Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$, notés respectivement $\bot$ et $\top$.
 Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
-En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre voulu (avec $\trm{id} = \trm{predId~\bot~tail}$).
+En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bot~tail}$).
 Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mintuple}.
 
 \begin{figure}[!ht]
@@ -2098,10 +2098,10 @@ Nous obtenons donc $\trm{id} = $ \id{n}{C0}{0}$\bot$\id{i}{C2}{0}, ce qui respec
 Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[\]
-La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre voulu.
+La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre souhaité.
 Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}$ et $MAX\_TUPLE$.
-$\trm{predOfSuccId}$ est obtenu en décrémentant le dernier $\trm{offset}$ de $\trm{succId}$.
-Ainsi, pour préserver l'ordre voulu, \textsc{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\top~tail}$.
+$\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
+Ainsi, pour préserver l'ordre souhaité, \textsc{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\top~tail}$.
 
 % Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
 
@@ -2332,30 +2332,31 @@ Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autor
   \begin{algorithmic}[5]
       \Function{renRemote}{seq, epochTree, currentEpoch, renOp}
           \State opEpoch $\gets$ getEpoch(renOp)
+          \State renamedIds $\gets$ getRenamedIds(renOp)
           \State introducedEpoch $\gets$ getIntroducedpoch(renOp)
           \\
-          \State addEpoch(epochTree, introducedEpoch, opEpoch) \label{alg:renameRemote-addEpoch}
+          \State newEpochTree $\gets$ addEpoch(epochTree, introducedEpoch, opEpoch, renamedIds) \label{alg:renameRemote-addEpoch}
           \\
           \If{introducedEpoch \lepoch currentEpoch}
-            \State \Return $\langle$seq, currentEpoch$\rangle$ \label{alg:renameRemote-return-1}
+            \State \Return $\langle$seq, newEpochTree, currentEpoch$\rangle$ \label{alg:renameRemote-return-1}
           \Else
             \State idIntervals $\gets$ getIdIntervals(seq) \label{alg:renameRemote-getIdIntervals}
             \State ids $\gets$ flatMap(idIntervals, expand) \label{alg:renameRemote-getIds}
             \\
-            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(epochTree, currentEpoch, introducedEpoch) \label{alg:renameRemote-get-path}
+            \State $\langle$epochsToRevert, epochsToApply$\rangle$ $\gets$ getPathBetweenEpochs(newEpochTree, currentEpoch, introducedEpoch) \label{alg:renameRemote-get-path}
             \\
             \For{epoch in epochsToRevert} \label{alg:renameRemote-rename-1}
-              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
-              \State nId $\gets$ getNodeId(epochTree, epoch)
-              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State renamedIds $\gets$ getRenamedIds(newEpochTree, epoch)
+              \State nId $\gets$ getNodeId(newEpochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(newEpochTree, epoch)
               \State revertRenameId\textsubscript{partial} $\gets$ papply(revertRenameId, renamedIds, nId, nSeq)
               \State ids $\gets$ map(ids, revertRenameId\textsubscript{partial})
             \EndFor
             \\
             \For{epoch in epochsToApply}
-              \State renamedIds $\gets$ getRenamedIds(epochTree, epoch)
-              \State nId $\gets$ getNodeId(epochTree, epoch)
-              \State nSeq $\gets$ getNodeSeq(epochTree, epoch)
+              \State renamedIds $\gets$ getRenamedIds(newEpochTree, epoch)
+              \State nId $\gets$ getNodeId(newEpochTree, epoch)
+              \State nSeq $\gets$ getNodeSeq(newEpochTree, epoch)
               \State renameId\textsubscript{partial} $\gets$ papply(renameId, renamedIds, nId, nSeq)
               \State ids $\gets$ map(ids, renameId\textsubscript{partial})
             \EndFor \label{alg:renameRemote-rename-2}
@@ -2367,7 +2368,7 @@ Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autor
             \State blocks $\gets$ generateBlocks(newIdIntervals, content)
             \State newSeq $\gets$ \new~LogootSplit(nId, nSeq, blocks) \label{alg:renameRemote-newSeq}
             \\
-            \State \Return $\langle$newSeq, introducedEpoch$\rangle$ \label{alg:renameRemote-return-2}
+            \State \Return $\langle$newSeq, newEpochTree, introducedEpoch$\rangle$ \label{alg:renameRemote-return-2}
         \EndIf
       \EndFunction
   \end{algorithmic}
@@ -2499,7 +2500,7 @@ Tout d'abord, le noeud A ajoute l'époque \epoch{B2} et les métadonnées associ
 
 Le noeud compare ensuite l'époque introduite (\epoch{B2}) à son époque courante (\epoch{A2}) en utilisant la relation \lepoch.
 Si l'époque introduite était plus petite que l'époque courante, aucun traitement supplémentaire ne serait nécessaire.
-\textsc{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées (ligne \ref{alg:renameRemote-return-1}).
+\textsc{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées, et le nouvel \emph{arbre des époques} (ligne \ref{alg:renameRemote-return-1}).
 
 Dans le cas présent, on a \epoch{A2} \lepoch \epoch{B2}.
 \epoch{B2} devient donc la nouvelle époque courante.
@@ -2512,7 +2513,7 @@ Le noeud obtient alors la liste des identifiants courant, à la nouvelle époque
 Il ne lui reste plus qu'à construire une nouvelle séquence à partir de ces identifiants.
 Pour cela, le noeud regénère des blocs à partir des intervalles d'identifiants obtenus et du contenu de la séquence courante.
 Le noeud utilise ensuite ces données pour instancier une nouvelle séquence équivalente à l'époque cible (ligne \ref{alg:renameRemote-newSeq}).
-Finalement, \textsc{renRemote} renvoie cette nouvelle séquence ainsi que la nouvelle époque courante.
+Finalement, \textsc{renRemote} renvoie cette nouvelle séquence, la nouvelle époque courante ainsi que le nouvel \emph{arbre des époques}.
 
 \subsection{Règles de récupération de la mémoire des états précédents}
 
@@ -2538,7 +2539,7 @@ Nous appelons \emph{époques requises} l'ensemble des époques correspondant.
 
 \begin{definition}[Époques requises]
   L'ensemble des époques qu'un noeud doit conserver pour traiter les potentielles prochaines opérations.
-  Il s'agit de l'ensemble des époques qui forment les chemins entre chaque époque appartenant à l'ensemble des \emph{potentielles époques courantes} et leur \ac{LCA}.
+  Il s'agit de l'ensemble des époques qui forment les chemins entre chaque époque appartenant à l'ensemble des \emph{potentielles époques courantes} et leur \acf{LCA}.
 \end{definition}
 
 Il s'ensuit que toute époque qui n'appartient pas à l'ensemble des \emph{époques requises} peut être retirée par les noeuds.
@@ -2701,11 +2702,11 @@ Finalement, nous considérons que nous utilisons comme structures de données un
 Pour chaque opération, nous distinguons deux complexités : une complexité pour l'intégration de l'opération locale, une pour l'intégration de l'opération distante.
 
 La complexité de l'intégration de l'opération \emph{insert} locale est inchangée par rapport à celle obtenue pour LogootSplit.
-Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre voulu puis à insérer le bloc dans l'arbre AVL.
+Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre souhaité puis à insérer le bloc dans l'arbre AVL.
 D'après \textcite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.
 
 La complexité de l'intégration de l'opération \emph{insert} distante, elle, évolue par rapport à celle définie pour LogootSplit.
-Comme indiqué dans \autoref{sec:integration-process-insert-remove-op}, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
+Comme indiqué dans la \autoref{sec:integration-process-insert-remove-op}, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
 
 Tout d'abord, il est nécessaire d'identifier l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante.
 L'algorithme correspondant consiste à déterminer la première intersection entre deux branches de l'\emph{arbre des époques}.
@@ -2746,7 +2747,7 @@ L'opération \emph{rename} locale se décompose en 2 étapes :
   \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op})
   \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
 \end{enumerate*}
-La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les \texttt{IdInterval}.
+La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les intervalles d'identifiants.
 Elle s'effectue donc en \bigO{b}.
 La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
 Cette seconde étape s'effectue en \bigO{1}.
@@ -2770,7 +2771,7 @@ Ces étapes s'effectuent donc en \bigO{n(k + l \cdot \log{}n + \log{}b)}.
 Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération \emph{rename} distante.
 
 Nous pouvons néanmoins améliorer ce premier résultat.
-Notamment, nous pouvons tirer parti des faits suivantes :
+Notamment, nous pouvons tirer parti des faits suivants :
 \begin{enumerate*}[label=(\roman*)]
   \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe
   \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
@@ -2973,7 +2974,7 @@ Ce résultat s'explique par le fait que le mécanisme de renommage permet aux no
 
 Pour récapituler les résultats présentés, le mécanisme de renommage introduit un surcoût temporaire en métadonnées qui augmente avec chaque opération \emph{rename}.
 Mais ce surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations \emph{rename} deviennent causalement stables.
-Dans la section \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer l'impact du surcoût temporaire en métadonnées.
+Dans la \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer l'impact du surcoût temporaire en métadonnées.
 
 \subsubsection{Temps d'intégration des opérations standards}
 
@@ -3074,7 +3075,7 @@ Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integrati
 \end{table}
 
 Le principal résultat de ces mesures est que les opérations \emph{rename} sont particulièrement coûteuses quand comparées aux autres types d'opérations.
-Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse ~40k éléments.
+Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse 40k éléments.
 Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
 Il est donc nécessaire de prendre en compte ce résultat et de
 \begin{enumerate*}[label=(\roman*)]
@@ -3127,7 +3128,7 @@ Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-freq
   \resizebox{\linewidth}{!}{
     \begin{tabular}{llrrrrrrrrrr}
       \toprule
-      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration ($\trm{\mu}$s)}  & \multicolumn{5}{c}{Taille (B)} \\
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration ($\trm{\mu}$s)}  & \multicolumn{5}{c}{Taille (o)} \\
       \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
       Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
       \midrule
@@ -3138,7 +3139,7 @@ Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-freq
       & RLS - 30k &  247 &    181 &   39 &       97.9 &         308 &    434 &    412 &   0 &        320 &         900 \\
       & RLS - 7.5k &  296 &    151 & 34.8 &       74.9 &         214 &    401 &    412 &   0 &        320 &         596 \\
       \midrule
-      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)}  & \multicolumn{5}{c}{Taille (KB)} \\
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)}  & \multicolumn{5}{c}{Taille (Ko)} \\
       \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
       Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
       \midrule
@@ -3180,7 +3181,7 @@ Il n'existe cependant pas de solution universelle, chaque système ayant ses par
 
 Plusieurs aspects doivent être pris en compte lors de la définition de la stratégie de génération des opérations \emph{rename}.
 Le premier porte sur la taille de la structure de données.
-Comme illustré dans la figure \autoref{fig:evolution-document-size}, les métadonnées augmentent de manière progressive jusqu'à représenter 99\% de la structure de données.
+Comme illustré dans la \autoref{fig:evolution-document-size}, les métadonnées augmentent de manière progressive jusqu'à représenter 99\% de la structure de données.
 En utilisant les opérations \emph{rename}, les noeuds peuvent supprimer les métadonnées et ainsi réduire la taille de la structure à un niveau acceptable.
 Pour déterminer quand générer des opérations \emph{rename}, les noeuds peuvent donc monitorer le nombre d'opérations effectuées depuis la dernière opération \emph{rename}, le nombre de blocs qui composent la séquence ou encore la taille des identifiants.
 
@@ -3356,7 +3357,7 @@ Une solution alternative est de proposer une implémentation du mécanisme de re
 
 \label{sec:report-transition-to-target-epoch}
 
-Comme illustré par \autoref{tab:evolution-integration-time-rename}, intégrer des opérations \emph{rename} distantes est généralement coûteux.
+Comme illustré par le \autoref{tab:evolution-integration-time-rename}, intégrer des opérations \emph{rename} distantes est généralement coûteux.
 Ce traitement peut générer un surcoût computationnel significatif en cas de multiples opérations \emph{rename} concurrentes.
 En particulier, un noeud peut recevoir et intégrer les opérations \emph{rename} concurrentes dans l'ordre inverse défini par la relation \emph{priority} sur leur époques.
 Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.
@@ -3370,7 +3371,7 @@ Ces stratégies peuvent reposer sur une variété de métriques pour produire le
 
 Durant cette période d'incertitude introduite par le report, les noeuds peuvent recevoir des opérations provenant d'époques différentes, notamment de l'époque cible.
 Néanmoins, les noeuds peuvent toujours intégrer les opérations \emph{insert} et \emph{remove} en utilisant \textsc{renameId} et \textsc{revertRenameId} au prix d'un surcoût computationnel pour chaque identifiant.
-Cependant, ce coût est négligeable (plusieurs centaines de microsecondes par identifiant d'après \autoref{fig:evolution-integration-time-remote-insert}) comparé au coût de renommer, de manière inutile, complètement l'état (plusieurs centaines de milliseconds à des secondes complètes d'après \autoref{tab:evolution-integration-time-rename}).
+Cependant, ce coût est négligeable (plusieurs centaines de microsecondes par identifiant d'après la \autoref{fig:evolution-integration-time-remote-insert}) comparé au coût de renommer, de manière inutile, complètement l'état (plusieurs centaines de milliseconds à des secondes complètes d'après le \autoref{tab:evolution-integration-time-rename}).
 
 Notons que ce mécanisme nécessite que \textsc{renameId} et \textsc{revertRenameId} soient des fonctions réciproques.
 En effet, au cours de la période d'incertitude, un noeud peut avoir à utiliser \textsc{revertRenameId} pour intégrer les identifiants d'opérations \emph{insert} distantes provenant de l'époque cible.
@@ -3406,7 +3407,7 @@ En réponse à une demande de synchronisation d'un nouveau pair, un pair peut do
   \item les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
 \end{enumerate*}
 
-Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (\autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
+Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (cf. \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
 En effet, les données incluses (\emph{ancien état} au moment du renommage, identifiant du noeud auteur de l'opération \emph{rename} et son numéro de séquence au moment de la génération) nous permettent seulement de recréer la structure de la séquence après le renommage.
 Mais le contenu de la séquence est omis, celui-ci n'étant jusqu'ici d'aucune utilité pour l'opération \emph{rename}.
 Afin de pouvoir utiliser l'opération \emph{rename} comme état initial, il est nécessaire d'y inclure cette information.
@@ -3443,7 +3444,7 @@ Nous présentons les avantages et inconvénients de cette approche dans la sous-
 
 \subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le log d'opérations}
 
-Nous avons décrit précédemment dans \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
+Nous avons décrit précédemment dans la \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
 \begin{enumerate*}[label=(\roman*)]
   \item identifier le chemin entre l'époque courante et l'époque cible
@@ -3471,15 +3472,15 @@ Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
 
 Cet algorithme est équivalent à ré-ordonner le log des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
 
-Cette approche présente plusieurs avantages par rapport à l'implémentation décrite dans \autoref{sec:integration-process-rename-op}.
+Cette approche présente plusieurs avantages par rapport à l'implémentation décrite dans la \autoref{sec:integration-process-rename-op}.
 Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
-La version décrite dans \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si on dispose de \textsc{renameBlock}) de l'état courant.
+La version décrite dans la \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si on dispose de \textsc{renameBlock}) de l'état courant.
 La version présentée ici effectue une transformation pour chaque opération du log concurrente à l'opération \emph{rename} à intégrer.
 Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
 
 Un autre avantage de cette approche est qu'elle permet de récupérer et de réutiliser les identifiants originaux des opérations.
 Lorsqu'une suite de transformations est appliquée sur les identifiants d'une opération, elle est appliquée sur les identifiants originaux et non plus sur leur équivalents présents dans l'état courant.
-Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération \emph{rename} sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération \emph{rename}.
+Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans la \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération \emph{rename} sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération \emph{rename}.
 Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \textsc{renameId} et \textsc{revertRenameId}.
 
 Cette implémentation dispose néanmoins de plusieurs limites.
@@ -3601,7 +3602,7 @@ En pratique, il serait intéressant d'étudier la mise en place d'un mécanisme 
 La seconde limitation de RenamableLogootSplit concerne la génération d'opérations \emph{rename} concurrentes.
 Chaque opération \emph{rename} est coûteuse, aussi bien en terme de métadonnées à stocker et diffuser qu'en terme de traitements à effectuer.
 Il est donc important de chercher à minimiser le nombre d'opérations \emph{rename} concurrentes émises par les noeuds.
-Une approche possible est d'adopter une architecture à la Core et Nebula \cite{zawirski:hal-01248197}.
+Une approche possible est d'adopter une architecture du type \emph{core-nebula}\cite{zawirski:hal-01248197}.
 Mais pour les systèmes incompatibles avec ce type d'architecture système, il serait intéressant de proposer d'autres approches ne nécessitant aucune coordination entre les noeuds.
 Mais par définition, ces approches ne pourraient offrir de garanties fortes sur le nombre d'opérations concurrentes possibles.
 
