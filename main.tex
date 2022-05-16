@@ -3795,9 +3795,9 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.
               (b-b1) -- (b-end);
 
             \draw[dashed, ->, thick, shorten >= 3]
-              (a-a6) edge (b-a6-1)
-              (a-a6) edge (b-a6-2)
-              (b-b1) edge (a-b1);
+              (a-a6.east) edge (b-a6-1.west)
+              (a-a6.east) edge (b-a6-2.west)
+              (b-b1.east) edge (a-b1.west);
         \end{tikzpicture}
         \label{fig:exactly-once-delivery-sync}
       }
@@ -3839,6 +3839,136 @@ Au lieu d'enregistrer seulement le dernier dot observé par noeud, cette structu
 Ceci permet une livraison \emph{out of order} des opérations tout en garantissant une livraison \emph{exactly-once} et en compactant efficacement les données stockées par le module \texttt{Sync} à terme.
 
 \subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+
+\begin{figure}[!ht]
+  \subfloat[Exécution avec livraison dans le désordre d'une insertion et de sa suppression]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+                  to ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+                  to ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2A-right) {GNON}
+                  to ++(0:19 * \widthletter) node (A-end) {};
+
+
+              \path
+                  to ++(270:4) node {\textbf{B}}
+                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+                  to ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+                  to ++(0:29 * \widthletter) node (B-end) {};
+
+              \path
+                  to ++(270:8) node {\textbf{C}}
+                  to ++(0:\widthletter) node[epoch] {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
+                  to ++(0:30 * \widthletter) node[point] (S1C) {}
+                  to ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
+                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2C-right) {GNON}
+                  to ++(0:5 * \widthletter) node[epoch] (S3C-left) {\epoch{0}}
+                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S3C-right) {GNON}
+                  to ++(0:2 * \widthblock) node (C-end) {};
+
+              \draw[->, thick]
+                (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+                (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+
+              \draw[dotted]
+                (S1A-right) -- (S2A-left)
+                (S2A-right) -- (A-end)
+                (S0B) -- (S1B-left)
+                (S2B-right) -- (B-end)
+                (S0C) -- (S1C)
+                (S1C) -- (S2C-left)
+                (S2C-right) -- (S3C-left)
+                (S3C-right) -- (C-end);
+
+              \draw[dashed, ->, thick, shorten >= 3]
+                (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+                (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
+                (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
+                (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
+
+              \draw[->, dashed, thick, shorten >= 3] (S1C.east) edge[bend left] (S3C-left.west);
+            \end{tikzpicture}
+            \label{fig:causal-remove-delivery-rls}
+          }
+          \end{minipage}
+        }
+        \hfil
+  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:causal-remove-delivery-rls}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                to ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                to ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                to ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
+                to ++(0:11) node (a-end) {};
+
+
+            \path
+                to ++(270:3) node {\textbf{B}}
+                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6) {}
+                to ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                to ++(0:14) node (b-end) {};
+
+            \path
+                to ++(270:6) node {\textbf{C}}
+                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (c-start) {}
+                to ++(0:10) node[point, label=below:{$\langle A:5 \rangle$}, label=above:{\emph{postpone}}] (c-b1-postpone) {}
+                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (c-a6) {}
+                to ++ (0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{deliver}}] (c-b1-deliver) {}
+                to ++(0:1) node (c-end) {};
+
+            \draw[->, thick]
+              (a-start) edge (a-a6)
+              (b-a6-1) edge (b-b1);
+
+            \draw[dotted]
+              (a-a6) -- (a-b1) -- (a-end)
+              (b-start) -- (b-a6)
+              (b-b1) -- (b-end)
+              (c-start) -- (c-b1-postpone)
+              (c-b1-postpone) -- (c-a6)
+              (c-a6) -- (c-b1-deliver)
+              (c-b1-deliver) -- (c-end);
+
+            \draw[dashed, ->, thick, shorten >= 3]
+              (a-a6.east) edge (b-a6.west)
+              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (a-b1.west)
+              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (c-b1-postpone.west)
+              (a-a6.east) edge (c-a6.west);
+
+            \draw[->, dashed, thick, shorten >= 3] (c-b1-postpone.east) edge[bend left] (c-b1-deliver.west);
+        \end{tikzpicture}
+        \label{fig:causal-remove-sync}
+      }
+      \end{minipage}
+    }
+  \caption{Gestion de la livraison \emph{causale-remove} des opérations}
+  \label{fig:causal-remove-delivery}
+\end{figure}
 
 \begin{itemize}
   \item Pour livrer une opération \emph{remove} après opérations \emph{insert} correspondantes
