@@ -213,7 +213,12 @@
       \hbox{}\hbox to0pt{\includegraphics[scale=.2]{tulloria}\hss}\vss}%
                     }
 \newcommand\ULLogo{%
-    \vtop to0pt{\hbox{}\hbox to0pt{\includegraphics[scale=1]{tulul}\hss}\vss}%
+    \vtop to0pt{\hbox{}
+    \hbox to0pt{
+      \includegraphics[scale=1]{tulul}
+      \hss
+   }
+    \vss}%
                     }
 \newif\if@logos@
 \newif\if@logo@ul@
