@@ -173,6 +173,7 @@
 \acrodefplural{ADT}[ADTs]{Abstract Data Types}
 \acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
 \acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
+\acrodef{FIFO}[FIFO]{First In, First Out}
 \acrodef{JIT}[JIT]{Just-In-Time}
 \acrodef{LCA}[PPAC]{Plus Petit Ancêtre Commun}
 \acrodef{OT}[OT]{Operational Transformation}
@@ -592,6 +593,7 @@ Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'
 \textcite{2013-logootsplit} définissent une séquence LogootSplit de la manière suivante :
 
 \begin{definition}[Séquence LogootSplit]
+  \label{def:logootsplit}
   Une séquence \emph{Séquence LogootSplit} est un triplet $\langle$nodeId, nodeSeq, blocks$\rangle$ où
   \begin{itemize}
     \item nodeId est l'identifiant du noeud.
@@ -1438,6 +1440,7 @@ Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-i
 Nous obtenons donc le modèle de livraison suivant :
 
 \begin{definition}[Exactly-once + Causal remove + Epoch-based]
+  \label{def:rls-delivery-model}
   Le modèle de livraison \emph{Exactly-once + Causal remove + Epoch-based} définit les 4 règles suivantes sur la livraison des opérations :
   \begin{enumerate}
     \item Une opération doit être délivrée à l'ensemble des noeuds à terme,
@@ -3609,7 +3612,7 @@ Mais par définition, ces approches ne pourraient offrir de garanties fortes sur
 % \include{assets/chapter_application_HAL}
 
 \NumberThisInToc
-\chapter{MUTE, un éditeur web collaboratif P2P temps réel}
+\chapter{MUTE, un éditeur de texte web collaboratif P2P temps réel chiffré de bout en bout}
 \minitoc
 \section{Présentation}
 
@@ -3678,9 +3681,35 @@ Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à 
 
 Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
 Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
-Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{sec:logootsplit-delivery-model} et la \autoref{sec:renamablelogootsplit-delivery-model}.
+Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{def:ls-delivery-model} et dans la \autoref{def:rls-delivery-model}.
 
 \subsubsection{Livraison des opérations en exactement un exemplaire}
+
+Afin de respecter la contrainte de \emph{exactly-once delivery}, il est nécessaire d'identifier de manière unique chaque opération.
+Pour cela, le module \texttt{Sync} ajoute un \emph{Dot} à chaque opération :
+
+\begin{definition}[Dot]
+  Un \emph{Dot} est une paire $\langle$nodeId, nodeSyncSeq$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant unique du noeud qui a généré l'opération.
+    \item nodeSyncSeq est le numéro de séquence courant du noeud à la génération de l'opération.
+  \end{itemize}
+\end{definition}
+
+Il est à noter que \emph{nodeSyncSeq} est différent du \emph{nodeSeq} utilisé dans LogootSplit et RenamableLogootSplit (cf. \autoref{def:logootsplit}).
+En effet, \emph{nodeSyncSeq} se doit d'augmenter à chaque opération tandis que \emph{nodeSeq} n'augmente qu'à la création d'un nouveau bloc.
+Les contraintes étant différentes, il est nécessaire de distinguer ces deux données.
+
+Chaque noeud maintient une structure de données représentant l'ensemble des opérations reçues par le pair.
+Elle permet de vérifier à la réception d'une opération si le dot de cette dernière est déjà connu.
+S'il s'agit d'un nouveau dot, le module \texttt{Sync} peut délivrer l'opération au \ac{CRDT} et ajouter son dot à la structure.
+Le cas échéant, cela indique que l'opération a déjà été délivrée précédemment et doit être ignorée cette fois-ci.
+
+Plusieurs structures de données sont adaptées pour maintenir l'ensemble des opérations reçues.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un vecteur de versions.
+Cette structure nous permet de réduire à un dot par noeud le surcoût en métadonnées du module \texttt{Sync}, puisqu'il ne nécessite que de stocker le dot le plus récent par noeud.
+Cette structure permet aussi de vérifier en temps constant si une opération est déjà connue.
+La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.
 
 \begin{figure}[!ht]
   \subfloat[Exécution avec livraison multiple d'une opération \emph{insert}]{
@@ -3742,32 +3771,32 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
         \begin{tikzpicture}
             \path
                 node {\textbf{A}}
-                to ++(0:1) node[point, label=above:{<A:1>}] (a-start) {}
-                to ++(0:2) node[draw, circle, label=above:{<A:2>}] (a-a2) {a2}
-                to ++(0:8) node[point, label=above:{<A:2, B:1>}, label=below:{\emph{deliver}}] (a-b1) {}
+                to ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                to ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                to ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
                 to ++(0:3) node (a-end) {};
 
 
             \path
                 to ++(270:3) node {\textbf{B}}
-                to ++(0:1) node[point, label=below:{<A:1>}] (b-start) {}
-                to ++(0:5) node[point, label=below:{<A:2>}, label=above:{\emph{deliver}}] (b-a2-1) {}
-                to ++(0:2) node[draw, circle, label=below:{<A:2, B:1>}] (b-b1) {b1}
-                to ++(0:5) node[point, label=below:{<A:2, B:1>}, label=above:{\emph{discard}}] (b-a2-2) {}
+                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6-1) {}
+                to ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                to ++(0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{discard}}] (b-a6-2) {}
                 to ++(0:1) node (b-end) {};
 
             \draw[->, thick]
-              (a-start) edge (a-a2)
-              (b-a2-1) edge (b-b1);
+              (a-start) edge (a-a6)
+              (b-a6-1) edge (b-b1);
 
             \draw[dotted]
-              (a-a2) -- (a-b1) -- (a-end)
-              (b-start) -- (b-a2-1)
+              (a-a6) -- (a-b1) -- (a-end)
+              (b-start) -- (b-a6-1)
               (b-b1) -- (b-end);
 
             \draw[dashed, ->, thick, shorten >= 3]
-              (a-a2) edge (b-a2-1)
-              (a-a2) edge (b-a2-2)
+              (a-a6) edge (b-a6-1)
+              (a-a6) edge (b-a6-2)
               (b-b1) edge (a-b1);
         \end{tikzpicture}
         \label{fig:exactly-once-delivery-sync}
@@ -3778,33 +3807,36 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
   \label{fig:exactly-once-delivery}
 \end{figure}
 
-\begin{itemize}
-  \item Afin de respecter l'exactly-once delivery, doit identifier de manière unique chaque opération
-  \item Pour cela, ajoute un dot à chaque opération
-  \item dot est formé de l'identifiant du pair et d'un numéro séquentiel
-  \begin{itemize}
-    \item numéro séquentiel différent de celui-ci utilisé par le CRDT, puisque celui doit augmenter avec chaque opération
-  \end{itemize}
-  \item doit alors maintenir une structure de données représentant l'ensemble des opérations reçues par le pair
-  \item à la réception d'une opération, vérifie si son dot est présent dans cette structure
-  \item si absent, peut délivrer l'opération
-  \item sinon, opération déjà délivrée précédemment, peut l'ignorer sans risque
-  \item pour maintenir l'ensemble des opérations reçues, plusieurs structures de données adaptées
-  \item dans le cadre de MUTE, avons fait le choix d'utiliser un version vector
-  \item nous permet de réduire à un dot par pair le surcoût en métadonnées du mécanisme
-  \begin{itemize}
-    \item maintient seulement le dot le plus récent
-  \end{itemize}
-  \item à la réception d'une opération, vérifie qu'il s'agit de la prochaine opération attendue, \ie que son le numéro séquentiel de son dot est le successeur du dernier dot enregistré pour ce pair
-  \item si c'est le cas, délivre l'opération et met à jour l'entrée du pair dans le version vector avec ce nouveau numéro séquentiel
-  \item si le dot est un dot futur, met en attente l'opération en attendant d'avoir reçu et délivré les opérations manquantes de ce pair
-  \item sinon, si dot est déjà présent dans le version vector, ignore l'opération
-  \item ce fonctionnement se traduit dans les faits par une livraison FIFO des opérations par noeud
-  \item ajoute une contrainte non-nécessaire qui peut introduire des délais dans livraison des opérations si perd juste une opération d'un noeud
-  \item nous paraît un compromis acceptable entre le surcoût du mécanisme de livraison et son impact sur l'expérience utilisateur
-  \item une extension possible serait de remplacer cette structure par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}, qui rend possible la livraison dans le désordre
-  \item permettrait de supprimer la contrainte de livraison FIFO tout en permettant de compacter efficacement la représentation des opérations reçues par le noeud à terme
-\end{itemize}
+Dans cet exemple, qui reprend celui de la \autoref{fig:why-exactly-once-delivery}, deux noeuds A et B répliquent une séquence.
+Initialement, celle-ci contient les éléments "OGNON".
+Ces éléments ont été insérés un par un par le noeud A, donc par le biais des opérations \emph{a1} à \emph{a5}.
+Le module \texttt{Sync} de chaque noeud maintient donc initialement le vecteur de version $\langle A:5 \rangle$.
+
+Le noeud A insère l'élément "I" entre les éléments "O" et "G".
+Cette modification est alors labellée \emph{a6} par son module \texttt{Sync} et est envoyée au noeud B.
+À la réception de cette opération, le module \texttt{Sync} de B compare son dot avec son vecteur de version local.
+L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors délivrée au \ac{CRDT} et le vecteur de version est mis à jour.
+
+Le noeud B supprime ensuite l'élément nouvellement insérée.
+S'agissant de la première modification de B, cette modification \emph{b1} ajoute l'entrée correspondante dans le vecteur de version $\langle A:6, B:1 \rangle$.
+L'opération est envoyée au noeud A.
+Cette opération étant la prochaine opération attendue de B, elle est acceptée et délivrée.
+
+Finalement, le noeud B reçoit de nouveau l'opération \emph{a6}.
+Son module \texttt{Sync} détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:6, B:1 \rangle$.
+L'opération est donc ignorée, et la résurgence de l'élément "I" illustrée dans la \autoref{fig:why-exactly-once-delivery} est évitée.
+
+Il est à noter que dans le cas où un noeud reçoit une opération avec un dot plus élevé que celui attendu (\eg le noeud A reçoit une opération \emph{b3} à la fin de l'exemple), cette opération est mise en attente.
+En effet, délivrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
+L'opération \emph{b3} serait donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
+
+Ainsi, l'implémentation de livraison \emph{exactly-once} avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
+Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
+Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme de livraison \emph{exactly-once} et son impact sur l'expérience utilisateur.
+
+Pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
+Au lieu d'enregistrer seulement le dernier dot observé par noeud, cette structure de données enregistre les intervalles de dots observés.
+Ceci permet une livraison \emph{out of order} des opérations tout en garantissant une livraison \emph{exactly-once} et en compactant efficacement les données stockées par le module \texttt{Sync} à terme.
 
 \subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
 
