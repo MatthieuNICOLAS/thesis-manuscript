@@ -3840,6 +3840,20 @@ Ceci permet une livraison \emph{out of order} des opérations tout en garantissa
 
 \subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
 
+La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération \emph{remove} doit être délivrée après les opérations \emph{insert} insérant les éléments concernés.
+
+Pour cela, le module \texttt{Sync} ajoute un ensemble \emph{Deps} à chaque opération \emph{remove} avant de la diffuser :
+
+\begin{definition}[Deps]
+  \emph{Deps} est un ensemble d'opérations.
+  Il représente l'ensemble des opérations dont dépend l'opération \emph{remove} et qui doivent donc être livrées au préalable.
+\end{definition}
+
+Plusieurs structures de données sont adaptées pour représenter les dépendances de l'opération \emph{remove}.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un ensemble de dots : pour chaque élément supprimé par l'opération \emph{remove}, nous identifions le noeud l'ayant inséré et nous ajoutons le dot correspondant à l'opération la plus récente de ce noeud à l'ensemble des dépendances.
+Cette approche nous permet de limiter à un dot par élément supprimé le surcoût en métadonnées des dépendances et de les calculer en un temps linéaire par rapport au nombre d'éléments supprimés.
+Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emph{remove} à l'aide de la \autoref{fig:causal-remove-delivery}.
+
 \begin{figure}[!ht]
   \subfloat[Exécution avec livraison dans le désordre d'une insertion et de sa suppression]{
       \begin{minipage}{\linewidth}
@@ -3970,25 +3984,35 @@ Ceci permet une livraison \emph{out of order} des opérations tout en garantissa
   \label{fig:causal-remove-delivery}
 \end{figure}
 
-\begin{itemize}
-  \item Pour livrer une opération \emph{remove} après opérations \emph{insert} correspondantes
-  \begin{itemize}
-    \item besoin d'identifier les opérations \emph{insert} concernées
-    \item de les ajouter en dépendances de l'opération \emph{remove}
-    \item pour cela, ajoute leur dot à l'opération
-    \item à la livraison de l'opération, vérifie que les dots des opérations \emph{insert} concernées sont présents dans version vector en plus de vérifier le dot de l'opération \emph{remove} elle-même
-    \item si un dot est manquant, met l'opération en attente
-  \end{itemize}
-  \item Pour identifier opérations \emph{insert} correspondantes, plusieurs façons de procéder
-  \item manière la plus précise est de parcourir le log des opérations à la recherche des opérations \emph{insert} ajoutant les identifiants supprimés
-  \item mais s'avère coûteux
-  \item et incompatible avec un mécanisme tronquant le log des opérations en utilisant la stabilité
-  \item dans MUTE, nous préférons ajouter le dot le plus récent du noeud auteur de l'identifiant supprimé comme dépendance de l'opération
-  \item nous permet de réduire le surcoût computationnel du calcul des dépendances d'une opération \emph{remove}
-  \item en contrepartie, il s'agit de dépendances approximatives
-  \item retarde probablement la livraison de l'opération par rapport aux dépendances véritables
-  \item mais là aussi, nous paraît un compromis acceptable entre surcoût du mécanisme de livraison et expérience utilisateur
-\end{itemize}
+Cet exemple reprend et complète celui de la \autoref{fig:causal-remove-delivery}.
+Trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Les trois noeuds partagent le même état initial : une séquence contenant les éléments "OGNON" et un vecteur de version $\langle A:5 \rangle$.
+
+Le noeud A insère l'élément "I" entre les éléments "O" et "G".
+Cet élément se voit attribué l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
+L'opération correspondante \emph{a6} est diffusée aux autres noeuds.
+
+À la réception de cette dernière, le noeud B supprime l'élément "I" nouvellement inséré et génère l'opération \emph{b1} correspondante.
+Comme indiqué précédemment, l'opération \emph{b1} étant une opération \emph{remove}, le module \texttt{Sync} calcule ses dépendances avant de la diffuser.
+Pour chaque élément supprimé ("I"), \texttt{Sync} récupère l'identifiant de l'élément (\id{p}{A0}{0}\id{m}{A1}{0}) et en extrait l'identifiant du noeud qui l'a inséré (A).
+\texttt{Sync} ajoute alors le dot de l'opération la plus récente reçue de ce noeud ($\langle A:6 \rangle$) à l'ensemble des dépendances de l'opération.
+L'opération est ensuite diffusée.
+
+À la réception de l'opération \emph{b1}, le noeud A vérifie s'il possède l'ensemble des dépendances de l'opération.
+Le noeud A ayant déjà observé l'opération \emph{a6}, le module \texttt{Sync} délivre l'opération \emph{b1} au \ac{CRDT}.
+
+À l'inverse, lorsque le noeud C reçoit l'opération \emph{b1}, il n'a pas encore reçu l'opération \emph{a6}.
+L'opération \emph{b1} est alors mise en attente.
+À la réception de l'opération \emph{a6}, celle-ci est délivrée.
+Le module \texttt{Sync} ré-évalue alors le cas de l'opération \emph{b1} et détermine qu'elle peut à présent être délivrée.
+
+Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
+En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
+Nous n'ajoutons pas les dots des opérations qui ont spécifiquement insérés les éléments supprimés.
+Pour cela, il serait nécessaire de parcourir le log des opérations à la recherche des opérations \emph{insert} correspondante.
+Cette méthode serait plus coûteuse, sa complexité dépendant du nombre d'opérations dans le log d'opérations, et incompatible avec un mécanisme tronquant le log des opérations en utilisant la stabilité causale.
+Notre approche introduit un potentiel délai dans la livraison d'une opération \emph{remove} par rapport à une livraison utilisant ses dépendances exactes, puisqu'elle va reposer sur des opérations plus récentes et potentiellement encore inconnues par le noeud.
+Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le surcoût du mécanisme de livraison et l'expérience utilisateur.
 
 \subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
 
