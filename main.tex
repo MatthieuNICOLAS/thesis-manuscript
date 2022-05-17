@@ -4016,6 +4016,19 @@ Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le sur
 
 \subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
 
+La dernière contrainte spécifiée par le modèle de livraison qu'une opération doit être délivrée après l'opération \emph{rename} qui a introduite son époque de génération.
+
+Pour cela, le module \texttt{Sync} doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
+Cependant, dans notre implémentation, le module \texttt{Sync} et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.
+
+Pour remédier à ce problème, le module \texttt{Sync} maintient une structure supplémentaire : un vecteur des dots des opérations \emph{rename} connues.
+À la réception d'une opération \emph{rename} distante, l'entrée correspondante de son auteur est mise à jour avec le dot de la nouvelle époque introduite.
+À la génération d'une opération locale, l'opération est examinée pour récupérer son époque de génération.
+\texttt{Sync} conserve alors seulement l'entrée correspondante dans le vecteur des dots des opérations \emph{rename}.
+À ce stade, le contenu du vecteur est ajouté en tant que dépendance de l'opération.
+Ensuite, si l'opération locale s'avère être une opération \emph{rename}, le vecteur est modifié pour ne conserver que le dot de l'époque introduite par l'opération.
+La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.
+
 \begin{figure}[!ht]
   \subfloat[Exécution]{
       \begin{minipage}{\linewidth}
@@ -4100,18 +4113,18 @@ Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le sur
               ++(0:3) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a7) {}
               ++(0:3) node[op, label=below:{$\langle B:3 \rangle$}] (c1) {c1};
 
-          \draw[thick] (c0) -- (c-receives-b3) -- (c-receives-a1) edge (c-receives-a7) -- (c1) -- (c-end);
+          \draw[thick] (c0) -- (c-receives-b3) -- (c-receives-a1) -- (c-receives-a7) -- (c1) -- (c-end);
 
           \draw[->, dashed, shorten >= 1]
             (a1.east) edge (c-receives-a1.west)
-            (a7.east) edge (c-receives-a7.west)
+            (a7.east) edge node[near end, above right] {$\{\trm{deps}: \{\langle A:1 \rangle\}\}$} (c-receives-a7.west)
             (b3.east) edge (a-receives-b3.west)
             (b3.east) edge (c-receives-b3.west)
-            (c1.east) edge (a-receives-c1-postpone.west);
+            (c1.east) edge node[near start, right] {$\{\trm{deps}: \{\langle B:3 \rangle\}\}$} (a-receives-c1-postpone.west);
 
           \draw[->, dashed, thick, shorten >= 3] (a-receives-c1-postpone.east) edge[bend right] (a-receives-c1-deliver.west);
         \end{tikzpicture}
-        \label{fig:epoch-based-sync}
+        \label{fig:epoch-based-delivery-sync}
       }
       \end{minipage}
     }
@@ -4119,31 +4132,44 @@ Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le sur
   \label{fig:epoch-based-delivery}
 \end{figure}
 
-\begin{itemize}
-  \item Afin de livrer les opérations après l'opération \emph{rename} qui introduit leur époque
-  \begin{itemize}
-    \item besoin d'ajouter son dot en dépendance des opérations
-    \item pour cela, nécessaire de garder le dot l'opération \emph{rename} qui a introduit l'époque courante et de l'ajouter à chaque nouvelle opé
-    \item mais historiquement, \texttt{DocService} et \texttt{Sync} complètement séparés
-    \item \texttt{Sync} n'a pas moyen d'interroger \texttt{DocService} pour récupérer l'époque courante
-    \item a dû donc trouver une alternative
-    \item a implémenté la solution suivante
-    \item maintient un vecteur de dots des dernières opérations \emph{rename}
-    \item ajoute le contexte causale d'une opération \emph{rename} en tant que dépendances
-    \item lors de la livraison d'une opération \emph{rename}, utilise ce contexte causale pour retirer du vecteur de dots des opés \emph{rename} les dots qui sont couverts par l'opération
-    \item puis ajoute le dot de la nouvelle opé \emph{rename}
-    \item lors de l'émission d'une opération \emph{insert} ou \emph{remove}, ajoute en dépendances les dots du vecteur d'opérations \emph{rename}
-  \end{itemize}
-  \item Garantit ainsi livraison \emph{epoch-based} des opérations, sans reposer sur \lepoch
-  \item mais nécessite livraison causale des opérations \emph{rename}
-  \item ces opérations étant rares, le surcoût en métadonnées et le potentiel délai introduit paraissent acceptables
-\end{itemize}
+Dans la \autoref{fig:epoch-based-delivery-execution}, nous décrivons une exécution suivante en ne faisant apparaître que les opérations importantes : les opérations \emph{rename} et une opération \emph{insert} finale.
+Dans cette exécution, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Initialement, aucune opération \emph{rename} n'a encore eu lieu.
+Le noeud A effectue une première opération \emph{rename} (\emph{a1}) puis une seconde opération \emph{rename} (\emph{a7}), et les diffuse.
+En concurrence, le noeud B génère et propage sa propre opération \emph{rename} (\emph{b3}).
+De son côté, le noeud C reçoit les opérations \emph{b3}, puis \emph{a1} et \emph{a7}.
+Il émet ensuite une opération \emph{insert} (\emph{c1}).
+Le noeud A reçoit cette opération avant de finalement recevoir l'opération \emph{b3}.
 
-\mnnote{
-  TODO: Voir pour une autre implémentation.
-  Implémentation actuelle dûe à la séparation entre \texttt{DocService} et \texttt{Sync} : \texttt{Sync} n'a pas de moyen de connaître l'époque courante.
-  Donc peut pas cibler et ajouter uniquement le dot de l'opération \emph{rename} correspondante.
-}
+Dans la \autoref{fig:epoch-based-delivery-sync}, nous faisons apparaître l'état de \texttt{Sync} et les décisions prises par ce dernier au cours de l'exécution.
+Initialement, le vecteur des dots des opérations \emph{rename} connues est vide.
+Ainsi, lorsque A génère l'opération \emph{a1}, celle-ci ne se voit ajouter aucune dépendance (nous ne représentons pas les dépendances des opérations qui correspondent à l'ensemble vide).
+A met ensuite à jour son vecteur des dots des opérations \emph{rename} avec le dot $\langle A:1 \rangle$.
+B procède de manière similaire avec l'opération \emph{b3}.
+
+Quand A génère l'opération \emph{a7}, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
+Le dot $\langle A:7 \rangle$ remplace ensuite ce dernier dans le vecteur des dots des opérations \emph{rename}.
+
+À la réception de l'opération \emph{b3}, le module \texttt{Sync} de C peut la délivrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
+Le noeud C ajoute alors à son vecteur des dots des opérations \emph{rename} le dot $\langle B:3 \rangle$.
+Il procède de même pour l'opération \emph{a1} : il la délivre et ajoute le dot $\langle A:1 \rangle$.
+Le module \texttt{Sync} ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
+
+Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été délivrée précédemment.
+L'opération est donc délivrée et le vecteur de dots des opérations \emph{rename} mis à jour avec $\langle A:7 \rangle$.
+
+Quand le noeud C effectue l'opération locale \emph{c1}, le module \texttt{Sync} obtient l'information de l'époque courante de la séquence : \epoch{b3}.
+C met à jour son vecteur de dots des opérations \emph{rename} pour ne conserver que l'entrée du noeud B : $\langle B:3 \rangle$.
+Ce dot est ajouté en tant que dépendance de l'opération \emph{c1} avant sa diffusion.
+
+À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par \texttt{Sync}, l'opération \emph{b3} n'ayant pas encore été délivrée.
+Le noeud reçoit ensuite l'opération \emph{b3}.
+Son vecteur des dots des opérations \emph{rename} est mis à jour et l'opération délivrée.
+Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors délivrée.
+
+Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispose de plusieurs avantages : sa complexité spatiale dépend linéairement du nombre de noeuds et les opérations de mise à jour du vecteur des dots des opérations \emph{rename} s'effectuent en temps constant.
+De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.
+Finalement, cette implémentation ne contraint pas une livraison causale des opérations \emph{rename} et permet donc de les appliquer dès que possible.
 
 \subsubsection{Mécanisme d'anti-entropie}
 
