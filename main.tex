@@ -558,8 +558,8 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
           \begin{tikzpicture}
               \path
                   node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{1}}] {L}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{2}}] {O};
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{1}}] {L}
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{2}}] {O};
           \end{tikzpicture}
           \label{fig:logootsplit-seq-as-letters}
       \end{minipage}}
@@ -636,26 +636,26 @@ Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisat
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0A) {HRLO}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1A-left) {H}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S1A-right) {LO}
-            to ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2A-left) {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S2A-right) {LO}
-            to ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S3A-left) {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] {LO!};
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0A) {HRLO}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1A-left) {H}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S1A-right) {LO}
+            ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2A-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S2A-right) {LO}
+            ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S3A-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] {LO!};
 
 
         \path
-            to ++(270:4) node {\textbf{B}}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0B) {HRLO}
-            to ++(0:5 * \widthletter) node[block, label=below:{\id{i}{B0}{0..4}}] (S1B) {HRLO!}
-            to ++(0:7 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2B-left) {H}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] (S2B-right) {LO!}
-            to ++(0:7 * \widthletter) node[letter, label=above:{\id{i}{B0}{0}}] (S3B-left) {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=below:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{2..4}}] {LO!};
+            ++(270:4) node {\textbf{B}}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0B) {HRLO}
+            ++(0:5 * \widthletter) node[block, label=below:{\id{i}{B0}{0..4}}] (S1B) {HRLO!}
+            ++(0:7 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2B-left) {H}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] (S2B-right) {LO!}
+            ++(0:7 * \widthletter) node[letter, label=above:{\id{i}{B0}{0}}] (S3B-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=below:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{2..4}}] {LO!};
 
         \draw[->, thick]
           (S0A) edge node[above, align=center]{\emph{remove "R"}} (S1A-left)
@@ -733,25 +733,25 @@ La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la 
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-            to ++(0:21 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+            ++(0:21 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
 
         \path
-            to ++(270:4) node {\textbf{B}}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-            to ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-            to ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S3B-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+            ++(270:4) node {\textbf{B}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+            ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+            ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S3B-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
         \draw[->, thick]
           (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
@@ -806,31 +806,31 @@ La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrai
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-            to ++(0:25 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+            ++(0:25 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
 
         \path
-            to ++(270:4) node {\textbf{B}}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-            to ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON};
+            ++(270:4) node {\textbf{B}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+            ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON};
 
         \path
-            to ++(270:8) node {\textbf{C}}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
-            to ++(0:30 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1C-left) {O}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1C-right) {GNON}
-            to ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+            ++(270:8) node {\textbf{C}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
+            ++(0:30 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1C-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1C-right) {GNON}
+            ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
         \draw[->, thick]
           (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
@@ -907,10 +907,10 @@ Pour respecter l'ordre souhaité, LogootSplit génère un identifiant en ajoutan
   \begin{tikzpicture}
       \path
           node {\textbf{A}}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..2}}] (HLO) {HLO}
-          to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (H) {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] {LO};
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..2}}] (HLO) {HLO}
+          ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (H) {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] {LO};
 
       \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "E"}\\\emph{between}\\\emph{"H" and "L"}} (H);
   \end{tikzpicture}
@@ -1079,10 +1079,10 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  to ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
 
               \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
           \end{tikzpicture}
@@ -1095,13 +1095,13 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  to ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H}
-                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{1}}] {E}
-                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{2}}] {L}
-                  to ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{3}}] {O};
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H}
+                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{1}}] {E}
+                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{2}}] {L}
+                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{3}}] {O};
 
                   \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
               \end{tikzpicture}
@@ -1114,10 +1114,10 @@ Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la
           \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  to ++(0:4 * \widthletter) node[block, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0..3}}] (HELO) {HELO};
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+                  ++(0:4 * \widthletter) node[block, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0..3}}] (HELO) {HELO};
 
               \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (HELO);
           \end{tikzpicture}
@@ -1175,28 +1175,28 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-            to ++(0:5 * \widthletter) node[block, fill=mydarkblue,
+            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            ++(0:5 * \widthletter) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                         ] (S1A) {HELO}
-            to ++(0:8 * \widthletter) node[block, fill=mydarkblue,
+            ++(0:8 * \widthletter) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                         ] (S2A-left) {HELO}
-            to ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
+            ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
                     label={above:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}} }
                         ] {L};
 
         \path
-            to ++(270:2) node {\textbf{B}}
-            to ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-            to ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+            ++(270:2) node {\textbf{B}}
+            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
 
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
@@ -1291,36 +1291,36 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                         ] (S1A-right) {HELO}
-            to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                         ] {HE}
-            to ++(0:\widthblock) node[letter, fill=mylightblue,
+            ++(0:\widthblock) node[letter, fill=mylightblue,
                     label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
                         ] {L}
-            to ++(0:\widthletter) node[block, fill=mydarkblue,
+            ++(0:\widthletter) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
                         ] {LO};
 
         \path
-            to ++(270:2) node {\textbf{B}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-            to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+            ++(270:2) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
 
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
@@ -1365,41 +1365,41 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
 
-            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                         ] (S1A-right) {ABCD}
 
-            to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                         ] {AB}
-            to ++(0:\widthblock) node[letter, fill=mylightblue,
+            ++(0:\widthblock) node[letter, fill=mylightblue,
                     label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{f}{A2}{0}} }
                         ] {X}
-            to ++(0:\widthletter) node[block, fill=mydarkblue,
+            ++(0:\widthletter) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
                         ] (S2A-right) {CD};
 
         \path
-            to ++(270:2) node {\textbf{B}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
+            ++(270:2) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
 
-            to ++(0:21 * \widthletter) node (S1B) {?};
+            ++(0:21 * \widthletter) node (S1B) {?};
 
         \path
-          to ++(270:1)
-          to ++ (0:14 * \widthletter) node[cross] (fail) {};
+          ++(270:1)
+          ++ (0:14 * \widthletter) node[cross] (fail) {};
 
         \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
         \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{insert "X"}\\\emph{between}\\\emph{"B" and "C"}} (S2A-left);
@@ -1460,43 +1460,43 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
 
-            to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange,
+            ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            ++(0:\widthletter) node[letter, fill=mydarkorange,
                     label=below:{\color{mydarkorange}\id{m}{A1}{0}}] {X}
-            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S1A-right) {D}
+            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S1A-right) {D}
 
-            to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
                         ] (S2A-right) {ABXCD};
 
         \path
-            to ++(270:4) node {\textbf{B}}
-            to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            to ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            to ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            to ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
+            ++(270:4) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
+            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
+            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
+            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
 
-            to ++(0:21 * \widthletter) node[epoch] (S1B-left) {\epoch{A2}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:21 * \widthletter) node[epoch] (S1B-left) {\epoch{A2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                         ] {AB}
-            to ++(0:\widthblock) node[block, fill=mydarkblue,
+            ++(0:\widthblock) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{3..4}} }
                         ] (S1B-right) {CD}
 
-            to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{A2}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{A2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
                         ] (S2B-right) {ABXCD};
 
@@ -1540,38 +1540,38 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
     \begin{tikzpicture}
       \path
           node {\textbf{A}}
-          to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+          ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                   label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                       ] (S1A-right) {HELO}
-          to ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+          ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                   label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                       ] {HE}
-          to ++(0:\widthblock) node[letter, fill=mylightblue,
+          ++(0:\widthblock) node[letter, fill=mylightblue,
                   label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
                       ] {L}
-          to ++(0:\widthletter) node[block, fill=mydarkblue,
+          ++(0:\widthletter) node[block, fill=mydarkblue,
                   label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
                       ] (S2A-right) {LO};
 
       \path
-          to ++(270:3) node {\textbf{B}}
-          to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-          to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-          to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-          to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-          to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
-          to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
-          to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+          ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                   label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
               ] (S2B-right) {HELLO};
 
@@ -1601,11 +1601,11 @@ Les époques sont representées sous la forme de noeuds de l'arbre et la relatio
   \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
       \path
           node[op] (e0) {\epoch{0}}
-          to ++(270:1.5)
-          to ++(180:0.95) node[op] (eA1) {\epoch{A1}};
+          ++(270:1.5)
+          ++(180:0.95) node[op] (eA1) {\epoch{A1}};
       \path
-          to ++(270:1.5)
-          to ++(0:0.95) node[op] (eB2) {\epoch{B2}};
+          ++(270:1.5)
+          ++(0:0.95) node[op] (eB2) {\epoch{B2}};
 
       \draw[thick, ->] (e0) -- (eA1);
       \draw[thick, ->] (e0) -- (eB2);
@@ -1660,27 +1660,27 @@ La \autoref{fig:priority-example} fournit un exemple.
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
               \path
                   node {\textbf{A}}
-                  to ++(0:1) node (a0) {}
-                  to ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                  to ++(0:5) node (a-end) {};
+                  ++(0:1) node (a0) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                  ++(0:5) node (a-end) {};
 
               \draw[->, thick] (a0) --  (a1) -- (a-end);
 
               \path
-                  to ++(270:1.5) node {\textbf{B}}
-                  to ++(0:1) node (b0) {}
-                  to ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
-                  to ++(0:4) node[point, label=above:{rename to \epoch{B7}}] (b7) {}
-                  to ++(0:1) node (b-end) {};
+                  ++(270:1.5) node {\textbf{B}}
+                  ++(0:1) node (b0) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
+                  ++(0:4) node[point, label=above:{rename to \epoch{B7}}] (b7) {}
+                  ++(0:1) node (b-end) {};
 
               \draw[->, thick] (b0) -- (b2) -- (b7) -- (b-end);
 
               \path
-                  to ++(270:3) node {\textbf{C}}
-                  to ++(0:1) node (c0) {}
-                  to ++(0:3) node (c-receives-a1) {}
-                  to ++(0:1) node[point, label=below:{rename to \epoch{C6}}] (c6) {}
-                  to ++(0:2) node (c-end) {};
+                  ++(270:3) node {\textbf{C}}
+                  ++(0:1) node (c0) {}
+                  ++(0:3) node (c-receives-a1) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{C6}}] (c6) {}
+                  ++(0:2) node (c-end) {};
 
               \draw[->, thick] (c0) -- (c6) -- (c-end);
 
@@ -1695,11 +1695,11 @@ La \autoref{fig:priority-example} fournit un exemple.
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
               \path
                   node[op] (e0) {\epoch{0}}
-                  to ++(225:1.5) node[op] (eA1) {\epoch{A1}}
-                  to ++(270:1.5) node[op] (eC6) {\epoch{C6}};
+                  ++(225:1.5) node[op] (eA1) {\epoch{A1}}
+                  ++(270:1.5) node[op] (eC6) {\epoch{C6}};
               \path
-                  to ++(315:1.5) node[op] (eB2) {\epoch{B2}}
-                  to ++(270:1.5) node[op, red] (eB7) {\epoch{B7}};
+                  ++(315:1.5) node[op] (eB2) {\epoch{B2}}
+                  ++(270:1.5) node[op, red] (eB7) {\epoch{B7}};
 
               \draw[->, thick] (e0) edge (eA1) (eA1) edge (eC6) (e0) edge (eB2) (eB2) edge (eB7);
               \draw[->, dashed, thick, red] (eB7.135) -- (eB2.225) (eB2.180) -- (eC6.45) -- (eA1.315) (eA1.0) -- (e0.270);
@@ -1745,40 +1745,40 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
     \begin{tikzpicture}
         \path
             node {\textbf{A}}
-            to ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
                         ] (S1A-right) {HELO}
-            to ++(0:10 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+            ++(0:10 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
                         ] {HE}
-            to ++(0:\widthblock) node[letter, fill=mylightblue,
+            ++(0:\widthblock) node[letter, fill=mylightblue,
                     label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
                         ] {L}
-            to ++(0:\widthletter) node[block, fill=mydarkblue,
+            ++(0:\widthletter) node[block, fill=mydarkblue,
                     label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
                         ] (S2A-right) {LO}
-            to ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
-            to ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
-            to ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+            ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
+            ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
+            ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                     label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
                 ] {HELLO};
 
         \path
-            to ++(270:3) node {\textbf{B}}
-            to ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-            to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            to ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-            to ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
-            to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
-            to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                     label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
                 ] (S2B-right) {HELLO};
 
@@ -1911,74 +1911,74 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
         \begin{tikzpicture}
             \path
                 node {\textbf{C}}
-                to ++(0:0.5 * \widthletter) node[epoch] (S1C-left) {\epoch{0}}
-                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                ++(0:0.5 * \widthletter) node[epoch] (S1C-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
                           label={below:{\id{k}{D0}{0}} }
                               ] {W}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={below:{\id{n}{C0}{0}} }
                               ] {O}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={below:{\id{o}{D1}{0}} }
                               ] (S1C-right) {D}
-                to ++(0:3 * \widthblock) node[epoch] (S2C-left) {\epoch{C1}}
-                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                ++(0:3 * \widthblock) node[epoch] (S2C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{k}{C1}{0..2}} }
                               ] (S2C-right) {WOD}
-                to ++(0:4 * \widthblock) node[epoch] (S3C-left) {\epoch{C1}}
-                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                ++(0:4 * \widthblock) node[epoch] (S3C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
                               ] {WO}
-                to ++(0:\widthblock) node[letter, fill=mylightblue,
+                ++(0:\widthblock) node[letter, fill=mylightblue,
                           label={above:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
                               ] {L}
-                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{k}{C1}{2}} }
                               ] (S3C-right) {D}
-                to ++(0:3 * \widthblock) node[epoch] (S4C-left) {\epoch{C1}}
-                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                ++(0:3 * \widthblock) node[epoch] (S4C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
                               ] {WO}
-                to ++(0:\widthblock) node[letter,
+                ++(0:\widthblock) node[letter,
                           label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
                               ] {R}
-                to ++(0:\widthletter) node[letter, fill=mylightblue,
+                ++(0:\widthletter) node[letter, fill=mylightblue,
                           label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
                               ] {L}
-                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
                           label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
                               ] (S4C-right) {D};
 
             \path
-                to ++(270:3) node {\textbf{D}}
+                ++(270:3) node {\textbf{D}}
 
-                to ++(0:0.5 * \widthletter) node[epoch] (S1D-left) {\epoch{0}}
-                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                ++(0:0.5 * \widthletter) node[epoch] (S1D-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
                           label={below:{\id{k}{D0}{0}} }
                               ] {W}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={below:{\id{n}{C0}{0}} }
                               ] {O}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={below:{\id{o}{D1}{0}} }
                               ] (S1D-right) {D}
 
-                to ++(0:3 * \widthblock) node[epoch] (S2D-left) {\epoch{0}}
-                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                ++(0:3 * \widthblock) node[epoch] (S2D-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
                           label={below:{\id{k}{D0}{0}} }
                               ] {W}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={above:{\id{n}{C0}{0}} }
                               ] {O}
-                to ++(0:\widthletter) node[letter, fill=mylightorange,
+                ++(0:\widthletter) node[letter, fill=mylightorange,
                           label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
                               ] {L}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={above:{\id{o}{D1}{0}} }
                               ] (S2D-right) {D}
 
-                to ++(0:4 * \widthblock) node[epoch] (S3D-left) {\epoch{D3}}
-                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                ++(0:4 * \widthblock) node[epoch] (S3D-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
                               ] (S3D-right) {WOLD};
 
@@ -2004,52 +2004,52 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
         \begin{tikzpicture}
             \path
                 node {\textbf{C}}
-                to ++(0:0.5 * \widthletter) node[epoch] (S4C-left) {\epoch{C1}}
-                to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                ++(0:0.5 * \widthletter) node[epoch] (S4C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
                               ] {WO}
-                to ++(0:\widthblock) node[letter,
+                ++(0:\widthblock) node[letter,
                           label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
                               ] {R}
-                to ++(0:\widthletter) node[letter, fill=mylightblue,
+                ++(0:\widthletter) node[letter, fill=mylightblue,
                           label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
                               ] {L}
-                to ++(0:\widthletter) node[letter, fill=mydarkblue,
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
                           label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
                               ] (S4C-right) {D}
-                to ++(0:2 * \widthblock) node[point] (between-S4C-S5C) {}
-                to ++(0:3 * \widthletter) node[epoch] (S5C-left) {\epoch{0}}
-                to ++(0:1.05 * \widthoriginepoch) node[letter,
+                ++(0:2 * \widthblock) node[point] (between-S4C-S5C) {}
+                ++(0:3 * \widthletter) node[epoch] (S5C-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
                           label={below:{\id{k}{D0}{0}} }
                               ] {W}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={below:{\id{n}{C0}{0}} }
                               ] {O}
-                to ++(0:\widthletter) node[letter, fill=mydarkorange,
+                ++(0:\widthletter) node[letter, fill=mydarkorange,
                           label={above:{\color{mydarkorange}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
                               ] {R}
-                to ++(0:\widthletter) node[letter, fill=mylightorange,
+                ++(0:\widthletter) node[letter, fill=mylightorange,
                           label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
                               ] {L}
-                to ++(0:\widthletter) node[letter,
+                ++(0:\widthletter) node[letter,
                           label={above:{\id{o}{D1}{0}} }
                               ] (S5C-right) {D}
-                to ++(0:2 * \widthblock) node[epoch] (S6C-left) {\epoch{D3}}
-                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                ++(0:2 * \widthblock) node[epoch] (S6C-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..1}} }
                               ] {WO}
-                to ++(0:\widthblock) node[letter,
+                ++(0:\widthblock) node[letter,
                           label={above:{\id{k}{D3}{1}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
                               ] {R}
-                to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                ++(0:\widthletter) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{k}{D3}{2..3}} }
                               ] {LD};
 
             \path
-                to ++(270:3) node {\textbf{D}}
+                ++(270:3) node {\textbf{D}}
 
-                to ++(0:0.5 * \widthletter) node[epoch] (S3D-left) {\epoch{D3}}
-                to ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                ++(0:0.5 * \widthletter) node[epoch] (S3D-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
                               ] (S3D-right) {WOLD};
 
@@ -2189,54 +2189,54 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
             \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{0..3}} }
                               ] (S1A-right) {ABCD}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{0..1}} }
                               ] {AB}
-                  to ++(0:\widthblock) node[letter, fill=mylightblue,
+                  ++(0:\widthblock) node[letter, fill=mylightblue,
                           label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}} }
                               ] {X}
-                  to ++(0:\widthletter) node[block, fill=mydarkblue,
+                  ++(0:\widthletter) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{2..3}} }
                               ] (S2A-right) {CD};
 
               \path
-                  to ++(270:2) node {\textbf{B}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
+                  ++(270:2) node {\textbf{B}}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
                               ] (S1B-right) {ABCD}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
                               ] (S2B-right) {ABCD}
 
-                  to ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
                               ] {AB}
-                  to ++(0:\widthblock) node[letter,
+                  ++(0:\widthblock) node[letter,
                           label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
                               ] {X}
-                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                  ++(0:\widthletter) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
                               ] (S3B-right) {CD};
 
@@ -2256,9 +2256,9 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
             \path
                 node[op] (e0) {\epoch{0}}
-                to ++(225:2) node[op] (eA1) {\epoch{A2}};
+                ++(225:2) node[op] (eA1) {\epoch{A2}};
             \path
-                to ++(315:2) node[op, red] (eB2) {\epoch{B2}};
+                ++(315:2) node[op, red] (eB2) {\epoch{B2}};
 
             \draw[->, thick] (e0) edge (eA1) (e0) edge (eB2);
             \draw[->, dashed, thick, red] (eB2.180) -- (eA1.0) (eA1.0) -- (e0.270);
@@ -2389,65 +2389,65 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
             \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0A-right) {D}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{0..3}} }
                               ] (S1A-right) {ABCD}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{0..1}} }
                               ] {AB}
-                  to ++(0:\widthblock) node[letter, fill=mylightblue,
+                  ++(0:\widthblock) node[letter, fill=mylightblue,
                           label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A2}{1}\id{f}{A3}{0}} }
                               ] {X}
-                  to ++(0:\widthletter) node[block, fill=mydarkblue,
+                  ++(0:\widthletter) node[block, fill=mydarkblue,
                           label={below:{\color{mydarkblueid}\id{i}{A2}{2..3}} }
                               ] (S2A-right) {CD}
 
-                  to ++(0:3.7 * \widthletter) node[epoch] (S3A-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:3.7 * \widthletter) node[epoch] (S3A-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
                               ] {AB}
-                  to ++(0:\widthblock) node[letter,
+                  ++(0:\widthblock) node[letter,
                           label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
                               ] {X}
-                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                  ++(0:\widthletter) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
                               ] (S3A-right) {CD};
 
               \path
-                  to ++(270:5) node {\textbf{B}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
-                  to ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
+                  ++(270:5) node {\textbf{B}}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{A0}{0}}] {A}
+                  ++(0:\widthletter) node[letter, label=below:{\id{l}{B0}{0}}] {B}
+                  ++(0:\widthletter) node[letter, label=below:{\id{t}{A1}{0}}] {C}
+                  ++(0:\widthletter) node[letter, label=below:{\id{y}{B1}{0}}] (S0B-right) {D}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
                               ] (S1B-right) {ABCD}
 
-                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={below:{\color{mydarkpurpleid}\id{i}{B2}{0..3}} }
                               ] (S2B-right) {ABCD}
 
-                  to ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
-                  to ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  ++(0:7 * \widthletter) node[epoch] (S3B-left) {\epoch{B2}}
+                  ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{0..1}} }
                               ] {AB}
-                  to ++(0:\widthblock) node[letter,
+                  ++(0:\widthblock) node[letter,
                           label={below:{\id{i}{B2}{1}\id{l}{B0}{0}\id{f}{A3}{0}} }
                               ] {X}
-                  to ++(0:\widthletter) node[block, fill=mydarkpurple,
+                  ++(0:\widthletter) node[block, fill=mydarkpurple,
                           label={above:{\color{mydarkpurpleid}\id{i}{B2}{2..3}} }
                               ] (S3B-right) {CD};
 
@@ -2468,7 +2468,7 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
             \path
                 node[op] (e0) {\epoch{0}}
-                to ++(270:1.8) node[op, red] (eA2) {\epoch{A2}};
+                ++(270:1.8) node[op, red] (eA2) {\epoch{A2}};
 
             \draw[->, thick] (e0) edge (eA2);
             \draw[->, dashed, thick, red] (eA2.120) -- (e0.240);
@@ -2481,9 +2481,9 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
             \path
                 node[op] (e0) {\epoch{0}}
-                to ++(225:2) node[op] (eA1) {\epoch{A2}};
+                ++(225:2) node[op] (eA1) {\epoch{A2}};
             \path
-                to ++(315:2) node[op, red] (eB2) {\epoch{B2}};
+                ++(315:2) node[op, red] (eB2) {\epoch{B2}};
 
             \draw[->, thick] (e0) edge (eA1) (e0) edge (eB2);
             \draw[->, dashed, thick, red] (eB2.180) -- (eA1.0) (eA1.0) -- (e0.270);
@@ -2555,28 +2555,28 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
               \path
                   node {\textbf{A}}
-                  to ++(0:0.5) node (a0) {}
-                  to ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                  to ++(0:1) node (a2) {}
-                  to ++(0:1) node (a7) {}
-                  to ++(0:1) node[point, label=above:{rename to \epoch{A8}}] (a8) {}
-                  to ++(0:1.5) node (a-receives-b2) {}
-                  to ++(0:1.5) node[point, label=above:{rename to \epoch{A9}}] (a9) {}
-                  to ++(0:1.5) node (a-end) {};
+                  ++(0:0.5) node (a0) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                  ++(0:1) node (a2) {}
+                  ++(0:1) node (a7) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A8}}] (a8) {}
+                  ++(0:1.5) node (a-receives-b2) {}
+                  ++(0:1.5) node[point, label=above:{rename to \epoch{A9}}] (a9) {}
+                  ++(0:1.5) node (a-end) {};
 
               \draw[->, thick] (a0) --  (a1) -- (a2);
               \draw[dotted] (a2) -- (a7);
               \draw[->, thick] (a7) -- (a8) -- (a9) -- (a-end);
 
               \path
-                  to ++(270:2) node {\textbf{B}}
-                  to ++(0:0.5) node (b0) {}
-                  to ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
-                  to ++(0:1.5) node (b-receives-a1) {}
-                  to ++(0:1.5) node (b3) {}
-                  to ++(0:1) node (b6) {}
-                  to ++(0:1) node[point, label=below:{rename to \epoch{B7}}] (b7) {}
-                  to ++(0:2.5) node (b-end) {};
+                  ++(270:2) node {\textbf{B}}
+                  ++(0:0.5) node (b0) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
+                  ++(0:1.5) node (b-receives-a1) {}
+                  ++(0:1.5) node (b3) {}
+                  ++(0:1) node (b6) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B7}}] (b7) {}
+                  ++(0:2.5) node (b-end) {};
 
               \draw[->, thick] (b0) -- (b2) -- (b3);
               \draw[dotted] (b3) -- (b6);
@@ -2594,15 +2594,15 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
           \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
               \path
                   node {\textbf{A}}
-                  to ++(270:1) node[causalop] (Ae0) {\epoch{0}}
-                  to ++(225:1.5) node[op] (AeA1) {\epoch{A1}}
-                  to ++(270:1.5) node[op] (AeA8) {\epoch{A8}};
+                  ++(270:1) node[causalop] (Ae0) {\epoch{0}}
+                  ++(225:1.5) node[op] (AeA1) {\epoch{A1}}
+                  ++(270:1.5) node[op] (AeA8) {\epoch{A8}};
               \path
-                  to ++(270:1)
-                  to ++(315:1.5) node[causalop] (AeB2) {\epoch{B2}}
+                  ++(270:1)
+                  ++(315:1.5) node[causalop] (AeB2) {\epoch{B2}}
                       node[outer sep=12pt] (A-tl-potential-epochs) {}
                       node[outer sep=15pt] (A-tl-required-epochs) {}
-                  to ++(270:1.5) node[op, red] (AeA9) {\epoch{A9}}
+                  ++(270:1.5) node[op, red] (AeA9) {\epoch{A9}}
                       node[outer sep=12pt] (A-br-potential-epochs) {}
                       node[outer sep=15pt] (A-br-required-epochs) {};
 
@@ -2610,16 +2610,16 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
               \draw[dotted, thick, darkgreen] (A-tl-required-epochs.north west) rectangle (A-br-required-epochs.south east);
 
               \path
-                  to ++(0:4) node {\textbf{B}}
-                  to ++(270:1) node[causalop] (Be0) {\epoch{0}}
-                  to ++(315:1.5) node[op] (BeB2) {\epoch{B2}}
-                  to ++(270:1.5) node[op, red] (BeB7) {\epoch{B7}}
+                  ++(0:4) node {\textbf{B}}
+                  ++(270:1) node[causalop] (Be0) {\epoch{0}}
+                  ++(315:1.5) node[op] (BeB2) {\epoch{B2}}
+                  ++(270:1.5) node[op, red] (BeB7) {\epoch{B7}}
                       node[outer sep=12pt] (B-br-potential-epochs) {}
                       node[outer sep=15pt] (B-br-required-epochs) {};
               \path
-                  to ++(0:4)
-                  to ++(270:1)
-                  to ++(225:1.5) node[causalop] (BeA1) {\epoch{A1}}
+                  ++(0:4)
+                  ++(270:1)
+                  ++(225:1.5) node[causalop] (BeA1) {\epoch{A1}}
                       node[outer sep=12pt] (B-tl-potential-epochs) {};
 
               \draw[dashed] (B-tl-potential-epochs.north west) rectangle (B-br-potential-epochs.south east);
@@ -3263,41 +3263,41 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
             \begin{tikzpicture}
               \path
                 node {\textbf{A}}
-                to ++(0:0.5) node (a0) {}
-                to ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                to ++(0:2) node (a-receives-b7) {}
-                to ++(0:1) node [point, label=above:{rename to \epoch{A10}}] (a10) {}
-                to ++(0:1) node (a11) {}
-                to ++(0:1) node (a99) {}
-                to ++(0:1) node[point, label=above:{rename to \epoch{A100}}] (a100) {}
-                to ++(0:1.5) node (a-receives-c1) {}
-                to ++(0:1.5) node (a-end) {};
+                ++(0:0.5) node (a0) {}
+                ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                ++(0:2) node (a-receives-b7) {}
+                ++(0:1) node [point, label=above:{rename to \epoch{A10}}] (a10) {}
+                ++(0:1) node (a11) {}
+                ++(0:1) node (a99) {}
+                ++(0:1) node[point, label=above:{rename to \epoch{A100}}] (a100) {}
+                ++(0:1.5) node (a-receives-c1) {}
+                ++(0:1.5) node (a-end) {};
 
               \draw[thick] (a0) --  (a1) -- (a10) -- (a11);
               \draw[dotted] (a11) -- (a99);
               \draw[->, thick] (a99) -- (a100) -- (a-end);
 
               \path
-                  to ++(270:2) node {\textbf{B}}
-                  to ++(0:0.5) node (b0) {}
-                  to ++(0:2) node (b-receives-a1) {}
-                  to ++(0:0.5) node[point, label=below:{rename to \epoch{B2}}] (b7) {}
-                  to ++(0:2.5) node (b8) {}
-                  to ++(0:1) node (b99) {}
-                  to ++(0:2.5) node (b-receives-a100) {}
-                  to ++(0:1.5) node (b-end) {};
+                  ++(270:2) node {\textbf{B}}
+                  ++(0:0.5) node (b0) {}
+                  ++(0:2) node (b-receives-a1) {}
+                  ++(0:0.5) node[point, label=below:{rename to \epoch{B2}}] (b7) {}
+                  ++(0:2.5) node (b8) {}
+                  ++(0:1) node (b99) {}
+                  ++(0:2.5) node (b-receives-a100) {}
+                  ++(0:1.5) node (b-end) {};
 
               \draw[thick] (b0) -- (b7) -- (b8);
               \draw[dotted] (b8) -- (b99);
               \draw[->, thick] (b99) -- (b-end);
 
               \path
-                  to ++(270:4) node {\textbf{C}}
-                  to ++(0:0.5) node (c0) {}
-                  to ++(0:2) node[point, label=below:{rename to \epoch{C1}}] (c1) {}
-                  to ++(0:3) node (c2) {}
-                  to ++(0:1) node (c99) {}
-                  to ++(0:4) node (c-end) {};
+                  ++(270:4) node {\textbf{C}}
+                  ++(0:0.5) node (c0) {}
+                  ++(0:2) node[point, label=below:{rename to \epoch{C1}}] (c1) {}
+                  ++(0:3) node (c2) {}
+                  ++(0:1) node (c99) {}
+                  ++(0:4) node (c-end) {};
 
                 \draw[thick] (c0) -- (c1) -- (c2);
                 \draw[dotted] (c2) -- (c99);
@@ -3319,14 +3319,14 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
             \begin{tikzpicture}
                 \path
                     node[op] (e0) {\epoch{0}}
-                    to ++(225:1.5) node[op] (eA1) {\epoch{A1}}
-                    to ++(270:1.5) node[op] (eB7) {\epoch{B7}}
-                    to ++(270:1.5) node[op] (eA10) {\epoch{A10}}
-                    to ++(270:1) node (eA11) {}
-                    to ++(270:0.5) node (eA99) {}
-                    to ++(270:1) node[op] (eA100) {\epoch{A100}};
+                    ++(225:1.5) node[op] (eA1) {\epoch{A1}}
+                    ++(270:1.5) node[op] (eB7) {\epoch{B7}}
+                    ++(270:1.5) node[op] (eA10) {\epoch{A10}}
+                    ++(270:1) node (eA11) {}
+                    ++(270:0.5) node (eA99) {}
+                    ++(270:1) node[op] (eA100) {\epoch{A100}};
                 \path
-                    to ++(315:1.5) node[op, red] (eC1) {\epoch{C1}};
+                    ++(315:1.5) node[op, red] (eC1) {\epoch{C1}};
 
                 \draw[->, thick] (e0) edge (eA1) (eA1) edge (eB7) (eB7) edge (eA10) (eA10) edge (eA11) (eA99) edge(eA100) (e0) edge (eC1);
                 \draw[dotted] (eA11) edge (eA99);
@@ -3719,31 +3719,31 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.
             \begin{tikzpicture}
                 \path
                     node {\textbf{A}}
-                    to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-                    to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-                    to ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
-                    to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                    to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-                    to ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+                    ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+                    ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
+                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+                    ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
 
                 \path
-                    to ++(270:4) node {\textbf{B}}
-                    to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-                    to ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                    to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-                    to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-                    to ++(0:8 * \widthletter) node[epoch] (S3B-left) {\epoch{0}}
-                    to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+                    ++(270:4) node {\textbf{B}}
+                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+                    ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+                    ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+                    ++(0:8 * \widthletter) node[epoch] (S3B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
 
                 \draw[->, thick]
                   (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
@@ -3771,19 +3771,19 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.
         \begin{tikzpicture}
             \path
                 node {\textbf{A}}
-                to ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
-                to ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
-                to ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
-                to ++(0:3) node (a-end) {};
+                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
+                ++(0:3) node (a-end) {};
 
 
             \path
-                to ++(270:3) node {\textbf{B}}
-                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
-                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6-1) {}
-                to ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
-                to ++(0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{discard}}] (b-a6-2) {}
-                to ++(0:1) node (b-end) {};
+                ++(270:3) node {\textbf{B}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6-1) {}
+                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                ++(0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{discard}}] (b-a6-2) {}
+                ++(0:1) node (b-end) {};
 
             \draw[->, thick]
               (a-start) edge (a-a6)
@@ -3862,43 +3862,43 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emp
             \begin{tikzpicture}
               \path
                   node {\textbf{A}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-                  to ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-                  to ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-                  to ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2A-right) {GNON}
-                  to ++(0:19 * \widthletter) node (A-end) {};
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+                  ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+                  ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+                  ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2A-right) {GNON}
+                  ++(0:19 * \widthletter) node (A-end) {};
 
 
               \path
-                  to ++(270:4) node {\textbf{B}}
-                  to ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-                  to ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-                  to ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-                  to ++(0:29 * \widthletter) node (B-end) {};
+                  ++(270:4) node {\textbf{B}}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+                  ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+                  ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+                  ++(0:29 * \widthletter) node (B-end) {};
 
               \path
-                  to ++(270:8) node {\textbf{C}}
-                  to ++(0:\widthletter) node[epoch] {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
-                  to ++(0:30 * \widthletter) node[point] (S1C) {}
-                  to ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
-                  to ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2C-right) {GNON}
-                  to ++(0:5 * \widthletter) node[epoch] (S3C-left) {\epoch{0}}
-                  to ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  to ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S3C-right) {GNON}
-                  to ++(0:2 * \widthblock) node (C-end) {};
+                  ++(270:8) node {\textbf{C}}
+                  ++(0:\widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
+                  ++(0:30 * \widthletter) node[point] (S1C) {}
+                  ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2C-right) {GNON}
+                  ++(0:5 * \widthletter) node[epoch] (S3C-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S3C-right) {GNON}
+                  ++(0:2 * \widthblock) node (C-end) {};
 
               \draw[->, thick]
                 (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
@@ -3934,26 +3934,26 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emp
         \begin{tikzpicture}
             \path
                 node {\textbf{A}}
-                to ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
-                to ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
-                to ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
-                to ++(0:11) node (a-end) {};
+                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
+                ++(0:11) node (a-end) {};
 
 
             \path
-                to ++(270:3) node {\textbf{B}}
-                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
-                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6) {}
-                to ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
-                to ++(0:14) node (b-end) {};
+                ++(270:3) node {\textbf{B}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6) {}
+                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                ++(0:14) node (b-end) {};
 
             \path
-                to ++(270:6) node {\textbf{C}}
-                to ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (c-start) {}
-                to ++(0:10) node[point, label=below:{$\langle A:5 \rangle$}, label=above:{\emph{postpone}}] (c-b1-postpone) {}
-                to ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (c-a6) {}
-                to ++ (0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{deliver}}] (c-b1-deliver) {}
-                to ++(0:1) node (c-end) {};
+                ++(270:6) node {\textbf{C}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (c-start) {}
+                ++(0:10) node[point, label=below:{$\langle A:5 \rangle$}, label=above:{\emph{postpone}}] (c-b1-postpone) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (c-a6) {}
+                ++ (0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{deliver}}] (c-b1-deliver) {}
+                ++(0:1) node (c-end) {};
 
             \draw[->, thick]
               (a-start) edge (a-a6)
@@ -4015,6 +4015,109 @@ Notre approche introduit un potentiel délai dans la livraison d'une opération 
 Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le surcoût du mécanisme de livraison et l'expérience utilisateur.
 
 \subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
+
+\begin{figure}[!ht]
+  \subfloat[Exécution]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                node {\textbf{A}}
+                +(0:20) node (a-end) {}
+                ++(0:0.5) node (a0) {}
+                ++(0:3) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                ++(0:3) node [point, label=above:{rename to \epoch{A7}}] (a7) {}
+                ++(0:10) node (a-receives-c1) {}
+                ++(0:2) node (a-receives-b3) {};
+
+
+              \draw[thick] (a0) --  (a1) -- (a7) edge (a-receives-c1) edge (a-receives-b3) edge (a-end);
+
+              \path
+                  ++(270:2) node {\textbf{B}}
+                  +(0:20) node (b-end) {}
+                  ++(0:0.5) node (b0) {}
+                  ++(0:3) node[point, label=above:{rename to \epoch{B3}}] (b3) {};
+
+              \draw[thick] (b0) -- (b3) -- (b-end);
+
+              \path
+                  ++(270:4) node {\textbf{C}}
+                  +(0:20) node (c-end) {}
+                  ++(0:0.5) node (c0) {}
+                  ++(0:5.5) node (c-receives-b3) {}
+                  ++(0:2.5) node (c-receives-a1) {}
+                  ++(0:3) node (c-receives-a7) {}
+                  ++(0:3) node[point, label=below:{insert}] (c1) {};
+
+              \draw[thick] (c0) edge (c-receives-b3) edge (c-receives-a1) edge (c-receives-a7) -- (c1) -- (c-end);
+
+              \draw[->, dashed, shorten >= 1]
+                (a1) edge (c-receives-a1)
+                (a7) edge (c-receives-a7)
+                (b3) edge (a-receives-b3)
+                (b3) edge (c-receives-b3)
+                (c1) edge (a-receives-c1);
+            \end{tikzpicture}
+            \label{fig:epoch-based-delivery-execution}
+          }
+          \end{minipage}
+        }
+        \hfil
+  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:epoch-based-delivery-execution}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \path
+            node {\textbf{A}}
+            +(0:25) node (a-end) {}
+            ++(0:0.5) node (a0) {}
+            ++(0:3) node[op, label=above:{$\langle A:1 \rangle$}] (a1) {a1}
+            ++(0:3) node [op, label=above:{$\langle A:7 \rangle$}] (a7) {a7}
+            ++(0:10) node[point, label=above:{$\langle A:7 \rangle$}, label=below:{\emph{postpone}}] (a-receives-c1-postpone) {}
+            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b3) {}
+            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-c1-deliver) {};
+
+
+          \draw[thick] (a0) --  (a1) -- (a7) -- (a-receives-c1-postpone) -- (a-receives-b3) -- (a-receives-c1-deliver) -- (a-end);
+
+          \path
+              ++(270:2) node {\textbf{B}}
+              +(0:25) node (b-end) {}
+              ++(0:0.5) node (b0) {}
+              ++(0:3) node[op, label=above:{$\langle B:3 \rangle$}] (b3) {b3};
+
+          \draw[thick] (b0) -- (b3) -- (b-end);
+
+          \path
+              ++(270:4) node {\textbf{C}}
+              +(0:25) node (c-end) {}
+              ++(0:0.5) node (c0) {}
+              ++(0:5.5) node[point, label=below:{$\langle B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b3) {}
+              ++(0:2.5) node[point, label=below:{$\langle A:1,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a1) {}
+              ++(0:3) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a7) {}
+              ++(0:3) node[op, label=below:{$\langle B:3 \rangle$}] (c1) {c1};
+
+          \draw[thick] (c0) -- (c-receives-b3) -- (c-receives-a1) edge (c-receives-a7) -- (c1) -- (c-end);
+
+          \draw[->, dashed, shorten >= 1]
+            (a1.east) edge (c-receives-a1.west)
+            (a7.east) edge (c-receives-a7.west)
+            (b3.east) edge (a-receives-b3.west)
+            (b3.east) edge (c-receives-b3.west)
+            (c1.east) edge (a-receives-c1-postpone.west);
+
+          \draw[->, dashed, thick, shorten >= 3] (a-receives-c1-postpone.east) edge[bend right] (a-receives-c1-deliver.west);
+        \end{tikzpicture}
+        \label{fig:epoch-based-sync}
+      }
+      \end{minipage}
+    }
+  \caption{Gestion de la livraison \emph{epoch based} des opérations}
+  \label{fig:epoch-based-delivery}
+\end{figure}
 
 \begin{itemize}
   \item Afin de livrer les opérations après l'opération \emph{rename} qui introduit leur époque
