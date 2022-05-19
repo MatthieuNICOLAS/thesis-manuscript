@@ -3685,6 +3685,8 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
 
 \subsubsection{Livraison des opérations en exactement un exemplaire}
 
+\label{sec:mute-exactly-once-delivery}
+
 Afin de respecter la contrainte de \emph{exactly-once delivery}, il est nécessaire d'identifier de manière unique chaque opération.
 Pour cela, le module \texttt{Sync} ajoute un \emph{Dot} à chaque opération :
 
@@ -4016,7 +4018,7 @@ Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le sur
 
 \subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
 
-La dernière contrainte spécifiée par le modèle de livraison qu'une opération doit être délivrée après l'opération \emph{rename} qui a introduite son époque de génération.
+La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être délivrée après l'opération \emph{rename} qui a introduite son époque de génération.
 
 Pour cela, le module \texttt{Sync} doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
 Cependant, dans notre implémentation, le module \texttt{Sync} et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.
@@ -4171,29 +4173,125 @@ Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispos
 De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.
 Finalement, cette implémentation ne contraint pas une livraison causale des opérations \emph{rename} et permet donc de les appliquer dès que possible.
 
-\subsubsection{Mécanisme d'anti-entropie}
+\subsubsection{Livraison des opérations à terme}
 
-\begin{itemize}
-  \item Réseau peut perdre des messages.
-    Doit rediffuser les messages perdus pour assurer la livraison à terme.
-    Pour cela, implémente le mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
-  \item Consiste à synchroniser deux à deux les pairs.
-    De manière périodique, noeud choisit un autre pair de manière aléatoire.
-    Lui envoie une représentation de son état courant, \ie son version vector.
-  \item À la réception de ce message, le second pair compare le version vector reçu par rapport au sien.
-    Identifie de cette manière les dots des opérations qu'il a reçues mais qui sont inconnues pour l'initiateur de la synchronisation et récupère les opérations correspondantes depuis le log des opérations.
-    Identifie aussi les dots des opérations connues par l'initiateur de la synchronisation mais pas par lui pour les demander en retour.
-    Renvoie alors une réponse composée des opérations récupérées et des dots des opérations demandées.
-  \item À la réception de la réponse, le noeud initiateur intègre les opérations reçues.
-    Parcourt son log des opérations à la recherche des opérations demandées par le second pair et les rediffuse sur le réseau.
-  \item Mécanisme d'anti-entropie permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser opérations perdues.
-    Sert aussi comme mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer le travail effectué depuis sa dernière connexion.
-  \item Avantages sont sa simplicité et que réexploite le causal context.
-  \item Principale limite est que nécessite par contre de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
-    Complexité en espace dépend du nombre de noeuds et du nombre d'opérations.
-    Peut pas tronquer les opérations du log car nécessaire pour mettre à niveau les nouveaux pairs (à moins d'un mécanisme de snapshot comme évoqué dans \autoref{sec:rename-as-compression-mechanism}).
-  \item Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree \mnnote{TODO: retrouver ref}, synchronisation par états (state/delta-based \acp{CRDT}).
-\end{itemize}
+La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être délivrées à tous les noeuds à terme.
+Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
+Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
+
+Pour cela, nous implémentons un mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
+Ce mécanisme permet à un noeud source de se synchroniser avec un autre noeud cible.
+Il est executé par l'ensemble des noeuds de manière indépendante.
+Nous décrivons ci-dessous son fonctionnement.
+
+De manière périodique, le noeud choisit un autre noeud cible de manière aléatoire.
+Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de version.
+
+À la réception de ce message, le noeud cible compare le vecteur de version reçu par rapport à son propre vecteur de version.
+À partir de ces données, il identifie les dots des opérations de sa connaissance qui sont inconnues au noeud source.
+Grâce à leur dot, le noeud cible retrouve ces opérations depuis son log des opérations.
+Il envoie alors une réponse composée de ces opérations au noeud source.
+
+À la réception de la réponse, le noeud source intègre normalement les opérations reçues.
+La \autoref{fig:anti-entropy} illustre ce mécanisme.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+        node {\textbf{A}}
+        +(0:26) node (a-end) {}
+        ++(0:0.5) node (a0) {}
+        ++(0:3) node[op, label=above:{$\langle A:1 \rangle$}] (a1) {a1}
+        ++(0:3) node [op, label=above:{$\langle A:7 \rangle$}] (a7) {a7}
+        ++(0:10) node[point, label=above:{$\langle A:7, B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b3) {};
+
+
+      \draw[thick] (a0) --  (a1) -- (a7) -- (a-receives-b3) -- (a-end);
+
+      \path
+          ++(270:2) node {\textbf{B}}
+          +(0:26) node (b-end) {}
+          ++(0:0.5) node (b0) {}
+          ++(0:6) node[point, label=above:{$\langle A:6 \rangle$}, label=below:{\emph{deliver}}] (b-receives-a1) {}
+          ++(0:3) node[point, label=above:{$\langle A:7 \rangle$}, label=below:{\emph{deliver}}](b-receives-a7) {}
+          ++(0:4) node[op, label=above:{$\langle B:3 \rangle$}] (b3) {b3}
+          ++(0:9) node[point, label=above:{\emph{reply to sync query}}] (b-receives-c-sync-request) {};
+
+      \draw[thick] (b0) -- (b-receives-a1) -- (b-receives-a7) -- (b3) -- (b-receives-c-sync-request) -- (b-end);
+
+      \path
+          ++(270:4) node {\textbf{C}}
+          +(0:26) node (c-end) {}
+          ++(0:0.5) node (c0) {}
+          ++(0:6) node (c-receives-a1) {}
+          +(90:0.5) node[cross] (fail-a1) {}
+          ++(0:3) node (c-receives-a7) {}
+          +(90:0.5) node[cross] (fail-a7) {}
+          ++(0:7) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b3) {}
+          ++(0:3) node[op, label=below:{$\langle B:3 \rangle$}] (c-query-sync) {sync}
+          ++(0:6) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b-sync-reply) {};
+
+
+      \draw[thick] (c0) -- (c-receives-b3) -- (c-query-sync) --  (c-receives-b-sync-reply) -- (c-end);
+
+      \draw[->, dashed, shorten >= 1]
+        (a1.east) edge (b-receives-a1.west)
+        (a1.east) edge (fail-a1)
+        (a7.east) edge (b-receives-a7.west)
+        (a7.east) edge (fail-a7)
+        (b3.east) edge (a-receives-b3.west)
+        (b3.east) edge (c-receives-b3.west)
+        (b-receives-c-sync-request.east) edge (c-receives-b-sync-reply.west)
+        (c-query-sync.east) edge (b-receives-c-sync-request.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Utilisation du mécanisme d'anti-entropie par le noeud C pour se synchroniser avec le noeud B}
+  \label{fig:anti-entropy}
+\end{figure}
+
+\mnnote{TODO: Choisir vecteur de version initial des noeuds et MàJ figure et texte en accordance.}
+
+Dans cette figure, nous représentons une exécution à laquelle participent trois noeuds : A, B et C.
+Initialement, les trois noeuds sont synchronisés.
+Leur vecteurs de version sont identiques et ont pour valeur $\langle A:X,B:Y,C:Z \rangle$.
+
+Le noeud A effectue les opérations \emph{a1} puis \emph{a7} et les diffusent sur le réseau.
+Le noeud B reçoit ces opérations et les délivre à son \ac{CRDT}.
+Il effectue ensuite et propage l'opération \emph{b3}, qui est reçue et délivrée par A.
+Ils atteignent tous deux la version représenté par le vecteur $\langle A:X+2,B:Y+1,C:Z \rangle$
+
+De son côté, le noeud C ne reçoit pas les opérations \emph{a1} et \emph{a7} à cause d'une erreur réseau.
+Néanmoins, cela ne l'empêche pas de délivrer l'opération \emph{b3} à sa réception et d'obtenir la version $\langle A:X,B:Y+1,C:Z \rangle$.
+
+Le noeud C déclenche alors son mécanisme d'anti-entropie.
+Il choisit aléatoirement le noeud B comme noeud cible.
+Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:X,B:Y+1,C:Z \rangle$.
+
+À la réception de ce message, le noeud B compare ce vecteur avec le sien.
+Il détermine que le noeud C n'a pas reçu les opérations \emph{a1} et \emph{a7}.
+B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
+
+À la réception de la réponse de B, le noeud C délivre les opérations \emph{a1} et \emph{a7}.
+Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:X+2,B:Y+1,C:Z \rangle$.
+
+Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.
+Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
+Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de version vide pour récupérer l'intégralité des opérations.
+
+Ce mécanisme propose plusieurs avantages.
+Son exécution n'implique que le noeud source et le noeud cible, ce qui limite les coûts de coordination.
+De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'un des messages, panne du noeud cible...), cette défaillance n'est pas critique : le noeud source se synchronisera à la prochaine exécution du mécanisme.
+Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison \emph{exactly-once}, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
+Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
+
+En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
+La complexité spatiale et en temps du mécanisme dépend donc linéairement du nombre d'opérations.
+Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations en se basant sur la stabilité causale des opérations puisque nous utilisons ce mécanisme pour mettre à niveau les nouveaux pairs.
+À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
+Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
 
 \subsection{Métadonnées}
 
@@ -4394,6 +4492,10 @@ Finalement, cette implémentation ne contraint pas une livraison causale des op�
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 \subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
 \subsection{Définition de types de données répliquées sans conflits plus complexes}
+\subsection{Comparaison des mécanismes de synchronisation}
+
+Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree\cite{2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees}, synchronisation par états (state/delta-based \acp{CRDT}).
+
 % \include{assets/conclusion}
 
 \Annex{Algorithmes \textsc{renameId}}
