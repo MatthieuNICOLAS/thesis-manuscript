@@ -989,6 +989,95 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   keywords = {replicated data, Availability, mutual consistency, distributed systems, network partitioning, network failures}
 }
 
+% Anti-entropy mechanism
+@inproceedings{demers1987epidemic,
+  title={Epidemic algorithms for replicated database maintenance},
+  author={Demers, Alan and Greene, Dan and Hauser, Carl and Irish, Wes and Larson, John and Shenker, Scott and Sturgis, Howard and Swinehart, Dan and Terry, Doug},
+  booktitle={Proceedings of the sixth annual ACM Symposium on Principles of distributed computing},
+  pages={1--12},
+  year={1987}
+}
+
+% Dynamo + anti-entropy mechanism with Merkle Trees
+@article{2007-dynamo,
+  title={Dynamo: Amazon's highly available key-value store},
+  author={DeCandia, Giuseppe and Hastorun, Deniz and Jampani, Madan and Kakulapati, Gunavardhan and Lakshman, Avinash and Pilchin, Alex and Sivasubramanian, Swaminathan and Vosshall, Peter and Vogels, Werner},
+  journal={ACM SIGOPS operating systems review},
+  volume={41},
+  number={6},
+  pages={205--220},
+  year={2007},
+  publisher={ACM New York, NY, USA}
+}
+
+
+% Comparison of anti-entropy mechanisms: Bloom Filters, Merkle Trees with fixed hash size, Merkle Trees with dynamic hash size
+@inproceedings{2015-approximate-hash-based-set-reconciliation,
+  author={Kruber, Nico and Lange, Maik and Schintke, Florian},
+  booktitle={2015 IEEE 34th Symposium on Reliable Distributed Systems (SRDS)},
+  title={Approximate Hash-Based Set Reconciliation for Distributed Replica Repair},
+  year={2015},
+  volume={},
+  number={},
+  pages={166-175},
+  doi={10.1109/SRDS.2015.30}
+}
+
+
+% DottedDB + Node-wide Dot-based Clocks + Comparison of anti-entropy mechanisms: Dotted Version Vectors, Merkle Trees, NDCs
+@inproceedings{2017-anti-entropy-without-merkle-trees,
+  author={Gonçalves, Ricardo Jorge Tomé and Almeida, Paulo Sérgio and Baquero, Carlos and Fonte, Vitor},
+  booktitle={2017 IEEE 36th Symposium on Reliable Distributed Systems (SRDS)},
+  title={DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones},
+  year={2017},
+  volume={},
+  number={},
+  pages={194-203},
+  doi={10.1109/SRDS.2017.28}
+}
+
+% Dot
+@inproceedings{2014-scalable-accurate-causality-tracking,
+  author="Almeida, Paulo S{\'e}rgio
+  and Baquero, Carlos
+  and Gon{\c{c}}alves, Ricardo
+  and Pregui{\c{c}}a, Nuno
+  and Fonte, Victor",
+  editor="Magoutis, Kostas
+  and Pietzuch, Peter",
+  title="Scalable and Accurate Causality Tracking for Eventually Consistent Stores",
+  booktitle="Distributed Applications and Interoperable Systems",
+  year="2014",
+  publisher="Springer Berlin Heidelberg",
+  address="Berlin, Heidelberg",
+  pages="67--81",
+  abstract="In cloud computing environments, data storage systems often rely on optimistic replication to provide good performance and availability even in the presence of failures or network partitions. In this scenario, it is important to be able to accurately and efficiently identify updates executed concurrently. Current approaches to causality tracking in optimistic replication have problems with concurrent updates: they either (1) do not scale, as they require replicas to maintain information that grows linearly with the number of writes or unique clients; (2) lose information about causality, either by removing entries from client-id based version vectors or using server-id based version vectors, which cause false conflicts. We propose a new logical clock mechanism and a logical clock framework that together support a traditional key-value store API, while capturing causality in an accurate and scalable way, avoiding false conflicts. It maintains concise information per data replica, only linear on the number of replica servers, and allows data replicas to be compared and merged linear with the number of replica servers and versions.",
+  isbn="978-3-662-43352-2"
+}
+
+
+
+% Network is unrealiable
+@article{2014-network-reliable,
+  author = {Bailis, Peter and Kingsbury, Kyle},
+  title = {The Network is Reliable: An Informal Survey of Real-World Communications Failures},
+  year = {2014},
+  issue_date = {July 2014},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {12},
+  number = {7},
+  issn = {1542-7730},
+  url = {https://doi.org/10.1145/2639988.2655736},
+  doi = {10.1145/2639988.2655736},
+  abstract = {The network is reliable tops Peter Deutsch’s classic list, "Eight fallacies of distributed computing", "all [of which] prove to be false in the long run and all [of which] cause big trouble and painful learning experiences." Accounting for and understanding the implications of network behavior is key to designing robust distributed programs; in fact, six of Deutsch’s "fallacies" directly pertain to limitations on networked communications. This should be unsurprising: the ability (and often requirement) to communicate over a shared channel is a defining characteristic of distributed programs, and many of the key results in the field pertain to the possibility and impossibility of performing distributed computations under particular sets of network conditions.},
+  journal = {Queue},
+  month = {jul},
+  pages = {20–32},
+  numpages = {13}
+}
+
+
 % CRDT + OT
 @inproceedings{10.1145/3380787.3393687,
   author = {Weidner, Matthew and Miller, Heather and Meiklejohn, Christopher},
