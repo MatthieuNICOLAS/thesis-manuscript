@@ -4433,47 +4433,10 @@ Néanmoins, une alternative possible est de mettre en place un système de charg
     Peu efficace pour les collaborations où le groupe est stable, mais avec des connexions/déconnexions.
 \end{itemize}
 
-\subsection{Perspectives}
-
-\subsubsection{Contrôle d'accès}
-
-\begin{itemize}
-  \item Pour le moment, n'importe quel utilisateur ayant l'URL du document peut y accéder dans MUTE
-  \item Pour des raisons de confidentialité, peut vouloir contrôler quels utilisateurs ont accès à un document
-  \item Nécessite l'implémentation de liste de contrôle d'accès
-  \item Mais s'agit d'une tâche complexe dans le cadre d'un système distribué
-  \item Peut s'inspirer des travaux réalisés au sein de la communautée \acp{CRDT} \cite{2021-access-control-crdts} pour cela
-\end{itemize}
-
-\subsubsection{Détection et éviction de pairs malhonnêtes}
-
-\begin{itemize}
-  \item À l'heure actuelle, MUTE suppose qu'ensemble des collaborateurs honnêtes
-  \item Vulnérable à plusieurs types d'attaques par des adversaires byzantins, tel que l'équivoque
-  \item Ce type d'attaque peut provoquer des divergences durables et faire échouer des collaborations
-  \item Dans \cite{2018-prunable-authenticated-log, 2021-these-vic}, \citeauthor{2021-these-vic} propose un mécanisme permettant de maintenir des logs authentifiés dans un système distribué
-  \item Les logs authentifiés permettent de mettre en lumière les comportements malveillants des adversaires et de limiter le nombre d'actions malveillantes qu'ils peuvent effectuer avant d'être évincer
-  \item Implémenter ce mécanisme permettrait de rendre compatible MUTE avec des environnements avec adversaires byzantins
-  \item Nécessiterait tout de même de faire évoluer le \ac{CRDT} pour résoudre les équivoques détectés
-\end{itemize}
-
-
 % \begin{itemize}
 %   \item Librairies alternatives (libP2P, hypercore)
 %   \item Topologies alternatives (SPRAY)
 % \end{itemize}
-
-\section{Pistes d'amélioration et de recherche}
-
-% \subsection{Historique du document}
-\subsection{Fusion de versions distantes d'un document collaboratif}
-
-\subsection{Rôles et places des bots dans systèmes collaboratifs}
-\begin{itemize}
-  \item Stockage du document pour améliorer sa disponibilité
-  \item Overleaf en P2P ?
-  \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
-\end{itemize}
 
 \section{Conclusion}
 
@@ -4495,6 +4458,37 @@ Néanmoins, une alternative possible est de mettre en place un système de charg
 \subsection{Comparaison des mécanismes de synchronisation}
 
 Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree\cite{2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees}, synchronisation par états (state/delta-based \acp{CRDT}).
+
+\subsection{Contrôle d'accès}
+
+\begin{itemize}
+  \item Pour le moment, n'importe quel utilisateur ayant l'URL du document peut y accéder dans MUTE
+  \item Pour des raisons de confidentialité, peut vouloir contrôler quels utilisateurs ont accès à un document
+  \item Nécessite l'implémentation de liste de contrôle d'accès
+  \item Mais s'agit d'une tâche complexe dans le cadre d'un système distribué
+  \item Peut s'inspirer des travaux réalisés au sein de la communautée \acp{CRDT} \cite{2021-access-control-crdts, 2022-dist-access-control-pa} pour cela
+\end{itemize}
+
+\subsection{Détection et éviction de pairs malhonnêtes}
+
+\begin{itemize}
+  \item À l'heure actuelle, MUTE suppose qu'ensemble des collaborateurs honnêtes
+  \item Vulnérable à plusieurs types d'attaques par des adversaires byzantins, tel que l'équivoque
+  \item Ce type d'attaque peut provoquer des divergences durables et faire échouer des collaborations
+  \item Dans \cite{2018-prunable-authenticated-log, 2021-these-vic}, \citeauthor{2021-these-vic} propose un mécanisme permettant de maintenir des logs authentifiés dans un système distribué
+  \item Les logs authentifiés permettent de mettre en lumière les comportements malveillants des adversaires et de borner le nombre d'actions malveillantes qu'ils peuvent effectuer avant d'être évincé
+  \item Implémenter ce mécanisme permettrait de rendre compatible MUTE avec des environnements avec adversaires byzantins
+  \item Nécessiterait tout de même de faire évoluer le \ac{CRDT} pour résoudre les équivoques détectés
+\end{itemize}
+
+\subsection{Fusion de versions distantes d'un document collaboratif}
+
+\subsection{Rôles et places des bots dans systèmes collaboratifs}
+\begin{itemize}
+  \item Stockage du document pour améliorer sa disponibilité
+  \item Overleaf en P2P ?
+  \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
+\end{itemize}
 
 % \include{assets/conclusion}
 
