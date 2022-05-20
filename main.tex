@@ -4303,22 +4303,75 @@ Néanmoins, une alternative possible est de mettre en place un système de charg
 
 \subsection{Collaborateurs}
 
+Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
+Une de ces fonctionnalités est de fournir la liste des collaborateurs actuellement connectés.
+Les protocoles d'appartenance au réseau sont une catégorie de protocoles spécifiquement dédiée à cet effet.
+Ainsi, nous devions en implémenter un dans MUTE.
+
+MUTE présente cependant plusieurs contraintes liées à notre modèle du système que le protocole sélectionné doit respecter.
+Tout d'abord, le protocole doit être compatible avec un environnement \ac{P2P}, où les noeuds partagent les mêmes droits et responsabilités.
+De plus, le protocole doit présenter une capacité de passage à l'échelle pour être adapté aux collaborations à large échelle.
+
+En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM\cite{swim2002}.
+Proposé par \citeauthor{swim2002}, ce protocole d'appartenance au réseau offre les propriétés suivantes :
+
+\mnnote{TODO: Lister propriétés de SWIM}
+
+Pour cela, SWIM découple les deux composants d'un protocole d'appartenance au réseau : le mécanisme de \emph{détection des défaillances des pairs} et le mécanisme de \emph{dissémination des mises à jour du groupe}.
+
+\subsubsection{Mécanisme de détection des défaillances des pairs}
+
 \begin{itemize}
-  \item Implémente Swim \cite{swim2002}
-  \item Découple protocole de détection des failures du protocole de diffusion de l'évolution du groupe
-  \item Protocole de détection des failures
-    \begin{itemize}
-      \item Basé sur un système de rounds, basés sur un intervalle de temps
-      \item À chaque round, chaque pair probe de manière aléatoire un autre pair
-      \item Si pas de réponse, demande à un autre pair de le contacter
-      \item Si pas de réponse par leur intermédiaire, pair devient suspect
-      \item Si toujours pas de nouvelles du pair après un certain temps, le considère déconnecté
-    \end{itemize}
-  \item Protocole de diffusion de l'évolution du groupe
-    \begin{itemize}
-      \item Plutôt que de diffuser chaque évolution du groupe, adopte un modèle de diffusion épidémique
-      \item Piggyback les évolutions aux messages du protocole de détection des failures
-    \end{itemize}
+  \item Basé sur un système de rounds, basés sur un intervalle de temps
+  \item À chaque round, chaque pair probe de manière aléatoire un autre pair
+  \item Si pas de réponse, demande à un autre pair de le contacter
+  \item Si pas de réponse par leur intermédiaire, pair devient suspect
+  \item Si toujours pas de nouvelles du pair après un certain temps, le considère déconnecté
+\end{itemize}
+
+\subsubsection{Mécanisme de dissémination des mises à jour du groupe}
+
+\begin{itemize}
+  \item Plutôt que de diffuser chaque évolution du groupe, adopte un modèle de diffusion épidémique
+  \item Piggyback les évolutions aux messages du protocole de détection des failures
+\end{itemize}
+
+\subsubsection{Modifications apportées}
+
+Nous avons ensuite apporté plusieurs modifications à la version du protocole SWIM présentée dans \cite{swim2002}.
+Notre première modification porte sur l'ordre de priorité entre les états d'un pair.
+
+\paragraph{Modification de l'ordre de précédence}
+
+Dans la version originale, un pair désigné comme défaillant l'est de manière irrévocable.
+Ce comportement est dû à la règle de précédence suivante :
+
+\[\forall i,j \in \mathbb{N}, \forall s \in \{\trm{Alive}, \trm{Suspect}\} \cdot \langle s,i \rangle < \langle \trm{Confirm},j \rangle\]
+
+pour un noeud donné.
+Ainsi, un noeud déclaré comme défaillant par un autre noeud doit changer d'identité pour rejoindre de nouveau le groupe.
+
+Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateurs croît de manière linéaire avec le nombre de connexions.
+S'agissant du paramètre avec le plus grand ordre de grandeur de l'application, nous avons cherché à le diminuer.
+
+Nous avons donc modifié les règles de précédence de la manière suivante :
+
+\[\forall i,j \in \mathbb{N}, i < j, \forall s,t \in \{\trm{Alive}, \trm{Suspect}, \trm{Confirm}\} \cdot \langle i,s \rangle < \langle j,t \rangle\]
+
+et
+
+\[\forall i,j,k \in \mathbb{N}, i \leq j \leq k \cdot \langle i \cdot \trm{Alive} \rangle < \langle j,\trm{Suspect} \rangle < \langle k,\trm{Confirm} \rangle\]
+
+Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
+Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
+La taille de la liste des collaborateurs devient dès lors linéaire par rapport au nombre de noeuds.
+
+Ces modifications n'ont pas d'impact sur la convergence des listes des collaborateurs des différents noeuds.
+Une étude approfondie reste néanmoins à effectuer pour déterminer si ces modifications ont un impact sur la vitesse à laquelle un noeud défaillant est déterminé comme tel par l'ensemble des noeuds.
+
+\paragraph{Ajout d'un mécanisme de synchronisation}
+
+\begin{itemize}
   \item Modifie le fonctionnement du protocole pour en faire un CRDT
   \item Afin de permettre un nouveau pair de récupérer instantanément état courant du groupe
   \item Autorise aussi un pair à se déconnecter puis reconnecter en modifiant l'ordre de priorité entre les différents messages
@@ -4327,6 +4380,8 @@ Néanmoins, une alternative possible est de mettre en place un système de charg
     \item Afin de maintenir l'identifiant du pair, notamment pour ses opérations sur le document
   \end{itemize}
 \end{itemize}
+
+\subsubsection{Synthèse}
 
 \subsection{Curseurs}
 
