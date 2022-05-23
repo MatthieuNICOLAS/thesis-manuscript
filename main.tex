@@ -4323,6 +4323,8 @@ Pour cela, SWIM découple les deux composants d'un protocole d'appartenance au r
 
 \subsubsection{Mécanisme de détection des défaillances des pairs}
 
+\label{sec:swim-failure-detection}
+
 Le mécanisme de détection des défaillances des pairs est executé de manière périodique, toutes les $T$ unités de temps, par chacun des noeuds du système de manière non-coordonnée.
 Son fonctionnement est illustré par la \autoref{fig:swim-failure-detection}.
 
@@ -4417,10 +4419,29 @@ Lorsqu'une mise à jour est effectuée, celle-ci est diffusée de la manière pr
 
 \subsubsection{Mécanisme de dissémination des mises à jour du groupe}
 
-\begin{itemize}
-  \item Plutôt que de diffuser chaque évolution du groupe, adopte un modèle de diffusion épidémique
-  \item Piggyback les évolutions aux messages du protocole de détection des failures
-\end{itemize}
+\label{sec:swim-update-dissemination}
+
+Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateur, cette mise à jour doit être propagée au reste des noeuds.
+
+Or, diffuser cette mise à jour à l'ensemble du réseau serait coûteux pour un seul noeud.
+Afin de propager cette information de manière efficace, SWIM propose d'utiliser un protocole de diffusion épidémique : le noeud transmet la mise à jour qu'à un nombre réduit $\lambda$\footnote{
+  \cite{swim2002} montre que choisir une valeur constante faible comme $\lambda$ suffit néanmoins à garantir la dissémination des mises à jour à l'ensemble du réseau.
+} de pairs, qui se chargeront de la transmettre à leur tour.
+Le mécanisme de dissémination des mises à jour de SWIM fonctionne donc de la manière suivante.
+
+Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur, initialisé avec $\lambda$.
+À chaque génération d'un message pour le mécanisme de détection des défaillances, $\lambda$ mises à jour sont sélectionnées dans la liste et attachées au message.
+Leur compteurs respectifs sont décrémentés.
+Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.
+
+À la réception d'un message, le noeud le traite comme définit précédemment en \autoref{sec:swim-failure-detection}.
+De manière additionnelle, il intègre dans sa liste des collaborateurs les mises à jour attachées au message en utilisant la règle suivante :
+
+\[\forall i,j,k \cdot i \leq j \cdot \langle \trm{Alive},i \rangle < \langle \trm{Suspect},j \rangle < \langle \trm{Confirm},k \rangle \]
+
+Ainsi, le mécanisme de dissémination des mises à jour du groupe réutilise les messages du mécanisme de détection des défaillances pour diffuser les modifications.
+Cela permet de propager les évolutions de la liste des collaborateurs sans ajouter de message supplémentaire.
+De plus, les règles de précédence sur l'état d'un collaborateur permettent aux noeuds de converger même si les mises à jour sont reçues dans un ordre distinct.
 
 \subsubsection{Modifications apportées}
 
