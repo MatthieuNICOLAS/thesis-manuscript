@@ -4175,6 +4175,8 @@ Finalement, cette implémentation ne contraint pas une livraison causale des op�
 
 \subsubsection{Livraison des opérations à terme}
 
+\label{sec:mute-anti-entropy}
+
 La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être délivrées à tous les noeuds à terme.
 Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
 Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
@@ -4371,15 +4373,19 @@ Une étude approfondie reste néanmoins à effectuer pour déterminer si ces mod
 
 \paragraph{Ajout d'un mécanisme de synchronisation}
 
-\begin{itemize}
-  \item Modifie le fonctionnement du protocole pour en faire un CRDT
-  \item Afin de permettre un nouveau pair de récupérer instantanément état courant du groupe
-  \item Autorise aussi un pair à se déconnecter puis reconnecter en modifiant l'ordre de priorité entre les différents messages
-  \begin{itemize}
-    \item Dans protocole original, un pair déconnecté doit revenir sous une nouvelle identité
-    \item Afin de maintenir l'identifiant du pair, notamment pour ses opérations sur le document
-  \end{itemize}
-\end{itemize}
+La seconde modification que nous avons effectué concerne l'ajout d'un mécanisme de synchronisation entre pairs.
+En effet, le papier ne précise pas de procédure particulière lorsqu'un nouveau pair rejoint le réseau.
+Pour obtenir la liste des collaborateurs, ce dernier doit donc la demander à un autre pair.
+
+Nous avons donc implémenté pour la liste des collaborateurs un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
+Le noeud cible lui répond alors en lui envoyant l'état courant de sa liste.
+À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
+Cette fusion conserve l'entrée la plus récente pour chaque noeud.
+
+Pour récapituler, les mises à jour du groupe sont diffusées de manière atomique de façon épidémique, en utilisant les messages du mécanisme de détection des défaillances des noeuds.
+De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser leur état.
+Ce mécanisme nous permet de pallier aux défaillances éventuelles du réseau.
+Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par différences pour la liste des collaborateurs.
 
 \subsubsection{Synthèse}
 
