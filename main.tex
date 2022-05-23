@@ -4400,6 +4400,21 @@ Pour éviter qu'un message antérieur n'invalide une suspicion d'une défaillanc
 Chaque noeud maintient un numéro d'incarnation.
 Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.
 
+Ainsi, afin de représenter la liste des collaborateur, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
+
+\begin{definition}[Liste des collaborateurs]
+  \label{def:collaborator-list}
+  La \emph{liste des collaborateurs} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
+  \begin{itemize}
+    \item $\trm{nodeId}$ correspond à l'identifiant du noeud correspondant à ce tuple.
+    \item $\trm{nodeStatus}$ correspond au statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
+    \item $\trm{nodeIncarn}$ correspond au numéro d'incarnation maximal, \ie le plus récent, connu pour le noeud correspondant à ce tuple.
+  \end{itemize}
+\end{definition}
+
+Chaque noeud réplique cette liste et la fait évoluer au cours l'exécution du mécanisme présenté jusqu'ici.
+Lorsqu'une mise à jour est effectuée, celle-ci est diffusée de la manière présentée ci-dessous.
+
 \subsubsection{Mécanisme de dissémination des mises à jour du groupe}
 
 \begin{itemize}
