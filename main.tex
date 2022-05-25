@@ -3669,13 +3669,18 @@ MUTE propose plusieurs alternatives pour représenter le document texte.
 MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}}.
 Ce choix est effectué via une valeur de configuration de l'application choisie au moment de son déploiement.
 
-Le modèle de données utilisé interagit avec l'éditeur de texte par l'intermédiaire de d'opérations textes.
+Le modèle de données utilisé interagit avec l'éditeur de texte par l'intermédiaire d'opérations textes.
 Lorsque l'utilisateur effectue des modifications locales, celles-ci sont détectées et mises sous la forme d'opérations textes.
 Elles sont transmises au modèle de données, qui les intègre alors à la structure de données répliquées.
 Le \ac{CRDT} retourne en résultat l'opération distante à propager aux autres noeuds.
 
 De manière complémentaire, lorsqu'une opération distante est délivrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
 Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.
+
+En plus du texte, MUTE maintient un ensemble de métadonnées par document.
+Par exemple, les utilisateurs peuvent donner un titre au document.
+Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Wins Register \ac{CRDT} synchronisé par opérations\cite{shapiro_2011_crdt} au document.
+De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par opérations pour représenter la date de création du document.
 
 \subsection{Module de livraison des opérations}
 
@@ -4295,14 +4300,6 @@ Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations 
 À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
 Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
 
-\subsection{Métadonnées}
-
-\begin{itemize}
-  \item Titre (Simple LWW-Register)
-  \item Date de création (fixe)
-  \item Mode de chiffrement (fixe)
-\end{itemize}
-
 \subsection{Collaborateurs}
 
 Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
@@ -4508,11 +4505,16 @@ Ainsi, une perspective est d'implémenter ces améliorations dans MUTE.
 
 \subsection{Curseurs}
 
-\begin{itemize}
-  \item Repose sur des identifiants pour indiquer la position des curseurs
-  \item Vecteur de LWW-Registers, chaque LWW-Register étant associé à un pair actuellement connecté
-    \mnnote{NOTE: C'est vrai ça ? J'ai un doute sur le fait qu'on avait mis en place un CRDT pour cette structure. À vérifier.}
-\end{itemize}
+Toujours dans le but d'offrir des fonctionnalités de conscience de groupe aux utilisateurs pour leur permettre de se coordonner aisément, nous avons implémenté dans MUTE l'affichage des curseurs distants.
+
+Pour représenter fidèlement la position des curseurs des collaborateurs distants, nous nous reposons sur les identifiants du \ac{CRDT} choisi pour représenter la séquence.
+Le fonctionnement est similaire à la gestion des modifications du document : lorsque l'éditeur indique que l'utilisateur a déplacé son curseur, nous récupérons son nouvel index.
+Nous recherchons ensuite l'identifiant correspondant à cet index dans la séquence répliquée et le diffusons aux collaborateurs.
+
+À la réception de la position d'un curseur distant, nous récupérons l'index correspondant à cet identifiant dans la séquence répliquée et représentons un curseur à cet index.
+Il est intéressant de noter que si l'identifiant a été supprimé en concurrence, nous pouvons à la place récupérer l'index de l'élément précédent et ainsi indiquer à l'utilisateur où son collaborateur est actuellement en train de travailler.
+
+De façon similaire, nous gérons les sélections de texte à l'aide de deux curseurs : un curseur de début et un curseur de fin de sélection.
 
 % \subsection{Composition de CRDTs}
 
