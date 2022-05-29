@@ -171,6 +171,7 @@
 % \input{assets/acronyms.tex}
 \acrodef{ADT}[ADT]{Abstract Data Type}
 \acrodefplural{ADT}[ADTs]{Abstract Data Types}
+\acrodef{API}[API]{Application Programming Interface}
 \acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
 \acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
 \acrodef{FIFO}[FIFO]{First In, First Out}
@@ -180,6 +181,7 @@
 \acrodefplural{OT}[OT]{Operational Transformations}
 \acrodef{P2P}[P2P]{Pair-à-Pair}
 \acrodef{SEC}[SEC]{Cohérence forte à terme}
+\acrodef{WebRTC}[WebRTC]{Web Real-Time Communication}
 
 %-------------------------------------------------------------------
 %                           Couleurs
@@ -4535,32 +4537,87 @@ De façon similaire, nous gérons les sélections de texte à l'aide de deux cur
 % \end{itemize}
 
 \section{Couche réseau}
-\subsection{Netflux}
-\begin{itemize}
-  \item Réseau P2P
-  \item Interface uniforme permettant d'interagir à la fois avec des navigateurs et des bots
-  \item Connectent les noeuds en utilisant la technologie WebRTC
-  \item Connectent les bots en utilisant la technologie WebSocket
-  \item Repose sur l'utilisation d'un signaling server pour permettre aux pairs de rejoindre la collaboration
-  \item Topologie maillée
-\end{itemize}
-\subsection{Pulsar}
-\begin{itemize}
-  \item Log-based message broker
-  \item Propose plusieurs modes de fonctionnement
-  \item En mode log-based message broker, maintient l'ensemble des messages reçus dans un log
-  \item Permet, lorsque utilisé pour diffuser les opérations, de conserver le log complet des opérations
-  \item Permet alors à un nouveau noeud de récupérer l'ensemble des opérations connues et de reconstruire l'état courant du document, même si actuellement aucun autre pair n'est connecté
-  \item En mode message broker, diffuse seulement les messages aux noeuds actuellement connectés au topic
-  \item Permet de communiquer les messages transients (protocole d'établissement de la clé de groupe, heartbeat de Swim, mécanisme d'anti-entropie du document) sans polluer le log
-  \item Pose néanmoins des questions de sécurité et d'utilisabilité
-  \item Besoin de chiffrer E2E les opérations
-  \item Dans ce cas
-    \begin{itemize}
-      \item comment un nouveau pair peut obtenir la clé de chiffrement si les autres pairs ne sont pas connectés ? (à moins de revenir à un chiffrement à base de passphrase, avec les problèmes qui en découlent)
-      \item comment un nouveau pair peut relire les opérations chiffrées avec l'ancienne clé ?
-    \end{itemize}
-\end{itemize}
+
+Pour permettre aux différents noeuds de communiquer, MUTE repose sur la librairie Netflux\footnote{\url{https://github.com/coast-team/netflux}}.
+Développée au sein de l'équipe Coast, cette librairie permet de construire un réseau \ac{P2P} entre des navigateurs, mais aussi des bots.
+
+\subsection{Établissement d'un réseau \ac{P2P} entre navigateurs}
+
+Pour créer un réseau \ac{P2P} entre navigateurs, Netflux utilise la technologie \acf{WebRTC}.
+\ac{WebRTC} est une API\footnote{\ac{API} : Interface de Programmation} de navigateur spécifiée en 2011, et en cours d'implémentation dans les différents navigateurs depuis 2013.
+Elle permet de créer une connexion directe entre deux navigateurs pour échanger des médias audio et/ou vidéo, ou simplement des données.
+
+Cette API utilise pour cela un ensemble de protocoles.
+Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
+Dans figure, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
+
+\mnnote{TODO: Ajouter figure architecture système pour WebRTC}
+
+Nous décrivons ci-dessous leur rôle respectif dans la collaboration.
+
+\subsubsection{Serveur de signalisation}
+
+Pour rejoindre un réseau \ac{P2P} déjà établi, un nouveau noeud a besoin de découvrir les noeuds déjà connectés et de pouvoir communiquer avec eux.
+Le serveur de signalisation offre ces fonctionnalités.
+
+Au moins un noeud du réseau \ac{P2P} doit maintenir une connexion avec le serveur de signalisation.
+À sa connexion, un nouveau noeud contacte le serveur de signalisation.
+Il est mis en relation avec un noeud du réseau \ac{P2P} par son intermédiaire et échange les différents messages de \ac{WebRTC} nécessaires à l'établissement d'une connexion \ac{P2P} entre eux.
+
+Une fois cette première connexion \ac{P2P} établie, le nouveau noeud contacte et communique avec les autres noeuds par l'intermédiaire du premier noeud.
+Il peut alors terminer sa connexion avec le serveur de signalisation.
+
+\subsubsection{Serveur STUN}
+
+Pour se connecter, les noeuds doivent s'échanger plusieurs informations logicielles et matérielles, notamment leur adresse IP publique respective.
+Cependant, un noeud n'a pas accès à cette donnée lorsque son routeur utilise le protocole NAT.
+Le noeud doit alors la récupérer.
+
+Pour permettre aux noeuds de découvrir leur adresse IP publique, \ac{WebRTC} repose sur le protocole STUN.
+Ce protocole consiste simplement à contacter un serveur tiers dédié à cet effet.
+Ce serveur retourne en réponse au noeud qui le contacte son adresse IP publique.
+
+\subsubsection{Serveur TURN}
+
+Il est possible que des noeuds provenant de réseaux différents ne puissent établir une connection \ac{P2P} directe entre eux, par exemple à cause de restrictions imposées par leur pare-feux respectifs.
+Pour contourner ce cas de figure, \ac{WebRTC} utilise le protocole TURN.
+
+Ce protocole consiste à utiliser un serveur tiers comme relais entre les noeuds.
+Ainsi, les noeuds peuvent communiquer par son intermédiaire tout au long de la collaboration.
+Les échanges sont chiffrés, afin que le serveur TURN ne représente pas une faille de sécurité.
+
+\subsubsection{Rôle des serveurs}
+
+Ainsi, \ac{WebRTC} implique l'utilisation de plusieurs serveurs.
+
+Les serveurs de signalisation et STUN sont nécessaires pour permettre à de nouveaux noeuds de rejoindre la collaboration.
+Autrement dit, leur rôle est ponctuel : une fois le réseau \ac{P2P} établit, les noeuds n'ont plus besoin d'eux.
+Ces serveurs peuvent alors être coupés sans impacter la collaboration.
+
+À l'inverse, les serveurs TURN jouent un rôle plus prédominant dans la collaboration.
+Ils sont nécessaires dès lors que des noeuds proviennent de réseaux différents et sont alors requis tout au long de la collaboration.
+Une panne de ces derniers entraverait la collaboration puisqu'elle résulterait en une partition des noeuds.
+Il est donc primordial de s'assurer de la disponibilité et fiabilité de ces serveurs.
+
+\subsection{Topologie réseau}
+
+Netflux établit un réseau \ac{P2P} par document.
+Chaque réseau \ac{P2P} est un réseau entièrement maillé : chaque noeud se connecte à l'ensemble des autres noeuds.
+
+Cette topologie simple est adaptée à des groupes de petite taille, mais ne passe pas à l'échelle.
+D'autres topologies limitant le nombre de connexions par noeuds, telle que celle décrite par \cite{2018-spray-nedelec}, pourraient être implémentées pour adresser cette limite.
+
+% \subsection{Gestion des bots}
+
+% \begin{itemize}
+%   \item Pour faciliter la collaboration, MUTE propose l'utilisation de bots
+%   \item Par exemple, un bot de stockage se contentant de suivre une collaboration et de stocker les opérations
+%   \item De façon à permettre à un pair de récupérer la dernière version du document même si les autres collaborateurs sont actuellement déconnectés
+%   \item Afin de réutiliser les structures de données implémentées, développés en NodeJS
+%   \item Cependant, NodeJS ne supporte pas WebRTC nativement
+%   \item Utilise alors des websockets
+%   \item Netflux propose une couche d'abstraction permettant de communiquer avec un pair de manière uniforme, qu'il soit un navigateur ou un bot
+% \end{itemize}
 
 \section{Couche sécurité}
 
