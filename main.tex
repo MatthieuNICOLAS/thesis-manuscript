@@ -180,6 +180,7 @@
 \acrodef{OT}[OT]{Operational Transformation}
 \acrodefplural{OT}[OT]{Operational Transformations}
 \acrodef{P2P}[P2P]{Pair-à-Pair}
+\acrodef{PKI}[PKI]{Public Key Infrastructure}
 \acrodef{SEC}[SEC]{Cohérence forte à terme}
 \acrodef{WebRTC}[WebRTC]{Web Real-Time Communication}
 
@@ -4549,9 +4550,13 @@ Elle permet de créer une connexion directe entre deux navigateurs pour échange
 
 Cette API utilise pour cela un ensemble de protocoles.
 Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
-Dans figure, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
+Dans \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
 
-\mnnote{TODO: Ajouter figure architecture système pour WebRTC}
+\begin{figure}[!ht]
+  \mnnote{TODO: Compléter figure webrtc}
+  \caption{Architecture système pour la couche réseau de MUTE}
+  \label{fig:architecture-systeme-webrtc}
+\end{figure}
 
 Nous décrivons ci-dessous leur rôle respectif dans la collaboration.
 
@@ -4621,54 +4626,33 @@ D'autres topologies limitant le nombre de connexions par noeuds, telle que celle
 
 \section{Couche sécurité}
 
-\subsection{Objectifs}
+La couche sécurité a pour but de garantir l'authenticité et la confidentialité des messages échangés par les noeuds.
+Pour cela, elle implémente un mécanisme de chiffrement de bout en bout.
 
-\begin{itemize}
-  \item Souhaite garantir confidentialité, authenticité et intégrité des messages.
-    Pour cela, vise chiffrement de bout en bout.
-  \item Souhaite aussi garantir backward et forward secrecies.
-    Backward : nouveau pair ne peut pas déchiffrer les messages précédemments envoyés.
-    Forward : ancien pair ne peut pas déchiffrer les messages envoyés après son départ.
-  \item Besoin de mettre à jour clé au fur et à mesure des évolutions du groupe.
-    Comment procéder à l'évolution de la clé en distribué ?
-\end{itemize}
+Pour chiffrer les messages, MUTE utilise un mécanisme de chiffrement à base de clé de groupe.
+Le protocole choisi est le protocole Burmester-Desmedt\cite{1995-burmester-desmedt}.
+Il nécessite que chaque noeud possède une paire de clés de chiffrement et enregistre sa clé publique auprès d'un PKI\footnote{\acf{PKI} : Infrastructure de gestion de clés}.
 
-\subsection{Approche choisie}
+Afin d'éviter qu'un \ac{PKI} malicieux n'effectue une attaque de l'homme au milieu sur la collaboration, les noeuds doivent vérifier le bon comportement des PKI de manière non-coordonnée.
+À cet effet, MUTE implémente le mécanisme d'audit de PKI Trusternity\cite{2018-trusternity-short, 2018-trusternity-long}.
+Son fonctionnement nécessite l'utilisation d'un registre publique sécurisé \emph{append-only}, \ie une blockchain.
 
-\begin{itemize}
-  \item Intègre un mécanisme de chiffrement à base de clé de groupe.
-    Implémente protocole Burmester - Desmedt pour établir la clé de chiffrement de groupe.
-    Nécessite clés publiques des différents participants.
-    Besoin d'authentifier les clés publiques pour éviter man-in-the-middle attack.
-\end{itemize}
+L'architecture système nécessaire pour la couche sécurité est présentée dans la \autoref{fig:architecture-systeme-trusternity}.
 
-\subsubsection{Trusternity}
+\begin{figure}[!ht]
+  \mnnote{TODO: Compléter figure trusternity}
+  \caption{Architecture système pour la couche sécurité de MUTE}
+  \label{fig:architecture-systeme-trusternity}
+\end{figure}
 
-\begin{itemize}
-  \item Mécanisme d'audit des PKI. \cite{2018-trusternity-short, 2018-trusternity-long}
-\end{itemize}
+Cette couche sécurité s'ajoute au mécanisme de chiffrement des messages inhérent à \ac{WebRTC}.
+Cela nous offre de nouvelles possibilités : plutôt que de créer un réseau \ac{P2P} par document, nous pouvons désormais mettre en place un réseau \ac{P2P} global.
+Les messages étant chiffrés de bout en bout, les noeuds peuvent communiquer en toute sécurité et confidentialité par l'intermédiaire de noeuds tiers, \ie des noeuds extérieurs à la collaboration.
 
-\subsubsection{Protocole Burmester-Desmedt}
-
-\begin{itemize}
-  \item Permet d'établir la clé de chiffrement de groupe. \cite{1995-burmester-desmedt}.
-\end{itemize}
-
-\subsection{Limites}
-
-\begin{itemize}
-  \item Plusieurs limites à ce protocole.
-  \item Computationnellement lourd.
-    \mnnote{TODO: Limite provenant d'une slide de JP, voir ce qui justifie cette remarque}
-  \item Requiert participation de l'ensemble des noeuds lors évolution du groupe.
-    Peut être effectué de manière asynchrone.
-    Mais que faire en attendant que l'ensemble des noeuds ?
-    Peu adapté dans un système hautement dynamique.
-    Va passer son temps à regénérer une nouvelle clé.
-  \item Pour éviter ce problème, considère que le groupe est l'ensemble des noeuds connectés.
-    Mais implique de générer une nouvelle clé à chaque connexion et déconnexion.
-    Peu efficace pour les collaborations où le groupe est stable, mais avec des connexions/déconnexions.
-\end{itemize}
+Une limite de l'approche actuelle est que la clé de groupe change avec l'évolution des noeuds connectés : à chaque connexion ou déconnexion d'un noeud, une nouvelle clé est recalculée avec les collaborateurs présents.
+Cette évolution fréquente de la clé de chiffrement, nécessaire pour garantir la \emph{backward secrecy} et \emph{forward secrecy}, nous empêche par exemple de stocker les opérations de manière chiffrée chez des noeuds tiers.
+Cette fonctionnalité serait cependant bien pratique pour permettre à un noeud de récupérer la dernière version de ses documents, même en l'absence de ses collaborateurs.
+Une autre clé de chiffrement, dédiée au stockage, devrait être mise en place, ainsi qu'un mécanisme de découverte des noeuds tiers stockant les données de la collaboration.
 
 % \begin{itemize}
 %   \item Librairies alternatives (libP2P, hypercore)
@@ -4676,6 +4660,8 @@ D'autres topologies limitant le nombre de connexions par noeuds, telle que celle
 % \end{itemize}
 
 \section{Conclusion}
+
+
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
