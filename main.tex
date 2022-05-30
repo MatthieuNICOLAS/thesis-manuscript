@@ -3622,37 +3622,40 @@ Mais par définition, ces approches ne pourraient offrir de garanties fortes sur
 \NumberThisInToc
 \chapter{MUTE, un éditeur de texte web collaboratif P2P temps réel chiffré de bout en bout}
 \minitoc
-\section{Présentation}
 
-\begin{itemize}
-  \item Plateforme d'expérimentation et de démonstration de l'équipe
-\end{itemize}
+\mnnote{TODO: Ajouter intro outils collaboratifs}
 
-\subsection{Objectifs}
+Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT ont permis de populariser l'édition collaborative temps réel de texte\cite{gdocs, etherpad}.
+Ces approchent souffrent néanmoins de leur architecture centralisé.
+Notamment, ces solutions rencontrent des difficultés à passer à l'échelle\cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité\cite{prism-washington-post, prism-guardian}.
 
-\begin{itemize}
-  \item Éditeur collaboratif
-  \item Permettre collaboration synchrone (temps réel) et asynchrone (mode offline)
-  \item À grande échelle
-  \item Respecter privacy, limiter au maximum la confiance qu'on demande aux utilisateurs d'avoir dans l'outil
-  \item Facile d'accès
-  \item Facilement déployable par des tiers
-  \item S'inscrit dans la mouvance Local-First Software \cite{localfirstsoftware2019,pushpin2020}
-\end{itemize}
+L'approche \ac{CRDT} offrant une meilleure capacité de passage à l'échelle et étant compatible avec une architecture \ac{P2P}, de nombreux travaux\cite{peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant à ces limites.
+De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
+Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
 
-\subsection{Architecture}
+De manière semblable, l'équipe Coast conçoit des applications avec ces objectifs et étudient les problématiques de recherche liées depuis plusieurs années.
+Notamment, elle développe \acf{MUTE}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+\ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
 
-\begin{itemize}
-  \item Pour répondre à ces besoins, a effectué les choix suivants
-  \item Application web
-  \item Utilise CRDT pour représenter le document partagé
-  \item Nous permet de supporter les différents modes de collaboration
-  \item Nous permet aussi d'adopter une architecture P2P garantissant la privacy et le passage à l'échelle
-  \item Mais présence de plusieurs serveurs, aux responsabilités limitées, pour simplifier la collaboration (signaling server, pulsar, bots(?))
-  \item \mnnote{TODO: Insérer schéma de l'architecture d'une collaboration (noeuds, types de noeuds et lien)}
-  \item L'architecture d'un pair se décompose en plusieurs couches
-  \item \mnnote{TODO: Insérer schéma de l'architecture logicielle d'un pair}
-\end{itemize}
+La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
+MUTE étant une application web, chaque noeud représenté ici correspond à un navigateur.
+
+\begin{figure}[!ht]
+  \mnnote{TODO: Faire figure architecture système de MUTE}
+  \caption{Architecture système de l'application MUTE}
+  \label{fig:architecture-sys-mute}
+\end{figure}
+
+Nous décrivons l'architecture logicielle d'un noeud dans la \autoref{fig:architecture-log-mute}.
+Dans ce chapitre, nous présentons les différentes couches logicielles de MUTE.
+Notamment, nous détaillons les couches correspondantes à l'implémentation des travaux présentés dans le \autoref{chap:renamablelogootsplit}.
+De la même façon, nous précisons dans ce chapitre les différents composants de l'architecture système de MUTE autre que les pairs eux-mêmes.
+
+\begin{figure}[!ht]
+  \mnnote{TODO: Faire figure architecture logicielle de MUTE}
+  \caption{Architecture logicielle de l'application MUTE}
+  \label{fig:architecture-log-mute}
+\end{figure}
 
 \section{Couche interface utilisateur}
 
@@ -3660,7 +3663,7 @@ La \autoref{fig:interface-mute} illustre l'interface utilisateur de MUTE.
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.8\linewidth]{img/screenshot-mute.png}
+  \includegraphics[width=\linewidth]{img/screenshot-mute.png}
   \caption{Capture d'écran d'une session d'édition collaborative avec MUTE}
   \label{fig:interface-mute}
 \end{figure}
@@ -3713,7 +3716,7 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
 \label{sec:mute-exactly-once-delivery}
 
 Afin de respecter la contrainte de \emph{exactly-once delivery}, il est nécessaire d'identifier de manière unique chaque opération.
-Pour cela, le module \texttt{Sync} ajoute un \emph{Dot} à chaque opération :
+Pour cela, le module \texttt{Sync} ajoute un \emph{Dot}\cite{2014-scalable-accurate-causality-tracking} à chaque opération :
 
 \begin{definition}[Dot]
   Un \emph{Dot} est une paire $\langle$nodeId, nodeSyncSeq$\rangle$ où
