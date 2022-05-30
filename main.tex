@@ -3654,20 +3654,31 @@ Mais par définition, ces approches ne pourraient offrir de garanties fortes sur
   \item \mnnote{TODO: Insérer schéma de l'architecture logicielle d'un pair}
 \end{itemize}
 
-\section{Couche éditeur de texte}
+\section{Couche interface utilisateur}
 
-\begin{itemize}
-  \item Éditeur Markdown
-  \item Permet d'incorporer le style des éléments directement dans la séquence représentant le document texte
-  \item Mécanisme de conscience de groupe
-  \begin{itemize}
-    \item Liste des collaborateurs
-    \item Curseurs et sélections des autres collaborateurs
-    \item Indicateur de connexion
-  \end{itemize}
-  \item Stocke au sein du navigateur les données du document (état du document, log des opérations...)
-  \item Glue le reste des couches ensemble
-\end{itemize}
+La \autoref{fig:interface-mute} illustre l'interface utilisateur de MUTE.
+
+\begin{figure}[!ht]
+  \mnnote{TODO: Faire capture de MUTE avec 2-3 collaborateurs}
+  \caption{Capture d'écran d'une session d'édition collaborative avec MUTE}
+  \label{fig:interface-mute}
+\end{figure}
+
+L'interface se compose d'un éditeur de texte supportant le langage de balisage Markdown.
+Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
+Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.
+
+L'éditeur est agrémenté de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateurs.
+L'indicateur en haut à droite de la fenêtre représente le statut de connexion de l'utilisateur.
+Ceci lui indique s'il est actuellement connecté au réseau \ac{P2P}, en cours de connexion, ou si un incident réseau a lieu.
+
+MUTE affiche la liste des collaborateurs actuellement connectés sur la droite de l'éditeur.
+De plus, un curseur ou une sélection distante est associée à chaque collaborateur de la liste.
+Elle permet d'indiquer à l'utilisateur courant dans quelles sections du document ses collaborateurs sont en train de travailler.
+Ainsi, ils peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un collaborateur.
+
+Les documents de l'utilisateur étant sauvegardés dans le navigateur, les documents sont aussi bien disponibles en étant en ligne que hors ligne.
+Une seconde page, listant les documents sauvegardés, permet à l'utilisateur de parcourir ses différents documents.
 
 \section{Couche réplication}
 
