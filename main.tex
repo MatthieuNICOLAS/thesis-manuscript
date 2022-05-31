@@ -3201,7 +3201,7 @@ Comme indiqué dans le \autoref{tab:evolution-integration-time-rename}, l'intég
 Bien que les opérations \emph{rename} travaillent en coulisses, elles peuvent néanmoins impacter négativement l'expérience utilisateur.
 Notamment, les noeuds ne peuvent pas intégrer d'autres opérations \emph{distantes} tant qu'ils sont en train de traiter des opérations \emph{rename}.
 Du point de vue des utilisateurs, les opérations \emph{rename} peuvent alors être perçues comme des pics de latence.
-Dans le domaine de l'édition collaborative temps réel, \textcite{ignat:hal-01088815,ignat:hal-01238831} ont montré que le délai dégradait la qualité des collaborations.
+Dans le domaine de l'édition collaborative temps réel, \textcite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat} ont montré que le délai dégradait la qualité des collaborations.
 Il est donc important de générer fréquemment des opérations \emph{rename} pour conserver leur temps d'intégration sous une limite perceptible.
 
 Finalement, le dernier aspect à considérer est le nombre d'opérations \emph{rename} concurrentes.
@@ -3215,7 +3215,7 @@ Pour récapituler, nous pouvons proposer plusieurs stragégies de génération d
 Mais bien que certaines de ces stratégies convergent (minimiser la taille de la structure de données et minimiser le temps d'intégration des opérations \emph{rename}), d'autres entrent en conflit (générer une opération \emph{rename} dès qu'un seuil est atteint vs. minimiser le nombre d'opérations \emph{rename} concurrentes générées).
 Les concepteurs de systèmes doivent proposer un compromis entre les différents paramètres en fonction des contraintes du système concerné (application temps réel ou asynchrone, limitations matérielles des noeuds...).
 Il est donc nécessaire d'analyser le système pour évaluer ses performances sur chaque aspect, ses usages et trouver le bon compromis entre tous les paramètres de la stratégie de renommage.
-Par exemple, dans le contexte des systèmes d'édition collaborative temps réel, \cite{ignat:hal-01088815} a montré que le délai diminue la qualité de la collaboration.
+Par exemple, dans le contexte des systèmes d'édition collaborative temps réel, \cite{2014-effect-delay-collaborative-editing-ignat} a montré que le délai diminue la qualité de la collaboration.
 Dans de tels systèmes, nous viserions donc à conserver le temps d'intégration des opérations (en incluant les opérations \emph{rename}) en dessous du temps limite correspondant à leur perception par les utilisateurs.
 
 \subsection{Stockage des états précédents sur disque}
