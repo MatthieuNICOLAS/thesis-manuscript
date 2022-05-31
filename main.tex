@@ -4505,8 +4505,8 @@ En effet, le papier ne précise pas de procédure particulière lorsqu'un nouvea
 Pour obtenir la liste des collaborateurs, ce dernier doit donc la demander à un autre pair.
 
 Nous avons donc implémenté pour la liste des collaborateurs un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
-\mnnote{TODO: Ajouter que le noeud source envoie son statut et que le noeud cible l'ajoute à sa liste.}
-Le noeud cible lui répond alors en lui envoyant l'état courant de sa liste.
+Ce message sert aussi à transmettre l'état courant du noeud source au noeud cible.
+En réponse, le noeud cible lui envoie l'état courant de sa liste.
 À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
 Cette fusion conserve l'entrée la plus récente pour chaque noeud.
 
