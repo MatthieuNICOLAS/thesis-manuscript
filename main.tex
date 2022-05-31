@@ -3629,12 +3629,12 @@ Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT 
 Ces approchent souffrent néanmoins de leur architecture centralisé.
 Notamment, ces solutions rencontrent des difficultés à passer à l'échelle\cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité\cite{prism-washington-post, prism-guardian}.
 
-L'approche \ac{CRDT} offrant une meilleure capacité de passage à l'échelle et étant compatible avec une architecture \ac{P2P}, de nombreux travaux\cite{peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant à ces limites.
+L'approche \ac{CRDT} offrant une meilleure capacité de passage à l'échelle et étant compatible avec une architecture \ac{P2P}, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant à ces limites.
 De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
 Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
 
 De manière semblable, l'équipe Coast conçoit des applications avec ces objectifs et étudient les problématiques de recherche liées depuis plusieurs années.
-Notamment, elle développe \acf{MUTE}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+Notamment, elle développe \acf{MUTE}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
 \ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
 
 La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
@@ -3659,7 +3659,7 @@ De la même façon, nous précisons dans ce chapitre les différents composants 
 
 \section{Couche interface utilisateur}
 
-La \autoref{fig:interface-mute} illustre l'interface utilisateur de MUTE.
+La \autoref{fig:interface-mute} illustre l'interface utilisateur de l'éditeur de document de MUTE.
 
 \begin{figure}[!ht]
   \centering
