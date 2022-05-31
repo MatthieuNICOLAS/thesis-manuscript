@@ -3632,13 +3632,15 @@ Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT 
 Ces approchent souffrent néanmoins de leur architecture centralisée.
 Notamment, ces solutions rencontrent des difficultés à passer à l'échelle\cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité\cite{prism-washington-post, prism-guardian}.
 
-L'approche \ac{CRDT} offrant une meilleure capacité de passage à l'échelle et étant compatible avec une architecture \ac{P2P}, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant à ces limites.
-De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
+L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P}\cite{ahmednacer:inria-00629503}.
+Ainsi, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
+De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares}\cite{localfirstsoftware2019, pushpin2020}.
 Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
 
 De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
 Elle développe \acf{MUTE}\cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
 \ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
+Nous avons donc intégré dans \ac{MUTE} les travaux de cette thèse.
 
 La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
 MUTE étant une application web, chaque noeud représenté ici correspond à un navigateur.
@@ -3848,11 +3850,11 @@ Ces éléments ont été insérés un par un par le noeud A, donc par le biais d
 Le module \texttt{Sync} de chaque noeud maintient donc initialement le vecteur de version $\langle A:5 \rangle$.
 
 Le noeud A insère l'élément "I" entre les éléments "O" et "G".
-Cette modification est alors labellée \emph{a6} par son module \texttt{Sync} et est envoyée au noeud B.
+Cette modification est alors labellisée \emph{a6} par son module \texttt{Sync} et est envoyée au noeud B.
 À la réception de cette opération, le module \texttt{Sync} de B compare son dot avec son vecteur de version local.
 L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors délivrée au \ac{CRDT} et le vecteur de version est mis à jour.
 
-Le noeud B supprime ensuite l'élément nouvellement insérée.
+Le noeud B supprime ensuite l'élément nouvellement inséré.
 S'agissant de la première modification de B, cette modification \emph{b1} ajoute l'entrée correspondante dans le vecteur de version $\langle A:6, B:1 \rangle$.
 L'opération est envoyée au noeud A.
 Cette opération étant la prochaine opération attendue de B, elle est acceptée et délivrée.
@@ -4297,9 +4299,9 @@ Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et délivr
 Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
 
 De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une défaillance réseau.
-Néanmoins, cela ne l'empêche pas de délivrer l'opération \emph{b3} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
+Néanmoins, cela ne l'empêche pas de délivrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
 
-Le noeud C déclenche alors son mécanisme d'anti-entropie.
+Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
 Il choisit aléatoirement le noeud B comme noeud cible.
 Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:7,B:8,C:1 \rangle$.
 
@@ -4417,7 +4419,7 @@ A informe alors C du bon fonctionnement du B via le message \emph{ack B}.
 Le mécanisme prend alors fin, jusqu'à sa prochaine exécution.
 
 Si C n'avait pas reçu de réponse suite à sa \emph{ping-req B} envoyée à A, C aurait supposé que B a eu une défaillance.
-Afin de réduire le taux de faux positif, SWIM ne considère pas directement les noeuds n'ayant pas répondu comme en panne : ils sont tout d'abord \emph{suspectés} d'être en panne.
+Afin de réduire le taux de faux positifs, SWIM ne considère pas directement les noeuds n'ayant pas répondu comme en panne : ils sont tout d'abord \emph{suspectés} d'être en panne.
 Après un certain temps sans signe de vie d'un noeud suspecté d'être en panne, le noeud est \emph{confirmé} comme défaillant.
 
 L'information qu'un noeud est suspecté d'être en panne est propagé dans le réseau via le mécanisme de dissémination des mises à jour du groupe décrit ci-dessous.
@@ -4439,14 +4441,14 @@ Ainsi, afin de représenter la liste des collaborateur, le protocole SWIM utilis
   \end{itemize}
 \end{definition}
 
-Chaque noeud réplique cette liste et la fait évoluer au cours l'exécution du mécanisme présenté jusqu'ici.
+Chaque noeud réplique cette liste et la fait évoluer au cours de l'exécution du mécanisme présenté jusqu'ici.
 Lorsqu'une mise à jour est effectuée, celle-ci est diffusée de la manière présentée ci-dessous.
 
 \subsubsection{Mécanisme de dissémination des mises à jour du groupe}
 
 \label{sec:swim-update-dissemination}
 
-Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateur, cette mise à jour doit être propagée au reste des noeuds.
+Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateurs, cette mise à jour doit être propagée au reste des noeuds.
 
 Or, diffuser cette mise à jour à l'ensemble du réseau serait coûteux pour un seul noeud.
 Afin de propager cette information de manière efficace, SWIM propose d'utiliser un protocole de diffusion épidémique : le noeud transmet la mise à jour qu'à un nombre réduit $\lambda$\footnote{
@@ -4454,8 +4456,8 @@ Afin de propager cette information de manière efficace, SWIM propose d'utiliser
 } de pairs, qui se chargeront de la transmettre à leur tour.
 Le mécanisme de dissémination des mises à jour de SWIM fonctionne donc de la manière suivante.
 
-Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur, initialisé avec $\lambda$.
-À chaque génération d'un message pour le mécanisme de détection des défaillances, $\lambda$ mises à jour sont sélectionnées dans la liste et attachées au message.
+Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur, initialisé avec $\lambda \log{} n$ avec $n$ le nombre de noeuds.
+À chaque génération d'un message pour le mécanisme de détection des défaillances, un nombre arbitraire de mises à jour sont sélectionnées dans la liste et attachées au message.
 Leur compteurs respectifs sont décrémentés.
 Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.
 
@@ -4528,7 +4530,7 @@ Sa complexité en temps et sa complexité en communication, elles, sont indépen
 Elles dépendent en effet de paramètres dont nous choisissons les valeurs : la fréquence de déclenchement du mécanisme de détection de défaillance et le nombre de mises à jour du groupe propagées par message.
 
 Des améliorations au protocole SWIM furent proposées dans \cite{lifeguard2018}.
-Ces modifications visent notamment à réduire le délai de détection d'un noeud défaillant, ainsi que réduire le taux de faux positif.
+Ces modifications visent notamment à réduire le délai de détection d'un noeud défaillant, ainsi que réduire le taux de faux positifs.
 Ainsi, une perspective est d'implémenter ces améliorations dans MUTE.
 
 \subsection{Curseurs}
@@ -4575,7 +4577,7 @@ Elle permet de créer une connexion directe entre deux navigateurs pour échange
 
 Cette API utilise pour cela un ensemble de protocoles.
 Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
-Dans \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
+Dans la \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
 
 \begin{figure}[!ht]
   \centering
