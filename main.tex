@@ -428,12 +428,32 @@ qui fut la première de toutes.
     \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
     \item Besoin d'un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
       \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
-    \item Permet de lisser la consommation réseau
-    \item Offre des temps d'intégration et de propagation des modifications rapides
+    \item Généralement, impose que la couche livraison soit compliant avec Reliable Causal Broadcast
+    \item Mais s'agit dans plusieurs cas d'une contrainte plus forte que nécessaire
+      \mnnote{
+        TODO: Me semble que c'est \cite{baquero2017pure} qui indique la nécessité de RCB.
+        Relire si c'est vraiment le cas pour les CRDTs qu'il présente dans le papier.
+      }
+    \item Opérations permettent de lisser la consommation réseau
+    \item Et offrent des temps d'intégration et de propagation des modifications rapides
     \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
     \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
   \end{itemize}
   \item Types de données répliquées sans conflits à base de différences \cite{almeida2015delta, Almeida_2018}
+  \mnnote{NOTE:
+    La thèse de Vic est vraiment bien sur cette partie.
+    Il présente une exécution abstraite avec un ensemble répliqué avec la sémantique Add-Win, puis il présente comment cela se traduit concrètement avec un op-based CRDT et un state-based CRDT.
+    Utiliser la même approche pour présenter les spécificités de chaque famille de CRDTs.
+  }
+  \mnnote{TODO:
+    Voir quels intérêts peuvent encore avoir les operation-based CRDTs par rapport aux delta-based.
+    Là, comme ça, me dit que ça permet de faire de la composition et de lier les modifications de plusieurs CRDTs entre elles.
+    Voir si d'autres cas d'utilisations.
+  }
+  \mnnote{NOTE:
+    Peut être intéressant de classifier les différents types abstraits répliqués en fonction des spécifications proposées dans la littérature pour indiquer lesquels sont plus adaptés à du state-based et lesquels sont plus adaptés à du delta-based.
+    Voir si ça a pas déjà été fait dans les derniers rapports de Shapiro et Nuno.
+  }
 \end{itemize}
 
 \subsubsection{Adoption dans la littérature et l'industrie}
