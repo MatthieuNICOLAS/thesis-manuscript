@@ -4747,6 +4747,50 @@ Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécani
 \subsection{Définition de relations de priorité pour minimiser les traitements}
 \subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
 \subsection{Définition de types de données répliquées sans conflits plus complexes}
+
+\subsection{Étude comparative des différentes familles de CRDTs}
+
+\begin{itemize}
+  \item La spécification récente des Delta-based CRDTs .
+    Ce nouveau type de CRDTs se base sur celui des State-based CRDTs.
+    Partage donc les mêmes pré-requis :
+    \begin{itemize}
+      \item États du type de données répliqué forment un sup-demi-treillis
+      \item Modifications locales entraînent une inflation de l'état
+      \item Possède une fonction de \texttt{merge}, permettant de fusionner deux états S et S', et qui
+      \begin{itemize}
+        \item Est associative, commutative et idempotente
+        \item Retourne S", la Least Upper Bound (LUB) de S et S' (\ie $\nexists S''' \cdot merge(S, S') < S''' < S''$)
+      \end{itemize}
+    \end{itemize}
+    Et bénéficie de son principal avantage : synchronisation possible entre deux pairs en fusionnant leur états, peu importe le nombre de modifications les séparant.
+  \item Spécificité des Delta-based CRDTs est de proposer une synchronisation par différence d'états.
+    Plutôt que de diffuser l'entièreté de l'état pour permettre aux autres pairs de se mettre à jour, idée est de seulement transmettre la partie de l'état ayant été mise à jour.
+    Correspond à un élément irréductible du sup-demi-treillis.
+    Permet ainsi de mettre en place une synchronisation en temps réel de manière efficace.
+    Et d'utiliser la synchronisation par fusion d'états complets pour compenser les défaillances du réseau
+  \item Ainsi, ce nouveau type de CRDTs semble allier le meilleur des deux mondes :
+    \begin{itemize}
+      \item Absence de contrainte sur le réseau autre que la livraison à terme
+      \item Propagation possible en temps réel des modifications
+    \end{itemize}
+    Semble donc être une solution universelle :
+    \begin{itemize}
+      \item Utilisable peu importe la fiabilité réseau à disposition
+      \item Empreinte réseau du même ordre de grandeur qu'un Op-based CRDT
+      \item Utilisable peu importe la fréquence de synchronisation désirée
+    \end{itemize}
+    Pose la question de l'intérêt des autres types de CRDTs.
+  \item Delta-based CRDT est un State-based CRDT dont on a identifié les éléments irréductibles et qui utilise ces derniers pour la propagation des modifications plutôt que l'état complet.
+    Famille des State-based CRDTs semble donc rendue obsolète par celle des Delta-based CRDTs.
+    À confirmer.
+  \item Les Op-based CRDTs proposent une spécification différente du type répliqué de leur équivalent Delta-based, généralement plus simple.
+    À première vue, famille des Op-based CRDTs semble donc avoir la simplicité comme avantage par rapport à celle des Delta-based CRDTs.
+    S'agit d'un paramètre difficilement mesurable et auquel on peut objecter si on considère qu'un Op-based CRDT s'accompagne d'une couche livraison de messages, qui cache sa part de complexité.
+    Intéressant d'étudier si la spécification différente des Op-based CRDTs présente d'autres avantages par rapport aux Delta-based CRDTs : performances (temps d'intégration des modifications, délai de convergence...), fonctionnalités spécifiques (composition, undo...)
+  \item But serait de fournir des guidelines sur la famille de CRDT à adopter en fonction du cas d'utilisation.
+\end{itemize}
+
 \subsection{Définition d'opérations supplémentaires pour fonctionnalités liées à l'édition collaborative}
 
 \begin{itemize}
