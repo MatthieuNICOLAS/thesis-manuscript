@@ -392,6 +392,10 @@ qui fut la première de toutes.
   \end{itemize}
   \item Pour gérer ces scénarios, intègrent un mécanisme de résolution de conflits directement au sein de leur spécification
   \item Garantissent la cohérence forte à terme
+  \item \mnnote{
+      TODO: Lister les CRDTs ayant été proposés.
+      Registre, Ensemble, Sequence, Graphe, JSON, Filesystem, Access Control
+    }
 \end{itemize}
 
 \mnnote{Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
@@ -1673,7 +1677,7 @@ Pour que chaque noeud sélectionne la même époque cible de manière non-coordo
 En utilisant la relation \emph{priority}, nous définissons l'époque cible de la manière suivante :
 
 \begin{definition}[Époque cible]
-  L'époque de l'ensemble des époques vers laquelle les noeuds doivent progresser.
+  L'époque cible est l'époque de l'ensemble des époques vers laquelle les noeuds doivent progresser.
   Les noeuds sélectionnent comme époque cible l'époque maximale d'après l'ordre établit par \emph{priority}.
 \end{definition}
 
