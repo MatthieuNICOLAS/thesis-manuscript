@@ -4812,6 +4812,14 @@ Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécani
 
 Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree\cite{2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees}, synchronisation par états (state/delta-based \acp{CRDT}).
 
+\subsection{Distance entre versions d'un document}
+
+\begin{itemize}
+  \item Est-ce que ça a vraiment du sens d'intégrer automatiquement des modifications ayant été généré sur une version du document distante de l'état actuel du document (voir distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al))
+  \item Jusqu'à quelle distance est-ce que la fusion automatique a encore du sens ?
+  \mnnote{NOTE: Peut connecter ça à la nécessité de conserver un chemin d'une époque à l'autre : si les opérations émises depuis cette époque ont probablement plus d'intérêt pour l'état actuel, couper l'arbre ?}
+\end{itemize}
+
 \subsection{Contrôle d'accès}
 
 \begin{itemize}
