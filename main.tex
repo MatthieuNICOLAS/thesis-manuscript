@@ -377,30 +377,56 @@ qui fut la première de toutes.
 
 \mnnote{TODO: Spécification faible et forte des séquences répliquées}
 
-\section{Séquences répliquées sans conflits}
-\subsection{Types de données répliquées sans conflits}
-\subsubsection{Principes}
+\section{Types de données répliquées sans conflits}
 
 \begin{itemize}
-  \item Nouvelles spécifications des types de données existants
-  \item Structures conçues pour être répliquées au sein d'un système
-  \item Et être modifiées sans coordination par ses différents noeuds
+  \item Pour limiter la coordination entre les noeuds, systèmes distribués adoptent le paradigme de la réplication optimiste.
+    Paradigme consiste à ce que chaque noeud possède une copie de la donnée.
+    Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
+    Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
+    Mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
+    Ce paradigme offre aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} et une faible latence.
+  \item Lorsque modifications possibles sur un type de données sont commutatives,
+    Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives.
+    Ainsi, une exécution distribuée dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
+    Parle lors de conflits.
+    \mnnote{TODO: Exemple avec Ensemble}
+    Pour résoudre ces situations et permettre aux noeuds de converger, nécessité d'un mécanisme de résolution de conflits.
+  \item Les \acp{CRDT} répondent à ce besoin.
+    S'agit de nouvelles spécifications des types de données existants, \eg Ensemble ou Séquence.
+    Conçus pour être utilisés dans des systèmes distribués adoptant la réplication optimiste.
+    Offrent les deux propriétés suivantes :
+    \begin{itemize}
+      \item Peuvent être modifiés sans coordination avec les autres noeuds.
+      \item Tous noeuds ayant observé le même ensemble de modifications obtiendront des états équivalents.
+        S'agit de la propriété de cohérence forte à terme.
+    \end{itemize}
+  \item De la perspective des utilisateurs, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant.
+    Mais leur particuliarité est d'être conçus pour supporter nativement les exécutions concurrentes.
+    Les \acp{CRDT} partagent donc le comportement des types non-répliqués dans le cadre d'exécutions séquentielles, mais définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
+  \item Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.
+    Un \ac{CRDT} se doit donc de préciser quelle sémantique il choisit.
+  \item L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour propager les modifications.
+    Au fil des années, la littérature a établi et défini plusieurs modèles dit de synchronisation, chacun ayant ses propres besoins et avantages.
+    De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
+  \item Ainsi, ce qui définit un CRDT est sa sémantique en cas de concurrence et son modèle de synchronisation.
+    Dans les prochaines sections, nous présenterons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
+    Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant.
+\end{itemize}
+
+\mnnote{TODO: Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
+
+\subsection{Sémantique en cas de concurrence}
+
+\begin{itemize}
   \item Doivent donc supporter de nouveaux scénarios uniquement possible dans des exécutions parallèles
   \item Et définir une sémantique pour ces scénarios inédits
   \begin{itemize}
     \item Exemple du Registre avec LWW-Register et MV-Register ?
   \end{itemize}
-  \item Pour gérer ces scénarios, intègrent un mécanisme de résolution de conflits directement au sein de leur spécification
-  \item Garantissent la cohérence forte à terme
-  \item \mnnote{
-      TODO: Lister les CRDTs ayant été proposés.
-      Registre, Ensemble, Sequence, Graphe, JSON, Filesystem, Access Control
-    }
 \end{itemize}
 
-\mnnote{Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
-
-\subsubsection{Familles de types de données répliquées sans conflits}
+\subsection{Modèle de synchronisation}
 
 \begin{itemize}
   \item Une catégorisation des CRDTs a été proposée
@@ -444,23 +470,22 @@ qui fut la première de toutes.
     \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
   \end{itemize}
   \item Types de données répliquées sans conflits à base de différences \cite{almeida2015delta, Almeida_2018}
-  \mnnote{NOTE:
-    La thèse de Vic est vraiment bien sur cette partie.
-    Il présente une exécution abstraite avec un ensemble répliqué avec la sémantique Add-Win, puis il présente comment cela se traduit concrètement avec un op-based CRDT et un state-based CRDT.
-    Utiliser la même approche pour présenter les spécificités de chaque famille de CRDTs.
-  }
-  \mnnote{TODO:
-    Voir quels intérêts peuvent encore avoir les operation-based CRDTs par rapport aux delta-based.
-    Là, comme ça, me dit que ça permet de faire de la composition et de lier les modifications de plusieurs CRDTs entre elles.
-    Voir si d'autres cas d'utilisations.
-  }
-  \mnnote{NOTE:
-    Peut être intéressant de classifier les différents types abstraits répliqués en fonction des spécifications proposées dans la littérature pour indiquer lesquels sont plus adaptés à du state-based et lesquels sont plus adaptés à du delta-based.
-    Voir si ça a pas déjà été fait dans les derniers rapports de Shapiro et Nuno.
-  }
 \end{itemize}
 
-\subsubsection{Adoption dans la littérature et l'industrie}
+\mnnote{NOTE:
+La thèse de Vic est vraiment bien sur cette partie.
+Il présente une exécution abstraite avec un ensemble répliqué avec la sémantique Add-Win, puis il présente comment cela se traduit concrètement avec un op-based CRDT et un state-based CRDT.
+Utiliser la même approche pour présenter les spécificités de chaque famille de CRDTs.
+}
+
+\mnnote{TODO: Récapituler sous la forme d'un tableau les spécificités, avantages et inconvénients de chaque famille de CRDTs}
+
+\subsection{Adoption dans la littérature et l'industrie}
+
+\mnnote{
+  TODO: Lister les CRDTs ayant été proposés.
+  Registre, Ensemble, Sequence, Graphe, JSON, Filesystem, Access Control
+}
 
 \begin{itemize}
   \item Conception et développement de librairies mettant à disposition des développeurs d'applications des types de données composés \cite{Nicolaescu2015Yjs, Nicolaescu2016YATA, yjsimplem, jsoncrdt2017, automerge}
@@ -470,8 +495,9 @@ qui fut la première de toutes.
   \item Éditeurs collaboratifs temps réel à large échelle et offrant de nouveaux scénarios de collaboration grâce aux CRDTs \cite{Nedelec2016CRATE, MUTE2017}
 \end{itemize}
 
-\subsection{Approches pour les séquences répliquées sans conflits}
-\subsubsection{Approche à pierres tombales}
+\section{Séquences répliquées sans conflits}
+
+\subsection{Approche à pierres tombales}
 
 \begin{itemize}
   \item WOOT \cite{oster:inria-00108523, Weiss_2007, ahmednacer:inria-00629503}
@@ -479,7 +505,7 @@ qui fut la première de toutes.
   \item RGASplit \cite{briot:hal-01343941}
 \end{itemize}
 
-\subsubsection{Approche à identifiants densément ordonnés}
+\subsection{Approche à identifiants densément ordonnés}
 
 \begin{itemize}
   \item Treedoc \cite{5158449}
