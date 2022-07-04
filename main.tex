@@ -4522,7 +4522,7 @@ Nous avons donc modifié les règles de précédence de la manière suivante :
 
 et
 
-\[\forall i,j,k \in \mathbb{N}, i \leq j \leq k \cdot \langle i,\trm{Alive} \rangle < \langle j,\trm{Suspect} \rangle < \langle k,\trm{Confirm} \rangle\]
+\[\forall i \in \mathbb{N} \cdot \langle i,\trm{Alive} \rangle < \langle i,\trm{Suspect} \rangle < \langle i,\trm{Confirm} \rangle\]
 
 Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
 Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
