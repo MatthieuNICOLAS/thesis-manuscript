@@ -386,7 +386,23 @@ qui fut la première de toutes.
     Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
     Mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
     Ce paradigme offre aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} et une faible latence.
-  \item Lorsque modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds ne nécessite aucun mécanisme particulier, même dans le cas où le noeud courant a effectué ses propres modifications en parallèle.
+  \item Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before}.
+    Nous l'adaptons ci-dessous à notre contexte :
+    \begin{definition}[Happen-before]
+      La relation \emph{happen-before}, indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, noté $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
+      \begin{enumerate}[label=(\roman*)]
+        \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
+        \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de cette dernière.
+        \item Il existe une modification $m$ telle que $m_1 \rightarrow m \wedge m \rightarrow m_2$.
+      \end{enumerate}
+    \end{definition}
+    Dans le cadre d'un système distribué, on note que la relation \emph{happen-before} ne permet pas d'établir un ordre total entre les opérations.
+    En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
+    De telles modifications sont alors dites \emph{concurrentes} :
+    \begin{definition}[Concurrence]
+      Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \wedge m_1 \nrightarrow m_2$.
+    \end{definition}
+  \item Lorsque modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
     Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives.
     Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
     Parle alors de conflits.
@@ -411,7 +427,7 @@ qui fut la première de toutes.
     De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
   \item Ainsi, ce qui définit un CRDT est sa sémantique en cas de concurrence et son modèle de synchronisation.
     Dans les prochaines sections, nous présenterons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
-    Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant.
+    Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
 \end{itemize}
 
 \mnnote{TODO: Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
