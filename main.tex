@@ -386,10 +386,10 @@ qui fut la première de toutes.
     Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
     Mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
     Ce paradigme offre aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} et une faible latence.
-  \item Lorsque modifications possibles sur un type de données sont commutatives,
+  \item Lorsque modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds ne nécessite aucun mécanisme particulier, même dans le cas où le noeud courant a effectué ses propres modifications en parallèle.
     Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives.
-    Ainsi, une exécution distribuée dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
-    Parle lors de conflits.
+    Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
+    Parle alors de conflits.
     \mnnote{TODO: Exemple avec Ensemble}
     Pour résoudre ces situations et permettre aux noeuds de converger, nécessité d'un mécanisme de résolution de conflits.
   \item Les \acp{CRDT} répondent à ce besoin.
