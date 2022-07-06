@@ -466,22 +466,32 @@ qui fut la première de toutes.
 \subsection{Modèle de synchronisation}
 
 \begin{itemize}
-  \item Une catégorisation des CRDTs a été proposée
-  \item Propose de répartir les CRDTs en différentes familles en fonction de la méthode de synchronisation utilisée
-  \item Chacune de ces méthodes de synchronisation implique des contraintes sur la couche réseau du système et entraîne des répercussions sur la structure de données elle-même
-  \item Types de données répliquées sans conflits à base d'états \cite{shapiro_2011_crdt, shapiro:inria-00555588}
-  \begin{itemize}
-    \item Les noeuds partagent leur état de manière périodique
-    \item Une fonction \emph{merge} permet aux noeuds de fusionner leur état courant avec un autre état reçu
-    \item Aucune hypothèse sur la partie réseau autre que les noeuds arrivent à communiquer à terme
-    \item Pas un problème si états perdus, les prochains intégreront les informations de ces derniers
-    \item Pas un problème si états reçus dans le désordre, la fonction \emph{merge} est commutative
-    \item Pas un problème si états reçus plusieurs fois, \emph{merge} est idempotent
-    \item Mais nécessite de conserver au sein de la structure de données assez d'informations pour proposer une telle fonction de \emph{merge}
-    \item Par exemple, besoin de conserver une trace des éléments supprimés pour empêcher leur réapparition suite à une fusion d'états
-    \item \mnnote{TODO: Ajouter forces, faiblesses et cas d'utilisation de cette approche}
-  \end{itemize}
-  \item Types de données répliquées sans conflits à base d'opérations \cite{shapiro_2011_crdt, shapiro:inria-00555588, 2014-making-op-based-crdts-op-based, baquero2017pure}
+  \item Dans le modèle de réplication optimiste, les noeuds divergent momentanément lorsqu'ils effectuent des modifications locales.
+    Pour ensuite converger vers des états équivalents, les noeuds doivent propager et intégrer l'ensemble des modifications.
+    Dans le cadre des \acp{CRDT}, le choix de la méthode pour synchroniser les noeuds n'est pas anodin.
+    En effet, ce choix impacte la spécification même du \ac{CRDT} et ses prérequis.
+  \item Initialement, deux approches ont été proposées : une méthode de synchronisation par états \cite{shapiro_2011_crdt, shapiro:inria-00555588} et une méthode de synchronisation par opérations \cite{shapiro_2011_crdt, shapiro:inria-00555588, 2014-making-op-based-crdts-op-based, baquero2017pure}.
+    Une troisième approche, nommée synchronisation par différence d'états \cite{almeida2015delta, Almeida_2018}, a été par la suite spécifiée.
+    Le but de cette dernière est d'allier le meilleur des deux approches précédentes.
+    Dans la suite de cette section, nous présentons ces approches ainsi que leurs caractéristiques respectives.
+\end{itemize}
+
+\subsubsection{Synchronisation par états}
+
+\begin{itemize}
+  \item Les noeuds partagent leur état de manière périodique
+  \item Une fonction \emph{merge} permet aux noeuds de fusionner leur état courant avec un autre état reçu
+  \item Aucune hypothèse sur la partie réseau autre que les noeuds arrivent à communiquer à terme
+  \item Pas un problème si états perdus, les prochains intégreront les informations de ces derniers
+  \item Pas un problème si états reçus dans le désordre, la fonction \emph{merge} est commutative
+  \item Pas un problème si états reçus plusieurs fois, \emph{merge} est idempotent
+  \item Mais nécessite de conserver au sein de la structure de données assez d'informations pour proposer une telle fonction de \emph{merge}
+  \item Par exemple, besoin de conserver une trace des éléments supprimés pour empêcher leur réapparition suite à une fusion d'états
+  \item \mnnote{TODO: Ajouter forces, faiblesses et cas d'utilisation de cette approche}
+\end{itemize}
+
+\begin{itemize}
+  \item Types de données répliquées sans conflits à base d'opérations
   \begin{itemize}
     \item Les noeuds partagent uniquement des opérations représentant leurs modifications
     \item Une modification peut se formaliser en deux étapes
@@ -506,7 +516,7 @@ qui fut la première de toutes.
     \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
     \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
   \end{itemize}
-  \item Types de données répliquées sans conflits à base de différences \cite{almeida2015delta, Almeida_2018}
+  \item Types de données répliquées sans conflits à base de différences
 \end{itemize}
 
 \mnnote{NOTE:
