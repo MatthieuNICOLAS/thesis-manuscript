@@ -386,7 +386,7 @@ qui fut la première de toutes.
     Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
     Mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
     Ce paradigme offre aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} et une faible latence.
-  \item Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before}.
+  \item Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before} \cite{1978-happen-before-lamport}.
     Nous l'adaptons ci-dessous à notre contexte :
     \begin{definition}[Happen-before]
       La relation \emph{happen-before}, indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, noté $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
@@ -403,7 +403,7 @@ qui fut la première de toutes.
       Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \wedge m_1 \nrightarrow m_2$.
     \end{definition}
   \item Lorsque modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
-    Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives.
+    Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives car de sémantiques contraires.
     Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
     Parle alors de conflits.
     \mnnote{TODO: Exemple avec Ensemble}
@@ -435,11 +435,32 @@ qui fut la première de toutes.
 \subsection{Sémantique en cas de concurrence}
 
 \begin{itemize}
-  \item Doivent donc supporter de nouveaux scénarios uniquement possible dans des exécutions parallèles
-  \item Et définir une sémantique pour ces scénarios inédits
-  \begin{itemize}
-    \item Exemple du Registre avec LWW-Register et MV-Register ?
-  \end{itemize}
+  \item Plusieurs sémantiques peuvent être proposées pour résoudre les conflits.
+  \item Sémantique simple est de trancher entre l'ensemble des opérations en conflit et d'en sélectionner une de manière arbitraire.
+    \mnnote{TODO: Préciser que le but est de recréer un ordre total sur les opérations s'approchant de celui instauré par une horloge globale.}
+    Cette sémantique, dite du Last-Writer Wins (LWW) \mnnote{TODO: citer papier}, est une sémantique générique que l'on retrouve dans une variété de \acp{CRDT} proposés pour des types différents.
+    Ainsi, avec cette sémantique, utilisons une horloge pour déterminer quelle opération choisir.
+    L'horloge physique étant sujette à des imprécisions, a généralement recours à une horloge logique \cite{1978-happen-before-lamport} \mnnote{TODO: Ajouter refs des horloges logiques plus intelligentes (Interval Tree Clock, Hybrid Clock...)}.
+  \item D'autres sémantiques sont spécifiques au type de donnée concerné.
+    Dans le cadre de l'Ensemble, on remarque qu'un conflit est produit lorsque des modifications \emph{add} et \emph{remove} sont effectuées en concurrence.
+    Deux sémantiques peuvent alors être proposées pour le résoudre :
+    \begin{enumerate}[label=(\roman*)]
+      \item Une sémantique où l'opération \emph{add} d'une valeur a la précédence sur les opérations concurrentes \emph{remove} de la même valeur, nommée Add-wins.
+      \item Une sémantique où l'opération \emph{remove} d'une valeur a la précédence sur les opérations concurrentes \emph{add} de la même valeur, nommée Remove-wins.
+    \end{enumerate}
+  \item Dernière sémantique proposée récemment : celle du CL-Set.
+    Se base sur les constats suivants :
+    \begin{enumerate}[label=(\roman*)]
+      \item \emph{add} et \emph{remove} d'un élément prennent place à tour de rôle, chaque modification écrasant la précédente.
+      \item \emph{add} (resp. \emph{remove}) concurrents d'un même élément ont le même but.
+        Prendre en compte une de ces modifications concurrentes revient à prendre en compte leur ensemble.
+    \end{enumerate}
+    À partir de ces observations, propose de simplement suivre pour chaque élément la chaîne d'ajouts et retraits la plus longue pour déterminer si l'élément est présent ou non dans l'ensemble.
+  \item Ainsi, pour un même type de données, différents \ac{CRDT} peuvent être spécifiés, chacun proposant la sémantique qu'il utilise pour résoudre les conflits.
+    Il est à noter qu'aucune sémantique n'est intrasèquement meilleure que les autres.
+    Il revient alors aux concepteur-rices d'applications de choisir les bons \ac{CRDT} en fonction des besoins et des comportements attendus en cas de conflits.
+    Par exemple, une application pour liste de courses peut justifier l'utilisation d'un Add-wins Set \ac{CRDT} inter-éléments, où l'ajout d'un élément (\eg lait, pour faire des crêpes) invalide un retrait concurrent d'un autre élément (\eg oeufs).
+    \mnnote{TODO: Ajouter use-case d'un CL set.}
 \end{itemize}
 
 \subsection{Modèle de synchronisation}
