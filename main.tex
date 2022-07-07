@@ -57,6 +57,10 @@
 
 \usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
 
+\usepackage{pifont} % \ding
+\renewcommand{\checkmark}{\ding{51}}
+\newcommand{\ballotx}{\ding{55}}
+
 % Commands
 %---------
 \newcommand{\eg}{e.g. }
@@ -389,10 +393,10 @@ qui fut la première de toutes.
   \item Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before} \cite{1978-happen-before-lamport}.
     Nous l'adaptons ci-dessous à notre contexte :
     \begin{definition}[Happen-before]
-      La relation \emph{happen-before}, indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, noté $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
+      La relation \emph{happen-before} indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
       \begin{enumerate}[label=(\roman*)]
         \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
-        \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de cette dernière.
+        \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
         \item Il existe une modification $m$ telle que $m_1 \rightarrow m \wedge m \rightarrow m_2$.
       \end{enumerate}
     \end{definition}
@@ -451,17 +455,22 @@ qui fut la première de toutes.
   \item Dernière sémantique proposée récemment : celle du CL-Set.
     Se base sur les constats suivants :
     \begin{enumerate}[label=(\roman*)]
-      \item \emph{add} et \emph{remove} d'un élément prennent place à tour de rôle, chaque modification écrasant la précédente.
+      \item \emph{add} et \emph{remove} d'un élément prennent place à tour de rôle, chaque modification invalidant la précédente.
       \item \emph{add} (resp. \emph{remove}) concurrents d'un même élément ont le même but.
         Prendre en compte une de ces modifications concurrentes revient à prendre en compte leur ensemble.
     \end{enumerate}
-    À partir de ces observations, propose de simplement suivre pour chaque élément la chaîne d'ajouts et retraits la plus longue pour déterminer si l'élément est présent ou non dans l'ensemble.
+    À partir de ces observations, propose de simplement déterminer pour chaque élément la chaîne d'ajouts et retraits la plus longue pour déterminer si l'élément est présent ou non dans l'ensemble.
   \item Ainsi, pour un même type de données, différents \ac{CRDT} peuvent être spécifiés, chacun proposant la sémantique qu'il utilise pour résoudre les conflits.
-    Il est à noter qu'aucune sémantique n'est intrasèquement meilleure que les autres.
-    Il revient alors aux concepteur-rices d'applications de choisir les bons \ac{CRDT} en fonction des besoins et des comportements attendus en cas de conflits.
+    Il est à noter qu'aucune sémantique n'est intrinsèquement meilleure et préférable aux autres.
+    Il revient alors aux concepteur-rices d'applications de choisir les \ac{CRDT} adaptés en fonction des besoins et des comportements attendus en cas de conflits.
     Par exemple, une application pour liste de courses peut justifier l'utilisation d'un Add-wins Set \ac{CRDT} inter-éléments, où l'ajout d'un élément (\eg lait, pour faire des crêpes) invalide un retrait concurrent d'un autre élément (\eg oeufs).
     \mnnote{TODO: Ajouter use-case d'un CL set.}
 \end{itemize}
+
+\mnnote{NOTE:
+  Pourrait ajouter quelques lignes sur le fait que la sémantique peut même mener à un changement du domaine du \ac{CRDT} par rapport au domaine du type séquentiel.
+  Exemple du MV-Register CRDT dont les états sont des ensembles, et non plus simplement une valeur comme pour le type séquentiel ou encore le LWW-Register CRDT.
+}
 
 \subsection{Modèle de synchronisation}
 
@@ -479,6 +488,11 @@ qui fut la première de toutes.
 \subsubsection{Synchronisation par états}
 
 \begin{itemize}
+  \item Intéressant de noter que cette approche met en place une diffusion des modifications suivant le modèle de cohérence causale \mnnote{TODO: Ajouter ref} par nature.
+    Permet ainsi d'éviter ce qui pourrait être interprétées comme des anomalies par les utilisateur-rices.
+\end{itemize}
+
+\begin{itemize}
   \item Les noeuds partagent leur état de manière périodique
   \item Une fonction \emph{merge} permet aux noeuds de fusionner leur état courant avec un autre état reçu
   \item Aucune hypothèse sur la partie réseau autre que les noeuds arrivent à communiquer à terme
@@ -490,33 +504,37 @@ qui fut la première de toutes.
   \item \mnnote{TODO: Ajouter forces, faiblesses et cas d'utilisation de cette approche}
 \end{itemize}
 
+\subsubsection{Synchronisation par opérations}
+
 \begin{itemize}
-  \item Types de données répliquées sans conflits à base d'opérations
-  \begin{itemize}
-    \item Les noeuds partagent uniquement des opérations représentant leurs modifications
-    \item Une modification peut se formaliser en deux étapes
-    \item \emph{prepare}, qui permet de générer une opération correspondant à une modification
-    \item \emph{effect}, qui permet d'appliquer l'effet de la modification à un état
-    \item Les opérations concurrentes doivent être commutatives pour assurer la convergence
-    \item Mais pas de contraintes sur les opérations causalement liées
-    \item Pas de contraintes non plus sur l'idempotence des opérations
-    \item Nécessite donc généralement d'ajouter une couche \emph{livraison} pour faire le lien entre le réseau et le CRDT
-    \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
-    \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
-    \item Besoin d'un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
-      \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
-    \item Généralement, impose que la couche livraison soit compliant avec Reliable Causal Broadcast
-    \item Mais s'agit dans plusieurs cas d'une contrainte plus forte que nécessaire
-      \mnnote{
-        TODO: Me semble que c'est \cite{baquero2017pure} qui indique la nécessité de RCB.
-        Relire si c'est vraiment le cas pour les CRDTs qu'il présente dans le papier.
-      }
-    \item Opérations permettent de lisser la consommation réseau
-    \item Et offrent des temps d'intégration et de propagation des modifications rapides
-    \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
-    \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
-  \end{itemize}
-  \item Types de données répliquées sans conflits à base de différences
+  \item Les noeuds partagent uniquement des opérations représentant leurs modifications
+  \item Une modification peut se formaliser en deux étapes
+  \item \emph{prepare}, qui permet de générer une opération correspondant à une modification
+  \item \emph{effect}, qui permet d'appliquer l'effet de la modification à un état
+  \item Les opérations concurrentes doivent être commutatives pour assurer la convergence
+  \item Mais pas de contraintes sur les opérations causalement liées
+  \item Pas de contraintes non plus sur l'idempotence des opérations
+  \item Nécessite donc généralement d'ajouter une couche \emph{livraison} pour faire le lien entre le réseau et le CRDT
+  \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
+  \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
+  \item Besoin d'un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
+    \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
+  \item Généralement, impose que la couche livraison soit compliant avec Reliable Causal Broadcast
+  \item Mais s'agit dans plusieurs cas d'une contrainte plus forte que nécessaire
+    \mnnote{
+      TODO: Me semble que c'est \cite{baquero2017pure} qui indique la nécessité de RCB.
+      Relire si c'est vraiment le cas pour les CRDTs qu'il présente dans le papier.
+    }
+  \item Opérations permettent de lisser la consommation réseau
+  \item Et offrent des temps d'intégration et de propagation des modifications rapides
+  \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
+  \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
+\end{itemize}
+
+\subsubsection{Synchronisation par différences d'états}
+
+\begin{itemize}
+  \item
 \end{itemize}
 
 \mnnote{NOTE:
@@ -525,7 +543,27 @@ Il présente une exécution abstraite avec un ensemble répliqué avec la séman
 Utiliser la même approche pour présenter les spécificités de chaque famille de CRDTs.
 }
 
-\mnnote{TODO: Récapituler sous la forme d'un tableau les spécificités, avantages et inconvénients de chaque famille de CRDTs}
+\subsubsection{Synthèse}
+
+\begin{table}[!ht]
+  \centering
+  \caption{Récapitulatif comparatif des différents modèles de synchronisation pour \acp{CRDT}}
+  \label{tab:synchronisation-models}
+  % \resizebox{\columnwidth}{!}{
+    \begin{tabular}{lccc}
+      \toprule
+                                                & State-based & Op-based    & Delta-based \\
+      \midrule
+      États forment sup-demi-treillis           & \checkmark  & \checkmark  & \checkmark  \\
+      Intègre modifications par fusion d'états  & \checkmark  & \ballotx    & \checkmark  \\
+      Intègre modifications de manière atomique & \ballotx    & \checkmark  & \checkmark  \\
+      Résistant aux défaillances réseau         & \checkmark  & \ballotx    & \checkmark  \\
+      Peut s'affranchir de la cohérence causale & \ballotx    & \checkmark  & \checkmark  \\
+      Adapté pour systèmes temps réel           & \ballotx    & \checkmark  & \checkmark  \\
+      \bottomrule
+    \end{tabular}
+  % }
+\end{table}
 
 \subsection{Adoption dans la littérature et l'industrie}
 
