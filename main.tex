@@ -426,7 +426,7 @@ qui fut la première de toutes.
     \begin{enumerate}[label=(\roman*)]
       \item États forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
       \item Modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
-      \item Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
+      \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
         On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
     \end{enumerate}
   \item Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant du point de vue des utilisateurs.
@@ -496,20 +496,24 @@ qui fut la première de toutes.
 \subsubsection{Synchronisation par états}
 
 \begin{itemize}
-  \item Intéressant de noter que cette approche met en place une diffusion des modifications suivant le modèle de cohérence causale \mnnote{TODO: Ajouter ref} par nature.
+  \item L'approche de la synchronisation par états propose que les noeuds diffusent leurs modifications en transmettant leur état.
+    Les \acp{CRDT} adoptant cette approche doivent définir une fonction \texttt{merge}.
+    Cette fonction correspond à la fonction de fusion mentionnée précédemment en \ref{item:lub} : elle prend en paramètres une paire d'états et génère en retour l'état correspondant à leur \ac{LUB}.
+    Cette fonction doit être associative, commutative et idempotente.
+  \item Ainsi, lorsqu'un noeud reçoit l'état d'un autre noeud, il fusionne ce dernier avec son état courant à l'aide de la fonction \texttt{merge}.
+    Il obtient alors un nouvel état intégrant l'ensemble des modifications ayant été effectuées sur les deux états.
+  \item La nature croissante des états des \acp{CRDT} couplée aux propriétés d'associativité, de commutativité et d'idempotence de la fonction \texttt{merge} permettent de reposer sur la couche réseau sans lui imposer de contraintes fortes : les messages peuvent être perdus, réordonnés ou même dupliqués.
+    Les noeuds convergeront tant que la couche réseau garantit que les noeuds seront capables de transmettre leur état aux autres à terme.
+    Il s'agit là de la principale force des \acp{CRDT} synchronisés par états.
+  \item Néanmoins, la définition de la fonction \texttt{merge} offrant ces propriétés peut s'avérer complexe et a des répercussions sur la spécification même du \ac{CRDT}.
+    Notamment, les états doivent conserver une trace de l'existence des éléments et de leur suppression afin d'éviter qu'une fusion d'états ne les fassent ressurgirent.
+    Ainsi, les \acp{CRDT} synchronisés par états utilisent régulièrement des pierres tombales.
+  \item En plus de l'utilisation de pierres tombales, la taille de l'état peut croître de manière non-bornée dans le cas de certains types de donnés, \eg l'Ensemble ou la Séquence.
+    Ainsi, ces structures peuvent atteindre à terme des tailles conséquentes.
+    Dans de tels cas, diffuser l'état complet à chaque modification induirait alors un coût rédhibitoire.
+    L'approche de la synchronisation par états s'avère donc inadaptée aux systèmes temps réel et repose généralement sur une synchronisation périodique.
+  \item Finalement, il est intéressant de noter que cette approche met en place par nature une diffusion des modifications suivant le modèle de cohérence causale \mnnote{TODO: Ajouter ref}.
     Permet ainsi d'éviter ce qui pourrait être interprétées comme des anomalies par les utilisateur-rices.
-\end{itemize}
-
-\begin{itemize}
-  \item Les noeuds partagent leur état de manière périodique
-  \item Une fonction \emph{merge} permet aux noeuds de fusionner leur état courant avec un autre état reçu
-  \item Aucune hypothèse sur la partie réseau autre que les noeuds arrivent à communiquer à terme
-  \item Pas un problème si états perdus, les prochains intégreront les informations de ces derniers
-  \item Pas un problème si états reçus dans le désordre, la fonction \emph{merge} est commutative
-  \item Pas un problème si états reçus plusieurs fois, \emph{merge} est idempotent
-  \item Mais nécessite de conserver au sein de la structure de données assez d'informations pour proposer une telle fonction de \emph{merge}
-  \item Par exemple, besoin de conserver une trace des éléments supprimés pour empêcher leur réapparition suite à une fusion d'états
-  \item \mnnote{TODO: Ajouter forces, faiblesses et cas d'utilisation de cette approche}
 \end{itemize}
 
 \subsubsection{Synchronisation par opérations}
