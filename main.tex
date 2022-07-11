@@ -181,6 +181,7 @@
 \acrodef{FIFO}[FIFO]{First In, First Out}
 \acrodef{JIT}[JIT]{Just-In-Time}
 \acrodef{LCA}[PPAC]{Plus Petit Ancêtre Commun}
+\acrodef{LUB}[LUB]{Least Upper Bound}
 \acrodef{MUTE}[MUTE]{Multi User Text Editor}
 \acrodef{OT}[OT]{Operational Transformation}
 \acrodefplural{OT}[OT]{Operational Transformations}
@@ -416,14 +417,21 @@ qui fut la première de toutes.
     S'agit de nouvelles spécifications des types de données existants, \eg Ensemble ou Séquence.
     Conçus pour être utilisés dans des systèmes distribués adoptant la réplication optimiste.
     Offrent les deux propriétés suivantes :
-    \begin{itemize}
+    \begin{enumerate}[label=(\roman*)]
       \item Peuvent être modifiés sans coordination avec les autres noeuds.
       \item Tous noeuds ayant observé le même ensemble de modifications obtiendront des états équivalents.
         S'agit de la propriété de cohérence forte à terme.
-    \end{itemize}
-  \item De la perspective des utilisateurs, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant.
-    Mais leur particuliarité est d'être conçus pour supporter nativement les exécutions concurrentes.
-    Les \acp{CRDT} partagent donc le comportement des types non-répliqués dans le cadre d'exécutions séquentielles, mais définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
+    \end{enumerate}
+  \item Pour ce faire, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
+    \begin{enumerate}[label=(\roman*)]
+      \item États forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
+      \item Modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
+      \item Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
+        On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
+    \end{enumerate}
+  \item Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant du point de vue des utilisateurs.
+    Ainsi, les \acp{CRDT} partagent le comportement des types non-répliqués dans le cadre d'exécutions séquentielles.
+    Cependant, ils définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
   \item Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.
     Un \ac{CRDT} se doit donc de préciser quelle sémantique il choisit.
   \item L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour propager les modifications.
@@ -4871,7 +4879,7 @@ Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécani
       \item Possède une fonction de \texttt{merge}, permettant de fusionner deux états S et S', et qui
       \begin{itemize}
         \item Est associative, commutative et idempotente
-        \item Retourne S", la Least Upper Bound (LUB) de S et S' (\ie $\nexists S''' \cdot merge(S, S') < S''' < S''$)
+        \item Retourne S", la \ac{LUB} de S et S' (\ie $\nexists S''' \cdot merge(S, S') < S''' < S''$)
       \end{itemize}
     \end{itemize}
     Et bénéficie de son principal avantage : synchronisation possible entre deux pairs en fusionnant leur états, peu importe le nombre de modifications les séparant.
