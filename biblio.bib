@@ -795,7 +795,7 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   keywords = "Collaborative text editing, Specification, Metadata lower bound, Eventual consistency",
 }
 
-@inproceedings{10.1145/3358504.3361231,
+@inproceedings{2019-memory-efficient-crdts-dynamic-environments-bauwens,
   author = {Bauwens, Jim and Gonzalez Boix, Elisa},
   title = {Memory Efficient CRDTs in Dynamic Environments},
   year = {2019},
@@ -813,7 +813,7 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   series = {VMIL 2019}
 }
 
-@inproceedings{10.1145/3380787.3393685,
+@inproceedings{2020-flec-bauwens,
   author = {Bauwens, Jim and Boix, Elisa Gonzalez},
   title = {Flec: A Versatile Programming Framework for Eventually Consistent Systems},
   year = {2020},
@@ -831,7 +831,7 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   series = {PaPoC '20}
 }
 
-@inbook{10.1145/3426182.3426183,
+@inbook{2020-from-causality-to-stability-reducing-metadata-crdts-bauwens,
   author = {Bauwens, Jim and Gonzalez Boix, Elisa},
   title = {From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs},
   year = {2020},
@@ -842,6 +842,24 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.4108},
   booktitle = {Proceedings of the 17th International Conference on Managed Programming Languages and Runtimes},
   pages = {3–14},
   numpages = {12}
+}
+
+@inproceedings{2021-improving-reactivity-pure-op-based-crdts-bauwens,
+  author = {Bauwens, Jim and Boix, Elisa Gonzalez},
+  title = {Improving the Reactivity of Pure Operation-Based CRDTs},
+  year = {2021},
+  isbn = {9781450383387},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3447865.3457968},
+  doi = {10.1145/3447865.3457968},
+  abstract = {Modern distributed applications increasingly replicate data to guarantee both high availability of the system and an optimal user experience. Conflict-Free Replicated Data Types (CRDTs) are a family of data types specially designed for highly available systems which guarantee some form of eventual consistency. In this paper, we show that the reliance on reliable causal broadcasting (RCB) middleware by existing CRDT frameworks may lead to less reactive CRDTs which in turn hampers user experience. We propose a solution that improves the reactivity of CRDTs built on an RCB middleware by reifying buffered operations. We apply our strategy to the pure operation-based CRDT framework, allowing for reactive pure operation-based CRDTs. We describe our approach as a formal extension to the framework and implement it in Flec, an extensible and open CRDT framework. The extension is then used to create new Add-Wins and Remove-Wins sets which exhibit higher reactivity.},
+  booktitle = {Proceedings of the 8th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {4},
+  numpages = {6},
+  keywords = {Replication, WebAssembly, CRDTs, Middleware, Reflection, Eventual consistency},
+  location = {Online, United Kingdom},
+  series = {PaPoC '21}
 }
 
 % Miscellaneous
@@ -1494,7 +1512,7 @@ series = {PaPoC '21}
 
 @phdthesis{2021-these-vic,
   TITLE = {{R{\'e}plication s{\'e}curis{\'e}e dans les infrastructures pair-{\`a}-pair de collaboration}},
-  AUTHOR = {Elvinger, VIctorien},
+  AUTHOR = {Elvinger, Victorien},
   URL = {https://hal.univ-lorraine.fr/tel-03284806},
   NUMBER = {2021LORR0099},
   SCHOOL = {{Universit{\'e} de Lorraine}},
