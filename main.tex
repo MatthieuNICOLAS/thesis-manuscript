@@ -519,28 +519,67 @@ qui fut la première de toutes.
 \subsubsection{Synchronisation par opérations}
 
 \begin{itemize}
-  \item Les noeuds partagent uniquement des opérations représentant leurs modifications
-  \item Une modification peut se formaliser en deux étapes
-  \item \emph{prepare}, qui permet de générer une opération correspondant à une modification
-  \item \emph{effect}, qui permet d'appliquer l'effet de la modification à un état
-  \item Les opérations concurrentes doivent être commutatives pour assurer la convergence
-  \item Mais pas de contraintes sur les opérations causalement liées
-  \item Pas de contraintes non plus sur l'idempotence des opérations
-  \item Nécessite donc généralement d'ajouter une couche \emph{livraison} pour faire le lien entre le réseau et le CRDT
-  \item Permet d'attacher des informations de causalité aux opérations locales avant de les envoyer
-  \item Permet de ré-ordonner et filtrer les opérations distantes reçues avant de les fournir au CRDT
-  \item Besoin d'un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv} pour assurer que l'ensemble des noeuds observent l'ensemble des opérations et ainsi garantir la convergence
-    \mnnote{TODO: Ajouter référence mécanisme d'anti-entropie basé sur Merkle Tree}
-  \item Généralement, impose que la couche livraison soit compliant avec Reliable Causal Broadcast
-  \item Mais s'agit dans plusieurs cas d'une contrainte plus forte que nécessaire
-    \mnnote{
-      TODO: Me semble que c'est \cite{baquero2017pure} qui indique la nécessité de RCB.
-      Relire si c'est vraiment le cas pour les CRDTs qu'il présente dans le papier.
-    }
-  \item Opérations permettent de lisser la consommation réseau
-  \item Et offrent des temps d'intégration et de propagation des modifications rapides
-  \item Mais accumule des métadonnées puisque les noeuds doivent conserver les opérations passées pour permettre à un nouveau noeud de rejoindre la collaboration et de se synchroniser
-  \item Possible de tronquer le log des opérations en se basant sur la stabilité causale \cite{10.1007/978-3-662-43352-2_11} afin de limiter cette accumulation de métadonnées
+  \item L'approche de la synchronisation par opérations propose quant à elle que les noeuds diffusent leurs modifications sous la forme d'opérations.
+    Pour chaque modification possible, les \acp{CRDT} synchronisés par opérations doivent définir deux fonctions : \texttt{prepare} et \texttt{effect}.
+  \item La fonction \texttt{prepare} a pour but de générer une opération correspondant à la modification effectuée, et commutative avec les potentielles opérations concurrentes.
+    Elle prend en paramètres la modification ainsi que ses paramètres, et l'état courant du noeud.
+    Cette fonction n'a pas d'effet de bord, \ie ne modifie pas l'état courant, et génère en retour l'opération à diffuser à l'ensemble des noeuds.
+  \item Une opération est un message.
+    Son rôle est d'encoder la modification sous la forme d'un ou plusieurs éléments irréductibles du sup-demi-treillis.
+    \begin{definition}[Élément irréductible]
+      Un élément irréductible d'un sup-demi-treillis est un élément atomique de ce dernier.
+      Il ne peut être obtenu par la fusion d'autres états.
+    \end{definition}
+    Il est à noter que dans le cas des \acp{CRDT} purs synchronisés par opérations\cite{baquero2017pure}, les modifications labellisées avec leur information de causalité correspondent à des éléments irréductibles, \ie à des opérations.
+    La fonction \texttt{prepare} peut donc être omise pour cette sous-catégorie de \acp{CRDT} synchronisés par opérations.
+  \item La fonction \texttt{effect} permet quant à elle d'intégrer les effets d'une opération générée ou reçue.
+    Elle prend en paramètre l'état courant et l'opération, et retourne un nouvel état.
+    Ce nouvel état correspond à la \ac{LUB} entre l'état courant et le ou les éléments irréductibles encodés par l'opération.
+  \item La diffusion des modifications par le biais d'opérations présentent plusieurs avantages.
+    Tout d'abord, taille des opérations est généralement fixe et inférieure à la taille de l'état complet du \ac{CRDT}, puisque les opérations servent à encoder un de ses éléments irréductibles.
+    Ensuite, l'expressivité des opérations permet de proposer plus simplement des algorithmes efficaces pour leur intégration par rapport aux modifications équivalentes dans les \acp{CRDT} synchronisés par états.
+    Par exemple, la suppression d'un élément dans un Ensemble se traduit en une opération de manière presque littérale, tandis que pour les \acp{CRDT} synchronisés par états, c'est l'absence de l'élément dans l'état qui va rendre compte de la suppression effectuée.
+    Ces avantages rendent possible la diffusion et l'intégration une à une des modifications et rendent ainsi utilisables les \acp{CRDT} synchronisés par opérations pour construire des systèmes temps réels.
+  \item Il est à noter que la seule contrainte imposée aux \acp{CRDT} synchronisés par opérations est que leurs opérations concurrentes soient commutatives.
+    Ainsi, il n'existe aucune contrainte sur la commutativité des opérations liées causalement.
+    De la même manière, aucune contrainte n'est définie sur l'idempotence des opérations.
+    Ces libertés impliquent qu'il peut être nécessaire que les opérations soient délivrées au \ac{CRDT} en respectant un ordre donné et en garantissant leur livraison en exactement une fois pour garantir la convergence.
+    Ainsi, un intergiciel chargé de la diffusion et de la livraison des opérations est usuellement associé aux \acp{CRDT} synchronisés par opérations pour respecter ces contraintes.
+  \item Généralement, \acp{CRDT} synchronisés par opérations sont présentés dans la littérature comme nécessitant une livraison causale des opérations.
+    Permet de respecter le modèle de cohérence causale et de simplifier raisonnement sur exécutions.
+    Mais plusieurs impacts négatifs.
+    Introduit un délai dans diffusion des modifications, \eg la perte d'une opération par le réseau empêche la livraison des opérations suivantes.
+    Nécessite que des informations de causalité précises soient attachées à chaque opération.
+    Repose généralement sur l'utilisation d'un vecteur de version, dont la taille croît linéairement avec le nombre de noeuds du système\footnote{
+      La relation de causalité étant transitive, les opérations et leurs relations de causalité forment un DAG.
+      \cite{1997-causal-barrier} propose d'ajouter en dépendances causales d'une opération seulement les opérations correspondant aux extremités du DAG au moment de sa génération.
+      Ce mécanisme plus complexe permet de réduire la consommation réseau, mais induit un surcoût en calculs et en mémoire utilisée.
+    }.
+    Mais dans certains cas, observons que la livraison causale de toutes les opérations n'est pas nécessaire \eg l'ordre d'intégration de deux opérations d'ajout d'éléments différents dans un Ensemble n'a pas d'importance.
+    Pouvons alors nous affranchir de la livraison causale pour accélérer la vitesse d'intégration des modifications et pour réduire métadonnées envoyées.
+  \item Une autre contrainte généralement associée aux \acp{CRDT} synchronisés par opérations est la nécessité d'une livraison en exactement un exemplaire de chaque opération.
+   Cette contrainte dérive de la potentielle non-idempotence des opérations et de la nécessité de la livraison de chaque opération pour la livraison causale.
+    Cependant, observons que des opérations peuvent être sémantiquement rendues obsolètes par d'autres opérations, \eg une opération d'ajout d'un élément dans un Ensemble est rendue obsolète par une opération de suppression ultérieure du même élément.
+    Ainsi, l'intergiciel de livraison peut se contenter d'assurer une livraison en un exemplaire au plus des opérations non-obsolètes.
+    Permet de réduire la consommation réseau en évitant la diffusion d'opérations désormais non-pertinentes.
+  \item Pour compenser la perte d'opérations par le réseau et ainsi garantir la livraison à terme des opérations pertinentes, l'intergiciel de livraison des opérations doit mettre en place un mécanisme d'anti-entropie.
+    Plusieurs mécanismes de ce type ont été proposés dans la littérature \cite{1983-anti-entropy-vv, 2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees} \mnnote{TODO: Ajouter refs Scuttlebutt si applicable à Op-based} et proposent des compromis variés entre complexité en temps, complexité spatiale et consommation réseau.
+  \item Finalement,nous noterons qu'il est nécessaire pour les \acp{CRDT} synchronisés par opérations de maintenir leur journal d'opérations.
+    En effet, les noeuds l'utilisent pour renvoyer les opérations manquées lors de l'exécution du mécanisme d'anti-entropie évoqué ci-dessus.
+    Ceci se traduit par une augmentation perpétuelle des métadonnées des \acp{CRDT} synchronisés par opérations.
+    Pour y pallier, des travaux\cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} proposent de tronquer le journal des opérations pour en supprimer les opérations connues de tous.
+    Les noeuds reposent alors sur la notion de stabilité causale pour déterminer les opérations supprimables de manière sûre.
+    \begin{definition}[Stabilité causale]
+      Une opération est stable causalement lorsqu'elle a été observée par l'ensemble des noeuds du système.
+      Ainsi, toute opération future dépendra causalement des opérations causalement stables, \ie les noeuds ne pourront plus générer de manière honnête d'opérations concurrentes aux opérations causalement stables.
+    \end{definition}
+    Un mécanisme d'instantané \mnnote{TODO: Ajouter refs} doit néanmoins être associé au mécanisme de troncage du journal pour générer un état équivalent à celui résultant des opérations supprimées.
+    Ce mécanisme est en effet nécessaire pour permettre un nouveau noeud de rejoindre le système et d'obtenir l'état courant à partir de l'instantané et du journal tronqué.
+  \item En conclusion, il est relativement simple de mettre en place un système fonctionnel à l'aide d'un \ac{CRDT} synchronisé par opérations et d'un intergiciel de diffusion et de livraison RCB.
+    Mais comme illustré ci-dessus, chaque \ac{CRDT} synchronisé par opérations établit les propriétés de ses différentes opérations et délègue potentiellement des responsabilités à l'intergiciel de diffusion et livraison.
+    La complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{intergiciel} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
+    Des approches \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} ont été proposées ces dernières années pour concevoir et structurer plus proprement ces composants et leurs relations, mais reposent encore sur une livraison causale des opérations.
+    \mnnote{TODO: Vérifier que c'est bien le cas dans \cite{2021-improving-reactivity-pure-op-based-crdts-bauwens}}
 \end{itemize}
 
 \subsubsection{Synchronisation par différences d'états}
@@ -3726,7 +3765,7 @@ Cela permettrait aussi de réduire la fréquence de l'opération \emph{rename}, 
 
 % \subsection{Eager stability determination}
 
-% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{10.1145/3358504.3361231, 10.1145/3380787.3393685, 10.1145/3426182.3426183} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
+% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{2019-memory-efficient-crdts-dynamic-environments-bauwens, 2020-flec-bauwens, 2020-from-causality-to-stability-reducing-metadata-crdts-bauwens} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
 
 % \mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
 
@@ -4925,6 +4964,14 @@ Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécani
 
 \begin{itemize}
   \item Absence d'un dataset réel et réutilisable sur les sessions d'édition collaborative
+  \item Généralement, expériences utilisent données d'articles de Wikipédia \mnnote{TODO: Revoir références, mais me semble que c'est celui utilisé pour Logoot, LogootSplit et RGASplit entre autres}.
+    Mais ces données correspondent à une exécution séquentielle, \ie aucune édition concurrente ne peut être réalisée avec le système de résolution de conflits de Wikipédia.
+    \mnnote{TODO:
+      Me semble que Kleppmann a aussi utilisé et mis à disposition ses traces correspondant à la rédaction d'un de ses articles.
+      Mais que cet article n'était rédigé que par lui.
+      Peu de chances de présence d'éditions concurrentes.
+      À retrouver et vérifier.
+    }
   \item Inspiré par expériences de Claudia, pourrait mener des sessions d'édition collaborative sur des outils orchestrés pour produire ce dataset
   \item Devrait rendre ce dataset agnostique de l'approche choisie pour la résolution automatique de conflits
   \item Absence de retours sur les collaborations à grande échelle
@@ -4934,6 +4981,7 @@ Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécani
 \subsection{Comparaison des mécanismes de synchronisation}
 
 Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree\cite{2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees}, synchronisation par états (state/delta-based \acp{CRDT}).
+Dans le cadre des Delta-based \acp{CRDT}, pourrait évaluer un protocole de diffusion épidémique des deltas comme celui proposé par SWIM\cite{swim2002}.
 
 \subsection{Distance entre versions d'un document}
 
