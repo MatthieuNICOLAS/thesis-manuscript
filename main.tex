@@ -411,7 +411,7 @@ qui fut la première de toutes.
     Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives car de sémantiques contraires.
     Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
     Parle alors de conflits.
-    \mnnote{TODO: Exemple avec Ensemble}
+    La figure \autoref{fig:set-conflict} présente un scénario où des opérations de sémantiques opposées sont générées en concurrence.
 
     \begin{figure}[!ht]
 
@@ -445,11 +445,20 @@ qui fut la première de toutes.
           \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
         \end{tikzpicture}
       }
-      \label{fig:set-conflict}
       \caption{Exécution distribuée présentant un conflit provoqué par l'ajout et la suppression d'un même élément en concurrence}
+      \label{fig:set-conflict}
     \end{figure}
 
-    Pour résoudre ces situations et permettre aux noeuds de converger, nécessité d'un mécanisme de résolution de conflits.
+  \item Dans cet exemple, deux noeuds A et B répliquent et partagent un même Ensemble.
+    Les deux noeuds possèdent le même état initial : ${a}$.
+    Le noeud A retire l'élément $a$ de l'ensemble, $\trm{rmv}(a)$.
+    Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via l'opération de modification $\trm{add}(a)$.
+    En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
+    Les deux noeuds se synchronisent ensuite.
+  \item À l'issue de ce scénario, l'état à produire n'est pas trivial : le noeud A a exprimé son intention d'ajouter l'élément $a$ à l'ensemble, tandis que le noeud B a exprimé son intention contraire de retirer l'élément $a$ de ce même ensemble.
+    Nous pouvons juger tout aussi correct les états $\{a\}$ et $\{\}$ dans cette situation.
+    Afin de permettre aux noeuds de continuer leur collaboration, il est cependant primordial qu'ils convergent vers le même état.
+    Pour ce faire, nécessité d'un mécanisme de résolution de conflits, potentiellement automatique.
   \item Les \acp{CRDT} répondent à ce besoin.
     S'agit de nouvelles spécifications des types de données existants, \eg Ensemble ou Séquence.
     Conçus pour être utilisés dans des systèmes distribués adoptant la réplication optimiste.
