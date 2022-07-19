@@ -527,6 +527,7 @@ qui fut la première de toutes.
   \item Une opération est un message.
     Son rôle est d'encoder la modification sous la forme d'un ou plusieurs éléments irréductibles du sup-demi-treillis.
     \begin{definition}[Élément irréductible]
+      \label{def:irreducible-element}
       Un élément irréductible d'un sup-demi-treillis est un élément atomique de ce dernier.
       Il ne peut être obtenu par la fusion d'autres états.
     \end{definition}
@@ -567,11 +568,11 @@ qui fut la première de toutes.
   \item Finalement,nous noterons qu'il est nécessaire pour les \acp{CRDT} synchronisés par opérations de maintenir leur journal d'opérations.
     En effet, les noeuds l'utilisent pour renvoyer les opérations manquées lors de l'exécution du mécanisme d'anti-entropie évoqué ci-dessus.
     Ceci se traduit par une augmentation perpétuelle des métadonnées des \acp{CRDT} synchronisés par opérations.
-    Pour y pallier, des travaux\cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} proposent de tronquer le journal des opérations pour en supprimer les opérations connues de tous.
+    Pour y pallier, des travaux \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} proposent de tronquer le journal des opérations pour en supprimer les opérations connues de tous.
     Les noeuds reposent alors sur la notion de stabilité causale pour déterminer les opérations supprimables de manière sûre.
     \begin{definition}[Stabilité causale]
       Une opération est stable causalement lorsqu'elle a été observée par l'ensemble des noeuds du système.
-      Ainsi, toute opération future dépendra causalement des opérations causalement stables, \ie les noeuds ne pourront plus générer de manière honnête d'opérations concurrentes aux opérations causalement stables.
+      Ainsi, toute opération future dépend causalement des opérations causalement stables, \ie les noeuds ne peuvent plus générer d'opérations concurrentes aux opérations causalement stables de manière honnête .
     \end{definition}
     Un mécanisme d'instantané \mnnote{TODO: Ajouter refs} doit néanmoins être associé au mécanisme de troncage du journal pour générer un état équivalent à celui résultant des opérations supprimées.
     Ce mécanisme est en effet nécessaire pour permettre un nouveau noeud de rejoindre le système et d'obtenir l'état courant à partir de l'instantané et du journal tronqué.
@@ -585,7 +586,39 @@ qui fut la première de toutes.
 \subsubsection{Synchronisation par différences d'états}
 
 \begin{itemize}
-  \item
+  \item Dans \cite{almeida2015delta}, \citeauthor{almeida2015delta} introduisent un nouveau modèle de synchronisation pour \acp{CRDT}.
+    La proposition de ce modèle est nourrie par les observations suivantes :
+    \begin{enumerate}[label=(\roman*)]
+      \item Les \acp{CRDT} synchronisés par opérations sont vulnérables aux défaillances du réseau et nécessitent généralement pour pallier à cette vulnérabilité une livraison des opérations en exactement un exemplaire et respectant l'ordre causal.
+      \item Les \acp{CRDT} synchronisés par états pâtissent du surcoût induit par la diffusion de leurs états complets, généralement croissant continuellement.
+    \end{enumerate}
+  \item Pour pallier aux faiblesses de chaque approche et allier le meilleur des deux mondes, les auteurs proposent les \acp{CRDT} synchronisés par différences d'états \cite{almeida2015delta,Almeida_2018, enes2019}.
+    S'agit en fait d'une sous-famille des \acp{CRDT} synchronisés par états.
+    Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} permettant de produire la LUB entre deux états, et qui est associative, commutative et idempotente.
+  \item La spécificité des \acp{CRDT} synchronisés par différences d'états est qu'une modification locale produit en retour un delta.
+    Un delta encode la modification effectuée sous la forme d'un état du lattice.
+    Les deltas étant des états, ils peuvent être diffusés puis intégrés par les autres noeuds à l'aide de la fonction \texttt{merge}.
+    Ceci permet de bénéficier des propriétés d'associativité, de commutativité et d'idempotence offertes par cette fonction.
+    Les \acp{CRDT} synchronisés par différences d'états offrent ainsi :
+    \begin{enumerate}[label=(\roman*)]
+      \item Une diffusion des modifications avec un surcoût pour le réseau proche de celui des \acp{CRDT} synchronisés par opérations.
+      \item Une résistance aux défaillances réseaux similaire celle des \acp{CRDT} synchronisés par états.
+    \end{enumerate}
+  \item Cette définition des \acp{CRDT} synchronisés par différences d'états, introduite dans \cite{almeida2015delta,Almeida_2018}, fut ensuite précisée dans \cite{enes2019}.
+    Dans cet article, \citeauthor{enes2019} précisent qu'utiliser des éléments irréductibles (cf. \autoref{def:irreducible-element}) comme deltas est optimal du point de vue de la taille des deltas produits.
+  \item Concernant la diffusion des modifications, les \acp{CRDT} synchronisés par différences d'états autorisent un large éventail de possibilités.
+    Par exemple, les deltas peuvent être diffusés et intégrés de manière indépendante.
+    Une autre approche possible consiste à tirer avantage du fait que les deltas sont des états : il est possible d'agréger plusieurs deltas à l'aide la fonction \texttt{merge}, éliminant leurs éventuelles redondances.
+    Ainsi, la fusion de deltas permet ensuite de diffuser un ensemble de modifications par le biais d'un seul et unique delta, minimal.
+    Et en dernier recours, les \acp{CRDT} synchronisés par différences d'états peuvent adopter le même schéma de diffusion que les \acp{CRDT} synchronisés par états, \ie diffuser leur état complet de manière périodique.
+    Plusieurs de ces approches sont évaluées et comparées de manière expérimentale dans \cite{enes2019}.
+  \item Cependant, il est important de noter que la décomposition en deltas entraîne la perte d'une des propriétés intrinsèques des \acp{CRDT} synchronisés par états : le respect du modèle de cohérence causale.
+    En effet, sans mécanisme supplémentaire, la perte ou le ré-ordonnement de deltas par le réseau peut mener à une livraison dans le désordre des modifications à l'un des noeuds.
+    S'ils souhaitent assurer une diffusion causale des modifications, les \acp{CRDT} synchronisés par différences d'états doivent donc définir et intégrer dans leur spécification un mécanisme similaire à l'intergiciel de livraison des \acp{CRDT} synchronisés par opérations.
+    En revanche et à l'instar des \acp{CRDT} synchronisés par opérations, les \acp{CRDT} synchronisés par différences d'états peuvent aussi faire le choix inverse : s'affranchir du modèle de cohérence causale pour accélerer la diffusion des modifications et minimiser le surcoût du type répliqué.
+  \item Ainsi, les \acp{CRDT} synchronisés par différences d'états sont une évolution prometteuse des \acp{CRDT} synchronisés par états.
+    Ce modèle de synchronisation rend ces \acp{CRDT} utilisables dans les systèmes temps réels sans introduire de contraintes sur la fiabilité du réseau.
+    Mais pour cela, il ajoute une couche supplémentaire de complexité à la spécification des \acp{CRDT} synchronisés par états, \ie le mécanisme dédié à la livraison des deltas, qui peut s'avérer source d'erreurs et de coûts supplémentaires.
 \end{itemize}
 
 \mnnote{NOTE:
@@ -595,6 +628,8 @@ Utiliser la même approche pour présenter les spécificités de chaque famille 
 }
 
 \subsubsection{Synthèse}
+
+Nous récapitulons les principales propriétés et différences des modèles de synchronisations pour \acp{CRDT} dans \autoref{tab:synchronisation-models}.
 
 \begin{table}[!ht]
   \centering
