@@ -412,6 +412,43 @@ qui fut la première de toutes.
     Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
     Parle alors de conflits.
     \mnnote{TODO: Exemple avec Ensemble}
+
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \path
+              node {\textbf{A}}
+              ++(0:0.5) node (a) {}
+              +(0:21) node (a-end) {}
+              +(0:2) node[point, label=above right:{\{a\}}] (a-initial) {}
+              +(0:7) node[point, label=above right:{\{\}}, label=below left:{\emph{rmv(a)}}] (a-removes) {}
+              +(0:12) node[point, label=above right:{\{a\}}, label=below left:{\emph{add(a)}}] (a-add) {}
+              +(0:19) node[point, label=above right:{?}] (a-conflicts) {};
+
+          \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+          \path
+              ++(270:3) node {\textbf{B}}
+              ++(0:0.5) node (b) {}
+              +(0:21) node (b-end) {}
+              +(0:2) node[point, label=below right:{\{a\}}] (b-initial) {}
+              +(0:15.5) node[point, label=below right:{\{\}}, label=above left:{\emph{rmv(a)}}] (b-removes) {}
+              +(0:19) node[point, label=below right:{?}] (b-conflicts) {};
+
+          \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+          \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+          \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+        \end{tikzpicture}
+      }
+      \label{fig:set-conflict}
+      \caption{Exécution distribuée présentant un conflit provoqué par l'ajout et la suppression d'un même élément en concurrence}
+    \end{figure}
+
     Pour résoudre ces situations et permettre aux noeuds de converger, nécessité d'un mécanisme de résolution de conflits.
   \item Les \acp{CRDT} répondent à ce besoin.
     S'agit de nouvelles spécifications des types de données existants, \eg Ensemble ou Séquence.
