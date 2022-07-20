@@ -384,109 +384,121 @@ qui fut la première de toutes.
 
 \section{Types de données répliquées sans conflits}
 
-\begin{itemize}
-  \item Pour limiter la coordination entre les noeuds, systèmes distribués adoptent le paradigme de la réplication optimiste.
-    Paradigme consiste à ce que chaque noeud possède une copie de la donnée.
-    Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
-    Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
-    Mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
-    Ce paradigme offre aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} et une faible latence.
-  \item Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before} \cite{1978-happen-before-lamport}.
-    Nous l'adaptons ci-dessous à notre contexte :
-    \begin{definition}[Happen-before]
-      La relation \emph{happen-before} indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
-      \begin{enumerate}[label=(\roman*)]
-        \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
-        \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
-        \item Il existe une modification $m$ telle que $m_1 \rightarrow m \wedge m \rightarrow m_2$.
-      \end{enumerate}
-    \end{definition}
-    Dans le cadre d'un système distribué, on note que la relation \emph{happen-before} ne permet pas d'établir un ordre total entre les opérations.
-    En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
-    De telles modifications sont alors dites \emph{concurrentes} :
-    \begin{definition}[Concurrence]
-      Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \wedge m_1 \nrightarrow m_2$.
-    \end{definition}
-  \item Lorsque modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
-    Cependant, majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives car de sémantiques contraires.
-    Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
-    Parle alors de conflits.
-    La figure \autoref{fig:set-conflict} présente un scénario où des opérations de sémantiques opposées sont générées en concurrence.
+Pour limiter la coordination entre les noeuds, les systèmes distribués adoptent le paradigme de la réplication optimiste.
+Ce paradigme consiste à ce que chaque noeud possède une copie de la donnée.
+Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
+Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
+Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
+Ce paradigme offre ainsi aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} ainsi qu'une faible latence.
 
-    \begin{figure}[!ht]
+Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before} \cite{1978-happen-before-lamport}.
+Nous l'adaptons ci-dessous à notre contexte :
 
-      \centering
-      \resizebox{\columnwidth}{!}{
-        \begin{tikzpicture}
-          \path
-              node {\textbf{A}}
-              ++(0:0.5) node (a) {}
-              +(0:21) node (a-end) {}
-              +(0:2) node[point, label=above right:{\{a\}}] (a-initial) {}
-              +(0:7) node[point, label=above right:{\{\}}, label=below left:{\emph{rmv(a)}}] (a-removes) {}
-              +(0:12) node[point, label=above right:{\{a\}}, label=below left:{\emph{add(a)}}] (a-add) {}
-              +(0:19) node[point, label=above right:{?}] (a-conflicts) {};
+\begin{definition}[Happen-before]
+  La relation \emph{happen-before} indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
+  \begin{enumerate}[label=(\roman*)]
+    \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
+    \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
+    \item Il existe une modification $m$ telle que $m_1 \rightarrow m \wedge m \rightarrow m_2$.
+  \end{enumerate}
+\end{definition}
 
-          \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
-          \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+Dans le cadre d'un système distribué, on note que la relation \emph{happen-before} ne permet pas d'établir un ordre total entre les opérations.
+En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
+De telles modifications sont alors dites \emph{concurrentes} :
 
-          \path
-              ++(270:3) node {\textbf{B}}
-              ++(0:0.5) node (b) {}
-              +(0:21) node (b-end) {}
-              +(0:2) node[point, label=below right:{\{a\}}] (b-initial) {}
-              +(0:15.5) node[point, label=below right:{\{\}}, label=above left:{\emph{rmv(a)}}] (b-removes) {}
-              +(0:19) node[point, label=below right:{?}] (b-conflicts) {};
+\begin{definition}[Concurrence]
+  Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \wedge m_1 \nrightarrow m_2$.
+\end{definition}
 
-          \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
-          \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
+Cependant, la majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives car de sémantiques contraires.
+Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
+Nous parlons alors de conflits.
+La figure \autoref{fig:set-conflict} présente un scénario où des opérations de sémantiques opposées sont générées en concurrence.
 
-          \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
-          \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
-        \end{tikzpicture}
-      }
-      \caption{Exécution distribuée présentant un conflit provoqué par l'ajout et la suppression d'un même élément en concurrence}
-      \label{fig:set-conflict}
-    \end{figure}
+\begin{figure}[!ht]
 
-  \item Dans cet exemple, deux noeuds A et B répliquent et partagent un même Ensemble.
-    Les deux noeuds possèdent le même état initial : ${a}$.
-    Le noeud A retire l'élément $a$ de l'ensemble, $\trm{rmv}(a)$.
-    Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via l'opération de modification $\trm{add}(a)$.
-    En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
-    Les deux noeuds se synchronisent ensuite.
-  \item À l'issue de ce scénario, l'état à produire n'est pas trivial : le noeud A a exprimé son intention d'ajouter l'élément $a$ à l'ensemble, tandis que le noeud B a exprimé son intention contraire de retirer l'élément $a$ de ce même ensemble.
-    Nous pouvons juger tout aussi correct les états $\{a\}$ et $\{\}$ dans cette situation.
-    Afin de permettre aux noeuds de continuer leur collaboration, il est cependant primordial qu'ils convergent vers le même état.
-    Pour ce faire, nécessité d'un mécanisme de résolution de conflits, potentiellement automatique.
-  \item Les \acp{CRDT} répondent à ce besoin.
-    S'agit de nouvelles spécifications des types de données existants, \eg Ensemble ou Séquence.
-    Conçus pour être utilisés dans des systèmes distribués adoptant la réplication optimiste.
-    Offrent les deux propriétés suivantes :
-    \begin{enumerate}[label=(\roman*)]
-      \item Peuvent être modifiés sans coordination avec les autres noeuds.
-      \item Tous noeuds ayant observé le même ensemble de modifications obtiendront des états équivalents.
-        S'agit de la propriété de cohérence forte à terme.
-    \end{enumerate}
-  \item Pour ce faire, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
-    \begin{enumerate}[label=(\roman*)]
-      \item États forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
-      \item Modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
-      \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
-        On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
-    \end{enumerate}
-  \item Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant du point de vue des utilisateurs.
-    Ainsi, les \acp{CRDT} partagent le comportement des types non-répliqués dans le cadre d'exécutions séquentielles.
-    Cependant, ils définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
-  \item Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.
-    Un \ac{CRDT} se doit donc de préciser quelle sémantique il choisit.
-  \item L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour propager les modifications.
-    Au fil des années, la littérature a établi et défini plusieurs modèles dit de synchronisation, chacun ayant ses propres besoins et avantages.
-    De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
-  \item Ainsi, ce qui définit un CRDT est sa sémantique en cas de concurrence et son modèle de synchronisation.
-    Dans les prochaines sections, nous présenterons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
-    Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
-\end{itemize}
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+          +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+          +(0:19) node[point, label=above right:{$?$}] (a-conflicts) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+          +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+          +(0:19) node[point, label=below right:{$?$}] (b-conflicts) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+      \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+      \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+    \end{tikzpicture}
+  }
+  \caption{Exécution distribuée présentant un conflit provoqué par l'ajout et la suppression d'un même élément en concurrence}
+  \label{fig:set-conflict}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B répliquent et partagent un même Ensemble.
+Les deux noeuds possèdent le même état initial : ${a}$.
+Le noeud A retire l'élément $a$ de l'ensemble, $\trm{rmv}(a)$.
+Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via l'opération de modification $\trm{add}(a)$.
+En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
+Les deux noeuds se synchronisent ensuite.
+
+À l'issue de ce scénario, l'état à produire n'est pas trivial : le noeud A a exprimé son intention d'ajouter l'élément $a$ à l'ensemble, tandis que le noeud B a exprimé son intention contraire de retirer l'élément $a$ de ce même ensemble.
+Ainsi, les états $\{a\}$ et $\{\}$ semblent tous les deux corrects et légitimes dans cette situation.
+Il est néanmoins primordial que les noeuds choisissent et convergent vers un même état pour leur permettre de poursuivre leur collaboration.
+Pour ce faire, il est nécessaire de mettre en place un mécanisme de résolution de conflits, potentiellement automatique.
+
+Les \acp{CRDT} répondent à ce besoin.
+Il s'agit de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
+Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
+Ainsi, elles offrent les deux propriétés suivantes :
+
+\begin{enumerate}[label=(\roman*)]
+  \item Les \acp{CRDT} peuvent être modifiés sans coordination avec les autres noeuds.
+  \item Tous les noeuds ayant observés le même ensemble de modifications obtiendront des états équivalents.
+    Cette propriété est connue sous le nom de \emph{cohérence forte à terme} \mnnote{TODO: Ajouter ref}.
+\end{enumerate}
+
+Pour offrir la propriété de \emph{cohérence forte à terme}, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
+
+\begin{enumerate}[label=(\roman*)]
+  \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
+  \item Les modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
+  \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
+  On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
+\end{enumerate}
+
+Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant du point de vue des utilisateurs.
+Ainsi, les \acp{CRDT} partagent le comportement des types non-répliqués dans le cadre d'exécutions séquentielles.
+Cependant, ils définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
+
+Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.
+Un \ac{CRDT} se doit donc de préciser quelle sémantique il choisit.
+
+L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour propager les modifications.
+Au fil des années, la littérature a établi et défini plusieurs modèles dit de synchronisation, chacun ayant ses propres besoins et avantages.
+De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
+
+Ainsi, ce qui définit un \ac{CRDT} est sa sémantique en cas de concurrence et son modèle de synchronisation.
+Dans les prochaines sections, nous présenterons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
+Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
 
 \mnnote{TODO: Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
 
