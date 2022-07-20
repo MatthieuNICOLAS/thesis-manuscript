@@ -66,6 +66,8 @@
 \newcommand{\eg}{e.g. }
 \newcommand{\ie}{c.-à-d. }
 
+\newcommand{\hb}{\emph{happens-before}}
+
 \newcommand{\headerparagraph}[1]{\textbf{\emph{#1}}\quad}
 
 \newcommand{\inbb}[1]{\in \mathbb{#1}}
@@ -182,6 +184,7 @@
 \acrodef{JIT}[JIT]{Just-In-Time}
 \acrodef{LCA}[PPAC]{Plus Petit Ancêtre Commun}
 \acrodef{LUB}[LUB]{Least Upper Bound}
+\acrodef{LWW}[LWW]{\emph{Last-Writer-Wins}}
 \acrodef{MUTE}[MUTE]{Multi User Text Editor}
 \acrodef{OT}[OT]{Operational Transformation}
 \acrodefplural{OT}[OT]{Operational Transformations}
@@ -391,11 +394,11 @@ Noeuds peuvent alors temporairement diverger, \ie posséder des états différen
 Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
 Ce paradigme offre ainsi aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} ainsi qu'une faible latence.
 
-Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \emph{happen-before} \cite{1978-happen-before-lamport}.
+Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \hb \cite{1978-happen-before-lamport}.
 Nous l'adaptons ci-dessous à notre contexte :
 
-\begin{definition}[Happen-before]
-  La relation \emph{happen-before} indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
+\begin{definition}[Relation \hb]
+  La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
   \begin{enumerate}[label=(\roman*)]
     \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
     \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
@@ -403,7 +406,7 @@ Nous l'adaptons ci-dessous à notre contexte :
   \end{enumerate}
 \end{definition}
 
-Dans le cadre d'un système distribué, on note que la relation \emph{happen-before} ne permet pas d'établir un ordre total entre les opérations.
+Dans le cadre d'un système distribué, on note que la relation \hb ne permet pas d'établir un ordre total entre les opérations.
 En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
 De telles modifications sont alors dites \emph{concurrentes} :
 
@@ -504,13 +507,78 @@ Puis nous présenterons les différents modèles de synchronisation proposés da
 
 \subsection{Sémantique en cas de concurrence}
 
+Plusieurs sémantiques peuvent être proposées pour résoudre les conflits.
+Certaines de ces sémantiques ont comme avantage d'être générique, \ie applicable à l'ensemble des types de données.
+En contrepartie, elles souffrent de cette même généricité, en ne permettant que des comportements simples en cas de conflits.
+
+À l'inverse, la majorité des sémantiques proposées dans la littérature sont spécifiques à un type de données.
+Elles visent ainsi à prendre plus finement en compte l'intention des modifications pour proposer des comportements plus précis.
+
+Dans la suite de cette section, nous présentons ces sémantiques génériques ainsi que celles spécifiques à l'Ensemble et, à titre d'exemple, les illustrons à l'aide du scénario présenté dans la \autoref{fig:set-conflict}.
+
+\subsubsection{Sémantique \acl{LWW}}
+
+Une manière simple pour résoudre un conflit consiste à trancher de manière arbitraire et de sélectionner une modification parmi l'ensemble des modifications en conflit.
+Pour faire cela de manière déterministe, une approche est de reproduire et d'utiliser l'ordre total sur les modifications qui serait instauré par une horloge globale pour choisir la modification à prioritiser.
+
+Cette approche, présentée dans \cite{johnson1975rfc0677}, correspond à la sémantique nommée \acf{LWW}.
+De par son fonctionnement, cette sémantique est générique et est donc utilisée par une variété de \acp{CRDT} pour des types différents.
+La \autoref{fig:set-lww} illustre son application à l'Ensemble pour résoudre le conflit de la \autoref{fig:set-conflict}.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+          +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+          +(0:19) node[point, label=above right:{$\{\}$}] (a-conflicts) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+          +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+          +(0:19) node[point, label=below right:{$\{\}$}] (b-conflicts) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+      \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+      \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+    \end{tikzpicture}
+  }
+  \caption{Résolution du conflit en utilisant la sémantique \ac{LWW}}
+  \label{fig:set-lww}
+\end{figure}
+
+Comme indiqué précédemment, le scénario illustré dans la \autoref{fig:set-lww} présente un conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{rmv}(a)$ générées de manière concurrente respectivement par les noeuds A et B.
+Pour le résoudre, la sémantique \ac{LWW} associe à chaque modification une estampille.
+L'ordre créé entre les modifications par ces dernières permet de déterminer laquelle déterminer comme modification prioritaire.
+Ici, nous considérons que $\trm{add}(a)$ a eu lieu plus tôt que $\trm{rmv}(a)$.
+La sémantique \ac{LWW} désigne donc $\trm{rmv}(a)$ comme prioritaire et ignore $\trm{add}(a)$.
+L'état obtenu à l'issue de cet exemple par chaque noeud est donc $\{\}$.
+
+Il est à noter que si la modification $\trm{rmv}(a)$ du noeud B avait eu lieu plus tôt dans notre exemple, l'état final obtenu aurait été $\{a\}$.
+Ainsi, des exécutions reproduisant le même ensemble de modifications produiront des résultats différents en fonction de l'ordre créé par les estampilles associées à chaque modification.
+Ces estampilles étant des métadonnées du mécanisme de résolution de conflits, elles sont dissimulées aux utilisateur-rices.
+Le comportement de cette sémantique peut donc être perçu comme aléatoire et s'avérer perturbant pour les utilisateur-rices.
+
+La sémantique \ac{LWW} repose sur l'horloge de chaque noeud pour attribuer une estampille à chacune de leurs modifications.
+Les horloges physiques étant sujettes à des imprécisions et notamment des décalages, utiliser les estampilles qu'elles fournissent peut provoquer des anomalies vis-à-vis de la relation \hb.
+Les systèmes distribués préfèrent donc généralement utiliser des horloges logiques \cite{1978-happen-before-lamport}.
+\mnnote{TODO: Ajouter refs des horloges logiques plus intelligentes (Interval Tree Clock, Hybrid Clock...)}
+
 \begin{itemize}
-  \item Plusieurs sémantiques peuvent être proposées pour résoudre les conflits.
-  \item Sémantique simple est de trancher entre l'ensemble des opérations en conflit et d'en sélectionner une de manière arbitraire.
-    \mnnote{TODO: Préciser que le but est de recréer un ordre total sur les opérations s'approchant de celui instauré par une horloge globale.}
-    Cette sémantique, dite du Last-Writer Wins (LWW) \mnnote{TODO: citer papier}, est une sémantique générique que l'on retrouve dans une variété de \acp{CRDT} proposés pour des types différents.
-    Ainsi, avec cette sémantique, utilisons une horloge pour déterminer quelle opération choisir.
-    L'horloge physique étant sujette à des imprécisions, a généralement recours à une horloge logique \cite{1978-happen-before-lamport} \mnnote{TODO: Ajouter refs des horloges logiques plus intelligentes (Interval Tree Clock, Hybrid Clock...)}.
   \item D'autres sémantiques sont spécifiques au type de donnée concerné.
     Dans le cadre de l'Ensemble, on remarque qu'un conflit est produit lorsque des modifications \emph{add} et \emph{remove} sont effectuées en concurrence.
     Deux sémantiques peuvent alors être proposées pour le résoudre :
