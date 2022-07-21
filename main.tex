@@ -178,6 +178,7 @@
 \acrodef{ADT}[ADT]{Abstract Data Type}
 \acrodefplural{ADT}[ADTs]{Abstract Data Types}
 \acrodef{API}[API]{Application Programming Interface}
+\acrodef{AW}[AW]{\emph{Add-Wins}}
 \acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
 \acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
 \acrodef{FIFO}[FIFO]{First In, First Out}
@@ -191,6 +192,7 @@
 \acrodefplural{OT}[OT]{Operational Transformations}
 \acrodef{P2P}[P2P]{Pair-à-Pair}
 \acrodef{PKI}[PKI]{Public Key Infrastructure}
+\acrodef{RW}[RW]{\emph{Remove-Wins}}
 \acrodef{SEC}[SEC]{Cohérence forte à terme}
 \acrodef{WebRTC}[WebRTC]{Web Real-Time Communication}
 
@@ -635,14 +637,96 @@ Il est intéressant de noter que cette sémantique mène à un changement du dom
 E.g. si nous considérons que le type correspondant au \ac{CRDT} dans la \autoref{fig:set-mv} est le type $\trm{Set}\langle V \rangle$, nous observons que la valeur finale obtenue a pour type $\trm{Set}\langle \trm{Set}\langle V \rangle \rangle$.
 Il s'agit à notre connaissance de la seule sémantique opérant ce changement.
 
+\subsubsection{Sémantiques \acl{AW} et \acl{RW}}
+
+Comme évoqué précédemment, d'autres sémantiques sont spécifiques au type de données concerné.
+Ainsi, nous abordons à présent des sémantiques spécifiques au type de l'Ensemble.
+
+Dans le cadre de l'Ensemble, un conflit est provoqué lorsque des modifications $\trm{add}$ et $\trm{rmv}$ d'un même élément sont effectuées en concurrence.
+Ainsi, deux approches peuvent être proposées pour résoudre le conflit :
+
+\begin{enumerate}[label=(\roman*)]
+  \item Une sémantique où la modification $\trm{add}$ d'une élément prend la précédence sur les modifications concurrentes $\trm{rmv}$ du même élément, nommée \acf{AW}.
+    L'élément est alors présent dans l'état obtenu à l'issue de la résolution du conflit.
+  \item Une sémantique où la modification $\trm{rmv}$ d'une élément prend la précédence sur les opérations concurrentes $\trm{add}$ du même élément, nommée \acf{RW}.
+    L'élément est alors absent de l'état obtenu à l'issue de la résolution du conflit.
+\end{enumerate}
+
+La \autoref{fig:set-aw-rw} illustre l'application de chacune de ces sémantiques sur notre exemple.
+
+\begin{figure}[!ht]
+  \subfloat[Application de la sémantique \ac{AW}]{
+      \begin{minipage}{\columnwidth}
+        \resizebox{\columnwidth}{!}{
+          \centering
+          \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:21) node (a-end) {}
+                +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+                +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+                +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+                +(0:19) node[point, label=above right:{$\{a\}$}] (a-conflicts) {};
+
+            \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+            \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:21) node (b-end) {}
+                +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+                +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+                +(0:19) node[point, label=below right:{$\{a\}$}] (b-conflicts) {};
+
+            \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+            \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+            \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+            \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+          \end{tikzpicture}
+          \label{fig:set-aw}}
+      \end{minipage}}
+  \hfil
+  \subfloat[Application de la sémantique \ac{RW}]{
+      \begin{minipage}{\columnwidth}
+        \centering
+        \resizebox{\columnwidth}{!}{
+          \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:21) node (a-end) {}
+                +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+                +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+                +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+                +(0:19) node[point, label=above right:{$\{\}$}] (a-conflicts) {};
+
+            \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+            \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:21) node (b-end) {}
+                +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+                +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+                +(0:19) node[point, label=below right:{$\{\}$}] (b-conflicts) {};
+
+            \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+            \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+            \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+            \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+          \end{tikzpicture}
+          \label{fig:set-rw}}
+      \end{minipage}}
+  \caption{Résolution du conflit en utilisant soit la sémantique \ac{AW}, soit la sémantique \ac{RW}}
+  \label{fig:set-aw-rw}
+\end{figure}
+
 \begin{itemize}
-  \item D'autres sémantiques sont spécifiques au type de donnée concerné.
-    Dans le cadre de l'Ensemble, on remarque qu'un conflit est produit lorsque des modifications \emph{add} et \emph{remove} sont effectuées en concurrence.
-    Deux sémantiques peuvent alors être proposées pour le résoudre :
-    \begin{enumerate}[label=(\roman*)]
-      \item Une sémantique où l'opération \emph{add} d'une valeur a la précédence sur les opérations concurrentes \emph{remove} de la même valeur, nommée Add-wins.
-      \item Une sémantique où l'opération \emph{remove} d'une valeur a la précédence sur les opérations concurrentes \emph{add} de la même valeur, nommée Remove-wins.
-    \end{enumerate}
   \item Dernière sémantique proposée récemment : celle du CL-Set.
     Se base sur les constats suivants :
     \begin{enumerate}[label=(\roman*)]
