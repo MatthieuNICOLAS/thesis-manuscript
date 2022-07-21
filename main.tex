@@ -461,7 +461,7 @@ La figure \autoref{fig:set-conflict} présente un scénario où des opérations 
 \end{figure}
 
 Dans cet exemple, deux noeuds A et B répliquent et partagent un même Ensemble.
-Les deux noeuds possèdent le même état initial : ${a}$.
+Les deux noeuds possèdent le même état initial : $\{a\}$.
 Le noeud A retire l'élément $a$ de l'ensemble, $\trm{rmv}(a)$.
 Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via l'opération de modification $\trm{add}(a)$.
 En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
@@ -473,7 +473,7 @@ Il est néanmoins primordial que les noeuds choisissent et convergent vers un m�
 Pour ce faire, il est nécessaire de mettre en place un mécanisme de résolution de conflits, potentiellement automatique.
 
 Les \acp{CRDT} répondent à ce besoin.
-Il s'agit de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
+Les \acp{CRDT} sont de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
 Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
 Ainsi, elles offrent les deux propriétés suivantes :
 
@@ -791,13 +791,17 @@ Son état évolue donc pour devenir $\{a\}$.
 
 \subsubsection{Synthèse}
 
-\begin{itemize}
-  \item Ainsi, pour un même type de données, différents \ac{CRDT} peuvent être spécifiés, chacun proposant la sémantique qu'il utilise pour résoudre les conflits.
-    Il est à noter qu'aucune sémantique n'est intrinsèquement meilleure et préférable aux autres.
-    Il revient alors aux concepteur-rices d'applications de choisir les \ac{CRDT} adaptés en fonction des besoins et des comportements attendus en cas de conflits.
-    Par exemple, une application pour liste de courses peut justifier l'utilisation d'un Add-wins Set \ac{CRDT} inter-éléments, où l'ajout d'un élément (\eg lait, pour faire des crêpes) invalide un retrait concurrent d'un autre élément (\eg oeufs).
-    \mnnote{TODO: Ajouter use-case d'un CL set.}
-\end{itemize}
+Dans cette section, nous avons mis en lumière l'existence de solutions différentes pour résoudre un même conflit.
+Chacune de ces solutions correspond à une sémantique spécifique de résolution de conflits.
+Ainsi, pour un même type de données, différents \acp{CRDT} peuvent être spécifiés.
+Chacun de ces \acp{CRDT} est spécifié par la combinaison de sémantiques qu'il adopte, chaque sémantique servant à résoudre un des types de conflits du type de données.
+
+Il est à noter qu'aucune sémantique n'est intrinsèquement meilleure et préférable aux autres.
+Il revient aux concepteur-rices d'applications de choisir les \acp{CRDT} adaptés en fonction des besoins et des comportements attendus en cas de conflits.
+
+Par exemple, pour une application collaborative de listes de courses, l'utilisation d'un \ac{MV}-Registre pour représenter le contenu de la liste se justifie : cette sémantique permet d'exposer les modifications concurrentes aux utilisateur-rices.
+Ainsi, les personnes peuvent détecter et résoudre les conflits provoquées par ces éditions concurrentes, \eg l'ajout de l'élément \emph{lait} à la liste, pour cuisiner des crêpes, tandis que les \emph{oeufs} nécessaires à ces mêmes crêpes sont retirés.
+En parallèle, cette même application peut utiliser un \ac{LWW}-Registre pour représenter et indiquer aux utilisateur-rices la date de la dernière modification effectuée.
 
 \subsection{Modèle de synchronisation}
 
