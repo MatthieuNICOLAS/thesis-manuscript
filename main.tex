@@ -410,7 +410,7 @@ Nous l'adaptons ci-dessous à notre contexte :
   \end{enumerate}
 \end{definition}
 
-Dans le cadre d'un système distribué, on note que la relation \hb ne permet pas d'établir un ordre total entre les opérations.
+Dans le cadre d'un système distribué, on note que la relation \hb ne permet pas d'établir un ordre total entre les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.}.
 En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
 De telles modifications sont alors dites \emph{concurrentes} :
 
@@ -419,10 +419,10 @@ De telles modifications sont alors dites \emph{concurrentes} :
 \end{definition}
 
 Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
-Cependant, la majorité des types de données proposent des opérations de modifications qui ne sont pas commutatives car de sémantiques contraires.
-Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération d'opérations concurrentes non commutatives.
+Cependant, généralement les modifications permises par un type de données ne sont pas commutatives car de sémantiques contraires.
+Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération de modifications concurrentes non commutatives.
 Nous parlons alors de conflits.
-La figure \autoref{fig:set-conflict} présente un scénario où des opérations de sémantiques opposées sont générées en concurrence.
+La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques opposées sont générées en concurrence.
 
 \begin{figure}[!ht]
 
@@ -480,10 +480,10 @@ Ainsi, elles offrent les deux propriétés suivantes :
 \begin{enumerate}[label=(\roman*)]
   \item Les \acp{CRDT} peuvent être modifiés sans coordination avec les autres noeuds.
   \item Tous les noeuds ayant observés le même ensemble de modifications obtiendront des états équivalents.
-    Cette propriété est connue sous le nom de \emph{cohérence forte à terme} \mnnote{TODO: Ajouter ref}.
+    Cette propriété est connue sous le nom de \emph{convergence forte} \mnnote{TODO: Ajouter ref}.
 \end{enumerate}
 
-Pour offrir la propriété de \emph{cohérence forte à terme}, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
+Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
 
 \begin{enumerate}[label=(\roman*)]
   \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
