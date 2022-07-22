@@ -456,7 +456,7 @@ La figure \autoref{fig:set-conflict} présente un scénario où des modification
       \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
     \end{tikzpicture}
   }
-  \caption{Exécution distribuée présentant un conflit provoqué par l'ajout et la suppression d'un même élément en concurrence}
+  \caption{Modifications concurrentes d'un Ensemble répliqué provoquant un conflit provoqué suite à l'ajout et la suppression d'un même élément}
   \label{fig:set-conflict}
 \end{figure}
 
@@ -841,7 +841,7 @@ La \autoref{fig:sync-model-base} illustre ce point.
       % \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
     \end{tikzpicture}
   }
-  \caption{Exécution distribuée de mo}
+  \caption{Modifications en concurrence d'un Ensemble répliqué par les noeuds A et B}
   \label{fig:sync-model-base}
 \end{figure}
 
