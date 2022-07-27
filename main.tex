@@ -1236,6 +1236,16 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 
 \section{Séquences répliquées sans conflits}
 
+\begin{itemize}
+  \item Présentation du type Sequence et de son utilisation
+  \item Spécification du type : données, modifications
+  \item Présentation de conflits
+  \begin{itemize}
+    \item dOpt puzzle
+  \end{itemize}
+  \item Introduction des principales approches pour Sequence \acp{CRDT}
+\end{itemize}
+
 \subsection{Approche à pierres tombales}
 
 \begin{itemize}
@@ -1254,6 +1264,39 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 \mnnote{NOTE: Ajouter LogootSplit de manière sommaire aussi à cet endroit?}
 
 \mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
+
+\subsection{Synthèse}
+
+\begin{itemize}
+  \item Deux approches différentes pour la résolution de conflits ont été proposées pour \acp{CRDT} pour Séquence.
+    Chacune de ces approches visent à minimiser surcoût du type répliqué, que ce soit d'un point de vue mémoire, computations et réseau.
+  \item Au fil des années, ces approches ont été raffinées avec de nouveaux \acp{CRDT} de plus en plus en efficace.
+  \item Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
+    Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
+    L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
+    L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
+
+    \begin{table}[!ht]
+      \centering
+      \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour Séquence}
+      \label{tab:sequence-crdts}
+      % \resizebox{\columnwidth}{!}{
+        \begin{tabular}{lcc}
+          \toprule
+                                                    & Dense ids-based & Tombstoned-based  \\
+          \midrule
+          Identifiants de taille fixe               & \ballotx        & \checkmark        \\
+          Eléments réellement supprimés             & \checkmark      & \ballotx          \\
+          Empreinte réseau fixe                     & \ballotx        & \checkmark        \\
+          Peut s'affranchir de la cohérence causale & \checkmark      & \ballotx          \\
+          \bottomrule
+        \end{tabular}
+      % }
+    \end{table}
+
+  \item Pour la suite de ce manuscrit, nous prenons LogootSplit comme base de travail.
+    Nous détaillons donc son fonctionnement dans la section suivante.
+\end{itemize}
 
 \section{LogootSplit}
 
