@@ -421,7 +421,7 @@ De telles modifications sont alors dites \emph{concurrentes} :
 \end{definition}
 
 Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
-Cependant, généralement les modifications permises par un type de données ne sont pas commutatives car de sémantiques contraires.
+Cependant, les modifications permises par un type de données ne sont généralement pas commutatives car de sémantiques contraires.
 Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération de modifications concurrentes non commutatives.
 Nous parlons alors de conflits.
 La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques opposées sont générées en concurrence.
@@ -1803,6 +1803,27 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 \end{itemize}
 
 \section{Synthèse}
+
+\begin{itemize}
+  \item Systèmes distribués adoptent le modèle de la réplication optimiste pour offrir de meilleures performances, \ie disponibilité et latence, et assurer la résilience du système, \ie accroître la capacité de tolérance aux pannes.
+  \item Ce modèle autorise les noeuds à modifier leur copie sans coordination, provoquant ainsi des divergences temporaires.
+    Pour résoudre les potentiels conflits et assurer la convergence à terme des copies, systèmes utilisent les \acp{CRDT} en place et lieu des types de données séquentiels.
+  \item \acp{CRDT} pour Séquence ont été proposés pour conception d'éditeurs collaboratifs pair-à-pair.
+    Deux approches sont utilisées pour concevoir leur mécanismes de résolution de conflits : l'approche basée sur les pierres tombales et l'approche basée sur les identifiants densément ordonnés.
+  \item Chacune de ces approches introduit un surcoût croissant, pénalisant leurs performances à terme.
+    Plusieurs travaux ont été proposés pour limiter ce surcoût, notamment \cite{letia:hal-01248270, zawirski:hal-01248197} qui présentent un mécanisme de renommage des identifiants pour les \acp{CRDT} pour Séquence basés sur identifiants densément ordonnés.
+  \item Mais cette approche requiert un mécanisme de consensus, des renommages concurrents provoquant un nouveau conflit.
+    Cette contrainte empêche son utilisation dans les systèmes pair-à-pair ne disposant pas de noeuds suffisamment stables et bien connectés pour exécuter le mécanisme de consensus.
+\end{itemize}
+
+\section{Proposition}
+
+\begin{itemize}
+  \item Dans ce manuscrit, nous proposons et présentons un nouveau mécanisme de renommage pour \acp{CRDT} pour Séquence, ne nécessitant pas de coordination synchrons entre les noeuds.
+  \item Concevons ce mécanisme pour le \ac{CRDT} pour Séquence LogootSplit, mais intuition derrière notre approche est générique.
+    Pourrait ainsi l'adapter et proposer un équivalent pour autres \acp{CRDT} pour Séquence, \eg RGASplit.
+  \item Présentons et détaillons notre contribution dans le chapitre suivant.
+\end{itemize}
 
 % \include{assets/chapter_soa_ergm}
 
