@@ -1,0 +1,1085 @@
+\NumberThisInToc
+\chapter{MUTE, un éditeur de texte web collaboratif P2P temps réel chiffré de bout en bout}
+\minitoc
+
+Les systèmes collaboratifs temps réels permettent à plusieurs utilisateurs de réaliser une tâche de manière coopérative.
+Ils permettent aux utilisateurs de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateurs.
+L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
+L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit\cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
+
+Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT ont permis de populariser l'édition collaborative temps réel de texte\cite{gdocs, etherpad}.
+Ces approchent souffrent néanmoins de leur architecture centralisée.
+Notamment, ces solutions rencontrent des difficultés à passer à l'échelle\cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité\cite{prism-washington-post, prism-guardian}.
+
+L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P}\cite{ahmednacer:inria-00629503}.
+Ainsi, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
+De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares}\cite{localfirstsoftware2019, pushpin2020}.
+Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
+
+\mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
+
+De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
+Elle développe \acf{MUTE}\cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+\ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
+Nous avons donc intégré dans \ac{MUTE} les travaux de cette thèse.
+
+La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
+MUTE étant une application web, chaque noeud représenté ici correspond à un navigateur.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[page=1, trim=0cm 0cm 0cm 0cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
+  \caption{Architecture système de l'application MUTE}
+  \label{fig:architecture-sys-mute}
+\end{figure}
+
+Nous décrivons l'architecture logicielle d'un noeud dans la \autoref{fig:architecture-log-mute}.
+Dans ce chapitre, nous présentons les différentes couches logicielles de MUTE.
+Notamment, nous détaillons les couches correspondantes à l'implémentation des travaux présentés dans le \autoref{chap:renamablelogootsplit}.
+De la même façon, nous précisons dans ce chapitre les différents composants de l'architecture système de MUTE autre que les pairs eux-mêmes.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[page=2, trim=0cm 0cm 0cm 0cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
+  \caption{Architecture logicielle de l'application MUTE}
+  \label{fig:architecture-log-mute}
+\end{figure}
+
+\section{Couche interface utilisateur}
+
+La \autoref{fig:interface-mute} illustre l'interface utilisateur de l'éditeur de document de MUTE.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{img/screenshot-mute.png}
+  \caption{Capture d'écran d'une session d'édition collaborative avec MUTE}
+  \label{fig:interface-mute}
+\end{figure}
+
+L'interface se compose d'un éditeur de texte supportant le langage de balisage Markdown.
+Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
+Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.
+
+L'éditeur est agrémenté de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateurs.
+L'indicateur en haut à droite de la fenêtre représente le statut de connexion de l'utilisateur.
+Ceci lui indique s'il est actuellement connecté au réseau \ac{P2P}, en cours de connexion, ou si un incident réseau a lieu.
+
+MUTE affiche la liste des collaborateurs actuellement connectés sur la droite de l'éditeur.
+De plus, un curseur ou une sélection distante est associée à chaque collaborateur de la liste.
+Elle permet d'indiquer à l'utilisateur courant dans quelles sections du document ses collaborateurs sont en train de travailler.
+Ainsi, ils peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un collaborateur.
+
+Les documents de l'utilisateur étant sauvegardés dans le navigateur, les documents sont aussi bien disponibles en étant en ligne que hors ligne.
+Une seconde page, listant les documents sauvegardés, permet à l'utilisateur de parcourir ses différents documents.
+
+\section{Couche réplication}
+
+\subsection{Modèle de données du document texte}
+
+MUTE propose plusieurs alternatives pour représenter le document texte.
+MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}}.
+Ce choix est effectué via une valeur de configuration de l'application choisie au moment de son déploiement.
+
+Le modèle de données utilisé interagit avec l'éditeur de texte par l'intermédiaire d'opérations textes.
+Lorsque l'utilisateur effectue des modifications locales, celles-ci sont détectées et mises sous la forme d'opérations textes.
+Elles sont transmises au modèle de données, qui les intègre alors à la structure de données répliquées.
+Le \ac{CRDT} retourne en résultat l'opération distante à propager aux autres noeuds.
+
+De manière complémentaire, lorsqu'une opération distante est délivrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
+Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.
+
+En plus du texte, MUTE maintient un ensemble de métadonnées par document.
+Par exemple, les utilisateurs peuvent donner un titre au document.
+Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Wins Register \ac{CRDT} synchronisé par opérations\cite{shapiro_2011_crdt} au document.
+De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par opérations pour représenter la date de création du document.
+
+\subsection{Module de livraison des opérations}
+
+Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
+Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
+Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{def:ls-delivery-model} et dans la \autoref{def:rls-delivery-model}.
+
+\subsubsection{Livraison des opérations en exactement un exemplaire}
+
+\label{sec:mute-exactly-once-delivery}
+
+Afin de respecter la contrainte de \emph{exactly-once delivery}, il est nécessaire d'identifier de manière unique chaque opération.
+Pour cela, le module \texttt{Sync} ajoute un \emph{Dot}\cite{2014-scalable-accurate-causality-tracking} à chaque opération :
+
+\begin{definition}[Dot]
+  Un \emph{Dot} est une paire $\langle$nodeId, nodeSyncSeq$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant unique du noeud qui a généré l'opération.
+    \item nodeSyncSeq est le numéro de séquence courant du noeud à la génération de l'opération.
+  \end{itemize}
+\end{definition}
+
+Il est à noter que \emph{nodeSyncSeq} est différent du \emph{nodeSeq} utilisé dans LogootSplit et RenamableLogootSplit (cf. \autoref{def:logootsplit}).
+En effet, \emph{nodeSyncSeq} se doit d'augmenter à chaque opération tandis que \emph{nodeSeq} n'augmente qu'à la création d'un nouveau bloc.
+Les contraintes étant différentes, il est nécessaire de distinguer ces deux données.
+
+Chaque noeud maintient une structure de données représentant l'ensemble des opérations reçues par le pair.
+Elle permet de vérifier à la réception d'une opération si le dot de cette dernière est déjà connu.
+S'il s'agit d'un nouveau dot, le module \texttt{Sync} peut délivrer l'opération au \ac{CRDT} et ajouter son dot à la structure.
+Le cas échéant, cela indique que l'opération a déjà été délivrée précédemment et doit être ignorée cette fois-ci.
+
+Plusieurs structures de données sont adaptées pour maintenir l'ensemble des opérations reçues.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un vecteur de versions.
+Cette structure nous permet de réduire à un dot par noeud le surcoût en métadonnées du module \texttt{Sync}, puisqu'il ne nécessite que de stocker le dot le plus récent par noeud.
+Cette structure permet aussi de vérifier en temps constant si une opération est déjà connue.
+La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution avec livraison multiple d'une opération \emph{insert}]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+                \path
+                    node {\textbf{A}}
+                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+                    ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+                    ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
+                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+                    ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+
+                \path
+                    ++(270:4) node {\textbf{B}}
+                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+                    ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+                    ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+                    ++(0:8 * \widthletter) node[epoch] (S3B-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+                \draw[->, thick]
+                  (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+                  (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+
+                \draw[dotted]
+                  (S1A-right) -- (S2A-left)
+                  (S0B) -- (S1B-left)
+                  (S2B-right) -- (S3B-left);
+
+                \draw[dashed, ->, thick, shorten >= 3]
+                  (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+                  (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
+                  (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
+            \end{tikzpicture}
+            \label{fig:exactly-once-delivery-rls}
+          }
+          \end{minipage}
+        }
+        \hfil
+  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:exactly-once-delivery-rls}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
+                ++(0:3) node (a-end) {};
+
+
+            \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6-1) {}
+                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                ++(0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{discard}}] (b-a6-2) {}
+                ++(0:1) node (b-end) {};
+
+            \draw[->, thick]
+              (a-start) edge (a-a6)
+              (b-a6-1) edge (b-b1);
+
+            \draw[dotted]
+              (a-a6) -- (a-b1) -- (a-end)
+              (b-start) -- (b-a6-1)
+              (b-b1) -- (b-end);
+
+            \draw[dashed, ->, thick, shorten >= 3]
+              (a-a6.east) edge (b-a6-1.west)
+              (a-a6.east) edge (b-a6-2.west)
+              (b-b1.east) edge (a-b1.west);
+        \end{tikzpicture}
+        \label{fig:exactly-once-delivery-sync}
+      }
+      \end{minipage}
+    }
+  \caption{Gestion de la livraison \emph{exactly-once} des opérations}
+  \label{fig:exactly-once-delivery}
+\end{figure}
+
+Dans cet exemple, qui reprend celui de la \autoref{fig:why-exactly-once-delivery}, deux noeuds A et B répliquent une séquence.
+Initialement, celle-ci contient les éléments "OGNON".
+Ces éléments ont été insérés un par un par le noeud A, donc par le biais des opérations \emph{a1} à \emph{a5}.
+Le module \texttt{Sync} de chaque noeud maintient donc initialement le vecteur de version $\langle A:5 \rangle$.
+
+Le noeud A insère l'élément "I" entre les éléments "O" et "G".
+Cette modification est alors labellisée \emph{a6} par son module \texttt{Sync} et est envoyée au noeud B.
+À la réception de cette opération, le module \texttt{Sync} de B compare son dot avec son vecteur de version local.
+L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors délivrée au \ac{CRDT} et le vecteur de version est mis à jour.
+
+Le noeud B supprime ensuite l'élément nouvellement inséré.
+S'agissant de la première modification de B, cette modification \emph{b1} ajoute l'entrée correspondante dans le vecteur de version $\langle A:6, B:1 \rangle$.
+L'opération est envoyée au noeud A.
+Cette opération étant la prochaine opération attendue de B, elle est acceptée et délivrée.
+
+Finalement, le noeud B reçoit de nouveau l'opération \emph{a6}.
+Son module \texttt{Sync} détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:6, B:1 \rangle$.
+L'opération est donc ignorée, et la résurgence de l'élément "I" illustrée dans la \autoref{fig:why-exactly-once-delivery} est évitée.
+
+Il est à noter que dans le cas où un noeud reçoit une opération avec un dot plus élevé que celui attendu (\eg le noeud A reçoit une opération \emph{b3} à la fin de l'exemple), cette opération est mise en attente.
+En effet, délivrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
+L'opération \emph{b3} serait donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
+
+Ainsi, l'implémentation de livraison \emph{exactly-once} avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
+Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
+Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme de livraison \emph{exactly-once} et son impact sur l'expérience utilisateur.
+
+Pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
+Au lieu d'enregistrer seulement le dernier dot observé par noeud, cette structure de données enregistre les intervalles de dots observés.
+Ceci permet une livraison \emph{out of order} des opérations tout en garantissant une livraison \emph{exactly-once} et en compactant efficacement les données stockées par le module \texttt{Sync} à terme.
+
+\subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+
+La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération \emph{remove} doit être délivrée après les opérations \emph{insert} insérant les éléments concernés.
+
+Pour cela, le module \texttt{Sync} ajoute un ensemble \emph{Deps} à chaque opération \emph{remove} avant de la diffuser :
+
+\begin{definition}[Deps]
+  \emph{Deps} est un ensemble d'opérations.
+  Il représente l'ensemble des opérations dont dépend l'opération \emph{remove} et qui doivent donc être livrées au préalable.
+\end{definition}
+
+Plusieurs structures de données sont adaptées pour représenter les dépendances de l'opération \emph{remove}.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un ensemble de dots : pour chaque élément supprimé par l'opération \emph{remove}, nous identifions le noeud l'ayant inséré et nous ajoutons le dot correspondant à l'opération la plus récente de ce noeud à l'ensemble des dépendances.
+Cette approche nous permet de limiter à un dot par élément supprimé le surcoût en métadonnées des dépendances et de les calculer en un temps linéaire par rapport au nombre d'éléments supprimés.
+Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emph{remove} à l'aide de la \autoref{fig:causal-remove-delivery}.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution avec livraison dans le désordre d'une insertion et de sa suppression]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                  node {\textbf{A}}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+                  ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
+                  ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+                  ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2A-right) {GNON}
+                  ++(0:19 * \widthletter) node (A-end) {};
+
+
+              \path
+                  ++(270:4) node {\textbf{B}}
+                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+                  ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+                  ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
+                  ++(0:29 * \widthletter) node (B-end) {};
+
+              \path
+                  ++(270:8) node {\textbf{C}}
+                  ++(0:\widthletter) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
+                  ++(0:30 * \widthletter) node[point] (S1C) {}
+                  ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
+                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2C-right) {GNON}
+                  ++(0:5 * \widthletter) node[epoch] (S3C-left) {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
+                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S3C-right) {GNON}
+                  ++(0:2 * \widthblock) node (C-end) {};
+
+              \draw[->, thick]
+                (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+                (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+
+              \draw[dotted]
+                (S1A-right) -- (S2A-left)
+                (S2A-right) -- (A-end)
+                (S0B) -- (S1B-left)
+                (S2B-right) -- (B-end)
+                (S0C) -- (S1C)
+                (S1C) -- (S2C-left)
+                (S2C-right) -- (S3C-left)
+                (S3C-right) -- (C-end);
+
+              \draw[dashed, ->, thick, shorten >= 3]
+                (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+                (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
+                (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
+                (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
+
+              \draw[->, dashed, thick, shorten >= 3] (S1C.east) edge[bend left] (S3C-left.west);
+            \end{tikzpicture}
+            \label{fig:causal-remove-delivery-rls}
+          }
+          \end{minipage}
+        }
+        \hfil
+  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:causal-remove-delivery-rls}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
+                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
+                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
+                ++(0:11) node (a-end) {};
+
+
+            \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6) {}
+                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
+                ++(0:14) node (b-end) {};
+
+            \path
+                ++(270:6) node {\textbf{C}}
+                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (c-start) {}
+                ++(0:10) node[point, label=below:{$\langle A:5 \rangle$}, label=above:{\emph{postpone}}] (c-b1-postpone) {}
+                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (c-a6) {}
+                ++ (0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{deliver}}] (c-b1-deliver) {}
+                ++(0:1) node (c-end) {};
+
+            \draw[->, thick]
+              (a-start) edge (a-a6)
+              (b-a6-1) edge (b-b1);
+
+            \draw[dotted]
+              (a-a6) -- (a-b1) -- (a-end)
+              (b-start) -- (b-a6)
+              (b-b1) -- (b-end)
+              (c-start) -- (c-b1-postpone)
+              (c-b1-postpone) -- (c-a6)
+              (c-a6) -- (c-b1-deliver)
+              (c-b1-deliver) -- (c-end);
+
+            \draw[dashed, ->, thick, shorten >= 3]
+              (a-a6.east) edge (b-a6.west)
+              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (a-b1.west)
+              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (c-b1-postpone.west)
+              (a-a6.east) edge (c-a6.west);
+
+            \draw[->, dashed, thick, shorten >= 3] (c-b1-postpone.east) edge[bend left] (c-b1-deliver.west);
+        \end{tikzpicture}
+        \label{fig:causal-remove-sync}
+      }
+      \end{minipage}
+    }
+  \caption{Gestion de la livraison \emph{causale-remove} des opérations}
+  \label{fig:causal-remove-delivery}
+\end{figure}
+
+Cet exemple reprend et complète celui de la \autoref{fig:causal-remove-delivery}.
+Trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Les trois noeuds partagent le même état initial : une séquence contenant les éléments "OGNON" et un vecteur de version $\langle A:5 \rangle$.
+
+Le noeud A insère l'élément "I" entre les éléments "O" et "G".
+Cet élément se voit attribué l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
+L'opération correspondante \emph{a6} est diffusée aux autres noeuds.
+
+À la réception de cette dernière, le noeud B supprime l'élément "I" nouvellement inséré et génère l'opération \emph{b1} correspondante.
+Comme indiqué précédemment, l'opération \emph{b1} étant une opération \emph{remove}, le module \texttt{Sync} calcule ses dépendances avant de la diffuser.
+Pour chaque élément supprimé ("I"), \texttt{Sync} récupère l'identifiant de l'élément (\id{p}{A0}{0}\id{m}{A1}{0}) et en extrait l'identifiant du noeud qui l'a inséré (A).
+\texttt{Sync} ajoute alors le dot de l'opération la plus récente reçue de ce noeud ($\langle A:6 \rangle$) à l'ensemble des dépendances de l'opération.
+L'opération est ensuite diffusée.
+
+À la réception de l'opération \emph{b1}, le noeud A vérifie s'il possède l'ensemble des dépendances de l'opération.
+Le noeud A ayant déjà observé l'opération \emph{a6}, le module \texttt{Sync} délivre l'opération \emph{b1} au \ac{CRDT}.
+
+À l'inverse, lorsque le noeud C reçoit l'opération \emph{b1}, il n'a pas encore reçu l'opération \emph{a6}.
+L'opération \emph{b1} est alors mise en attente.
+À la réception de l'opération \emph{a6}, celle-ci est délivrée.
+Le module \texttt{Sync} ré-évalue alors le cas de l'opération \emph{b1} et détermine qu'elle peut à présent être délivrée.
+
+Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
+En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
+Nous n'ajoutons pas les dots des opérations qui ont spécifiquement insérés les éléments supprimés.
+Pour cela, il serait nécessaire de parcourir le log des opérations à la recherche des opérations \emph{insert} correspondante.
+Cette méthode serait plus coûteuse, sa complexité dépendant du nombre d'opérations dans le log d'opérations, et incompatible avec un mécanisme tronquant le log des opérations en utilisant la stabilité causale.
+Notre approche introduit un potentiel délai dans la livraison d'une opération \emph{remove} par rapport à une livraison utilisant ses dépendances exactes, puisqu'elle va reposer sur des opérations plus récentes et potentiellement encore inconnues par le noeud.
+Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le surcoût du mécanisme de livraison et l'expérience utilisateur.
+
+\subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
+
+La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être délivrée après l'opération \emph{rename} qui a introduite son époque de génération.
+
+Pour cela, le module \texttt{Sync} doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
+Cependant, dans notre implémentation, le module \texttt{Sync} et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.
+
+Pour remédier à ce problème, le module \texttt{Sync} maintient une structure supplémentaire : un vecteur des dots des opérations \emph{rename} connues.
+À la réception d'une opération \emph{rename} distante, l'entrée correspondante de son auteur est mise à jour avec le dot de la nouvelle époque introduite.
+À la génération d'une opération locale, l'opération est examinée pour récupérer son époque de génération.
+\texttt{Sync} conserve alors seulement l'entrée correspondante dans le vecteur des dots des opérations \emph{rename}.
+À ce stade, le contenu du vecteur est ajouté en tant que dépendance de l'opération.
+Ensuite, si l'opération locale s'avère être une opération \emph{rename}, le vecteur est modifié pour ne conserver que le dot de l'époque introduite par l'opération.
+La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \resizebox{\columnwidth}{!}{
+            \begin{tikzpicture}
+              \path
+                node {\textbf{A}}
+                +(0:20) node (a-end) {}
+                ++(0:0.5) node (a0) {}
+                ++(0:3) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                ++(0:3) node [point, label=above:{rename to \epoch{A7}}] (a7) {}
+                ++(0:10) node (a-receives-c1) {}
+                ++(0:2) node (a-receives-b3) {};
+
+
+              \draw[thick] (a0) --  (a1) -- (a7) edge (a-receives-c1) edge (a-receives-b3) edge (a-end);
+
+              \path
+                  ++(270:2) node {\textbf{B}}
+                  +(0:20) node (b-end) {}
+                  ++(0:0.5) node (b0) {}
+                  ++(0:3) node[point, label=above:{rename to \epoch{B3}}] (b3) {};
+
+              \draw[thick] (b0) -- (b3) -- (b-end);
+
+              \path
+                  ++(270:4) node {\textbf{C}}
+                  +(0:20) node (c-end) {}
+                  ++(0:0.5) node (c0) {}
+                  ++(0:5.5) node (c-receives-b3) {}
+                  ++(0:2.5) node (c-receives-a1) {}
+                  ++(0:3) node (c-receives-a7) {}
+                  ++(0:3) node[point, label=below:{insert}] (c1) {};
+
+              \draw[thick] (c0) edge (c-receives-b3) edge (c-receives-a1) edge (c-receives-a7) -- (c1) -- (c-end);
+
+              \draw[->, dashed, shorten >= 1]
+                (a1) edge (c-receives-a1)
+                (a7) edge (c-receives-a7)
+                (b3) edge (a-receives-b3)
+                (b3) edge (c-receives-b3)
+                (c1) edge (a-receives-c1);
+            \end{tikzpicture}
+            \label{fig:epoch-based-delivery-execution}
+          }
+          \end{minipage}
+        }
+        \hfil
+  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:epoch-based-delivery-execution}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \path
+            node {\textbf{A}}
+            +(0:25) node (a-end) {}
+            ++(0:0.5) node (a0) {}
+            ++(0:3) node[op, label=above:{$\langle A:1 \rangle$}] (a1) {a1}
+            ++(0:3) node [op, label=above:{$\langle A:7 \rangle$}] (a7) {a7}
+            ++(0:10) node[point, label=above:{$\langle A:7 \rangle$}, label=below:{\emph{postpone}}] (a-receives-c1-postpone) {}
+            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b3) {}
+            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-c1-deliver) {};
+
+
+          \draw[thick] (a0) --  (a1) -- (a7) -- (a-receives-c1-postpone) -- (a-receives-b3) -- (a-receives-c1-deliver) -- (a-end);
+
+          \path
+              ++(270:2) node {\textbf{B}}
+              +(0:25) node (b-end) {}
+              ++(0:0.5) node (b0) {}
+              ++(0:3) node[op, label=above:{$\langle B:3 \rangle$}] (b3) {b3};
+
+          \draw[thick] (b0) -- (b3) -- (b-end);
+
+          \path
+              ++(270:4) node {\textbf{C}}
+              +(0:25) node (c-end) {}
+              ++(0:0.5) node (c0) {}
+              ++(0:5.5) node[point, label=below:{$\langle B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b3) {}
+              ++(0:2.5) node[point, label=below:{$\langle A:1,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a1) {}
+              ++(0:3) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a7) {}
+              ++(0:3) node[op, label=below:{$\langle B:3 \rangle$}] (c1) {c1};
+
+          \draw[thick] (c0) -- (c-receives-b3) -- (c-receives-a1) -- (c-receives-a7) -- (c1) -- (c-end);
+
+          \draw[->, dashed, shorten >= 1]
+            (a1.east) edge (c-receives-a1.west)
+            (a7.east) edge node[near end, above right] {$\{\trm{deps}: \{\langle A:1 \rangle\}\}$} (c-receives-a7.west)
+            (b3.east) edge (a-receives-b3.west)
+            (b3.east) edge (c-receives-b3.west)
+            (c1.east) edge node[near start, right] {$\{\trm{deps}: \{\langle B:3 \rangle\}\}$} (a-receives-c1-postpone.west);
+
+          \draw[->, dashed, thick, shorten >= 3] (a-receives-c1-postpone.east) edge[bend right] (a-receives-c1-deliver.west);
+        \end{tikzpicture}
+        \label{fig:epoch-based-delivery-sync}
+      }
+      \end{minipage}
+    }
+  \caption{Gestion de la livraison \emph{epoch based} des opérations}
+  \label{fig:epoch-based-delivery}
+\end{figure}
+
+Dans la \autoref{fig:epoch-based-delivery-execution}, nous décrivons une exécution suivante en ne faisant apparaître que les opérations importantes : les opérations \emph{rename} et une opération \emph{insert} finale.
+Dans cette exécution, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Initialement, aucune opération \emph{rename} n'a encore eu lieu.
+Le noeud A effectue une première opération \emph{rename} (\emph{a1}) puis une seconde opération \emph{rename} (\emph{a7}), et les diffuse.
+En concurrence, le noeud B génère et propage sa propre opération \emph{rename} (\emph{b3}).
+De son côté, le noeud C reçoit les opérations \emph{b3}, puis \emph{a1} et \emph{a7}.
+Il émet ensuite une opération \emph{insert} (\emph{c1}).
+Le noeud A reçoit cette opération avant de finalement recevoir l'opération \emph{b3}.
+
+Dans la \autoref{fig:epoch-based-delivery-sync}, nous faisons apparaître l'état de \texttt{Sync} et les décisions prises par ce dernier au cours de l'exécution.
+Initialement, le vecteur des dots des opérations \emph{rename} connues est vide.
+Ainsi, lorsque A génère l'opération \emph{a1}, celle-ci ne se voit ajouter aucune dépendance (nous ne représentons pas les dépendances des opérations qui correspondent à l'ensemble vide).
+A met ensuite à jour son vecteur des dots des opérations \emph{rename} avec le dot $\langle A:1 \rangle$.
+B procède de manière similaire avec l'opération \emph{b3}.
+
+Quand A génère l'opération \emph{a7}, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
+Le dot $\langle A:7 \rangle$ remplace ensuite ce dernier dans le vecteur des dots des opérations \emph{rename}.
+
+À la réception de l'opération \emph{b3}, le module \texttt{Sync} de C peut la délivrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
+Le noeud C ajoute alors à son vecteur des dots des opérations \emph{rename} le dot $\langle B:3 \rangle$.
+Il procède de même pour l'opération \emph{a1} : il la délivre et ajoute le dot $\langle A:1 \rangle$.
+Le module \texttt{Sync} ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
+
+Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été délivrée précédemment.
+L'opération est donc délivrée et le vecteur de dots des opérations \emph{rename} mis à jour avec $\langle A:7 \rangle$.
+
+Quand le noeud C effectue l'opération locale \emph{c1}, le module \texttt{Sync} obtient l'information de l'époque courante de la séquence : \epoch{b3}.
+C met à jour son vecteur de dots des opérations \emph{rename} pour ne conserver que l'entrée du noeud B : $\langle B:3 \rangle$.
+Ce dot est ajouté en tant que dépendance de l'opération \emph{c1} avant sa diffusion.
+
+À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par \texttt{Sync}, l'opération \emph{b3} n'ayant pas encore été délivrée.
+Le noeud reçoit ensuite l'opération \emph{b3}.
+Son vecteur des dots des opérations \emph{rename} est mis à jour et l'opération délivrée.
+Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors délivrée.
+
+Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispose de plusieurs avantages : sa complexité spatiale dépend linéairement du nombre de noeuds et les opérations de mise à jour du vecteur des dots des opérations \emph{rename} s'effectuent en temps constant.
+De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.
+Finalement, cette implémentation ne contraint pas une livraison causale des opérations \emph{rename} et permet donc de les appliquer dès que possible.
+
+\subsubsection{Livraison des opérations à terme}
+
+\label{sec:mute-anti-entropy}
+
+La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être délivrées à tous les noeuds à terme.
+Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
+Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
+
+Pour cela, nous implémentons un mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
+Ce mécanisme permet à un noeud source de se synchroniser avec un autre noeud cible.
+Il est executé par l'ensemble des noeuds de manière indépendante.
+Nous décrivons ci-dessous son fonctionnement.
+
+De manière périodique, le noeud choisit un autre noeud cible de manière aléatoire.
+Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de version.
+
+À la réception de ce message, le noeud cible compare le vecteur de version reçu par rapport à son propre vecteur de version.
+À partir de ces données, il identifie les dots des opérations de sa connaissance qui sont inconnues au noeud source.
+Grâce à leur dot, le noeud cible retrouve ces opérations depuis son log des opérations.
+Il envoie alors une réponse composée de ces opérations au noeud source.
+
+À la réception de la réponse, le noeud source intègre normalement les opérations reçues.
+La \autoref{fig:anti-entropy} illustre ce mécanisme.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+        node {\textbf{A}}
+        +(0:37) node (a-end) {}
+        ++(0:0.5) node (a0) {}
+        ++(0:3) node[op, label=above:{$\langle A:8,B:3,C:1 \rangle$}] (a8) {a8}
+        ++(0:6) node [op, label=above:{$\langle A:9,B:3,C:1 \rangle$}] (a9) {a9}
+        ++(0:15) node[point, label=above:{$\langle A:9,B:4,C:1 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b4) {};
+
+
+      \draw[thick] (a0) --  (a8) -- (a9) -- (a-receives-b4) -- (a-end);
+
+      \path
+          ++(270:2) node {\textbf{B}}
+          +(0:37) node (b-end) {}
+          ++(0:0.5) node (b0) {}
+          ++(0:9) node[point, label=below:{$\langle A:8,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}] (b-receives-a8) {}
+          ++(0:6) node[point, label=below:{$\langle A:9,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}](b-receives-a9) {}
+          ++(0:4) node[op, label=above:{$\langle A:9,B:4,C:1 \rangle$}] (b4) {b4}
+          ++(0:12) node[point, label=above:{\emph{reply to sync query}}] (b-receives-c-sync-request) {};
+
+      \draw[thick] (b0) -- (b-receives-a8) -- (b-receives-a9) -- (b4) -- (b-receives-c-sync-request) -- (b-end);
+
+      \path
+          ++(270:4) node {\textbf{C}}
+          +(0:37) node (c-end) {}
+          ++(0:0.5) node (c0) {}
+          ++(0:8) node (c-receives-a8) {}
+          +(90:0.5) node[cross] (fail-a8) {}
+          ++(0:6) node (c-receives-a9) {}
+          +(90:0.5) node[cross] (fail-a9) {}
+          ++(0:10) node[point, label=below:{$\langle A:7,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b4) {}
+          ++(0:4) node[op, label=below:{$\langle A:7,B:4,C:1 \rangle$}] (c-query-sync) {sync}
+          ++(0:6) node[point, label=below:{$\langle A:9,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b-sync-reply) {};
+
+
+      \draw[thick] (c0) -- (c-receives-b4) -- (c-query-sync) --  (c-receives-b-sync-reply) -- (c-end);
+
+      \draw[->, dashed, shorten >= 1]
+        (a8.east) edge (b-receives-a8.west)
+        (a8.east) edge (fail-a8)
+        (a9.east) edge (b-receives-a9.west)
+        (a9.east) edge (fail-a9)
+        (b4.east) edge (a-receives-b4.west)
+        (b4.east) edge (c-receives-b4.west)
+        (b-receives-c-sync-request.east) edge (c-receives-b-sync-reply.west)
+        (c-query-sync.east) edge (b-receives-c-sync-request.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Utilisation du mécanisme d'anti-entropie par le noeud C pour se synchroniser avec le noeud B}
+  \label{fig:anti-entropy}
+\end{figure}
+
+Dans cette figure, nous représentons une exécution à laquelle participent trois noeuds : A, B et C.
+Initialement, les trois noeuds sont synchronisés.
+Leur vecteurs de version sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
+
+Le noeud A effectue les opérations \emph{a8} puis \emph{a9} et les diffusent sur le réseau.
+Le noeud B reçoit ces opérations et les délivre à son \ac{CRDT}.
+Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et délivrée par A.
+Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
+
+De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une défaillance réseau.
+Néanmoins, cela ne l'empêche pas de délivrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
+
+Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
+Il choisit aléatoirement le noeud B comme noeud cible.
+Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:7,B:8,C:1 \rangle$.
+
+À la réception de ce message, le noeud B compare ce vecteur avec le sien.
+Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9}.
+B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
+
+À la réception de la réponse de B, le noeud C délivre les opérations \emph{a8} et \emph{a9}.
+Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.
+
+Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.
+Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
+Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de version vide pour récupérer l'intégralité des opérations.
+
+Ce mécanisme propose plusieurs avantages.
+Son exécution n'implique que le noeud source et le noeud cible, ce qui limite les coûts de coordination.
+De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'un des messages, panne du noeud cible...), cette défaillance n'est pas critique : le noeud source se synchronisera à la prochaine exécution du mécanisme.
+Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison \emph{exactly-once}, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
+Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
+
+En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
+La complexité spatiale et en temps du mécanisme dépend donc linéairement du nombre d'opérations.
+Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations en se basant sur la stabilité causale des opérations puisque nous utilisons ce mécanisme pour mettre à niveau les nouveaux pairs.
+À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
+Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
+
+\subsection{Collaborateurs}
+
+Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
+Une de ces fonctionnalités est de fournir la liste des collaborateurs actuellement connectés.
+Les protocoles d'appartenance au réseau sont une catégorie de protocoles spécifiquement dédiée à cet effet.
+Ainsi, nous devions en implémenter un dans MUTE.
+
+MUTE présente cependant plusieurs contraintes liées à notre modèle du système que le protocole sélectionné doit respecter.
+Tout d'abord, le protocole doit être compatible avec un environnement \ac{P2P}, où les noeuds partagent les mêmes droits et responsabilités.
+De plus, le protocole doit présenter une capacité de passage à l'échelle pour être adapté aux collaborations à large échelle.
+
+En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM\cite{swim2002}.
+Proposé par \citeauthor{swim2002}, ce protocole d'appartenance au réseau offre les propriétés intéressantes suivantes.
+Tout d'abord, le nombre de messages diffusés sur le réseau est proportionnel de façon linéaire au nombre de pairs.
+Pour être plus précis, le nombre de messages envoyés par un pair par période du protocole est constant.
+De plus, il fournit à chaque noeud une vue de la liste des collaborateurs cohérente à terme, même en cas de réception désordonnée des messages du protocoles.
+Finalement, il intègre un mécanisme permettant de réduire le taux de faux positifs, \ie le taux de pairs déclarés injustement comme défaillants.
+
+Pour cela, SWIM découple les deux composants d'un protocole d'appartenance au réseau : le mécanisme de \emph{détection des défaillances des pairs} et le mécanisme de \emph{dissémination des mises à jour du groupe}.
+
+\subsubsection{Mécanisme de détection des défaillances des pairs}
+
+\label{sec:swim-failure-detection}
+
+Le mécanisme de détection des défaillances des pairs est executé de manière périodique, toutes les $T$ unités de temps, par chacun des noeuds du système de manière non-coordonnée.
+Son fonctionnement est illustré par la \autoref{fig:swim-failure-detection}.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+        node {\textbf{A}}
+        +(0:26) node (a-end) {}
+        ++(0:0.5) node (a0) {}
+        ++(0:15) node[point] (a-receives-c-pingreq) {}
+        ++(0:6) node [point] (a-receives-b-ack) {};
+
+      \draw[thick] (a0) --  (a-receives-c-pingreq) -- (a-receives-b-ack) -- (a-end);
+
+      \path
+          ++(270:2) node {\textbf{B}}
+          +(0:26) node (b-end) {}
+          ++(0:0.5) node (b0) {}
+          ++(0:6) node[point] (b-receives-c-ping) {}
+          ++(0:12) node[point] (b-receives-a-ping) {};
+
+      \draw[thick] (b0) -- (b-receives-c-ping) -- (b-receives-a-ping) -- (b-end);
+
+      \path
+          ++(270:4) node {\textbf{C}}
+          +(0:26) node (c-end) {}
+          ++(0:0.5) node (c0) {}
+          ++(0:3) node[point, label=below:{\emph{choose B to ping}}] (c-ping) {}
+          ++(0:6) node (c-receives) {}
+          +(90:0.5) node[cross] (fail-ack) {}
+          ++(0:3) node[point, label=below:{\emph{choose A to ping-req B}}] (c-pingreq) {}
+          ++(0:12) node[point] (c-receives-a-ack) {};
+
+      \draw[thick] (c0) -- (c-ping) -- (c-pingreq) --  (c-receives-a-ack) -- (c-end);
+
+      \draw[->, dashed, shorten >= 1]
+        (a-receives-c-pingreq.east) edge node[below left] {\emph{ping}} (b-receives-a-ping.west)
+        (a-receives-b-ack.east) edge node[near end, below left] {\emph{ack B}} (c-receives-a-ack)
+        (b-receives-c-ping.east) edge node[below left] {\emph{ack}} (fail-ack.west)
+        (b-receives-a-ping.east) edge node[above left] {\emph{ack}} (a-receives-b-ack.west)
+        (c-ping.east) edge node[above left] {\emph{ping}} (b-receives-c-ping.west)
+        (c-pingreq.east) edge node[near end, above left] {\emph{ping-req B}} (a-receives-c-pingreq.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Exécution du mécanisme de détection des défaillances par le noeud C pour tester le noeud B}
+  \label{fig:swim-failure-detection}
+\end{figure}
+
+Dans cet exemple, le réseau est composé des trois noeuds A, B et C.
+Le noeud C démarre l'exécution du mécanisme de détection des défaillances.
+
+Tout d'abord, le noeud C sélectionne un noeud cible de manière aléatoire, ici B, et lui envoie un message \emph{ping}.
+À la réception de ce message, le noeud B lui signifie qu'il est toujours opérationnel en lui répondant avec un message \emph{ack}.
+À la réception de ce message par C, cette exécution du mécanisme de détection des défaillances prendrait fin.
+Mais dans l'exemple présenté ici, ce message est perdu par le réseau.
+
+En l'absence de réponse de la part de B au bout d'un temps spécifié au préalable, le noeud C passe à l'étape suivante du mécanisme.
+Le noeud C sélectionne un autre noeud, ici A, et lui demande de vérifier via le message \emph{ping-req B} si B a eu une défaillance.
+À la réception de la requête de ping, le noeud A envoie un message \emph{ping} à B.
+Comme précédemment, B répond au \emph{ping} par le biais d'un \emph{ack} à A.
+A informe alors C du bon fonctionnement du B via le message \emph{ack B}.
+Le mécanisme prend alors fin, jusqu'à sa prochaine exécution.
+
+Si C n'avait pas reçu de réponse suite à sa \emph{ping-req B} envoyée à A, C aurait supposé que B a eu une défaillance.
+Afin de réduire le taux de faux positifs, SWIM ne considère pas directement les noeuds n'ayant pas répondu comme en panne : ils sont tout d'abord \emph{suspectés} d'être en panne.
+Après un certain temps sans signe de vie d'un noeud suspecté d'être en panne, le noeud est \emph{confirmé} comme défaillant.
+
+L'information qu'un noeud est suspecté d'être en panne est propagé dans le réseau via le mécanisme de dissémination des mises à jour du groupe décrit ci-dessous.
+Si un noeud apprend qu'il est suspecté d'une panne, il dissémine à son tour l'information qu'il est toujours opérationnel pour éviter d'être confirmé comme défaillant.
+
+Pour éviter qu'un message antérieur n'invalide une suspicion d'une défaillance et retarde ainsi sa détection, SWIM introduit un numéro d'\emph{incarnation}.
+Chaque noeud maintient un numéro d'incarnation.
+Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.
+
+Ainsi, afin de représenter la liste des collaborateur, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
+
+\begin{definition}[Liste des collaborateurs]
+  \label{def:collaborator-list}
+  La \emph{liste des collaborateurs} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
+  \begin{itemize}
+    \item $\trm{nodeId}$ correspond à l'identifiant du noeud correspondant à ce tuple.
+    \item $\trm{nodeStatus}$ correspond au statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
+    \item $\trm{nodeIncarn}$ correspond au numéro d'incarnation maximal, \ie le plus récent, connu pour le noeud correspondant à ce tuple.
+  \end{itemize}
+\end{definition}
+
+Chaque noeud réplique cette liste et la fait évoluer au cours de l'exécution du mécanisme présenté jusqu'ici.
+Lorsqu'une mise à jour est effectuée, celle-ci est diffusée de la manière présentée ci-dessous.
+
+\subsubsection{Mécanisme de dissémination des mises à jour du groupe}
+
+\label{sec:swim-update-dissemination}
+
+Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateurs, cette mise à jour doit être propagée au reste des noeuds.
+
+Or, diffuser cette mise à jour à l'ensemble du réseau serait coûteux pour un seul noeud.
+Afin de propager cette information de manière efficace, SWIM propose d'utiliser un protocole de diffusion épidémique : le noeud transmet la mise à jour qu'à un nombre réduit $\lambda$\footnote{
+  \cite{swim2002} montre que choisir une valeur constante faible comme $\lambda$ suffit néanmoins à garantir la dissémination des mises à jour à l'ensemble du réseau.
+} de pairs, qui se chargeront de la transmettre à leur tour.
+Le mécanisme de dissémination des mises à jour de SWIM fonctionne donc de la manière suivante.
+
+Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur, initialisé avec $\lambda \log{} n$ avec $n$ le nombre de noeuds.
+À chaque génération d'un message pour le mécanisme de détection des défaillances, un nombre arbitraire de mises à jour sont sélectionnées dans la liste et attachées au message.
+Leur compteurs respectifs sont décrémentés.
+Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.
+
+À la réception d'un message, le noeud le traite comme définit précédemment en \autoref{sec:swim-failure-detection}.
+De manière additionnelle, il intègre dans sa liste des collaborateurs les mises à jour attachées au message en utilisant la règle suivante :
+
+\[\forall i,j,k \cdot i \leq j \cdot \langle \trm{Alive},i \rangle < \langle \trm{Suspect},j \rangle < \langle \trm{Confirm},k \rangle \]
+
+Ainsi, le mécanisme de dissémination des mises à jour du groupe réutilise les messages du mécanisme de détection des défaillances pour diffuser les modifications.
+Cela permet de propager les évolutions de la liste des collaborateurs sans ajouter de message supplémentaire.
+De plus, les règles de précédence sur l'état d'un collaborateur permettent aux noeuds de converger même si les mises à jour sont reçues dans un ordre distinct.
+
+\subsubsection{Modifications apportées}
+
+Nous avons ensuite apporté plusieurs modifications à la version du protocole SWIM présentée dans \cite{swim2002}.
+Notre première modification porte sur l'ordre de priorité entre les états d'un pair.
+
+\paragraph{Modification de l'ordre de précédence}
+
+Dans la version originale, un pair désigné comme défaillant l'est de manière irrévocable.
+Ce comportement est dû à la règle de précédence suivante :
+
+\[\forall i,j \in \mathbb{N}, \forall s \in \{\trm{Alive}, \trm{Suspect}\} \cdot \langle s,i \rangle < \langle \trm{Confirm},j \rangle\]
+
+pour un noeud donné.
+Ainsi, un noeud déclaré comme défaillant par un autre noeud doit changer d'identité pour rejoindre de nouveau le groupe.
+
+Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateurs croît de manière linéaire avec le nombre de connexions.
+S'agissant du paramètre avec le plus grand ordre de grandeur de l'application, nous avons cherché à le diminuer.
+
+Nous avons donc modifié les règles de précédence de la manière suivante :
+
+\[\forall i,j \in \mathbb{N}, i < j, \forall s,t \in \{\trm{Alive}, \trm{Suspect}, \trm{Confirm}\} \cdot \langle i,s \rangle < \langle j,t \rangle\]
+
+et
+
+\[\forall i \in \mathbb{N} \cdot \langle i,\trm{Alive} \rangle < \langle i,\trm{Suspect} \rangle < \langle i,\trm{Confirm} \rangle\]
+
+Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
+Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
+La taille de la liste des collaborateurs devient dès lors linéaire par rapport au nombre de noeuds.
+
+Ces modifications n'ont pas d'impact sur la convergence des listes des collaborateurs des différents noeuds.
+Une étude approfondie reste néanmoins à effectuer pour déterminer si ces modifications ont un impact sur la vitesse à laquelle un noeud défaillant est déterminé comme tel par l'ensemble des noeuds.
+
+\paragraph{Ajout d'un mécanisme de synchronisation}
+
+La seconde modification que nous avons effectué concerne l'ajout d'un mécanisme de synchronisation entre pairs.
+En effet, le papier ne précise pas de procédure particulière lorsqu'un nouveau pair rejoint le réseau.
+Pour obtenir la liste des collaborateurs, ce dernier doit donc la demander à un autre pair.
+
+Nous avons donc implémenté pour la liste des collaborateurs un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
+Ce message sert aussi à transmettre l'état courant du noeud source au noeud cible.
+En réponse, le noeud cible lui envoie l'état courant de sa liste.
+À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
+Cette fusion conserve l'entrée la plus récente pour chaque noeud.
+
+Pour récapituler, les mises à jour du groupe sont diffusées de manière atomique de façon épidémique, en utilisant les messages du mécanisme de détection des défaillances des noeuds.
+De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser leur état.
+Ce mécanisme nous permet de pallier aux défaillances éventuelles du réseau.
+Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par différences pour la liste des collaborateurs.
+
+\subsubsection{Synthèse}
+
+Pour générer et maintenir la liste des collaborateurs, nous avons implémenté le protocole distribué d'appartenance au réseau SWIM\cite{swim2002}.
+Par rapport à la version originale, nous avons procédé à plusieurs modifications, notamment pour gérer plus efficacement les reconnexions successives d'un même noeud.
+
+Ainsi, nous avons implémenté un mécanisme dont la complexité spatiale dépend linéairement du nombre de noeuds.
+Sa complexité en temps et sa complexité en communication, elles, sont indépendantes de ce paramètre.
+Elles dépendent en effet de paramètres dont nous choisissons les valeurs : la fréquence de déclenchement du mécanisme de détection de défaillance et le nombre de mises à jour du groupe propagées par message.
+
+Des améliorations au protocole SWIM furent proposées dans \cite{lifeguard2018}.
+Ces modifications visent notamment à réduire le délai de détection d'un noeud défaillant, ainsi que réduire le taux de faux positifs.
+Ainsi, une perspective est d'implémenter ces améliorations dans MUTE.
+
+\subsection{Curseurs}
+
+Toujours dans le but d'offrir des fonctionnalités de conscience de groupe aux utilisateurs pour leur permettre de se coordonner aisément, nous avons implémenté dans MUTE l'affichage des curseurs distants.
+
+Pour représenter fidèlement la position des curseurs des collaborateurs distants, nous nous reposons sur les identifiants du \ac{CRDT} choisi pour représenter la séquence.
+Le fonctionnement est similaire à la gestion des modifications du document : lorsque l'éditeur indique que l'utilisateur a déplacé son curseur, nous récupérons son nouvel index.
+Nous recherchons ensuite l'identifiant correspondant à cet index dans la séquence répliquée et le diffusons aux collaborateurs.
+
+À la réception de la position d'un curseur distant, nous récupérons l'index correspondant à cet identifiant dans la séquence répliquée et représentons un curseur à cet index.
+Il est intéressant de noter que si l'identifiant a été supprimé en concurrence, nous pouvons à la place récupérer l'index de l'élément précédent et ainsi indiquer à l'utilisateur où son collaborateur est actuellement en train de travailler.
+
+De façon similaire, nous gérons les sélections de texte à l'aide de deux curseurs : un curseur de début et un curseur de fin de sélection.
+
+% \subsection{Composition de CRDTs}
+
+% \begin{itemize}
+%   \item
+% \end{itemize}
+
+% \subsection{CRDT pour les styles}
+
+% \begin{itemize}
+%   \item Permettrait de se découpler de Markdown pour gérer le style du document
+%   \item Permettrait de supporter un plus grand nombre d'options que Markdown ne le permet actuellement (couleurs, mise en page...)
+% \end{itemize}
+
+% \subsection{Évolution de schéma}
+% \begin{itemize}
+%   \item Cambria \cite{2021-cambria-schema-evolution}
+% \end{itemize}
+
+\section{Couche réseau}
+
+Pour permettre aux différents noeuds de communiquer, MUTE repose sur la librairie Netflux\footnote{\url{https://github.com/coast-team/netflux}}.
+Développée au sein de l'équipe Coast, cette librairie permet de construire un réseau \ac{P2P} entre des navigateurs, mais aussi des bots.
+
+\subsection{Établissement d'un réseau \ac{P2P} entre navigateurs}
+
+Pour créer un réseau \ac{P2P} entre navigateurs, Netflux utilise la technologie \acf{WebRTC}.
+\ac{WebRTC} est une API\footnote{\ac{API} : Interface de Programmation} de navigateur spécifiée en 2011, et en cours d'implémentation dans les différents navigateurs depuis 2013.
+Elle permet de créer une connexion directe entre deux navigateurs pour échanger des médias audio et/ou vidéo, ou simplement des données.
+
+Cette API utilise pour cela un ensemble de protocoles.
+Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
+Dans la \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[page=3, trim=7cm 3cm 4cm 2cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
+  \caption{Architecture système pour la couche réseau de MUTE}
+  \label{fig:architecture-systeme-webrtc}
+\end{figure}
+
+Nous décrivons ci-dessous leur rôle respectif dans la collaboration.
+
+\subsubsection{Serveur de signalisation}
+
+Pour rejoindre un réseau \ac{P2P} déjà établi, un nouveau noeud a besoin de découvrir les noeuds déjà connectés et de pouvoir communiquer avec eux.
+Le serveur de signalisation offre ces fonctionnalités.
+
+Au moins un noeud du réseau \ac{P2P} doit maintenir une connexion avec le serveur de signalisation.
+À sa connexion, un nouveau noeud contacte le serveur de signalisation.
+Il est mis en relation avec un noeud du réseau \ac{P2P} par son intermédiaire et échange les différents messages de \ac{WebRTC} nécessaires à l'établissement d'une connexion \ac{P2P} entre eux.
+
+Une fois cette première connexion \ac{P2P} établie, le nouveau noeud contacte et communique avec les autres noeuds par l'intermédiaire du premier noeud.
+Il peut alors terminer sa connexion avec le serveur de signalisation.
+
+\subsubsection{Serveur STUN}
+
+Pour se connecter, les noeuds doivent s'échanger plusieurs informations logicielles et matérielles, notamment leur adresse IP publique respective.
+Cependant, un noeud n'a pas accès à cette donnée lorsque son routeur utilise le protocole NAT.
+Le noeud doit alors la récupérer.
+
+Pour permettre aux noeuds de découvrir leur adresse IP publique, \ac{WebRTC} repose sur le protocole STUN.
+Ce protocole consiste simplement à contacter un serveur tiers dédié à cet effet.
+Ce serveur retourne en réponse au noeud qui le contacte son adresse IP publique.
+
+\subsubsection{Serveur TURN}
+
+Il est possible que des noeuds provenant de réseaux différents ne puissent établir une connection \ac{P2P} directe entre eux, par exemple à cause de restrictions imposées par leur pare-feux respectifs.
+Pour contourner ce cas de figure, \ac{WebRTC} utilise le protocole TURN.
+
+Ce protocole consiste à utiliser un serveur tiers comme relais entre les noeuds.
+Ainsi, les noeuds peuvent communiquer par son intermédiaire tout au long de la collaboration.
+Les échanges sont chiffrés, afin que le serveur TURN ne représente pas une faille de sécurité.
+
+\subsubsection{Rôle des serveurs}
+
+Ainsi, \ac{WebRTC} implique l'utilisation de plusieurs serveurs.
+
+Les serveurs de signalisation et STUN sont nécessaires pour permettre à de nouveaux noeuds de rejoindre la collaboration.
+Autrement dit, leur rôle est ponctuel : une fois le réseau \ac{P2P} établit, les noeuds n'ont plus besoin d'eux.
+Ces serveurs peuvent alors être coupés sans impacter la collaboration.
+
+À l'inverse, les serveurs TURN jouent un rôle plus prédominant dans la collaboration.
+Ils sont nécessaires dès lors que des noeuds proviennent de réseaux différents et sont alors requis tout au long de la collaboration.
+Une panne de ces derniers entraverait la collaboration puisqu'elle résulterait en une partition des noeuds.
+Il est donc primordial de s'assurer de la disponibilité et fiabilité de ces serveurs.
+
+\subsection{Topologie réseau}
+
+Netflux établit un réseau \ac{P2P} par document.
+Chaque réseau \ac{P2P} est un réseau entièrement maillé : chaque noeud se connecte à l'ensemble des autres noeuds.
+
+Cette topologie simple est adaptée à des groupes de petite taille, mais ne passe pas à l'échelle.
+D'autres topologies limitant le nombre de connexions par noeuds, telle que celle décrite par \cite{2018-spray-nedelec}, pourraient être implémentées pour adresser cette limite.
+
+% \subsection{Gestion des bots}
+
+% \begin{itemize}
+%   \item Pour faciliter la collaboration, MUTE propose l'utilisation de bots
+%   \item Par exemple, un bot de stockage se contentant de suivre une collaboration et de stocker les opérations
+%   \item De façon à permettre à un pair de récupérer la dernière version du document même si les autres collaborateurs sont actuellement déconnectés
+%   \item Afin de réutiliser les structures de données implémentées, développés en NodeJS
+%   \item Cependant, NodeJS ne supporte pas WebRTC nativement
+%   \item Utilise alors des websockets
+%   \item Netflux propose une couche d'abstraction permettant de communiquer avec un pair de manière uniforme, qu'il soit un navigateur ou un bot
+% \end{itemize}
+
+\section{Couche sécurité}
+
+La couche sécurité a pour but de garantir l'authenticité et la confidentialité des messages échangés par les noeuds.
+Pour cela, elle implémente un mécanisme de chiffrement de bout en bout.
+
+Pour chiffrer les messages, MUTE utilise un mécanisme de chiffrement à base de clé de groupe.
+Le protocole choisi est le protocole Burmester-Desmedt\cite{1995-burmester-desmedt}.
+Il nécessite que chaque noeud possède une paire de clés de chiffrement et enregistre sa clé publique auprès d'un PKI\footnote{\acf{PKI} : Infrastructure de gestion de clés}.
+
+Afin d'éviter qu'un \ac{PKI} malicieux n'effectue une attaque de l'homme au milieu sur la collaboration, les noeuds doivent vérifier le bon comportement des PKI de manière non-coordonnée.
+À cet effet, MUTE implémente le mécanisme d'audit de PKI Trusternity\cite{2018-trusternity-short, 2018-trusternity-long}.
+Son fonctionnement nécessite l'utilisation d'un registre publique sécurisé \emph{append-only}, \ie une blockchain.
+
+L'architecture système nécessaire pour la couche sécurité est présentée dans la \autoref{fig:architecture-systeme-trusternity}.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[page=4, trim=3cm 1cm 4cm 1cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
+  \caption{Architecture système pour la couche sécurité de MUTE}
+  \label{fig:architecture-systeme-trusternity}
+\end{figure}
+
+Cette couche sécurité s'ajoute au mécanisme de chiffrement des messages inhérent à \ac{WebRTC}.
+Cela nous offre de nouvelles possibilités : plutôt que de créer un réseau \ac{P2P} par document, nous pouvons désormais mettre en place un réseau \ac{P2P} global.
+Les messages étant chiffrés de bout en bout, les noeuds peuvent communiquer en toute sécurité et confidentialité par l'intermédiaire de noeuds tiers, \ie des noeuds extérieurs à la collaboration.
+
+Une limite de l'approche actuelle est que la clé de groupe change avec l'évolution des noeuds connectés : à chaque connexion ou déconnexion d'un noeud, une nouvelle clé est recalculée avec les collaborateurs présents.
+Cette évolution fréquente de la clé de chiffrement, nécessaire pour garantir la \emph{backward secrecy} et \emph{forward secrecy}, nous empêche par exemple de stocker les opérations de manière chiffrée chez des noeuds tiers.
+Cette fonctionnalité serait cependant bien pratique pour permettre à un noeud de récupérer la dernière version de ses documents, même en l'absence de ses collaborateurs.
+Une autre clé de chiffrement, dédiée au stockage, devrait être mise en place, ainsi qu'un mécanisme de découverte des noeuds tiers stockant les données de la collaboration.
+
+% \begin{itemize}
+%   \item Librairies alternatives (libP2P, hypercore)
+%   \item Topologies alternatives (SPRAY)
+% \end{itemize}
+
+\section{Conclusion}
+
+Dans ce chapitre, nous avons présenté \acf{MUTE}, notre éditeur collaboratif temps réel \ac{P2P} chiffré de bout en bout.
+
+MUTE permet d'éditer de manière collaborative des documents texte.
+Pour représenter les documents, MUTE implémente les structures de données répliquées décrites dans la \autoref{sec:logootsplit} et le \autoref{chap:renamablelogootsplit}.
+Ces \acp{CRDT} offrent de nouvelles méthodes de collaborer, notamment en permettant de collaborer de manière synchrone ou asynchrone de manière transparente.
+
+Pour permettre aux noeuds de communiquer, MUTE utilise WebRTC.
+Cette technologie permet de construire un réseau \ac{P2P} entre navigateurs.
+Plusieurs serveurs sont néanmoins requis, notamment pour la découverte des pairs et pour la communication entre des noeuds dont les pare-feux respectifs empêche l'établissement d'une connexion directe.
+
+Finalement, MUTE implémente un mécanisme de chiffrement de bout en bout garantissant l'authenticité et la confidentialité des échanges entre les noeuds.
+Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécanisme d'audit permettant de détecter leurs éventuels comportements malicieux.
