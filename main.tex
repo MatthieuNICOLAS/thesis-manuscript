@@ -357,12 +357,63 @@ qui fut la première de toutes.
     Les noeuds peuvent se comporter de manière byzantine.
     Pour assurer la confidentialité, l'absence de confiance requise et le bon fonctionnement du système, ce dernier doit être conçu pour résister aux comportements byzantins de ses acteurs.
   \item Ainsi, il est nécessaire de faire progresser les technologies existantes pour les rendre compatible avec ce nouveau modèle de système.
-    Dans le cadre de cette thèse, nous écartons la problèmatique des adversaires byzantins et nous intéressons aux mécanismes de réplication de données dans les systèmes collaboratifs pair-à-pair temps réel.
+    Dans le cadre de cette thèse, nous nous intéressons aux mécanismes de réplication de données dans les systèmes collaboratifs pair-à-pair temps réel.
 \end{itemize}
 
-\section{Questions de recherche}
-\section{Contributions}
+\section{Questions de recherche et contributions}
+
+\subsection{Ré-identification sans coordination pour \acp{CRDT} pour Séquence}
+
+\begin{itemize}
+  \item Systèmes collaboratifs permettent aux utilisateur-rices de manipuler et éditer un contenu partagé.
+    Pour des raisons de performance, ces systèmes autorisent généralement les utilisateur-rices à effectuer des modifications sans coordination.
+    Leur copies divergent alors momentanément.
+    Un mécanisme de synchronisation leur permet ensuite de récupérer l'ensemble des modifications et de les intégrer, de façon à converger.
+    Cependant, des modifications peuvent être incompatibles entre elles, car de sémantiques contraires.
+    Un mécanisme de résolution de conflits est alors nécessaire.
+  \item Les \acp{CRDT} sont des types de données répliquées.
+    Ils sont conçus pour être répliqués par les noeuds d'un système et pour permettre à ces derniers de modifier les données partagées sans aucune coordination.
+    Dans ce but, ils incluent des mécanismes de résolution de conflits directement au sein leur spécification.
+    Ces mécanismes leur permettent de résoudre le problème évoqué précédemment.
+    Cependant, ces mécanimes induisent un surcoût, aussi bien d'un point de vue consommation mémoire et réseau que computationnel.
+    Notamment, certains \acp{CRDT} comme ceux pour la Séquence souffrent d'une croissance monotone de leur surcoût.
+    Ce surcoût s'avère handicapant dans le contexte des collaborations à large échelle.
+  \item Pouvons-nous proposer un mécanisme sans coordination de réduction du surcoût des \acp{CRDT} pour Séquence, \ie compatible avec les systèmes pair-à-pair ?
+  \item Dans le cadre des \acp{CRDT} pour Séquence, le surcoût du type de données répliquées provient de la croissance de leurs métadonnées.
+    Métadonnées proviennent des identifiants associés aux éléments de la Séquence par les \acp{CRDT}.
+    Ces identifiants sont nécessaires pour le bon fonctionnement de leur mécanisme de résolution de conflits.
+  \item Plusieurs approches ont été proposées pour réduire le coût de ces identifiants.
+    Notamment, \cite{letia:hal-01248270,zawirski:hal-01248197} proposent un mécanisme de ré-assignation d'identifiants de façon à réduire leur taille.
+    Mécanisme non commutatif avec les modifications concurrentes de la Séquence, \ie l'insertion ou la suppression.
+    Propose ainsi un mécanisme de transformation des modifications concurrentes pour gérer ces conflits.
+    Mais mécanisme de ré-assignation n'est pas non plus commutatif avec lui-même.
+    De fait, utilisent un algorithme de consensus pour empêcher l'exécution du mécanisme en concurrence.
+  \item Proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour Séquence.
+    Intègre un mécanisme de renommage directement au sein de sa spécification.
+    Intègre un mécanisme de résolution de conflits pour les renommages concurrents.
+    Permet ainsi l'utilisation du mécanisme de renommage par les noeuds sans coordination.
+\end{itemize}
+
+\subsection{Éditeur de texte collaboratif pair-à-pair}
+
+\begin{itemize}
+  \item Systèmes collaboratifs adoptent généralement architecture décentralisée.
+    Disposent d'autorités centrales qui facilitent la collaboration, l'authentification des utilisateur-rices, la communication et le stockage des données.
+  \item Mais ces systèmes introduisent une dépendance des utilisateur-rices envers ces mêmes autorités centrales, une perte de confidentialité et de souveraineté.
+  \item Pouvons-nous concevoir un éditeur de texte collaboratif sans autorités centrales, \ie un éditeur de texte collaboratif à large échelle pair-à-pair ?
+  \item Ce changement de modèle, d'une architecture décentralisée à une architecture pair-à-pair, introduit un ensemble de problématiques de domaines variés, \eg
+    \begin{enumerate}[label=(\roman*)]
+      \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
+      \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
+      \item Comment structurer le réseau de manière efficace, \ie en limitant le nombre de connexion par pair ?
+    \end{enumerate}
+  \item Présentons \ac{MUTE} \cite{MUTE2017}.
+    S'agit, à notre connaissance, du seul prototype complet d'éditeur de texte collaboratif temps réel pair-à-pair chiffré de bout en bout.
+    Allie ainsi les résultats issus des travaux de l'équipe sur les \acp{CRDT} pour Séquence \cite{2013-logootsplit,2021-these-vic} et l'authentification des pairs dans systèmes distribués \cite{2018-trusternity-short,2018-trusternity-long} aux résultats de la littérature sur mécanismes de conscience de groupe \mnnote{TODO: Trouver et ajouter références}, les protocoles d'appartenance aux groupe \cite{swim2002, lifeguard2018}, les réseaux pair-à-pair \cite{2018-spray-nedelec} et les protocoles d'établissement de clés de groupe \cite{1995-burmester-desmedt}.
+\end{itemize}
+
 \section{Plan du manuscrit}
+\section{Publications}
 % \input{assets/intro}
 
 % \NumberThisInToc
@@ -4519,6 +4570,8 @@ L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et e
 Ainsi, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
 De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares}\cite{localfirstsoftware2019, pushpin2020}.
 Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
+
+\mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
 
 De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
 Elle développe \acf{MUTE}\cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
