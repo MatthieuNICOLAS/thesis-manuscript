@@ -2634,6 +2634,13 @@ Il s'agit d'une contrainte forte, notamment dans les systèmes dynamiques à gra
 Il est donc possible qu'un noeud déconnecté ne se reconnecte jamais, bloquant ainsi la progression de la stabilité causale pour l'ensemble des opérations.
 Il s'agit toutefois d'une limite partagée avec les autres mécanismes de réduction des métadonnées pour Sequence \acp{CRDT} proposés dans la littérature \cite{ROH2011354, zawirski:hal-01248197}, à l'exception de l'approche LSEQ \cite{lseq2017}.
 En pratique, il serait intéressant d'étudier la mise en place d'un mécanisme d'éviction des noeuds inactifs pour répondre à ce problème.
+\mnnote{
+  TODO: Revoir ce point pour indiquer que stabilité causale n'est pas une condition raisonnable dans systèmes sujets au churn.
+  Qu'à notre sens, rend cette solution inadéquate par rapport au modèle du système.
+  Mais préciser que majorité des noeuds dans ce type de système se connectent de manière éphèmère, \ie ne reviennent jamais.
+  Mais principe d'une collaboration est de collaborer.
+  Si noeuds ne collaborent pas ou mal, \eg font un truc dans leur coin pendant X mois (dépendant du cas d'application), nous paraît justifier de les retirer de la collaboration.
+}
 % Pour gérer le cas où des noeuds inactifs empêche la stabilité causale des opérations d'être atteinte, une solution possible serait de mettre en place un mécanisme d'éviction des noeuds inactifs.
 % La collaboration poursuivrait alors uniquement avec les noeuds
 % Cette solution est néanmoins imparfaite, car elle peut conduire à des forks,

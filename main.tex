@@ -7,6 +7,7 @@
 \usepackage{biblatex}
 \bibliography{biblio.bib}
 \usepackage{booktabs} % \toprule, \midrule, \cmidrule, \bottomrule
+\usepackage{cancel} % \cancel
 \usepackage{caption}
 \usepackage{csquotes}
 \usepackage{hyperref}
@@ -535,7 +536,7 @@ La figure \autoref{fig:set-conflict} présente un scénario où des modification
       \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
     \end{tikzpicture}
   }
-  \caption{Modifications concurrentes d'un Ensemble répliqué provoquant un conflit provoqué suite à l'ajout et la suppression d'un même élément}
+  \caption{Modifications concurrentes d'un Ensemble répliqué provoquant un conflit suite à l'ajout et la suppression d'un même élément}
   \label{fig:set-conflict}
 \end{figure}
 
@@ -1110,7 +1111,7 @@ Nous considèrons que le \ac{CRDT} utilisé est un \ac{CRDT} pur synchronisé pa
           +(0:11) node[point, label=above right:{$\set{a,b,c,e}$}, label=-170:{$\trm{add}(c)$}] (a-add-c) {}
           +(0:14) node[point, label=above right:{$\set{a,b,c,d,e}$}] (a-receives-add-d) {}
           +(0:21) node[point, label={[xshift=8pt]-10:{$\trm{add(b)}$}}] (a-receives-query-sync) {}
-          +(0:24) node[point, label=above right:{$\set{a,b,c,d,e}$}] (a-final) {};
+          +(0:24) node (a-final) {};
 
       \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
       \draw[->, thick] (a-initial) --  (a-add-b) -- (a-add-c) -- (a-receives-add-d) -- (a-receives-query-sync) -- (a-final);
@@ -1326,8 +1327,155 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 
 \subsection{Approche à pierres tombales}
 
+\subsubsection{WOOT}
+
 \begin{itemize}
-  \item WOOT \cite{oster:inria-00108523, Weiss_2007, ahmednacer:inria-00629503}
+  \item WOOT \cite{2006-woot-oster} fait suite aux travaux présentés dans \cite{2006-tombstone-transformation-functions-oster}.
+    Il est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour Séquence\footnote{\cite{shapiro_2011_crdt} n'ayant formalisé les \acp{CRDT} qu'en 2011.}.
+  \item Conçu pour l'édition collaborative \ac{P2P}, son but est de surmonter les limites de l'approche \ac{OT}.
+    En effet, l'approche \ac{OT} souffre de la nécessité d'associer à chaque opération des informations de causalité, \ie un vecteur d'horloges.
+    La taille de cette structure de données augmentant avec le nombre de noeuds du système, cette approche se révèle inadaptée aux systèmes \ac{P2P} dynamique, \ie systèmes dans lesquels un grand nombre de noeuds peuvent rejoindre puis quitter la collaboration.
+  \item L'intuition de WOOT est la suivante : WOOT modifie la sémantique de la modification $\trm{ins}$ pour qu'elle corresponde à l'insertion d'un nouvel élément entre deux autres, et non plus à l'insertion d'un nouvel élément à une position donnée.
+    Ce changement, qui est compatible avec l'intention des utilisateur-rices, n'est cependant pas anodin.
+    En effet, il permet à WOOT de rendre $\trm{ins}$ commutative avec les modifications concurrentes. en exprimant la position du nouvel élément de manière relative à d'autres éléments et non plus via un index qui est spécifique à un état donné.
+  \item Afin de préciser quels éléments correspondent aux prédécesseur et successeur de l'élément inséré, WOOT repose sur un système d'identifiants.
+    WOOT associe ainsi un identifiant unique à chaque élément de la Séquence.
+    La modification $\trm{rmv}$ utilise aussi les identifiants pour indiquer l'élément à supprimer.
+  \item WOOT utilise des pierres tombales pour rendre $\trm{ins}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, commutative avec $\trm{rmv}$.
+    Ainsi, une pierre tombale est conservée est conservée dans la Séquence pour indiquer sa présence passée, mais les données de l'élément sont supprimées.
+    Dans le cadre d'une Séquence WOOT de caractères, $\trm{rmv}$ a donc pour effet de masquer l'élément.
+  \item Finalement, WOOT définit $<_{id}$, un ordre strict total sur les identifiants associés aux éléments.
+    En effet, il convient de noter que la relation $\prec$ ne spécifie qu'un ordre partiel entre les éléments.
+    Ainsi, $\prec$ ne permet pas d'ordonner les éléments insérés en concurrence et possédant les mêmes prédecesseur et successeur, \eg $\trm{ins}(a \prec 1 \prec b)$ et $\trm{ins}(a \prec 2 \prec b)$.
+    Pour que tous les noeuds convergent, ils doivent choisir comment ordonner ces éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
+    Ils utilisent pour cela $<_{id}$.
+  \item Ainsi WOOT offre une spécification de la Séquence dont les opérations sont commutatives, \ie ne génèrent pas de conflits.
+    Nous illustrons son fonctionnement à l'aide de la \autoref{fig:woot}.
+
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \newcommand\initialstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\insl[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\rmvm[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\finalstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \path
+              node {\textbf{A}}
+              ++(0:0.5) node (a) {}
+              +(0:30) node (a-end) {}
+              +(0:2) node[point] (a-initial) {}
+              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(a2 \prec \langle a5,L \rangle \prec b1)}$}}] (a-ins-l) {}
+              +(0:20) node[point] (a-recv-rmv-m) {}
+              +(0:28) node (a-final) {};
+
+          \initialstate{(a-initial)}{90};
+          \insl{(a-ins-l)}{90};
+          \finalstate{(a-recv-rmv-m)}{90};
+
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
+
+          \path
+              ++(270:3) node {\textbf{B}}
+              ++(0:0.5) node (b) {}
+              +(0:30) node (b-end) {}
+              +(0:2) node[point] (b-initial) {}
+              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=45pt]10:{$\trm{rmv(b1)}$}}] (b-rmv-m) {}
+              +(0:20) node[point] (b-recv-ins-l) {}
+              +(0:28) node (b-final) {};
+
+          \initialstate{(b-initial)}{-90};
+          \rmvm{(b-rmv-m)}{-90};
+          \finalstate{(b-recv-ins-l)}{-90};
+
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
+
+          \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
+          \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
+        \end{tikzpicture}
+      }
+      \caption{Modifications concurrentes d'une séquence répliquée WOOT}
+      \label{fig:woot}
+    \end{figure}
+
+    Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée WOOT.
+    Initialement, ils possèdent le même état : la séquence contient les éléments "HEMLO", et à chaque élément est associé un identifiant, \eg $a1$, $b1$, $a2$...
+  \item Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{ins}(E \prec L \prec M)$.
+    WOOT convertit cette modification en opération $\trm{ins}(a2 \prec \langle a5,L \rangle \prec b1)$. L'opération est intégrée à la copie locale, ce qui produit l'état "HELMLO", puis diffusée sur le réseau.
+  \item En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{rmv}(M)$.
+    De la même manière, WOOT génère l'opération correspondante $\trm{rmv}(b1)$.
+    Comme expliqué précédemment, l'intégration de cette opération ne supprime pas l'élément "M" de l'état mais se contente de le masquer.
+    L'état produit est donc "HE\cancel{M}LO".
+    L'opération est ensuite diffusée.
+  \item A (resp. B) reçoit ensuite l'opération de B, $\trm{rmv}(b1)$ (resp. A, $\trm{ins}(a2 \prec \langle a5,L \rangle \prec b1)$), et l'intègre à sa copie.
+    Les opérations de WOOT étant commutatives, les noeuds obtiennent le même état final : "HEL\cancel{M}LO".
+  \item Grâce à la commutativité de ses opérations, WOOT s'affranchit du modèle de livraison causale nécessitant l'utilisation coûteuse de vecteurs d'horloges.
+    WOOT met en place un modèle de livraison sur-mesure basé sur les pré-conditions des opérations :
+    \begin{enumerate}[label=(\roman*)]
+      \item L'opération $\trm{ins}(predId \prec \langle id,elt \rangle \prec succId)$ ne peut être délivrée qu'après la livraison des opérations d'insertion des éléments associés à $predId$ et $succId$.
+      \item L'opération $\trm{rmv}(id)$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
+    \end{enumerate}
+    Ce modèle de livraison ne requiert qu'une quantité fixe de métadonnées associées à chaque opération pour être respecté.
+    WOOT est donc adapté aux systèmes \ac{P2P} dynamiques.
+  \item Des améliorations de WOOT furent par la suite proposées : WOOTO \cite{2007-wooto-weiss} et WOOTH \cite{2011-evaluation-crdts-ahmed-nacer}.
+    Dans \cite{2007-wooto-weiss}, \citeauthor{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
+    Cette modification permet un algorithme d'intégration des opérations $\trm{ins}$ plus efficace.
+    Dans \cite{2011-evaluation-crdts-ahmed-nacer}, \citeauthor{2011-evaluation-crdts-ahmed-nacer} se basent sur WOOTO et proposent l'utilisation de structures de données améliorant la complexité des algorithmes d'intégration des opérations, au détriment des métadonnées stockées localement par chaque noeud.
+  \item Néanmoins, l'évaluation expérimentale des différentes approches pour l'édition collaborative \ac{P2P} en temps réel menée dans \cite{2011-evaluation-crdts-ahmed-nacer} a montré que les \acp{CRDT} de la famille WOOT n'étaient pas assez efficaces.
+    Dans le cadre de cette expérience, des utilisateur-rices effectuaient des tâches d'édition collaborative données.
+    Les traces de ces sessions d'édition collaboratives furent ensuite rejouées en utilisant divers mécanismes de résolution de conflits, dont WOOT, WOOTO et WOOTH.
+    Le but était de mesurer les performances de ces mécanismes, notamment leurs temps d'intégration des modifications et opérations.
+    Dans le cas de la famille WOOT, \citeauthor{2011-evaluation-crdts-ahmed-nacer} ont constaté que ces temps dépassaient parfois 50ms.
+    Il s'agit là de la limite des délais acceptables par les utilisateur-rices d'après \cite{1984-human-performance-with-computers-shneiderman,2007-modeling-effects-delayed-feedback-jay}.
+    Ces performances disqualifient donc les \acp{CRDT} de la famille WOOT comme approches viables pour l'édition collaborative \ac{P2P} temps réel.
+\end{itemize}
+
+\begin{itemize}
   \item RGA \cite{ROH2011354}
   \item RGASplit \cite{briot:hal-01343941}
 \end{itemize}
@@ -1348,11 +1496,12 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 \begin{itemize}
   \item Deux approches différentes pour la résolution de conflits ont été proposées pour \acp{CRDT} pour Séquence.
     Chacune de ces approches visent à minimiser surcoût du type répliqué, que ce soit d'un point de vue mémoire, computations et réseau.
-  \item Au fil des années, ces approches ont été raffinées avec de nouveaux \acp{CRDT} de plus en plus en efficace.
+  \item Au fil des années, ces approches ont été raffinées avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
   \item Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
     Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
     L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
     L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
+    L'approche basée sur pierres tombales et l'approche basée sur identifiants densément ordonnés souffrent toutes les deux d'une augmentation théorique de leur surcoût en mémoire et en computations, respectivement dûe au nombre forcément croissant d'éléments stockées dans la Séquence et à la taille croissante\footnote{\cite{2011-evaluation-crdts-ahmed-nacer} montre expérimentalement que les performances de l'approche basée sur identifiants densément ordonnés restent stables tout au long des tâches d'édition collaborative proposées.} des identifiants associés aux éléments de la Séquence.
 
     \begin{table}[!ht]
       \centering
@@ -1363,6 +1512,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
           \toprule
                                                     & Dense ids-based & Tombstoned-based  \\
           \midrule
+          Performances stables                      & \ballotx        & \ballotx          \\
           Identifiants de taille fixe               & \ballotx        & \checkmark        \\
           Eléments réellement supprimés             & \checkmark      & \ballotx          \\
           Empreinte réseau fixe                     & \ballotx        & \checkmark        \\
