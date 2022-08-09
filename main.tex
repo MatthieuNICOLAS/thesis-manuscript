@@ -4,7 +4,7 @@
 %----------------------------------------------------------------------
 \usepackage[french]{babel}
 \usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
-\usepackage{biblatex}
+\usepackage[sorting=none]{biblatex}
 \bibliography{biblio.bib}
 \usepackage{booktabs} % \toprule, \midrule, \cmidrule, \bottomrule
 \usepackage{cancel} % \cancel
@@ -48,7 +48,6 @@
 
 \usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
-\FXRegisterAuthor{go}{ago}{Gerald}
 \FXRegisterAuthor{mn}{amn}{Matthieu}
 
 \usepackage{tikz} % \begin{tikzpicture} \end{tikzpicture}
@@ -67,15 +66,12 @@
 
 % Commands
 %---------
-\newcommand{\eg}{e.g. }
-\newcommand{\ie}{c.-à-d. }
+\newcommand{\eg}{e.g.\xspace}
+\newcommand{\ie}{c.-à-d.\xspace}
 
 \newcommand{\hb}{\emph{happens-before}\xspace}
 
-\newcommand{\headerparagraph}[1]{\textbf{\emph{#1}}\quad}
-
 \newcommand{\inbb}[1]{\in \mathbb{#1}}
-\newcommand{\mathlist}[2]{\set{#1_i \in #2}_{i \inbb{N}}}
 \newcommand{\new}{\textbf{new}}
 \newcommand{\trm}[1]{\mathit{#1}}
 \newcommand{\set}[1]{\left\{#1\right\}} % set brace notation
@@ -87,7 +83,7 @@
 \newcommand{\lepoch}{$<_{\varepsilon}$~}
 \newcommand{\leqepoch}{$\leq_{\varepsilon}$~}
 
-\newcommand\bigO[1]{$\mathcal{O}(#1)$}
+\newcommand{\bigO}[1]{$\mathcal{O}(#1)$}
 
 \newcommand{\widthletter}{2em}
 \newcommand{\widthblock}{3em}
@@ -552,7 +548,7 @@ Ainsi, les états $\{a\}$ et $\{\}$ semblent tous les deux corrects et légitime
 Il est néanmoins primordial que les noeuds choisissent et convergent vers un même état pour leur permettre de poursuivre leur collaboration.
 Pour ce faire, il est nécessaire de mettre en place un mécanisme de résolution de conflits, potentiellement automatique.
 
-Les \acp{CRDT} répondent à ce besoin.
+Les \acp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 2018-crdts-overview-preguica} répondent à ce besoin.
 Les \acp{CRDT} sont de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
 Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
 Ainsi, elles offrent les deux propriétés suivantes :
@@ -1331,7 +1327,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 
 \begin{itemize}
   \item WOOT \cite{2006-woot-oster} fait suite aux travaux présentés dans \cite{2006-tombstone-transformation-functions-oster}.
-    Il est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour Séquence\footnote{\cite{shapiro_2011_crdt} n'ayant formalisé les \acp{CRDT} qu'en 2011.}.
+    Il est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour Séquence\footnote{\cite{2007-crdt-shapiro} n'ayant formalisé les \acp{CRDT} qu'en 2007.}.
   \item Conçu pour l'édition collaborative \ac{P2P}, son but est de surmonter les limites de l'approche \ac{OT}.
     En effet, l'approche \ac{OT} souffre de la nécessité d'associer à chaque opération des informations de causalité, \ie un vecteur d'horloges.
     La taille de cette structure de données augmentant avec le nombre de noeuds du système, cette approche se révèle inadaptée aux systèmes \ac{P2P} dynamique, \ie systèmes dans lesquels un grand nombre de noeuds peuvent rejoindre puis quitter la collaboration.
@@ -1462,6 +1458,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     \end{enumerate}
     Ce modèle de livraison ne requiert qu'une quantité fixe de métadonnées associées à chaque opération pour être respecté.
     WOOT est donc adapté aux systèmes \ac{P2P} dynamiques.
+  \item \mnnote{TODO: Mentionner que WOOT ne propose pas de mécanisme pour purger les tombstones, par choix : souhaite mettre en place des fonctionnalités d'undo.}
   \item Des améliorations de WOOT furent par la suite proposées : WOOTO \cite{2007-wooto-weiss} et WOOTH \cite{2011-evaluation-crdts-ahmed-nacer}.
     Dans \cite{2007-wooto-weiss}, \citeauthor{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
     Cette modification permet un algorithme d'intégration des opérations $\trm{ins}$ plus efficace.
