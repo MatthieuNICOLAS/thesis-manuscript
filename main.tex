@@ -42,6 +42,7 @@
 \newtheorem{myrule}{Règle}
 \newtheorem{property}{Propriété}
 \newtheorem{subproperty}{Propriété}[property]
+\usepackage{MnSymbol} % \dashrightarrow
 
 \usepackage{algorithm, algpseudocode}
 \floatname{algorithm}{Algorithme} % Renomme caption de "Algorithm" -> "Algorithme"
@@ -1318,7 +1319,8 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \begin{itemize}
     \item dOpt puzzle
   \end{itemize}
-  \item Introduction des principales approches pour Sequence \acp{CRDT}
+  \item Introduction des principales approches pour Sequence \acp{CRDT}.
+    Préciser que, sauf mention contraire, ces \acp{CRDT} adoptent le modèle de synchronisation par opérations en raison de la taille non-bornée de l'état.
 \end{itemize}
 
 \subsection{Approche à pierres tombales}
@@ -1460,6 +1462,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     WOOT est donc adapté aux systèmes \ac{P2P} dynamiques.
   \item \mnnote{TODO: Mentionner que WOOT ne propose pas de mécanisme pour purger les tombstones, par choix : souhaite mettre en place des fonctionnalités d'undo.}
   \item Des améliorations de WOOT furent par la suite proposées : WOOTO \cite{2007-wooto-weiss} et WOOTH \cite{2011-evaluation-crdts-ahmed-nacer}.
+    \mnnote{TODO: Ajouter limite de WOOT : complexité en temps de l'algorithme d'intégration des insertions distantes trop importante}
     Dans \cite{2007-wooto-weiss}, \citeauthor{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
     Cette modification permet un algorithme d'intégration des opérations $\trm{ins}$ plus efficace.
     Dans \cite{2011-evaluation-crdts-ahmed-nacer}, \citeauthor{2011-evaluation-crdts-ahmed-nacer} se basent sur WOOTO et proposent l'utilisation de structures de données améliorant la complexité des algorithmes d'intégration des opérations, au détriment des métadonnées stockées localement par chaque noeud.
@@ -1472,9 +1475,171 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     Ces performances disqualifient donc les \acp{CRDT} de la famille WOOT comme approches viables pour l'édition collaborative \ac{P2P} temps réel.
 \end{itemize}
 
+\subsubsection{Replicated Growable Array}
+
 \begin{itemize}
-  \item RGA \cite{ROH2011354}
-  \item RGASplit \cite{briot:hal-01343941}
+  \item Replicated Growable Array (RGA) \cite{ROH2011354} est le second \ac{CRDT} appartenant à l'approche à pierres tombales.
+    Spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de Replicated Abstract Data Types (RADTs).
+  \item Dans cet article, définissent et se basent sur 2 principes pour concevoir RADTs.
+    Le premier d'entre eux est Operation Commutativity (OC).
+    Celui-ci indique que toutes paires possibles d'opérations concurrentes doit être commutative.
+    Permet de garantir que l'intégration par des noeuds différents d'une même séquence d'opérations concurrentes, mais dans des ordres différents, produira un état équivalent.
+  \item Le second principe sur lequel repose les RADTs est la Precedence Transitivity (PT).
+    Définit une relation de précédence, $\dashrightarrow$ , qui permet d'établir un ordre de priorité sur les intentions des opérations, pour déterminer laquelle conserver en cas de conflits.
+    Precedence Transitivity définit que pour tout trio d'opérations a, b et c, si on a $a \dashrightarrow b$ et $b \dashrightarrow c$, on a $a \dashrightarrow c$.
+  \item À partir de ces principes, proposent plusieurs RADTs : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et Replicated Growable Array (RGA), qui nous intéresse ici.
+  \item Dans RGA, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
+    Ainsi, RGA se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
+    De fait, tout comme WOOT, RGA repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
+    Nommé S4Vector, ces identifiants sont de la forme suivante\footnote{Dans présentations suivantes de RGA, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt} $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
+    \begin{itemize}
+      \item $\trm{ssid}$, identifiant de la session de collaboration
+      \item $\trm{sum}$, somme du vecteur d'horloges courant du noeud auteur de l'élément à son insertion
+      \item $\trm{ssn}$, identifiant du noeud auteur de l'élément
+      \item $\trm{seq}$, numéro de séquence de l'auteur de l'élément à son insertion
+    \end{itemize}
+    L'insertion est donc définie de la manière suivante : $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
+  \item Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
+    Pour cela, utilise l'ordre lexicographique sur les composants des identifiants des éléments.
+    Par exemple, on a $\langle 1, 10, A, 2\rangle < \langle 2, 5, B, 1 \rangle$ ou $\langle 1, 10, A, 2 \rangle < \langle 1, 15, B, 1 \rangle$.
+    L'utilisation de cet ordre comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
+  \item Concernant les suppressions, RGA se comporte de manière similaire à WOOT : la séquence conserve une tombstone pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
+    Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
+  \item Nous récapitulons le fonctionnement de RGA à l'aide de la \autoref{fig:rga}.
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \newcommand\initialstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\insl[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\rmvm[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \newcommand\finalstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+          }
+
+          \path
+              node {\textbf{A}}
+              ++(0:0.5) node (a) {}
+              +(0:30) node (a-end) {}
+              +(0:2) node[point] (a-initial) {}
+              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(a2 \prec \langle a5,L \rangle \prec b1)}$}}] (a-ins-l) {}
+              +(0:20) node[point] (a-recv-rmv-m) {}
+              +(0:28) node (a-final) {};
+
+          \initialstate{(a-initial)}{90};
+          \insl{(a-ins-l)}{90};
+          \finalstate{(a-recv-rmv-m)}{90};
+
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
+
+          \path
+              ++(270:3) node {\textbf{B}}
+              ++(0:0.5) node (b) {}
+              +(0:30) node (b-end) {}
+              +(0:2) node[point] (b-initial) {}
+              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=45pt]10:{$\trm{rmv(b1)}$}}] (b-rmv-m) {}
+              +(0:20) node[point] (b-recv-ins-l) {}
+              +(0:28) node (b-final) {};
+
+          \initialstate{(b-initial)}{-90};
+          \rmvm{(b-rmv-m)}{-90};
+          \finalstate{(b-recv-ins-l)}{-90};
+
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
+
+          \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
+          \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
+        \end{tikzpicture}
+      }
+      \caption{Modifications concurrentes d'une séquence répliquée RGA}
+      \label{fig:rga}
+    \end{figure}
+    \mnnote{TODO: Trouver exemple et le présenter.}
+  \item À la différence des auteurs de WOOT, \citeauthor{ROH2011354} jugent le coût des tombstones trop élévé.
+    Ils proposent alors un mécanisme de \emph{Garbage Collection} (GC) des tombstones.
+    Ce mécanisme repose sur deux conditions :
+    \begin{enumerate}[label=(\roman*)]
+      \item \label{item:gc-rga-1}
+        La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a observé la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
+      \item \label{item:gc-rga-2}
+        L'impossibilité pour l'ensemble des noeuds de générer un \emph{S4Vector} plus petit que l'élément suivant la tombstone\footnote{On constate cependant que la condition \ref{item:gc-rga-1} implique la condition \ref{item:gc-rga-2}, puisque tout noeud ayant observé l'insertion de l'élément suivant possédera un vecteur d'horloges supérieur.}.
+    \end{enumerate}
+  \item Concernant le modèle de livraison adopté, RGA repose sur une livraison causale des opérations.
+    \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
+    Cette piste est néanmoins laissé comme piste de recherche future.
+    À notre connaissance, celle-ci n'a pas été explorée dans la littérature.
+    Dans \cite{2021-these-vic}, \citeauthor{2021-these-vic} indique que RGA pourrait adopter le même modèle de livraison que WOOT.
+    Pour rappel, celui-ci consiste en :
+    \begin{enumerate}[label=(\roman*)]
+      \item L'opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
+      \item L'opération $\trm{rmv}(\trm{id})$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \end{enumerate}
+    Nous secondons cette observation.
+  \item \mnnote{TODO: Ajouter quelques lignes sur efficacité de RGA.
+      Meilleure complexité en temps pour l'intégration des opérations.
+      \cite{10.1145/2933057.2933090, ATTIYA2021141} montrent que RGA est optimal du point de vue complexité spatiale comme \ac{CRDT} pour Séquence par élément basée sur l'approche tombstone.
+      Implémenté dans Yjs et Automerge.
+    }
+  \item Plusieurs extensions de RGA furent proposées par la suite.
+    Dans \cite{briot:hal-01343941}, \citeauthor{briot:hal-01343941} indiquent que les pauvres performances\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
+    Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un feedback immédiat de la part de l'application.
+    Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
+    Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
+    Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
+    \citeauthor{briot:hal-01343941} combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
+    Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et spatiale.
+  \item Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
+    Lorsque des séquences de modifications sont effectuées ene concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
+    Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
+    \mnnote{TODO: Insérer et présenter exemple}
+    Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
+    Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{10.1145/2933057.2933090, ATTIYA2021141}, cette nouvelle spécification ajoute comme propriété que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
+    \citeauthor{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
+    Pour cela, les auteurs ajoutent à l'opération $\trm{ins}$ un paramètre, $\trm{samePredId}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
+    En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{ins}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
+    Cependant, les auteurs ne prouvent pas dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} que cette extension empêche tout entrelacement\footnote{Un travail en cours \cite{2022-no-doubly-non-interleaving-crdts-weidner} indique en effet qu'une séquence répliquée empêchant tout entrelacement est impossible.}.
 \end{itemize}
 
 \subsection{Approche à identifiants densément ordonnés}
@@ -1513,7 +1678,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
           Identifiants de taille fixe               & \ballotx        & \checkmark        \\
           Eléments réellement supprimés             & \checkmark      & \ballotx          \\
           Empreinte réseau fixe                     & \ballotx        & \checkmark        \\
-          Peut s'affranchir de la cohérence causale & \checkmark      & \ballotx          \\
+          Peut s'affranchir de la cohérence causale & \checkmark      & \checkmark          \\
           \bottomrule
         \end{tabular}
       % }

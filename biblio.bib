@@ -322,6 +322,31 @@ isbn="978-3-319-26850-7"
   HAL_VERSION = {v1},
 }
 
+@inproceedings{2019-interleaving-anomalies-collaborative-editors-kleppmann,
+  author = {Kleppmann, Martin and Gomes, Victor B. F. and Mulligan, Dominic P. and Beresford, Alastair R.},
+  title = {Interleaving Anomalies in Collaborative Text Editors},
+  year = {2019},
+  isbn = {9781450362764},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3301419.3323972},
+  doi = {10.1145/3301419.3323972},
+  abstract = {Collaborative text editors allow two or more users to concurrently edit a shared document without merge conflicts. Such systems require an algorithm to provide convergence, ensuring all clients that have seen the same set of document edits are in the same state. Unfortunately convergence alone does not guarantee that a collaborative text editor is usable. Several published algorithms for collaborative text editing exhibit an undesirable anomaly in which concurrently inserted portions of text with a well-defined order may be randomly interleaved on a character-by-character basis, resulting in an unreadable jumble of letters. Although this anomaly appears to be known informally by some researchers in the field, we are not aware of any published work that fully explains or addresses it. We show that several algorithms suffer from this problem, explain its cause, and also identify a lesser variant of the anomaly that occurs in another algorithm. Moreover, we propose a specification of collaborative text editing that rules out the anomaly, and show how to prevent the lesser anomaly from occurring in one particular algorithm.},
+  booktitle = {Proceedings of the 6th Workshop on Principles and Practice of Consistency for Distributed Data},
+  articleno = {6},
+  numpages = {7},
+  keywords = {CRDTs, specification, collaborative text editing, consistency},
+  location = {Dresden, Germany},
+  series = {PaPoC '19}
+}
+
+@misc{2022-no-doubly-non-interleaving-crdts-weidner,
+  title = {{There Are No Doubly Non-Interleaving List CRDTs}},
+  author = {Matthew Weidner},
+  url = {https://mattweidner.com/assets/pdf/List_CRDT_Non_Interleaving.pdf}
+}
+
+
 % Variable size sequence CRDTs
 % --------
 
