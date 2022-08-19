@@ -244,7 +244,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
 
 Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
-Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} \lid \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position souhaitée.
+Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} $\lid$ \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position souhaitée.
 Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
 Il est donc nécessaire de traiter les opérations concurrentes aux opérations \emph{rename} de manière particulière.
 
@@ -1121,13 +1121,13 @@ D'après les règles présentées précédemment :
 Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C1}{1}\id{i}{C2}{0} tel que :
 \[n^{C0}_{0} <_{id} \trm{id} <_{id} n^{C0}_{0}e^{D2}_{0}\]
 
-Utiliser $\trm{predId}$ (\id{n}{C0}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C0}{0} \lid $\trm{id}$.
+Utiliser $\trm{predId}$ (\id{n}{C0}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$.
 Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la \autoref{prop:order}.
 En effet, nous obtiendrions $\trm{id} = $ \id{n}{C0}{0}\id{i}{C2}{0}, or \id{n}{C0}{0}\id{i}{C2}{0} $\nless_{id}$ \id{n}{C0}{0}\id{e}{D2}{0}.
 
 Ainsi, nous devons choisir un autre préfixe dans cette situation, notamment pour garantir que l'identifiant résultant sera plus petit que les identifiants suivants.
 C'est pour cela que nous introduisons $MIN\_TUPLE$.
-En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C0}{0} \lid $\trm{id}$ et que $\trm{id}$ \lid \id{n}{C0}{0}\id{e}{D2}{0}.
+En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C0}{0}\id{e}{D2}{0}.
 Nous obtenons donc $\trm{id} = $ \id{n}{C0}{0}$\bot$\id{i}{C2}{0}, ce qui respecte la \autoref{prop:order}.
 
 Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
@@ -2552,7 +2552,7 @@ Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent a
 
 \subsection{Core-Nebula}
 
-L'approche \emph{core-nebula}\cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{5158449}.
+L'approche \emph{core-nebula}\cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{2009-treedoc-preguica}.
 Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
 Cependant, cette opération \emph{rebalance} n'est ni commutative avec les opérations \emph{insert} et \emph{remove}, ni avec elle-même.
 Pour assurer la convergence à terme \cite{10.1145/224057.224070}, l'approche \emph{core-nebula} empêche la génération d'opérations \emph{rebalance} concurrentes.

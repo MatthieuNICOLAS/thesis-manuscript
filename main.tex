@@ -79,7 +79,7 @@
 
 \newcommand{\id}[3]{$\trm{#1}^{\trm{#2}}_{\trm{#3}}$}
 \newcommand{\epoch}[1]{$\varepsilon_{#1}$}
-\newcommand{\lid}{$<_{id}$~}
+\newcommand{\lid}{<_{id}}
 \newcommand{\leqid}{$\leq_{id}$~}
 \newcommand{\lepoch}{$<_{\varepsilon}$~}
 \newcommand{\leqepoch}{$\leq_{\varepsilon}$~}
@@ -184,6 +184,7 @@
 \acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
 \acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
 \acrodef{FIFO}[FIFO]{First In, First Out}
+\acrodef{GC}[GC]{Garbage Collection}
 \acrodef{JIT}[JIT]{Just-In-Time}
 \acrodef{LCA}[PPAC]{Plus Petit Ancêtre Commun}
 \acrodef{LUB}[LUB]{Least Upper Bound}
@@ -194,6 +195,7 @@
 \acrodefplural{OT}[OT]{Operational Transformations}
 \acrodef{P2P}[P2P]{Pair-à-Pair}
 \acrodef{PKI}[PKI]{Public Key Infrastructure}
+\acrodef{RGA}[RGA]{Replicated Growable Array}
 \acrodef{RW}[RW]{\emph{Remove-Wins}}
 \acrodef{SEC}[SEC]{Cohérence forte à terme}
 \acrodef{WebRTC}[WebRTC]{Web Real-Time Communication}
@@ -1475,10 +1477,10 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     Ces performances disqualifient donc les \acp{CRDT} de la famille WOOT comme approches viables pour l'édition collaborative \ac{P2P} temps réel.
 \end{itemize}
 
-\subsubsection{Replicated Growable Array}
+\subsubsection{\acl{RGA}}
 
 \begin{itemize}
-  \item Replicated Growable Array (RGA) \cite{ROH2011354} est le second \ac{CRDT} appartenant à l'approche à pierres tombales.
+  \item \acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} appartenant à l'approche à pierres tombales.
     Spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de Replicated Abstract Data Types (RADTs).
   \item Dans cet article, définissent et se basent sur 2 principes pour concevoir RADTs.
     Le premier d'entre eux est Operation Commutativity (OC).
@@ -1487,11 +1489,11 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \item Le second principe sur lequel repose les RADTs est la Precedence Transitivity (PT).
     Définit une relation de précédence, $\dashrightarrow$ , qui permet d'établir un ordre de priorité sur les intentions des opérations, pour déterminer laquelle conserver en cas de conflits.
     Precedence Transitivity définit que pour tout trio d'opérations a, b et c, si on a $a \dashrightarrow b$ et $b \dashrightarrow c$, on a $a \dashrightarrow c$.
-  \item À partir de ces principes, proposent plusieurs RADTs : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et Replicated Growable Array (RGA), qui nous intéresse ici.
-  \item Dans RGA, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
-    Ainsi, RGA se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
-    De fait, tout comme WOOT, RGA repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
-    Nommé S4Vector, ces identifiants sont de la forme suivante\footnote{Dans présentations suivantes de RGA, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt} $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
+  \item À partir de ces principes, proposent plusieurs RADTs : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et \acf{RGA}, qui nous intéresse ici.
+  \item Dans \ac{RGA}, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
+    Ainsi, \ac{RGA} se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
+    De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
+    Nommé S4Vector, ces identifiants sont de la forme suivante\footnote{Dans présentations suivantes de \ac{RGA}, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt} $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
     \begin{itemize}
       \item $\trm{ssid}$, identifiant de la session de collaboration
       \item $\trm{sum}$, somme du vecteur d'horloges courant du noeud auteur de l'élément à son insertion
@@ -1503,9 +1505,9 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     Pour cela, utilise l'ordre lexicographique sur les composants des identifiants des éléments.
     Par exemple, on a $\langle 1, 10, A, 2\rangle < \langle 2, 5, B, 1 \rangle$ ou $\langle 1, 10, A, 2 \rangle < \langle 1, 15, B, 1 \rangle$.
     L'utilisation de cet ordre comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
-  \item Concernant les suppressions, RGA se comporte de manière similaire à WOOT : la séquence conserve une tombstone pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
+  \item Concernant les suppressions, \ac{RGA} se comporte de manière similaire à WOOT : la séquence conserve une tombstone pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
     Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
-  \item Nous récapitulons le fonctionnement de RGA à l'aide de la \autoref{fig:rga}.
+  \item Nous récapitulons le fonctionnement de \ac{RGA} à l'aide de la \autoref{fig:rga}.
     \begin{figure}[!ht]
 
       \centering
@@ -1593,12 +1595,12 @@ Nous récapitulons les principales propriétés et différences des modèles de 
           \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
         \end{tikzpicture}
       }
-      \caption{Modifications concurrentes d'une séquence répliquée RGA}
+      \caption{Modifications concurrentes d'une séquence répliquée \ac{RGA}}
       \label{fig:rga}
     \end{figure}
     \mnnote{TODO: Trouver exemple et le présenter.}
   \item À la différence des auteurs de WOOT, \citeauthor{ROH2011354} jugent le coût des tombstones trop élévé.
-    Ils proposent alors un mécanisme de \emph{Garbage Collection} (GC) des tombstones.
+    Ils proposent alors un mécanisme de \ac{GC} des tombstones.
     Ce mécanisme repose sur deux conditions :
     \begin{enumerate}[label=(\roman*)]
       \item \label{item:gc-rga-1}
@@ -1606,32 +1608,32 @@ Nous récapitulons les principales propriétés et différences des modèles de 
       \item \label{item:gc-rga-2}
         L'impossibilité pour l'ensemble des noeuds de générer un \emph{S4Vector} plus petit que l'élément suivant la tombstone\footnote{On constate cependant que la condition \ref{item:gc-rga-1} implique la condition \ref{item:gc-rga-2}, puisque tout noeud ayant observé l'insertion de l'élément suivant possédera un vecteur d'horloges supérieur.}.
     \end{enumerate}
-  \item Concernant le modèle de livraison adopté, RGA repose sur une livraison causale des opérations.
+  \item Concernant le modèle de livraison adopté, \ac{RGA} repose sur une livraison causale des opérations.
     \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
     Cette piste est néanmoins laissé comme piste de recherche future.
     À notre connaissance, celle-ci n'a pas été explorée dans la littérature.
-    Dans \cite{2021-these-vic}, \citeauthor{2021-these-vic} indique que RGA pourrait adopter le même modèle de livraison que WOOT.
+    Dans \cite{2021-these-vic}, \citeauthor{2021-these-vic} indique que \ac{RGA} pourrait adopter le même modèle de livraison que WOOT.
     Pour rappel, celui-ci consiste en :
     \begin{enumerate}[label=(\roman*)]
       \item L'opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
       \item L'opération $\trm{rmv}(\trm{id})$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
     \end{enumerate}
     Nous secondons cette observation.
-  \item \mnnote{TODO: Ajouter quelques lignes sur efficacité de RGA.
+  \item \mnnote{TODO: Ajouter quelques lignes sur efficacité de \ac{RGA}.
       Meilleure complexité en temps pour l'intégration des opérations.
-      \cite{10.1145/2933057.2933090, ATTIYA2021141} montrent que RGA est optimal du point de vue complexité spatiale comme \ac{CRDT} pour Séquence par élément basée sur l'approche tombstone.
+      \cite{10.1145/2933057.2933090, ATTIYA2021141} montrent que \ac{RGA} est optimal du point de vue complexité spatiale comme \ac{CRDT} pour Séquence par élément basée sur l'approche tombstone.
       Implémenté dans Yjs et Automerge.
     }
-  \item Plusieurs extensions de RGA furent proposées par la suite.
+  \item Plusieurs extensions de \ac{RGA} furent proposées par la suite.
     Dans \cite{briot:hal-01343941}, \citeauthor{briot:hal-01343941} indiquent que les pauvres performances\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
     Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un feedback immédiat de la part de l'application.
     Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
     Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
     Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
     \citeauthor{briot:hal-01343941} combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
-    Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et spatiale.
-  \item Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
-    Lorsque des séquences de modifications sont effectuées ene concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
+    Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
+  \item Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, \citeauthor{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
+    Lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
     Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
     \mnnote{TODO: Insérer et présenter exemple}
     Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
@@ -1644,8 +1646,65 @@ Nous récapitulons les principales propriétés et différences des modèles de 
 
 \subsection{Approche à identifiants densément ordonnés}
 
+\subsubsection{Treedoc}
+
 \begin{itemize}
-  \item Treedoc \cite{5158449}
+  \item \cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour CRDTs pour Séquence.
+    Se base sur des identifiants de position, respectant les propriétés suivantes :
+    \begin{enumerate}[label=(\roman*)]
+      \item Chaque élément se voit attribuer un identifiant.
+      \item \label{item:uniqueness} Aucune paire d'éléments ne partage le même identifiant.
+      \item L'identifiant d'un élément est immuable.
+      \item Il existe un ordre total strict sur les identifiants, $\lid$, cohérent avec l'ordre des éléments dans la séquence.
+      \item \label{item:dense-space}
+        Les identifiants sont tirés d'un ensemble dense, noté $\mathbb{I}$.
+    \end{enumerate}
+  \item La propriété \ref{item:dense-space} signifie que :
+    \[\forall \trm{predId}, \trm{succId} \in \mathbb{I}, \exists \trm{id} \in \mathbb{I} \cdot \trm{predId} \lid \trm{id} \lid \trm{succId} \]
+    Par exemple, les nombres réels forment un ensemble dense.
+    Ceux-ci sont néanmoins inutilisables en informatique puisqu'ils nécessiteraient une précision infinie.
+    \cite{2009-treedoc-preguica} utilise donc un type dédié pour les émuler.
+  \item L'utilisation d'identifiants de position permet de redéfinir les modifications :
+    \begin{enumerate}[label=(\roman*)]
+      \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins(\trm{id}, \trm{elt})}$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
+      \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+    \end{enumerate}
+    Ces redéfinitions permettent d'obtenir une spécification de la séquence avec des modifications commutatives.
+  \item À partir de cette spécification, \citeauthor{2009-treedoc-preguica} propose un CRDT pour Séquence : \emph{Treedoc}.
+    Ce dernier se base sur un arbre binaire pour générer les identifiants de position.
+  \item La racine de l'arbre binaire, notée $\epsilon$, correspond à l'identifiant du premier élément inséré dans la séquence répliquée.
+    Puis, pour générer l'identifiant d'un nouvel élément inséré à gauche (resp. à droite) d'un noeud de l'arbre binaire, Treedoc concatène un $0$ (resp. un $1$) à l'identifiant de ce dernier.
+    \mnnote{TODO: Figure arbre binaire d'identifiants.}
+  \item Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du systèmes peuvent générer un même identifiant pour des éléments insérés en concurrence, contravenant alors à la propriété \ref{item:uniqueness}.
+    Pour corriger cela, Treedoc ajoute aux identifiants des désambiguateurs : un \emph{Dot}.
+    Un désambiguateur est ajouté à chaque partie d'un identifiant lorsque nécessaire, \ie
+    \begin{enumerate}[label=(\roman*)]
+      \item La partie courante de l'identifiant est la fin de l'identifiant.
+      \item La partie courante de l'identifiant nécessite désambiguation, \ie plusieurs éléments utilisent ce même identifiant.
+    \end{enumerate}
+    Il convient de noter que les noeuds de l'arbre binaire des identifiants peuvent ainsi contenir une liste d'identifiants en cas d'insertions concurrentes.
+    \mnnote{TODO: Figure arbre binaire d'identifiants avec désambiguateurs et mini-nodes.}
+  \item \mnnote{TODO: Figure exemple d'édition collaborative}
+  \item Concernant le modèle de livraison utilisé, \cite{2009-treedoc-preguica} indique reposer sur le modèle de livraison causal.
+    En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
+    \begin{enumerate}[label=(\roman*)]
+      \item Les opérations $\trm{ins}$ peuvent être livrées dans n'importe quel ordre.
+      \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \end{enumerate}
+  \item Treedoc souffre néanmoins de plusieurs limites.
+    Tout d'abord, le mécanisme d'identifiants de positions proposé est couplé à la structure d'arbre binaire.
+    Cependant, les utilisateur-rices ont tendance à écrire de manière séquentielle, \ie dans le sens d'écriture de la langue utilisée.
+    Les nouveaux identifiants forment donc généralement une liste chaînée, qui déséquilibre l'arbre.
+  \item Ensuite, Treedoc doit conserver un noeud de l'arbre des identifiants malgré sa suppression lorsque ce dernier possède des enfants.
+    Ce noeud de l'arbre devient alors une pierre tombale.
+    Le mécanisme de \ac{GC} des pierres tombales de Treedoc ne repose cependant pas sur la stabilité causale d'opérations, mais sur l'état du noeud de l'arbre, \ie si la pierre tombale devient une feuille.
+    Néanmoins, l'évaluation de \cite{2009-treedoc-preguica} a montré que les pierres tombales pouvait représenter jusqu'à 95\% des noeuds de l'arbre.
+  \item Finalement, Treedoc souffre du problème de l'entrelacement d'éléments insérés de manière concurrente, malgré ce qui est conjecturé dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+\end{itemize}
+
+\subsubsection{Logoot}
+
+\begin{itemize}
   \item Logoot \cite{WeissICDCS09, weiss:hal-00450416}
 \end{itemize}
 
@@ -1728,16 +1787,16 @@ Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangl
 Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
 Pour ce faire, une relation d'ordre total aux identifiants est associée à l'ensemble des identifiants :
 
-\begin{definition}[Relation \lid]
-  La relation \lid est un ordre strict total sur l'ensemble des identifiants.
+\begin{definition}[Relation $\lid$]
+  La relation $\lid$ est un ordre strict total sur l'ensemble des identifiants.
   Elle permet aux noeuds de comparer n'importe quelle paire d'identifiants.
   Elle est définie en utilisant l'ordre lexicographique sur les composants des différents tuples des identifiants comparés.
 \end{definition}
 
 \begin{itemize}
   \item En utilisant cette relation d'ordre, les noeuds peuvent ordonner les éléments grâce à leur identifiant.
-  \item Par exemple, déterminent que \id{i}{A1}{0} \lid \id{i}{B0}{0} car les positions sont identiques et que le \emph{nodeId} (A) du premier est plus petit que le \emph{nodeId} (B) du second
-  \item et que \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second
+  \item Par exemple, déterminent que \id{i}{A1}{0} $\lid$ \id{i}{B0}{0} car les positions sont identiques et que le \emph{nodeId} (A) du premier est plus petit que le \emph{nodeId} (B) du second
+  \item et que \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second
 \end{itemize}
 
 \mnnote{TODO: Montrer que cet ensemble d'identifiants est un ensemble dense}
@@ -1922,7 +1981,7 @@ Cette opération est envoyée au noeud B pour qu'il intègre cette modification.
 
 Le noeud A insère ensuite un élément "E" dans la séquence, entre le "H" et le "L".
 LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément.
-Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} \lid $id$ \lid \id{i}{B0}{2}.
+Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} $\lid$ $id$ $\lid$ \id{i}{B0}{2}.
 Cependant, LogootSplit ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre.
 LogootSplit génère alors $id$ en recopiant le premier tuple (\id{i}{B0}{0}) et en y ajoutant un nouveau tuple (\id{f}{A0}{0}).
 LogootSplit génère l'opération \emph{insert} correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
@@ -1934,13 +1993,13 @@ LogootSplit associe donc l'identifiant \id{i}{B0}{4} à l'élément "!" et l'ajo
 
 Les noeuds se synchronisent ensuite.
 Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4}.
-Le noeud A détermine que cet élément doit être inséré à la fin de la séquence (puisque \id{i}{B0}{3} \lid \id{i}{B0}{4}) et qu'il peut être ajouté au bloc \id{i}{B0}{2..3} (puisque \id{i}{B0}{3} et \id{i}{B0}{4} sont contigus).
+Le noeud A détermine que cet élément doit être inséré à la fin de la séquence (puisque \id{i}{B0}{3} $\lid$ \id{i}{B0}{4}) et qu'il peut être ajouté au bloc \id{i}{B0}{2..3} (puisque \id{i}{B0}{3} et \id{i}{B0}{4} sont contigus).
 
 De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove} des éléments identifiés par l'intervalle \id{i}{B0}{1..1}, \ie l'élément attaché à l'identifiant \id{i}{B0}{1}.
 Le noeud B supprime donc l'élément "R" de son état.
 
 Il reçoit ensuite l'opération \emph{insert} de l'élément "E" à la position \id{i}{B0}{0}\id{f}{A0}{0}.
-Le noeud B insère cet élément entre les éléments "H" et "L" (puisque \id{i}{B0}{0} \lid \id{i}{B0}{0}\id{f}{A0}{0} \lid \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
+Le noeud B insère cet élément entre les éléments "H" et "L" (puisque \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} $\lid$ \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
 
 \mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}
 
@@ -2095,7 +2154,7 @@ Cependant, celui-ci n'est pas présent dans son état courant.
 L'intégration de l'opération s'achève donc sans effectuer de modification.
 
 Le noeud C reçoit ensuite l'opération \emph{insert}.
-Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant (\id{p}{A0}{0} \lid \id{p}{A0}{0}\id{m}{A1}{0} \lid \id{p}{A0}{1}).
+Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant (\id{p}{A0}{0} $\lid$ \id{p}{A0}{0}\id{m}{A1}{0} $\lid$ \id{p}{A0}{1}).
 
 Ainsi, l'état du noeud C diverge de celui-ci des autres noeuds à terme, et cela malgré que les noeuds A, B et C aient intégré le même ensemble d'opérations.
 Ce résultat transgresse la propriété de \ac{SEC} que doivent assurer les \acp{CRDT}.
@@ -2169,7 +2228,7 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
 
 \begin{itemize}
   \item Plusieurs approches ont été proposées pour réduire croissance des métadonnées dans Sequence \acp{CRDT}
-  \item RGA (et RGASplit) propose un mécanisme de GC des pierres tombales.
+  \item \ac{RGA} (et RGASplit) propose un mécanisme de GC des pierres tombales.
     Nécessite cependant stabilité causale des opérations de suppression.
     S'agit d'une contrainte forte, peu adaptée aux systèmes dynamiques à large échelle.
     \mnnote{TODO: Trouver référence sur la stabilité causale dans systèmes dynamiques}
