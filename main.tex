@@ -107,6 +107,7 @@
     block/.style={common, minimum width=\widthblock},
     epoch/.style={letter, rounded rectangle, rounded rectangle east arc=0pt, minimum width=\widthepoch},
     point/.style={insert path={ node[scale=5*sqrt(\pgflinewidth)]{.} }},
+    node/.style={draw, circle, minimum size=1em},
     op/.style={draw, circle, minimum size=2.7em},
     causalop/.style={op, double=white, inner sep=2pt},
     gc-rule-1/.style={dashed, thick, darkblue},
@@ -1566,7 +1567,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
               ++(0:0.5) node (a) {}
               +(0:30) node (a-end) {}
               +(0:2) node[point] (a-initial) {}
-              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=5em]-10:{$\trm{ins(t2 \prec \langle t_6,L \rangle)}$}}] (a-ins-l) {}
+              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=5em]-10:{$\trm{ins(t_2 \prec \langle t_6,L \rangle)}$}}] (a-ins-l) {}
               +(0:20) node[point] (a-recv-rmv-m) {}
               +(0:28) node (a-final) {};
 
@@ -1731,9 +1732,9 @@ Nous récapitulons les principales propriétés et différences des modèles de 
               ++(0:0.5) node (a) {}
               +(0:49) node (a-end) {}
               +(0:2) node[point] (a-initial) {}
-              +(0:9) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
-              +(0:17) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
-              +(0:26) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
+              +(0:9) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
+              +(0:17) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
+              +(0:26) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
               +(0:35) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
               +(0:39) node[point] (a-recv-sync) {}
               +(0:47) node (a-final) {};
@@ -1813,6 +1814,34 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \item La racine de l'arbre binaire, notée $\epsilon$, correspond à l'identifiant du premier élément inséré dans la séquence répliquée.
     Puis, pour générer l'identifiant d'un nouvel élément inséré à gauche (resp. à droite) d'un noeud de l'arbre binaire, Treedoc concatène un $0$ (resp. un $1$) à l'identifiant de ce dernier.
     \mnnote{TODO: Figure arbre binaire d'identifiants.}
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{0.3\columnwidth}{!}{
+        \begin{tikzpicture}
+          \newcommand\leftchild[3]{
+            \path
+              #1
+              +(220:2) node[node] #2 {#3};
+              \draw[thick] #1 -- #2 node[midway, above left] {0};
+          }
+          \newcommand\rightchild[3]{
+            \path
+              #1
+              +(320:2) node[node] #2 {#3};
+            \draw[thick] #1 -- #2 node[midway, above right] {1};
+          }
+
+          \path node[node, label={above:{$\epsilon$}}] (c) {C};
+          \leftchild{(c)}{(a)}{A};
+          \rightchild{(a)}{(b)}{B};
+          \rightchild{(c)}{(d)}{D};
+          \rightchild{(d)}{(e)}{E};
+        \end{tikzpicture}
+      }
+      \caption{Identifiants de positions}
+      \label{fig:treedoc-ids}
+    \end{figure}
   \item Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du systèmes peuvent générer un même identifiant pour des éléments insérés en concurrence, contravenant alors à la propriété \ref{item:uniqueness}.
     Pour corriger cela, Treedoc ajoute aux identifiants des désambiguateurs : un \emph{Dot}.
     Un désambiguateur est ajouté à chaque partie d'un identifiant lorsque nécessaire, \ie
