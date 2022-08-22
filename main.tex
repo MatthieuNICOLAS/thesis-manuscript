@@ -1493,7 +1493,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \item Dans \ac{RGA}, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
     Ainsi, \ac{RGA} se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
     De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
-    Nommé S4Vector, ces identifiants sont de la forme suivante\footnote{Dans présentations suivantes de \ac{RGA}, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt} $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
+    Nommé S4Vector, ces identifiants sont de la forme suivante $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
     \begin{itemize}
       \item $\trm{ssid}$, identifiant de la session de collaboration
       \item $\trm{sum}$, somme du vecteur d'horloges courant du noeud auteur de l'élément à son insertion
@@ -1501,9 +1501,11 @@ Nous récapitulons les principales propriétés et différences des modèles de 
       \item $\trm{seq}$, numéro de séquence de l'auteur de l'élément à son insertion
     \end{itemize}
     L'insertion est donc définie de la manière suivante : $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
+    Dans présentations suivantes de \ac{RGA}, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt.
+    Nous abstrayons donc ici la structure des identifiants avec le symbole $t$.
   \item Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
     Pour cela, utilise l'ordre lexicographique sur les composants des identifiants des éléments.
-    Par exemple, on a $\langle 1, 10, A, 2\rangle < \langle 2, 5, B, 1 \rangle$ ou $\langle 1, 10, A, 2 \rangle < \langle 1, 15, B, 1 \rangle$.
+    Par exemple, dans le cadre des S4Vector, on a $\langle 1, 10, A, 2\rangle < \langle 2, 5, B, 1 \rangle$ ou $\langle 1, 10, A, 2 \rangle < \langle 1, 15, B, 1 \rangle$.
     L'utilisation de cet ordre comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
   \item Concernant les suppressions, \ac{RGA} se comporte de manière similaire à WOOT : la séquence conserve une tombstone pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
     Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
@@ -1517,46 +1519,46 @@ Nous récapitulons les principales propriétés et différences des modèles de 
             \path
               #1
               ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
-              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
           }
 
           \newcommand\insl[2]{
             \path
               #1
               ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {M}
-              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
           }
 
           \newcommand\rmvm[2]{
             \path
               #1
               ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
-              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
           }
 
           \newcommand\finalstate[2]{
             \path
               #1
               ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$a1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$a2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$a5$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$b1$}] {\cancel{M}}
-              ++(0:\widthletter) node[letter, label=#2:{$a3$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$a4$}] {O};
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
           }
 
           \path
@@ -1564,7 +1566,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
               ++(0:0.5) node (a) {}
               +(0:30) node (a-end) {}
               +(0:2) node[point] (a-initial) {}
-              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(a2 \prec \langle a5,L \rangle \prec b1)}$}}] (a-ins-l) {}
+              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=5em]-10:{$\trm{ins(t2 \prec \langle t_6,L \rangle)}$}}] (a-ins-l) {}
               +(0:20) node[point] (a-recv-rmv-m) {}
               +(0:28) node (a-final) {};
 
@@ -1580,7 +1582,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
               ++(0:0.5) node (b) {}
               +(0:30) node (b-end) {}
               +(0:2) node[point] (b-initial) {}
-              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=45pt]10:{$\trm{rmv(b1)}$}}] (b-rmv-m) {}
+              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=5em]10:{$\trm{rmv(t_3)}$}}] (b-rmv-m) {}
               +(0:20) node[point] (b-recv-ins-l) {}
               +(0:28) node (b-final) {};
 
@@ -1610,7 +1612,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     \end{enumerate}
   \item Concernant le modèle de livraison adopté, \ac{RGA} repose sur une livraison causale des opérations.
     \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
-    Cette piste est néanmoins laissé comme piste de recherche future.
+    Ce point est néanmoins laissé comme piste de recherche future.
     À notre connaissance, celle-ci n'a pas été explorée dans la littérature.
     Dans \cite{2021-these-vic}, \citeauthor{2021-these-vic} indique que \ac{RGA} pourrait adopter le même modèle de livraison que WOOT.
     Pour rappel, celui-ci consiste en :
@@ -1625,7 +1627,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
       Implémenté dans Yjs et Automerge.
     }
   \item Plusieurs extensions de \ac{RGA} furent proposées par la suite.
-    Dans \cite{briot:hal-01343941}, \citeauthor{briot:hal-01343941} indiquent que les pauvres performances\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
+    Dans \cite{briot:hal-01343941}, \citeauthor{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
     Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un feedback immédiat de la part de l'application.
     Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
     Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
@@ -1635,6 +1637,142 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \item Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, \citeauthor{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
     Lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
     Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \newcommand\initialstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\inse[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\insf[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\insd[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_9$}] {D}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\insg[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\insh[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
+              ++(0:\widthletter) node[letter, label=#2:{$t_8$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \newcommand\finalstate[2]{
+            \path
+              #1
+              ++(0:0.5)
+              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+              ++(0:\widthletter) node[letter, label=#2:{$t_9$}] {D}
+              ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
+              ++(0:\widthletter) node[letter, label=#2:{$t_8$}] {H}
+              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
+              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+          }
+
+          \path
+              node {\textbf{A}}
+              ++(0:0.5) node (a) {}
+              +(0:49) node (a-end) {}
+              +(0:2) node[point] (a-initial) {}
+              +(0:9) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
+              +(0:17) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
+              +(0:26) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
+              +(0:35) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
+              +(0:39) node[point] (a-recv-sync) {}
+              +(0:47) node (a-final) {};
+
+          \initialstate{(a-initial)}{90};
+          \inse{(a-ins-e)}{90};
+          \insf{(a-ins-f)}{90};
+          \insd{(a-ins-d)}{90};
+          \finalstate{(a-recv-sync)}{90};
+
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-e) --  (a-ins-f) --  (a-ins-d) --  (a-send-sync) --  (a-recv-sync) -- (a-final);
+
+          \path
+              ++(270:3) node {\textbf{B}}
+              ++(0:0.5) node (b) {}
+              +(0:49) node (b-end) {}
+              +(0:2) node[point] (b-initial) {}
+              +(0:9) node[point, label=170:{$\trm{ins}(C \prec G)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_3 \prec \langle t7,G \rangle)$}}] (b-ins-g) {}
+              +(0:17) node[point, label=170:{$\trm{ins}(G \prec H)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_7 \prec \langle t8,H \rangle)$}}] (b-ins-h) {}
+              +(0:35) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
+              +(0:39) node[point] (b-recv-sync) {}
+              +(0:47) node (b-final) {};
+
+          \initialstate{(b-initial)}{-90};
+          \insg{(b-ins-g)}{-90};
+          \insh{(b-ins-h)}{-90};
+          \finalstate{(b-recv-sync)}{-90};
+
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-ins-g) --  (b-ins-h) --  (b-send-sync) -- (b-recv-sync) -- (b-final);
+
+          \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
+          \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+        \end{tikzpicture}
+      }
+      \caption{Entrelacement d'éléments insérés de manière concurrente}
+      \label{fig:rga-interleaving}
+    \end{figure}
     \mnnote{TODO: Insérer et présenter exemple}
     Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
     Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{10.1145/2933057.2933090, ATTIYA2021141}, cette nouvelle spécification ajoute comme propriété que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
@@ -1699,7 +1837,7 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     Ce noeud de l'arbre devient alors une pierre tombale.
     Le mécanisme de \ac{GC} des pierres tombales de Treedoc ne repose cependant pas sur la stabilité causale d'opérations, mais sur l'état du noeud de l'arbre, \ie si la pierre tombale devient une feuille.
     Néanmoins, l'évaluation de \cite{2009-treedoc-preguica} a montré que les pierres tombales pouvait représenter jusqu'à 95\% des noeuds de l'arbre.
-  \item Finalement, Treedoc souffre du problème de l'entrelacement d'éléments insérés de manière concurrente, malgré ce qui est conjecturé dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+  \item Finalement, Treedoc souffre du problème de l'entrelacement d'éléments insérés de manière concurrente, contrairement à ce qui est conjecturé dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
 \end{itemize}
 
 \subsubsection{Logoot}
