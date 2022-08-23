@@ -1817,26 +1817,25 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     \begin{figure}[!ht]
 
       \centering
-      \resizebox{0.3\columnwidth}{!}{
+      \resizebox{0.2\columnwidth}{!}{
         \begin{tikzpicture}
-          \newcommand\leftchild[3]{
-            \path
-              #1
-              +(220:2) node[node] #2 {#3};
-              \draw[thick] #1 -- #2 node[midway, above left] {0};
-          }
-          \newcommand\rightchild[3]{
-            \path
-              #1
-              +(320:2) node[node] #2 {#3};
-            \draw[thick] #1 -- #2 node[midway, above right] {1};
-          }
+          \newcommand\rightedge{ edge from parent node[right] {1} }
+          \newcommand\leftedge{ edge from parent node[left] {0} }
 
-          \path node[node, label={above:{$\epsilon$}}] (c) {C};
-          \leftchild{(c)}{(a)}{A};
-          \rightchild{(a)}{(b)}{B};
-          \rightchild{(c)}{(d)}{D};
-          \rightchild{(d)}{(e)}{E};
+          \path
+              node[node, label=above:{$\epsilon$}] {C}
+                child {
+                  node[node] {A}
+                    child[missing]
+                    child {node[node] {B} \rightedge}
+                    \leftedge
+                }
+                child {
+                  node[node] {D}
+                    child[missing]
+                    child {node[node] {E} \rightedge}
+                    \rightedge
+                };
         \end{tikzpicture}
       }
       \caption{Identifiants de positions}
@@ -1851,7 +1850,146 @@ Nous récapitulons les principales propriétés et différences des modèles de 
     \end{enumerate}
     Il convient de noter que les noeuds de l'arbre binaire des identifiants peuvent ainsi contenir une liste d'identifiants en cas d'insertions concurrentes.
     \mnnote{TODO: Figure arbre binaire d'identifiants avec désambiguateurs et mini-nodes.}
-  \item \mnnote{TODO: Figure exemple d'édition collaborative}
+  \item
+    \begin{figure}[!ht]
+
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \newcommand\initialstate[2]{
+            \path
+              #1
+              ++#2
+              node[node] {M}
+                child {
+                    node[node] {H}
+                      child[missing]
+                      child {node[node] {E} edge from parent node[right] {1}}
+                      edge from parent node[left] {0}
+                  }
+                child[missing];
+          }
+
+          \newcommand\heml[2]{
+            \path
+              #1
+              ++#2
+              node[node] {M}
+                child {
+                  node[node] {H}
+                    child[missing]
+                    child {node[node] {E} edge from parent node[right] {1}}
+                    edge from parent node[left] {0}
+                  }
+                child {
+                  node[node] {L} edge from parent node[right] {1}
+                };
+          }
+
+          \newcommand\hemlo[2]{
+            \path
+              #1
+              ++#2
+              node[node] {M}
+                child {
+                  node[node] {H}
+                    child[missing]
+                    child {node[node] {E} edge from parent node[right] {1}}
+                    edge from parent node[left] {0}
+                  }
+                child {
+                  node[node] {L}
+                    child[missing]
+                    child {node[node] {O} edge from parent node[right] {1}}
+                    edge from parent node[right] {1}
+                };
+          }
+
+          \newcommand\hel[2]{
+            \path
+              #1
+              ++#2
+              node[node] {\cancel{M}}
+                child {
+                  node[node] {H}
+                    child[missing]
+                    child {node[node] {E} edge from parent node[right] {1}}
+                    edge from parent node[left] {0}
+                  }
+                child {
+                  node[node] {L} edge from parent node[right] {1}
+                };
+          }
+
+          \newcommand\finalstate[2]{
+            \path
+              #1
+              ++#2
+              node[node] {\cancel{M}}
+                child {
+                  node[node] {H}
+                    child[missing]
+                    child {node[node] {E} edge from parent node[right] {1}}
+                    edge from parent node[left] {0}
+                  }
+                child {
+                  node[node] {L}
+                    child[missing]
+                    child {node[node] {O} edge from parent node[right] {1}}
+                    edge from parent node[right] {1}
+                };
+          }
+
+          \newcommand\offseta{ (90:4) }
+          \newcommand\offsetb{ (270:1) }
+
+          \path
+              node {\textbf{A}}
+              ++(0:0.5) node (a) {}
+              +(0:28) node (a-end) {}
+              +(0:2) node[point] (a-initial) {}
+              +(0:6) node[point, label=-170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]-10:{$\trm{ins}(\langle 1,d_4 \rangle,L)$}}] (a-ins-l) {}
+              +(0:14) node[point, label=-170:{$\trm{ins}(L \prec O)$}, label={[xshift=1em]-10:{$\trm{ins}(1 \odot \langle 1,d_6 \rangle,O)$}}] (a-ins-o) {}
+              +(0:20) node[point] (a-send-sync) {}
+              +(0:24) node[point] (a-recv-sync) {}
+              +(0:26) node (a-final) {};
+
+
+          \initialstate{(a-initial)}{\offseta};
+          \heml{(a-ins-l)}{\offseta};
+          \hemlo{(a-ins-o)}{\offseta};
+          \finalstate{(a-recv-sync)}{\offseta};
+
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-ins-o) -- (a-send-sync) -- (a-recv-sync) -- (a-final);
+
+          \path
+              ++(270:3) node {\textbf{B}}
+              ++(0:0.5) node (b) {}
+              +(0:28) node (b-end) {}
+              +(0:2) node[point] (b-initial) {}
+              +(0:6) node[point, label=170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]10:{$\trm{ins}(\langle 1, d_5 \rangle,L)$}}] (b-ins-l) {}
+              +(0:14) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=1em]10:{$\trm{rmv}(\epsilon)$}}] (b-rmv-m) {}
+              +(0:20) node[point] (b-send-sync) {}
+              +(0:24) node[point] (b-recv-sync) {}
+              +(0:26) node (b-final) {};
+
+          \initialstate{(b-initial)}{\offsetb};
+          \heml{(b-ins-l)}{\offsetb};
+          \hel{(b-rmv-m)}{\offsetb};
+          \finalstate{(b-recv-sync)}{\offsetb};
+
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-ins-l) -- (b-rmv-m) -- (b-send-sync) -- (b-recv-sync) -- (b-final);
+
+          \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
+          \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+        \end{tikzpicture}
+      }
+      \caption{Modifications concurrentes d'une séquence répliquée Treedoc}
+      \label{fig:treedoc}
+    \end{figure}
+    \mnnote{TODO: Figure exemple d'édition collaborative}
   \item Concernant le modèle de livraison utilisé, \cite{2009-treedoc-preguica} indique reposer sur le modèle de livraison causal.
     En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
     \begin{enumerate}[label=(\roman*)]
@@ -2441,8 +2579,8 @@ Il est donc nécessaire de proposer des mécanismes et techniques afin de mitige
   \item Présentons et détaillons notre contribution dans le chapitre suivant.
 \end{itemize}
 
-\import{chapters/}{rls}
-\import{chapters/}{mute}
+% \import{chapters/}{rls}
+% \import{chapters/}{mute}
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
