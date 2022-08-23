@@ -1,0 +1,55 @@
+\subsubsection{Sémantique \acl{MV}}
+
+Une seconde sémantique générique\footnote{Bien que généralement associée au type \emph{Registre} uniquement.} est la sémantique \acf{MV}.
+Cette approche propose de gérer les conflits de la manière suivante : plutôt que de prioritiser une modification par rapport aux autres modifications concurrentes, la sémantique \ac{MV} maintient l'ensemble des états résultant possibles.
+Nous présentons son application à l'Ensemble dans la \autoref{fig:set-mv}.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+          +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+          +(0:19) node[point, label=above right:{$\{\{\},\{a\}\}$}] (a-conflicts) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+          +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+          +(0:19) node[point, label=below right:{$\{\{\},\{a\}\}$}] (b-conflicts) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+      \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+      \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+    \end{tikzpicture}
+  }
+  \caption{Résolution du conflit en utilisant la sémantique \ac{MV}}
+  \label{fig:set-mv}
+\end{figure}
+
+La \autoref{fig:set-mv} présente la gestion du conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{rmv}(a)$ par la sémantique \ac{MV}.
+Devant ces modifications contraires, chaque noeud calcule chaque état possible, \ie un état sans l'élément $a$, $\{\}$, et un état avec ce dernier, $\{a\}$.
+Le \ac{CRDT} maintient alors l'ensemble de ces états en parallèle.
+L'état obtenu est donc $\{\{\},\{a\}\}$.
+
+Ainsi, la sémantique \ac{MV} expose les conflits aux utilisateur-rices lors de leur prochaine consultation de l'état du \ac{CRDT}.
+Les utilisateur-rices peuvent alors prendre connaissance des intentions de chacun-e et résoudre le conflit manuellement.
+Dans la \autoref{fig:set-mv}, résoudre le conflit revient à re-effectuer une modification $\trm{add}(a)$ ou $\trm{rmv}(a)$ selon l'état choisi.
+Ainsi, si plusieurs personnes résolvent en concurrence le conflit de manière contraire, la sémantique \ac{MV} exposera de nouveau les différents états proposés sous la forme d'un conflit.
+
+Il est intéressant de noter que cette sémantique mène à un changement du domaine du \ac{CRDT} considéré : en cas de conflit, la valeur retournée par le \ac{CRDT} correspond à un Ensemble de valeurs du type initialement considéré.
+E.g. si nous considérons que le type correspondant au \ac{CRDT} dans la \autoref{fig:set-mv} est le type $\trm{Set}\langle V \rangle$, nous observons que la valeur finale obtenue a pour type $\trm{Set}\langle \trm{Set}\langle V \rangle \rangle$.
+Il s'agit à notre connaissance de la seule sémantique opérant ce changement.

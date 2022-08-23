@@ -1,0 +1,46 @@
+\subsection{Identifiants}
+
+Pour ce faire, LogootSplit assigne des identifiants composés d'une liste de tuples aux éléments.
+Les tuples sont définis de la manière suivante :
+
+\begin{definition}[Tuple]
+  Un \emph{Tuple} est un quadruplet $\langle$position, nodeId, nodeSeq, offset$\rangle$ où
+  \begin{itemize}
+    \item position incarne la position souhaitée de l'élément.
+    \item nodeId est l'identifiant unique du noeud qui a généré le tuple.
+    \item nodeSeq est le numéro de séquence courant du noeud à la génération du tuple.
+    \item offset indique la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
+  \end{itemize}
+\end{definition}
+
+\mnnote{TODO: Ajouter une relation d'ordre sur les tuples}
+
+Dans ce manuscrit, nous représentons les tuples par le biais de la notation suivante : \id{position}{nodeId~nodeSeq}{offset} où $\trm{position}$ est une lettre minuscule, $\trm{nodeId}$ une lettre majuscule et $\trm{nodeSeq}$ et $\trm{offset}$ des entiers, \eg \id{i}{B0}{0}.
+
+À partir de là, les identifiants LogootSplit sont définis de la manière suivante :
+
+\begin{definition}[Identifiant]
+  Un \emph{Identifiant} est une liste de \emph{Tuples}.
+\end{definition}
+
+\mnnote{TODO: Définir la notion de base (et autres fonctions utiles sur les identifiants ? genre isPrefix, concat, getTail...)}
+
+Nous représentons les identifiants en listant les tuples qui les composent.
+Par exemple, l'identifiant composé des tuples $\langle\langle$i, B, 0, 0$\rangle\langle$f, A, 0, 0$\rangle\rangle$ est présenté de la manière suivante : \id{i}{B0}{0}\id{f}{A0}{0}.
+
+Les identifiants ont pour rôle d'ordonner les éléments relativement les uns par rapport aux autres.
+Pour ce faire, une relation d'ordre total aux identifiants est associée à l'ensemble des identifiants :
+
+\begin{definition}[Relation $\lid$]
+  La relation $\lid$ est un ordre strict total sur l'ensemble des identifiants.
+  Elle permet aux noeuds de comparer n'importe quelle paire d'identifiants.
+  Elle est définie en utilisant l'ordre lexicographique sur les composants des différents tuples des identifiants comparés.
+\end{definition}
+
+\begin{itemize}
+  \item En utilisant cette relation d'ordre, les noeuds peuvent ordonner les éléments grâce à leur identifiant.
+  \item Par exemple, déterminent que \id{i}{A1}{0} $\lid$ \id{i}{B0}{0} car les positions sont identiques et que le \emph{nodeId} (A) du premier est plus petit que le \emph{nodeId} (B) du second
+  \item et que \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second
+\end{itemize}
+
+\mnnote{TODO: Montrer que cet ensemble d'identifiants est un ensemble dense}

@@ -1,0 +1,64 @@
+\subsection{Modèle de synchronisation}
+
+Dans le modèle de réplication optimiste, les noeuds divergent momentanément lorsqu'ils effectuent des modifications locales.
+Pour ensuite converger vers des états équivalents, les noeuds doivent propager et intégrer l'ensemble des modifications.
+La \autoref{fig:sync-model-base} illustre ce point.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\set{a,e}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\set{a,b,e}$}, label=below left:{$\trm{add}(b)$}] (a-add-b) {}
+          +(0:12) node[point, label=above right:{$\set{a,b,c,e}$}, label=below left:{$\trm{add}(c)$}] (a-add-c) {}
+          +(0:19) node (a-final) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-add-b) -- (a-add-c) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\set{a,e}$}] (b-initial) {}
+          +(0:10) node[point, label=below right:{$\set{a,d,e}$}, label=above left:{$\trm{add}(d)$}] (b-add-d) {}
+          +(0:19) node (b-final) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-add-d) -- (b-final);
+    \end{tikzpicture}
+  }
+  \caption{Modifications en concurrence d'un Ensemble répliqué par les noeuds A et B}
+  \label{fig:sync-model-base}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent un même Ensemble à l'aide d'un \ac{CRDT}.
+Les deux noeuds possèdent le même état initial : $\set{a,e}$.
+
+Le noeud A effectue les modifications $\trm{add}(b)$ puis $\trm{add}(c)$.
+Il obtient ainsi l'état $\set{a,b,c,e}$.
+De son côté, le noeud B effectue la modification suivante : $\trm{add}(d)$.
+Son état devient donc $\set{a,d,e}$.
+Ainsi, les noeuds doivent encore s'échanger leur modifications pour converger vers l'état souhaité\footnote{Le scénario ne comportant uniquement des modifications $\trm{add}$, aucun conflit n'est produit malgré la concurrence des modifications.}, \ie $\set{a,b,c,d,e}$.
+
+% Dans ce scénario, aucune communication n'ayant eu lieu entre A et B au cours de cette exécution.
+% Leurs opérations respectives sont donc concurrentes.
+% Il est à noter que ce scénario ne présente uniquement des modifications $\trm{add}$.
+% Ainsi, aucun conflit n'est produit malgré la concurrence des modifications.
+% La sémantique utilisée par le \ac{CRDT} dans cet exemple n'a donc pas d'importance.
+
+Dans le cadre des \acp{CRDT}, le choix de la méthode pour synchroniser les noeuds n'est pas anodin.
+En effet, ce choix impacte la spécification même du \ac{CRDT} et ses prérequis.
+
+Initialement, deux approches ont été proposées : une méthode de synchronisation par états \cite{shapiro_2011_crdt, shapiro:inria-00555588} et une méthode de synchronisation par opérations \cite{shapiro_2011_crdt, shapiro:inria-00555588, 2014-making-op-based-crdts-op-based, baquero2017pure}.
+Une troisième approche, nommée synchronisation par différence d'états \cite{almeida2015delta, Almeida_2018}, fut spécifiée par la suite.
+Le but de cette dernière est d'allier le meilleur des deux approches précédentes.
+
+Dans la suite de cette section, nous présentons ces approches ainsi que leurs caractéristiques respectives.
+Pour les illustrer, nous complétons l'exemple décrit ici.
+Cependant, nous nous focalisons uniquement sur les messages envoyés par les noeuds et n'évoquons seulement les métadonnées introduites par chaque modèle de synchronisation, par soucis de clarté et de simplicité.

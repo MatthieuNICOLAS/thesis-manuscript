@@ -1,0 +1,91 @@
+\subsubsection{Synchronisation par différences d'états}
+
+Dans \cite{almeida2015delta}, \citeauthor{almeida2015delta} introduisent un nouveau modèle de synchronisation pour \acp{CRDT}.
+La proposition de ce modèle est nourrie par les observations suivantes :
+\begin{enumerate}[label=(\roman*)]
+  \item Les \acp{CRDT} synchronisés par opérations sont vulnérables aux défaillances du réseau et nécessitent généralement pour pallier à cette vulnérabilité une livraison des opérations en exactement un exemplaire et respectant l'ordre causal.
+  \item Les \acp{CRDT} synchronisés par états pâtissent du surcoût induit par la diffusion de leurs états complets, généralement croissant continuellement.
+\end{enumerate}
+
+Pour pallier aux faiblesses de chaque approche et allier le meilleur des deux mondes, les auteurs proposent les \acp{CRDT} synchronisés par différences d'états \cite{almeida2015delta,Almeida_2018, enes2019}.
+Il s'agit en fait d'une sous-famille des \acp{CRDT} synchronisés par états.
+Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} permettant de produire la LUB entre deux états, et qui est associative, commutative et idempotente.
+
+La spécificité des \acp{CRDT} synchronisés par différences d'états est qu'une modification locale produit en retour un delta.
+Un delta encode la modification effectuée sous la forme d'un état du lattice.
+Les deltas étant des états, ils peuvent être diffusés puis intégrés par les autres noeuds à l'aide de la fonction \texttt{merge}.
+Ceci permet de bénéficier des propriétés d'associativité, de commutativité et d'idempotence offertes par cette fonction.
+Les \acp{CRDT} synchronisés par différences d'états offrent ainsi :
+\begin{enumerate}[label=(\roman*)]
+  \item Une diffusion des modifications avec un surcoût pour le réseau proche de celui des \acp{CRDT} synchronisés par opérations.
+  \item Une résistance aux défaillances réseaux similaire celle des \acp{CRDT} synchronisés par états.
+\end{enumerate}
+
+Cette définition des \acp{CRDT} synchronisés par différences d'états, introduite dans \cite{almeida2015delta,Almeida_2018}, fut ensuite précisée dans \cite{enes2019}.
+Dans cet article, \citeauthor{enes2019} précisent qu'utiliser des éléments irréductibles (cf. \autoref{def:irreducible-element}) comme deltas est optimal du point de vue de la taille des deltas produits.
+
+Concernant la diffusion des modifications, les \acp{CRDT} synchronisés par différences d'états autorisent un large éventail de possibilités.
+Par exemple, les deltas peuvent être diffusés et intégrés de manière indépendante.
+Une autre approche possible consiste à tirer avantage du fait que les deltas sont des états : il est possible d'agréger plusieurs deltas à l'aide la fonction \texttt{merge}, éliminant leurs éventuelles redondances.
+Ainsi, la fusion de deltas permet ensuite de diffuser un ensemble de modifications par le biais d'un seul et unique delta, minimal.
+Et en dernier recours, les \acp{CRDT} synchronisés par différences d'états peuvent adopter le même schéma de diffusion que les \acp{CRDT} synchronisés par états, \ie diffuser leur état complet de manière périodique.
+Plusieurs de ces approches sont évaluées et comparées de manière expérimentale dans \cite{enes2019}.
+
+Nous illustrons cette approche avec la \autoref{fig:sync-model-delta}.
+Dans cet exemple, nous considérons que les noeuds adoptent la seconde approche évoquée, \ie que périodiquement les noeuds aggrégent les deltas issus de leurs modifications et diffusent le delta résultant.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\set{a,e}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\set{a,b,e}$}, label=-170:{$\trm{add}(b)$}] (a-add-b) {}
+          +(0:11) node[point, label=above right:{$\set{a,b,c,e}$}, label=-170:{$\trm{add}(c)$}] (a-add-c) {}
+          +(0:16) node[point, label=below left:{$\trm{sync}$}, label={[xshift=12pt]-10:{$\set{b,c}$}}] (a-sends-state) {}
+          +(0:19) node[point, label=above right:{$\set{a,b,c,d,e}$}] (a-final) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-add-b) -- (a-add-c) -- (a-sends-state) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\set{a,e}$}] (b-initial) {}
+          +(0:11) node[point, label=below right:{$\set{a,d,e}$}, label=170:{$\trm{add}(d)$}] (b-add-d) {}
+          +(0:16) node[point, label=170:{$\trm{sync}$}, label={[xshift=15pt]10:{$\set{d}$}}] (b-sends-state) {}
+          +(0:19) node[point, label=below right:{$\set{a,b,c,d,e}$}] (b-final) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-add-d) -- (b-sends-state) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-sends-state) -- (b-final);
+      \draw[->, dashed, shorten >= 1] (b-sends-state) -- (a-final);
+    \end{tikzpicture}
+  }
+  \caption{Synchronisation des noeuds A et B en adoptant le modèle de synchronisation par différences d'états}
+  \label{fig:sync-model-delta}
+\end{figure}
+
+Le noeud A effectue les modifications $\trm{add}(b)$ et $\trm{add}(c)$, qui retournent respectivement les deltas $\set{b}$ et $\set{c}$.
+Le noeud A aggrége ces deltas et diffuse donc le delta suivant $\trm{b,c}$.
+Quant au noeud B, il effectue la modification $\trm{add}(d)$ qui produit le delta $\set{d}$.
+S'agissant de son unique modification, il diffuse ce delta inchangé.
+
+Quand A (resp. B) reçoit le delta $\set{d}$ (resp. $\set{b,c}$), il l'intègre à sa copie en utilisant la fonction \texttt{merge}.
+Les deux noeuds convergent alors à l'état $\set{a,b,c,d,e}$.
+
+La synchronisation par différences d'états permet donc de réduire la taille des messages diffusés sur le réseau par rapport à la synchronisation par états.
+Cependant, il est important de noter que la décomposition en deltas entraîne la perte d'une des propriétés intrinsèques des \acp{CRDT} synchronisés par états : le respect du modèle de cohérence causale.
+En effet, sans mécanisme supplémentaire, la perte ou le ré-ordonnement de deltas par le réseau peut mener à une livraison dans le désordre des modifications à l'un des noeuds.
+S'ils souhaitent assurer une diffusion causale des modifications, les \acp{CRDT} synchronisés par différences d'états doivent donc définir et intégrer dans leur spécification un mécanisme similaire à l'intergiciel de livraison des \acp{CRDT} synchronisés par opérations.
+En revanche et à l'instar des \acp{CRDT} synchronisés par opérations, les \acp{CRDT} synchronisés par différences d'états peuvent aussi faire le choix inverse : s'affranchir du modèle de cohérence causale pour accélerer la diffusion des modifications et minimiser le surcoût du type répliqué.
+
+Ainsi, les \acp{CRDT} synchronisés par différences d'états sont une évolution prometteuse des \acp{CRDT} synchronisés par états.
+Ce modèle de synchronisation rend ces \acp{CRDT} utilisables dans les systèmes temps réels sans introduire de contraintes sur la fiabilité du réseau.
+Mais pour cela, il ajoute une couche supplémentaire de complexité à la spécification des \acp{CRDT} synchronisés par états, \ie le mécanisme dédié à la livraison des deltas, qui peut s'avérer source d'erreurs et de coûts supplémentaires.

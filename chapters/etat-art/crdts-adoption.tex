@@ -1,0 +1,14 @@
+\subsection{Adoption dans la littérature et l'industrie}
+
+\begin{itemize}
+  \item Proposition et conception de \acp{CRDT} pour une variété de types de données : Registre, Compteur \mnnote{TODO: Ajouter IPA}, Ensemble, Liste/Sequence, Graphe, JSON, Filesystem, Access Control.
+    Propose généralement plusieurs sémantiques de résolution de conflits par type de données.
+  \item Conception et développement de librairies mettant à disposition des développeurs d'applications des types de données composés \cite{Nicolaescu2015Yjs, Nicolaescu2016YATA, yjsimplem, jsoncrdt2017, automerge}
+    \mnnote{TODO: Revoir et ajouter Melda (PaPoC'22) si fitting}
+  \item Conception de langages de programmation intégrant des CRDTs comme types primitifs, destinés au développement d'applications distribuées \cite{Meiklejohn2015Lasp2, DePorre2020cscript}
+  \item Conception et implémentation de bases de données distribuées, relationnelles ou non, privilégiant la disponibilité et la minimisation de la latence à l'aide des CRDTs \cite{RiakKV, AntidoteDB, Anna2021, Concordant, yu:hal-02983557}
+    \mnnote{TODO: Ajouter Redis et Akka}
+  \item Conception d'un nouveau paradigme d'applications, Local-First Software, dont une des fondations est les CRDTs \cite{localfirstsoftware2019, pushpin2020}
+    \mnnote{TODO: Vérifier et ajouter l'article avec Digital Garden (PaPoC'22?) si fitting}
+  \item Éditeurs collaboratifs temps réel à large échelle et offrant de nouveaux scénarios de collaboration grâce aux CRDTs \cite{Nedelec2016CRATE, MUTE2017}
+\end{itemize}

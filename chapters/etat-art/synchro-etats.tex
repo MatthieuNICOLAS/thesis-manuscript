@@ -1,0 +1,73 @@
+\subsubsection{Synchronisation par états}
+
+L'approche de la synchronisation par états propose que les noeuds diffusent leurs modifications en transmettant leur état.
+Les \acp{CRDT} adoptant cette approche doivent définir une fonction \texttt{merge}.
+Cette fonction correspond à la fonction de fusion mentionnée précédemment en \ref{item:lub} : elle prend en paramètres une paire d'états et génère en retour l'état correspondant à leur \ac{LUB}.
+Cette fonction doit être associative, commutative et idempotente.
+
+Ainsi, lorsqu'un noeud reçoit l'état d'un autre noeud, il fusionne ce dernier avec son état courant à l'aide de la fonction \texttt{merge}.
+Il obtient alors un nouvel état intégrant l'ensemble des modifications ayant été effectuées sur les deux états.
+
+La nature croissante des états des \acp{CRDT} couplée aux propriétés d'associativité, de commutativité et d'idempotence de la fonction \texttt{merge} permettent de reposer sur la couche réseau sans lui imposer de contraintes fortes : les messages peuvent être perdus, réordonnés ou même dupliqués.
+Les noeuds convergeront tant que la couche réseau garantit que les noeuds seront capables de transmettre leur état aux autres à terme.
+Il s'agit là de la principale force des \acp{CRDT} synchronisés par états.
+
+Néanmoins, la définition de la fonction \texttt{merge} offrant ces propriétés peut s'avérer complexe et a des répercussions sur la spécification même du \ac{CRDT}.
+Notamment, les états doivent conserver une trace de l'existence des éléments et de leur suppression afin d'éviter qu'une fusion d'états ne les fassent ressurgirent.
+Ainsi, les \acp{CRDT} synchronisés par états utilisent régulièrement des pierres tombales.
+
+En plus de l'utilisation de pierres tombales, la taille de l'état peut croître de manière non-bornée dans le cas de certains types de donnés, \eg l'Ensemble ou la Séquence.
+Ainsi, ces structures peuvent atteindre à terme des tailles conséquentes.
+Dans de tels cas, diffuser l'état complet à chaque modification induirait alors un coût rédhibitoire.
+L'approche de la synchronisation par états s'avère donc inadaptée aux systèmes temps réel et repose généralement sur une synchronisation périodique.
+
+Nous illustrons le fonctionnement de cette approche avec la \autoref{fig:sync-model-state}.
+Dans cet exemple, après que les noeuds aient effectués leurs modifications respectives, le mécanisme de synchronisation périodique de chaque noeud se déclenche.
+Le noeud A (resp. B) diffuse alors son état $\set{a,b,c,e}$ (resp. $\set{a,d,e}$) à B (resp. A).
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\set{a,e}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\set{a,b,e}$}, label=-170:{$\trm{add}(b)$}] (a-add-b) {}
+          +(0:11) node[point, label=above right:{$\set{a,b,c,e}$}, label=-170:{$\trm{add}(c)$}] (a-add-c) {}
+          +(0:16) node[point, label=below left:{$\trm{sync}$}, label={[xshift=10pt]-10:{$\set{a,b,c,e}$}}] (a-sends-state) {}
+          +(0:19) node[point, label=above right:{$\set{a,b,c,d,e}$}] (a-final) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-add-b) -- (a-add-c) -- (a-sends-state) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\set{a,e}$}] (b-initial) {}
+          +(0:11) node[point, label=below right:{$\set{a,d,e}$}, label=170:{$\trm{add}(d)$}] (b-add-d) {}
+          +(0:16) node[point, label=170:{$\trm{sync}$}, label={[xshift=15pt]10:{$\set{a,d,e}$}}] (b-sends-state) {}
+          +(0:19) node[point, label=below right:{$\set{a,b,c,d,e}$}] (b-final) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-add-d) -- (b-sends-state) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-sends-state) -- (b-final);
+      \draw[->, dashed, shorten >= 1] (b-sends-state) -- (a-final);
+    \end{tikzpicture}
+  }
+  \caption{Synchronisation des noeuds A et B en adoptant le modèle de synchronisation par états}
+  \label{fig:sync-model-state}
+\end{figure}
+
+À la réception de l'état, chaque noeud utilise la fonction \texttt{merge} pour intégrer les modifications de l'état reçu dans son propre état.
+Dans le cadre de l'Ensemble répliqué, cette fonction consiste généralement à faire l'union des états, en prenant en compte l'estampille et le statut (présent ou non) associé à chaque élément.
+Ainsi la fusion de leur état respectif, $\set{a,b,c,e} \cup \set{a,d,e}$, permet aux noeuds de converger à l'état souhaité : $\set{a,b,c,d,e}$.
+
+Avant de conclure, il est intéressant de noter que ce modèle de synchronisation propose par nature une diffusion des modifications suivant le modèle de cohérence causale \mnnote{TODO: Ajouter ref}.
+En effet, ce modèle de synchronisation assure une livraison soit de toutes les modifications connues d'un noeud, soit d'aucune.
+Par exemple, dans la \autoref{fig:sync-model-state}, le noeud B ne peut pas recevoir et intégrer l'élément $c$ sans l'élement $b$.
+Ainsi, ce modèle permet naturellement d'éviter ce qui pourrait être interprétées comme des anomalies par les utilisateur-rices.

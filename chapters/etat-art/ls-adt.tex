@@ -1,0 +1,127 @@
+\subsection{Modèle de données}
+
+\textcite{2013-logootsplit} définissent une séquence LogootSplit de la manière suivante :
+
+\begin{definition}[Séquence LogootSplit]
+  \label{def:logootsplit}
+  Une séquence \emph{Séquence LogootSplit} est un triplet $\langle$nodeId, nodeSeq, blocks$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant du noeud.
+    \item nodeSeq est le numéro de séquence courant du noeud.
+    \item blocks est une liste de Blocs correspondant à l'état actuel de la séquence répliquée.
+  \end{itemize}
+\end{definition}
+
+Plusieurs fonctions sont définies sur cette structure de données et permettent de l'interroger et de la modifier :
+
+\begin{itemize}
+  \item ins(S, index, elts) permet d'insérer les éléments elts à la position index dans la séquence S.
+    Cette fonction génère et associe un intervalle d'identifiants valide aux éléments insérés
+    Elle retourne une opération \emph{insert} permettant aux autres noeuds d'intégrer la modification à leur état.
+\end{itemize}
+
+\begin{definition}[insert]
+  Une opération \emph{insert} est un couple $\langle$id, elts$\rangle$ où
+  \begin{itemize}
+    \item id est l'identifiant du premier élément inséré par cette opération.
+    \item elts est la liste des éléments insérés par cette opération.
+  \end{itemize}
+\end{definition}
+
+\begin{itemize}
+  \item rem(S, index, length) permet de supprimer length éléments à partir la position index dans la séquence S.
+  Cette fonction répertorie les éléments supprimés sous la forme d'intervalles d'identifiants.
+  Elle retourne une opération \emph{remove} permettant aux autres noeuds d'intégrer la modification à leur état.
+\end{itemize}
+
+\begin{definition}[remove]
+  Une opération \emph{remove} est une liste d'intervalles d'identifiants où chaque intervalle désigne un ensemble d'éléments à supprimer.
+\end{definition}
+
+Nous présentons dans la \autoref{fig:logootsplit-example} un exemple d'utilisation de cette séquence répliquée.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0A) {HRLO}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1A-left) {H}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S1A-right) {LO}
+            ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2A-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..3}}] (S2A-right) {LO}
+            ++(0:6 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S3A-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] {LO!};
+
+
+        \path
+            ++(270:4) node {\textbf{B}}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..3}}] (S0B) {HRLO}
+            ++(0:5 * \widthletter) node[block, label=below:{\id{i}{B0}{0..4}}] (S1B) {HRLO!}
+            ++(0:7 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S2B-left) {H}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{2..4}}] (S2B-right) {LO!}
+            ++(0:7 * \widthletter) node[letter, label=above:{\id{i}{B0}{0}}] (S3B-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=below:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{2..4}}] {LO!};
+
+        \draw[->, thick]
+          (S0A) edge node[above, align=center]{\emph{remove "R"}} (S1A-left)
+          (S1A-right) edge node[above, align=center]{\emph{insert "E"}\\\emph{between}\\\emph{"H" and "L"}} (S2A-left)
+          (S0B) edge node[below, align=center]{\emph{insert "!"}\\\emph{at the end}} (S1B);
+
+        \draw[dotted]
+          (S2A-right) -- (S3A-left)
+          (S1B) -- (S2B-left)
+          (S2B-right) -- (S3B-left);
+
+        \draw[dashed, ->, thick, shorten >= 3]
+          (S1A-right.east) edge node[right, align=center]{\emph{remove} \id{i}{B0}{1..1}}  (S2B-left.west)
+          (S2A-right.east) edge node[below right, align=center]{\emph{insert "E" at} {\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}} (S3B-left.west)
+          (S1B.east) edge node[below right, near end, align=center]{\emph{insert "!" at} \id{i}{B0}{4}} (S3A-left.west);
+
+
+        % \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
+        % \draw[dotted] (S1A) -- (S2A-left);
+        % \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "l"}\\\emph{between}\\\emph{"e" and "l"}} (S1B-left);
+        % \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "l" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes d'une séquence répliquée LogootSplit}
+  \label{fig:logootsplit-example}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement un document texte en utilisant LogootSplit.
+Ils partagent initialement le même état : une séquence composée d'un seul bloc associant les identifiants \id{i}{B0}{0..3} aux éléments "HRLO".
+Les noeuds se mettent ensuite à éditer le document.
+
+Le noeud A commence par supprimer l'élément "R" de la séquence.
+LogootSplit génère l'opération \emph{remove} correspondante en utilisant l'identifiant de l'élément supprimé (\id{i}{B0}{1}).
+Cette opération est envoyée au noeud B pour qu'il intègre cette modification.
+
+Le noeud A insère ensuite un élément "E" dans la séquence, entre le "H" et le "L".
+LogootSplit doit alors générer un identifiant $id$ à associer à ce nouvel élément.
+Ce nouvel identifiant $id$ doit respecter la contrainte suivante : \id{i}{B0}{0} $\lid$ $id$ $\lid$ \id{i}{B0}{2}.
+Cependant, LogootSplit ne peut pas générer un identifiant composé d'un seul tuple respectant cet ordre.
+LogootSplit génère alors $id$ en recopiant le premier tuple (\id{i}{B0}{0}) et en y ajoutant un nouveau tuple (\id{f}{A0}{0}).
+LogootSplit génère l'opération \emph{insert} correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
+Cette opération est ensuite diffusée sur le réseau.
+
+En parallèle, le noeud B insère un élément "!" à la fin de la séquence.
+Comme le noeud B est l'auteur du bloc \id{i}{B0}{0..3}, il peut y ajouter de nouveaux éléments.
+LogootSplit associe donc l'identifiant \id{i}{B0}{4} à l'élément "!" et l'ajoute au bloc existant.
+
+Les noeuds se synchronisent ensuite.
+Le noeud A reçoit l'opération \emph{insert} de l'élément "!" à la position \id{i}{B0}{4}.
+Le noeud A détermine que cet élément doit être inséré à la fin de la séquence (puisque \id{i}{B0}{3} $\lid$ \id{i}{B0}{4}) et qu'il peut être ajouté au bloc \id{i}{B0}{2..3} (puisque \id{i}{B0}{3} et \id{i}{B0}{4} sont contigus).
+
+De son côté, le noeud B reçoit tout d'abord l'opération \emph{remove} des éléments identifiés par l'intervalle \id{i}{B0}{1..1}, \ie l'élément attaché à l'identifiant \id{i}{B0}{1}.
+Le noeud B supprime donc l'élément "R" de son état.
+
+Il reçoit ensuite l'opération \emph{insert} de l'élément "E" à la position \id{i}{B0}{0}\id{f}{A0}{0}.
+Le noeud B insère cet élément entre les éléments "H" et "L" (puisque \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} $\lid$ \id{i}{B0}{2}), respectant ainsi l'intention du noeud A.
+
+\mnnote{NOTE: Pourrait définir dans cette sous-section la notion de séquence bien-formée}

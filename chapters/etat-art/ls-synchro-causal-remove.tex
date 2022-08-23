@@ -1,0 +1,79 @@
+\subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+
+Une autre propriété que doit assurer la couche de livraison de messages est que les opérations \emph{remove} doivent être livrées au \ac{CRDT} après les opérations \emph{insert} correspondantes.
+La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrainte.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
+            ++(0:25 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+
+        \path
+            ++(270:4) node {\textbf{B}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
+            ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON};
+
+        \path
+            ++(270:8) node {\textbf{C}}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
+            ++(0:30 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1C-left) {O}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1C-right) {GNON}
+            ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
+            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+
+        \draw[->, thick]
+          (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
+          (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+
+        \draw[dotted]
+          (S1A-right) -- (S2A-left)
+          (S0B) -- (S1B-left)
+          (S0C) -- (S1C-left)
+          (S1C-right) -- (S2C-left);
+
+        \draw[dashed, ->, thick, shorten >= 3]
+          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
+          (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
+          (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
+          (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C-left.west);
+    \end{tikzpicture}
+  }
+  \caption{Non-effet de l'opération \emph{remove} car reçue avant l'opération \emph{insert} correspondante}
+  \label{fig:why-causal-remove}
+\end{figure}
+
+Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Le noeud A commence par insérer un nouvel élément, "I", dans la séquence entre les éléments "O" et "G".
+L'opération \emph{insert} résultante, insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée aux autres noeuds.
+
+À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
+Cependant, le noeud B supprime dans la foulée l'élément nouvellement ajouté.
+Il diffuse ensuite l'opération \emph{remove} générée.
+
+Toutefois, suite à un aléa du réseau, l'opération \emph{remove} supprimant l'élément "I" est livrée au noeud C avant l'opération \emph{insert} l'ajoutant à son état.
+Lorsque le noeud C reçoit l'opération \emph{remove}, il parcourt son état à la recherche de l'élément "I" pour le supprimer.
+Cependant, celui-ci n'est pas présent dans son état courant.
+L'intégration de l'opération s'achève donc sans effectuer de modification.
+
+Le noeud C reçoit ensuite l'opération \emph{insert}.
+Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant (\id{p}{A0}{0} $\lid$ \id{p}{A0}{0}\id{m}{A1}{0} $\lid$ \id{p}{A0}{1}).
+
+Ainsi, l'état du noeud C diverge de celui-ci des autres noeuds à terme, et cela malgré que les noeuds A, B et C aient intégré le même ensemble d'opérations.
+Ce résultat transgresse la propriété de \ac{SEC} que doivent assurer les \acp{CRDT}.
+Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations \emph{remove} par rapport aux opérations \emph{insert} correspondantes.
+
+\mnnote{QUESTION: Même que pour la exactly-once delivery, est-ce que j'explique ici comment assurer cette contrainte plus en détails (Ajout des dots des opérations \emph{insert} en dépendances de l'opération \emph{remove}, vérification que dots présents dans dot store avant de passer l'opération \emph{remove} à la structure de données) ou je garde ça pour le chapitre sur MUTE ?}

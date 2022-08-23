@@ -1,0 +1,34 @@
+\subsection{Synthèse}
+
+\begin{itemize}
+  \item Deux approches différentes pour la résolution de conflits ont été proposées pour \acp{CRDT} pour Séquence.
+    Chacune de ces approches visent à minimiser surcoût du type répliqué, que ce soit d'un point de vue mémoire, computations et réseau.
+  \item Au fil des années, ces approches ont été raffinées avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
+  \item Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
+    Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
+    L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
+    L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
+    L'approche basée sur pierres tombales et l'approche basée sur identifiants densément ordonnés souffrent toutes les deux d'une augmentation théorique de leur surcoût en mémoire et en computations, respectivement dûe au nombre forcément croissant d'éléments stockées dans la Séquence et à la taille croissante\footnote{\cite{2011-evaluation-crdts-ahmed-nacer} montre expérimentalement que les performances de l'approche basée sur identifiants densément ordonnés restent stables tout au long des tâches d'édition collaborative proposées.} des identifiants associés aux éléments de la Séquence.
+
+    \begin{table}[!ht]
+      \centering
+      \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour Séquence}
+      \label{tab:sequence-crdts}
+      % \resizebox{\columnwidth}{!}{
+        \begin{tabular}{lcc}
+          \toprule
+                                                    & Dense ids-based & Tombstoned-based  \\
+          \midrule
+          Performances stables                      & \ballotx        & \ballotx          \\
+          Identifiants de taille fixe               & \ballotx        & \checkmark        \\
+          Eléments réellement supprimés             & \checkmark      & \ballotx          \\
+          Empreinte réseau fixe                     & \ballotx        & \checkmark        \\
+          Peut s'affranchir de la cohérence causale & \checkmark      & \checkmark          \\
+          \bottomrule
+        \end{tabular}
+      % }
+    \end{table}
+
+  \item Pour la suite de ce manuscrit, nous prenons LogootSplit comme base de travail.
+    Nous détaillons donc son fonctionnement dans la section suivante.
+\end{itemize}

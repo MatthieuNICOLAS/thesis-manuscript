@@ -1,0 +1,60 @@
+\subsubsection{Sémantique \acl{CL}}
+
+Une nouvelle sémantique pour l'Ensemble fut proposée \cite{2020-cl-set-weihai} récemment.
+Cette sémantique se base sur les observations suivantes :
+
+\begin{enumerate}[label=(\roman*)]
+  \item $\trm{add}$ et $\trm{rmv}$ d'un élément prennent place à tour de rôle, chaque modification invalidant la précédente.
+  \item $\trm{add}$ (resp. $\trm{rmv}$) concurrents d'un même élément représentent la même intention.
+    Prendre en compte une de ces modifications concurrentes revient à prendre en compte leur ensemble.
+\end{enumerate}
+
+À partir de ces observations, \citeauthor{2020-cl-set-weihai} proposent de déterminer pour chaque élément la chaîne d'ajouts et retraits la plus longue.
+C'est cette chaîne, et précisément son dernier maillon, qui indique si l'élement est présent ou non dans l'ensemble final.
+La \autoref{fig:set-cl} illustre son fonctionnement.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+          +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+          +(0:19) node[point, label=above right:{$\{a\}$}] (a-conflicts) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+          +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+          +(0:19) node[point, label=below right:{$\{a\}$}] (b-conflicts) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+      \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+      \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+    \end{tikzpicture}
+  }
+  \caption{Résolution du conflit en utilisant la sémantique \ac{CL}}
+  \label{fig:set-cl}
+\end{figure}
+
+Dans notre exemple, la modification $\trm{rmv(a)}$ effectuée par B est en concurrence avec une modification identique effectuée par A.
+La sémantique \ac{CL} définit que ces deux modifications partagent la même intention.
+Ainsi, A ayant déjà appliqué sa propre modification préalablement, il ne prend pas en compte \emph{de nouveau} cette modification lorsqu'il la reçoit de B.
+Son état reste donc inchangé.
+
+À l'inverse, la modification $\trm{add(a)}$ effectuée par A fait suite à sa modification $\trm{rmv}(a)$.
+La sémantique \ac{CL} définit alors qu'elle fait suite à toute autre modification $\trm{rmv}(a)$ concurrente.
+Ainsi, B intègre cette modification lorsqu'il la reçoit de A.
+Son état évolue donc pour devenir $\{a\}$.

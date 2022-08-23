@@ -1,0 +1,13 @@
+\subsubsection{Synthèse}
+
+Dans cette section, nous avons mis en lumière l'existence de solutions différentes pour résoudre un même conflit.
+Chacune de ces solutions correspond à une sémantique spécifique de résolution de conflits.
+Ainsi, pour un même type de données, différents \acp{CRDT} peuvent être spécifiés.
+Chacun de ces \acp{CRDT} est spécifié par la combinaison de sémantiques qu'il adopte, chaque sémantique servant à résoudre un des types de conflits du type de données.
+
+Il est à noter qu'aucune sémantique n'est intrinsèquement meilleure et préférable aux autres.
+Il revient aux concepteur-rices d'applications de choisir les \acp{CRDT} adaptés en fonction des besoins et des comportements attendus en cas de conflits.
+
+Par exemple, pour une application collaborative de listes de courses, l'utilisation d'un \ac{MV}-Registre pour représenter le contenu de la liste se justifie : cette sémantique permet d'exposer les modifications concurrentes aux utilisateur-rices.
+Ainsi, les personnes peuvent détecter et résoudre les conflits provoquées par ces éditions concurrentes, \eg l'ajout de l'élément \emph{lait} à la liste, pour cuisiner des crêpes, tandis que les \emph{oeufs} nécessaires à ces mêmes crêpes sont retirés.
+En parallèle, cette même application peut utiliser un \ac{LWW}-Registre pour représenter et indiquer aux utilisateur-rices la date de la dernière modification effectuée.

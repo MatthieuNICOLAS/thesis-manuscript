@@ -1,0 +1,42 @@
+\subsection{Limites}
+
+Comme indiqué précédemment, la taille des identifiants provenant d'un ordre total dense est variable.
+Quand les noeuds insèrent de nouveaux éléments entre deux autres ayant la même valeur de \emph{position}, LogootSplit n'a pas d'autre choix que d'augmenter la taille de l'identifiant résultant.
+La \autoref{fig:example-split} illustre de tels cas.
+Dans cet exemple, puisque le noeud A insère un nouvel élément entre deux identifiants contigus \id{i}{B0}{0} et \id{i}{B0}{1}, LogootSplit ne peut pas générer un identifiant adapté de la même taille.
+Pour respecter l'ordre souhaité, LogootSplit génère un identifiant en ajoutant un nouveau tuple à l'identifiant du prédecesseur : \id{i}{B0}{0}\id{f}{A0}{0}.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{0..2}}] (HLO) {HLO}
+          ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (H) {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] {LO};
+
+      \draw[->, thick] (HLO) -- node[below, align=center]{\emph{insert "E"}\\\emph{between}\\\emph{"H" and "L"}} (H);
+  \end{tikzpicture}
+  \caption{Insertion menant à une augmentation de la taille des identifiants}
+  \label{fig:example-split}
+\end{figure}
+
+Par conséquent, la taille des identifiants a tendance à croître alors que le système progresse.
+Cette croissance impacte négativement les performances de la structure de données sur plusieurs aspects.
+Puisque les identifiants attachés aux éléments deviennent plus long, le surcoût en métadonnées augmente.
+Ceci augmente aussi la consommation en bande-passante puisque les noeuds doivent diffuser les identifiants aux autres.
+
+\mnnote{TODO: Ajouter une phrase pour expliquer que la croissance des identifiants impacte aussi le temps d'intégration des modifications}
+
+De plus, le nombre de blocs composant la séquence répliquée augmente au fil du temps.
+En effet, plusieurs contraintes sur la génération d'identifiants empêchent les noeuds d'ajouter des nouveaux éléments aux blocs existants.
+Par exemple, seul le noeud qui a généré un bloc peut ajouter un élément à ce dernier.
+Ces limitations provoquent la génération de nouveau blocs.
+La séquence se retrouve finalement fragmentée en de nombreux blocs de seulement quelques caractères chacun.
+Cependant, aucun mécanisme pour fusionner les blocs à posteriori n'est fourni.
+L'efficacité de la structure décroît donc puisque chaque bloc entraîne un surcoût.
+
+Comme illustré plus loin, nous avons mesuré au cours de nos évaluations que le contenu représente à terme moins de 1\% de taille de la structure de données.
+Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée.
+Il est donc nécessaire de proposer des mécanismes et techniques afin de mitiger les problèmes soulignés précédemments.

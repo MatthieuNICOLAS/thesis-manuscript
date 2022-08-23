@@ -1,0 +1,61 @@
+\subsubsection{Sémantique \acl{LWW}}
+
+Une manière simple pour résoudre un conflit consiste à trancher de manière arbitraire et de sélectionner une modification parmi l'ensemble des modifications en conflit.
+Pour faire cela de manière déterministe, une approche est de reproduire et d'utiliser l'ordre total sur les modifications qui serait instauré par une horloge globale pour choisir la modification à prioritiser.
+
+Cette approche, présentée dans \cite{johnson1975rfc0677}, correspond à la sémantique nommée \acf{LWW}.
+De par son fonctionnement, cette sémantique est générique et est donc utilisée par une variété de \acp{CRDT} pour des types différents.
+La \autoref{fig:set-lww} illustre son application à l'Ensemble pour résoudre le conflit de la \autoref{fig:set-conflict}.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:21) node (a-end) {}
+          +(0:2) node[point, label=above right:{$\{a\}$}] (a-initial) {}
+          +(0:7) node[point, label=above right:{$\{\}$}, label=below left:{$\trm{rmv}(a)$}] (a-removes) {}
+          +(0:12) node[point, label=above right:{$\{a\}$}, label=below left:{$\trm{add}(a)$}] (a-add) {}
+          +(0:19) node[point, label=above right:{$\{\}$}] (a-conflicts) {};
+
+      \draw[dotted] (a) -- (a-initial) (a-conflicts) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-removes) -- (a-add) -- (a-conflicts);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:21) node (b-end) {}
+          +(0:2) node[point, label=below right:{$\{a\}$}] (b-initial) {}
+          +(0:15.5) node[point, label=below right:{$\{\}$}, label=above left:{$\trm{rmv}(a)$}] (b-removes) {}
+          +(0:19) node[point, label=below right:{$\{\}$}] (b-conflicts) {};
+
+      \draw[dotted] (b) -- (b-initial) (b-conflicts) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-removes) -- (b-conflicts);
+
+      \draw[->, dashed, shorten >= 1] (a-add) edge node[above right, near start] {\emph{sync}} (b-conflicts);
+      \draw[->, dashed, shorten >= 1] (b-removes) edge node[below right, near start, xshift=-10pt, yshift=-7pt] {\emph{sync}} (a-conflicts);
+    \end{tikzpicture}
+  }
+  \caption{Résolution du conflit en utilisant la sémantique \ac{LWW}}
+  \label{fig:set-lww}
+\end{figure}
+
+Comme indiqué précédemment, le scénario illustré dans la \autoref{fig:set-lww} présente un conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{rmv}(a)$ générées de manière concurrente respectivement par les noeuds A et B.
+Pour le résoudre, la sémantique \ac{LWW} associe à chaque modification une estampille.
+L'ordre créé entre les modifications par ces dernières permet de déterminer quelle modification désigner comme prioritaire.
+Ici, nous considérons que $\trm{add}(a)$ a eu lieu plus tôt que $\trm{rmv}(a)$.
+La sémantique \ac{LWW} désigne donc $\trm{rmv}(a)$ comme prioritaire et ignore $\trm{add}(a)$.
+L'état obtenu à l'issue de cet exemple par chaque noeud est donc $\{\}$.
+
+Il est à noter que si la modification $\trm{rmv}(a)$ du noeud B avait eu lieu plus tôt dans notre exemple, l'état final obtenu aurait été $\{a\}$.
+Ainsi, des exécutions reproduisant le même ensemble de modifications produiront des résultats différents en fonction de l'ordre créé par les estampilles associées à chaque modification.
+Ces estampilles étant des métadonnées du mécanisme de résolution de conflits, elles sont dissimulées aux utilisateur-rices.
+Le comportement de cette sémantique peut donc être perçu comme aléatoire et s'avérer perturbant pour les utilisateur-rices.
+
+La sémantique \ac{LWW} repose sur l'horloge de chaque noeud pour attribuer une estampille à chacune de leurs modifications.
+Les horloges physiques étant sujettes à des imprécisions et notamment des décalages, utiliser les estampilles qu'elles fournissent peut provoquer des anomalies vis-à-vis de la relation \hb.
+Les systèmes distribués préfèrent donc généralement utiliser des horloges logiques \cite{1978-happen-before-lamport}.
+\mnnote{TODO: Ajouter refs des horloges logiques plus intelligentes (Interval Tree Clock, Hybrid Clock...)}

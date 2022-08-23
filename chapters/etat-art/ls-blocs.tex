@@ -1,0 +1,73 @@
+\subsection{Aggrégation dynamique d'élements en blocs}
+
+\label{sec:blocs}
+
+Au lieu de stocker les identifiants de chaque élément de la séquence, LogootSplit propose d'aggréger de façon dynamique les éléments dans des blocs.
+Pour cela, LogootSplit introduit la notion d'intervalle d'identifiants :
+
+\begin{definition}[IdInterval]
+  Un \emph{IdInterval} est un couple $\langle$idBegin, offsetEnd$\rangle$ où
+  \begin{itemize}
+    \item idBegin est l'identifiant du premier élément de l'interval.
+    \item offsetEnd est l'offset du dernier identifiant de l'interval.
+  \end{itemize}
+\end{definition}
+
+Les intervalles d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant réellement que l'identifiant de son premier élément et le dernier offset de son dernier élément.
+
+LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un interval.
+Nous appelons \emph{contigus} deux identifiants qui partagent une même base (\ie qui sont identiques à l'exception de leur dernier offset) et dont les \emph{offsets} sont consécutifs.
+Nous représentons un intervalle d'identifiants à l'aide du formalisme suivant : \id{position}{nodeId~nodeSeq}{begin..end} où $\trm{begin}$ est l'offset du premier identifiant de l'intervalle et $\trm{end}$ du dernier.
+
+Les blocs permettent d'associer un intervalle d'identifiants aux éléments correspondant.
+Les blocs sont définis de la manière suivante :
+
+\begin{definition}[Bloc]
+  Un \emph{Bloc} est un quadruplet $\langle$idInterval, elts, isAppendable, isPrependable$\rangle$ où
+  \begin{itemize}
+    \item idInterval est l'intervalle d'identifiants formant le bloc
+    \item elts sont les éléments contenus dans le bloc
+    \item isAppendable (resp. isPrependable) est un booléen indiquant si l'auteur du bloc peut ajouter un nouvel élément en fin (resp. début) de bloc
+  \end{itemize}
+\end{definition}
+
+La \autoref{fig:logootsplit-seq} présente un exemple de séquence LogootSplit : dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants \id{i}{B0}{0}, \id{i}{B0}{1}, \id{i}{B0}{2} forment une chaîne d'identifiants contigus.
+LogootSplit est donc capable de regrouper ces éléments en un bloc représentant l'intervalle d'identifiants \id{i}{B0}{0..2} pour minimiser les métadonnées stockées, comme montré dans la \autoref{fig:logootsplit-seq-as-block}.
+
+\begin{figure}[!ht]
+  \centering
+  \subfloat[Éléments avec leur identifiant correspondant]{
+      \begin{minipage}{.48\linewidth}
+      \centering
+          \begin{tikzpicture}
+              \path
+                  node[letter, label=below:{\id{i}{B0}{0}}] {H}
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{1}}] {L}
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{2}}] {O};
+          \end{tikzpicture}
+          \label{fig:logootsplit-seq-as-letters}
+      \end{minipage}}
+  \hfil
+  \subfloat[Éléments regroupés en un bloc]{
+      \begin{minipage}{.48\linewidth}
+      \centering
+          \begin{tikzpicture}
+              \path
+                  node[block, label=below:{\id{i}{B0}{0..2}}] {HLO};
+          \end{tikzpicture}
+          \label{fig:logootsplit-seq-as-block}
+      \end{minipage}}
+  \caption{Représentation d'une séquence LogootSplit contenant les éléments "HLO"}
+  \label{fig:logootsplit-seq}
+\end{figure}
+
+Cette fonctionnalité réduit le nombre d'identifiants stockés au sein de la structure de données, puisque les identifiants sont conservés à l'échelle des blocs plutôt qu'à l'échelle de chaque élément.
+Ceci permet de réduire de manière significative le surcoût en métadonnées de la structure de données.
+L'utilisation de blocs améliore aussi les performances de la structure de données.
+En effet, l'utilisation de blocs permet de parcourir plus efficacement la structure de données.
+Les blocs permettent aussi d'effectuer des modifications à l'échelle de la chaîne de caractères et non plus seulement caractère par caractère.
+
+\mnnote{TODO: indiquer que le couple $\langle$nodeId, nodeSeq$\rangle$ permet d'identifier de manière unique la base d'un bloc ou d'un identifiant}
+
+Notons que pour une séquence donnée, nous pouvons identifier chacun de ses identifiants par le triplet $\langle$nodeId, nodeSeq, offset$\rangle$ issue de leur dernier Tuple.
+Par exemple, le triplet $\langle$B, 0, 2$\rangle$ désigne de manière unique l'identifiant \id{i}{B0}{2} dans \autoref{fig:logootsplit-seq}.
