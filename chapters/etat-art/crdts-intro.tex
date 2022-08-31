@@ -1,9 +1,9 @@
 Pour limiter la coordination entre les noeuds, les systèmes distribués adoptent le paradigme de la réplication optimiste.
 Ce paradigme consiste à ce que chaque noeud possède une copie de la donnée.
 Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
-Noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
+Les noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
 Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
-Ce paradigme offre ainsi aux noeuds une haute disponibilité \mnnote{TODO: insérer ref sticky model} ainsi qu'une faible latence.
+Ce paradigme offre ainsi aux noeuds une haute disponibilité \cite{2016-trade-offs-replicated-systems-guerraoui} ainsi qu'une faible latence.
 
 Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \hb \cite{1978-happen-before-lamport}.
 Nous l'adaptons ci-dessous à notre contexte :
@@ -79,18 +79,25 @@ Ainsi, les états $\{a\}$ et $\{\}$ semblent tous les deux corrects et légitime
 Il est néanmoins primordial que les noeuds choisissent et convergent vers un même état pour leur permettre de poursuivre leur collaboration.
 Pour ce faire, il est nécessaire de mettre en place un mécanisme de résolution de conflits, potentiellement automatique.
 
-Les \acp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 2018-crdts-overview-preguica} répondent à ce besoin.
-Les \acp{CRDT} sont de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
-Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
-Ainsi, elles offrent les deux propriétés suivantes :
+Les \acfp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 2018-crdts-overview-preguica} répondent à ce besoin.
 
-\begin{enumerate}[label=(\roman*)]
-  \item Les \acp{CRDT} peuvent être modifiés sans coordination avec les autres noeuds.
-  \item Tous les noeuds ayant observés le même ensemble de modifications obtiendront des états équivalents.
-    Cette propriété est connue sous le nom de \emph{convergence forte} \mnnote{TODO: Ajouter ref}.
-\end{enumerate}
+\begin{definition}[\acl{CRDT}]
+  Les \acp{CRDT} sont de nouvelles spécifications des types de données existants, \eg l'Ensemble ou la Séquence.
+  Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
+  Ainsi, elles offrent les deux propriétés suivantes :
 
-Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis :
+  \begin{enumerate}[label=(\roman*)]
+    \item Les \acp{CRDT} peuvent être modifiés sans coordination avec les autres noeuds.
+    \item Les \acp{CRDT} garantissent la \emph{convergence forte}\cite{shapiro_2011_crdt}.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Convergence forte]
+  La convergence forte est une propriété de sécurité indiquant que l'ensemble des noeuds d'un système ayant observés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
+  \footnotetext{Nous considérons comme équivalents deux états pour lesquels chaque observateur du type de données renvoie un même résultat.}
+\end{definition}
+
+Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis \cite{2002-intro-lattices-order-davey} :
 
 \begin{enumerate}[label=(\roman*)]
   \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
@@ -99,8 +106,9 @@ Pour offrir la propriété de \emph{convergence forte}, la spécification des \a
   On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
 \end{enumerate}
 
-Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique et interface que les types non-répliqués correspondant du point de vue des utilisateurs.
-Ainsi, les \acp{CRDT} partagent le comportement des types non-répliqués dans le cadre d'exécutions séquentielles.
+Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique, \ie le même comportement, et la même interface que les types séquentiels\footnotemark correspondant du point de vue des utilisateurs.
+\footnotetext{Nous dénotons comme \emph{types séquentiels} les spécifications précédentes des types de données supposant une exécution séquentielle de leurs modifications.}
+Ainsi, les \acp{CRDT} partagent le comportement des types séquentiels dans le cadre d'exécutions séquentielles.
 Cependant, ils définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
 
 Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.

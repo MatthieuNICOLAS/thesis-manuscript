@@ -4,10 +4,10 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \centering
   \caption{Récapitulatif comparatif des différents modèles de synchronisation pour \acp{CRDT}}
   \label{tab:synchronisation-models}
-  % \resizebox{\columnwidth}{!}{
+  \resizebox{\columnwidth}{!}{
     \begin{tabular}{lccc}
       \toprule
-                                                & State-based & Op-based    & Delta-based \\
+                                                & Synchro. par états & Synchro. par opérations    & Synchro. par diff. d'états \\
       \midrule
       États forment sup-demi-treillis           & \checkmark  & \checkmark  & \checkmark  \\
       Intègre modifications par fusion d'états  & \checkmark  & \ballotx    & \checkmark  \\
@@ -17,5 +17,5 @@ Nous récapitulons les principales propriétés et différences des modèles de 
       Adapté pour systèmes temps réel           & \ballotx    & \checkmark  & \checkmark  \\
       \bottomrule
     \end{tabular}
-  % }
+  }
 \end{table}

@@ -65,7 +65,7 @@ Le noeud A (resp. B) diffuse alors son état $\set{a,b,c,e}$ (resp. $\set{a,d,e}
 Dans le cadre de l'Ensemble répliqué, cette fonction consiste généralement à faire l'union des états, en prenant en compte l'estampille et le statut (présent ou non) associé à chaque élément.
 Ainsi la fusion de leur état respectif, $\set{a,b,c,e} \cup \set{a,d,e}$, permet aux noeuds de converger à l'état souhaité : $\set{a,b,c,d,e}$.
 
-Avant de conclure, il est intéressant de noter que ce modèle de synchronisation propose par nature une diffusion des modifications suivant le modèle de cohérence causale \mnnote{TODO: Ajouter ref}.
+Avant de conclure, il est intéressant de noter que ce modèle de synchronisation propose par nature une diffusion des modifications suivant le modèle de cohérence causale \cite{2011-consistency-availability-convergence-mahajan}.
 En effet, ce modèle de synchronisation assure une livraison soit de toutes les modifications connues d'un noeud, soit d'aucune.
 Par exemple, dans la \autoref{fig:sync-model-state}, le noeud B ne peut pas recevoir et intégrer l'élément $c$ sans l'élement $b$.
 Ainsi, ce modèle permet naturellement d'éviter ce qui pourrait être interprétées comme des anomalies par les utilisateur-rices.
