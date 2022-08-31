@@ -1,7 +1,3 @@
-\subsection{Approche à pierres tombales}
-
-\subsubsection{WOOT}
-
 \begin{itemize}
   \item WOOT \cite{2006-woot-oster} fait suite aux travaux présentés dans \cite{2006-tombstone-transformation-functions-oster}.
     Il est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour Séquence\footnote{\cite{2007-crdt-shapiro} n'ayant formalisé les \acp{CRDT} qu'en 2007.}.
@@ -138,9 +134,9 @@
   \item \mnnote{TODO: Mentionner que WOOT ne propose pas de mécanisme pour purger les tombstones, par choix : souhaite mettre en place des fonctionnalités d'undo.}
   \item Des améliorations de WOOT furent par la suite proposées : WOOTO \cite{2007-wooto-weiss} et WOOTH \cite{2011-evaluation-crdts-ahmed-nacer}.
     \mnnote{TODO: Ajouter limite de WOOT : complexité en temps de l'algorithme d'intégration des insertions distantes trop importante}
-    Dans \cite{2007-wooto-weiss}, \citeauthor{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
+   \textcite{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
     Cette modification permet un algorithme d'intégration des opérations $\trm{ins}$ plus efficace.
-    Dans \cite{2011-evaluation-crdts-ahmed-nacer}, \citeauthor{2011-evaluation-crdts-ahmed-nacer} se basent sur WOOTO et proposent l'utilisation de structures de données améliorant la complexité des algorithmes d'intégration des opérations, au détriment des métadonnées stockées localement par chaque noeud.
+    \textcite{2011-evaluation-crdts-ahmed-nacer} se basent sur WOOTO et proposent l'utilisation de structures de données améliorant la complexité des algorithmes d'intégration des opérations, au détriment des métadonnées stockées localement par chaque noeud.
   \item Néanmoins, l'évaluation expérimentale des différentes approches pour l'édition collaborative \ac{P2P} en temps réel menée dans \cite{2011-evaluation-crdts-ahmed-nacer} a montré que les \acp{CRDT} de la famille WOOT n'étaient pas assez efficaces.
     Dans le cadre de cette expérience, des utilisateur-rices effectuaient des tâches d'édition collaborative données.
     Les traces de ces sessions d'édition collaboratives furent ensuite rejouées en utilisant divers mécanismes de résolution de conflits, dont WOOT, WOOTO et WOOTH.

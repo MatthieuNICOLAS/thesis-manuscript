@@ -1,5 +1,3 @@
-\subsubsection{Synchronisation par états}
-
 L'approche de la synchronisation par états propose que les noeuds diffusent leurs modifications en transmettant leur état.
 Les \acp{CRDT} adoptant cette approche doivent définir une fonction \texttt{merge}.
 Cette fonction correspond à la fonction de fusion mentionnée précédemment en \ref{item:lub} : elle prend en paramètres une paire d'états et génère en retour l'état correspondant à leur \ac{LUB}.

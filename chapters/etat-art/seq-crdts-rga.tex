@@ -1,5 +1,3 @@
-\subsubsection{\acl{RGA}}
-
 \begin{itemize}
   \item \acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} appartenant à l'approche à pierres tombales.
     Spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de Replicated Abstract Data Types (RADTs).
@@ -122,7 +120,7 @@
       \label{fig:rga}
     \end{figure}
     \mnnote{TODO: Trouver exemple et le présenter.}
-  \item À la différence des auteurs de WOOT, \citeauthor{ROH2011354} jugent le coût des tombstones trop élévé.
+  \item À la différence des auteurs de WOOT, \textcite{ROH2011354} jugent le coût des tombstones trop élévé.
     Ils proposent alors un mécanisme de \ac{GC} des tombstones.
     Ce mécanisme repose sur deux conditions :
     \begin{enumerate}[label=(\roman*)]
@@ -135,7 +133,7 @@
     \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
     Ce point est néanmoins laissé comme piste de recherche future.
     À notre connaissance, celle-ci n'a pas été explorée dans la littérature.
-    Dans \cite{2021-these-vic}, \citeauthor{2021-these-vic} indique que \ac{RGA} pourrait adopter le même modèle de livraison que WOOT.
+    Néanmoins \textcite{2021-these-vic} indique que \ac{RGA} pourrait adopter le même modèle de livraison que WOOT.
     Pour rappel, celui-ci consiste en :
     \begin{enumerate}[label=(\roman*)]
       \item L'opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
@@ -148,14 +146,14 @@
       Implémenté dans Yjs et Automerge.
     }
   \item Plusieurs extensions de \ac{RGA} furent proposées par la suite.
-    Dans \cite{briot:hal-01343941}, \citeauthor{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
+   \textcite{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
     Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un feedback immédiat de la part de l'application.
     Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
     Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
     Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
-    \citeauthor{briot:hal-01343941} combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
+    \textcite{briot:hal-01343941} combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
     Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
-  \item Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, \citeauthor{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
+  \item \textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
     Lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
     Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
     \begin{figure}[!ht]
@@ -297,7 +295,7 @@
     \mnnote{TODO: Insérer et présenter exemple}
     Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
     Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{10.1145/2933057.2933090, ATTIYA2021141}, cette nouvelle spécification ajoute comme propriété que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
-    \citeauthor{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
+    \textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
     Pour cela, les auteurs ajoutent à l'opération $\trm{ins}$ un paramètre, $\trm{samePredId}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
     En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{ins}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
     Cependant, les auteurs ne prouvent pas dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} que cette extension empêche tout entrelacement\footnote{Un travail en cours \cite{2022-no-doubly-non-interleaving-crdts-weidner} indique en effet qu'une séquence répliquée empêchant tout entrelacement est impossible.}.
