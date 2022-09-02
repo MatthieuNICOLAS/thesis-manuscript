@@ -39,6 +39,7 @@
 \usepackage{amsmath}
 \interdisplaylinepenalty=2500
 \newtheorem{definition}{Définition}
+\newtheorem{subdefinition}{Définition}[definition]
 \newtheorem{myrule}{Règle}
 \newtheorem{property}{Propriété}
 \newtheorem{subproperty}{Propriété}[property]
@@ -183,6 +184,7 @@
 \acrodefplural{ADT}[ADTs]{Abstract Data Types}
 \acrodef{API}[API]{Application Programming Interface}
 \acrodef{AW}[AW]{\emph{Add-Wins}}
+\acrodef{CCI}[CCI]{Convergence, Causality preservation, Intention preservation}
 \acrodef{CL}[CL]{\emph{Causal-Length}}
 \acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
 \acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
@@ -201,6 +203,8 @@
 \acrodef{RGA}[RGA]{Replicated Growable Array}
 \acrodef{RW}[RW]{\emph{Remove-Wins}}
 \acrodef{SEC}[SEC]{Cohérence forte à terme}
+\acrodef{TTF}[TTF]{Tombstone Transformation Function}
+\acrodefplural{TTF}[TTF]{Tombstone Transformation Functions}
 \acrodef{WebRTC}[WebRTC]{Web Real-Time Communication}
 
 %-------------------------------------------------------------------
@@ -727,6 +731,9 @@ qui fut la première de toutes.
 \end{itemize}
 
 \mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
+
+\subsection{Synthèse}
+\input{chapters/etat-art/seq-crdts-synthese.tex}
 
 \section{LogootSplit}
 \input{chapters/etat-art/ls-intro}

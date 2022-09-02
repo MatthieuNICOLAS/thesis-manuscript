@@ -69,7 +69,7 @@ Plusieurs mécanismes de ce type ont été proposés dans la littérature \cite{
 
 Nous illustrons le modèle de synchronisation par opérations à l'aide de la \autoref{fig:sync-model-op}.
 Dans ce nouvel exemple, les noeuds diffusent les modifications qu'ils effectuent sous la forme d'opérations.
-Nous considèrons que le \ac{CRDT} utilisé est un \ac{CRDT} pur synchronisé par opérations, \ie que les modifications et opérations sont confondues.
+Nous considèrons que le \ac{CRDT} utilisé est un \ac{CRDT} pur synchronisé par opérations, \ie que les modifications et opérations sont confondues, et qu'il autorise une livraison dans le désordre des opérations $\trm{add}$.
 
 \begin{figure}[!ht]
 
@@ -126,7 +126,7 @@ Il obtient alors l'état $\set{a,b,c,d,e}$.
 
 De son côté, le noeud B ne reçoit initialement pas l'opération $\trm{add}(b)$ suite à une défaillance réseau.
 Il génère et diffuse $\trm{add}(d)$ puis reçoit l'opération $\trm{add}(c)$.
-Nous considérons que la livraisons des opérations $\trm{add}$ n'est pas obligatoire dans cet exemple, cette opération est alors intégrée.
+Comme indiqué précédemment, nous considérons que la livraison causale des opérations $\trm{add}$ n'est pas obligatoire dans cet exemple, cette opération est alors intégrée sans attendre.
 Le noeud B obtient alors l'état $\set{a,c,d,e}$.
 
 Ensuite, le mécanisme d'anti-entropie du noeud B se déclenche.

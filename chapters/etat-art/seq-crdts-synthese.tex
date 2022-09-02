@@ -1,5 +1,3 @@
-\subsection{Synthèse}
-
 \begin{itemize}
   \item Deux approches différentes pour la résolution de conflits ont été proposées pour \acp{CRDT} pour Séquence.
     Chacune de ces approches visent à minimiser surcoût du type répliqué, que ce soit d'un point de vue mémoire, computations et réseau.
@@ -17,13 +15,13 @@
       % \resizebox{\columnwidth}{!}{
         \begin{tabular}{lcc}
           \toprule
-                                                    & Dense ids-based & Tombstoned-based  \\
+                                                    & Pierres tombales  & Identifiants denséments ordonnés  \\
           \midrule
-          Performances stables                      & \ballotx        & \ballotx          \\
-          Identifiants de taille fixe               & \ballotx        & \checkmark        \\
-          Eléments réellement supprimés             & \checkmark      & \ballotx          \\
-          Empreinte réseau fixe                     & \ballotx        & \checkmark        \\
-          Peut s'affranchir de la cohérence causale & \checkmark      & \checkmark          \\
+          Performances stables en fct. de la taille de la séq.  & \ballotx            & \ballotx          \\
+          Identifiants de taille fixe               & \checkmark          & \ballotx        \\
+          Eléments réellement supprimés             & \ballotx            & \checkmark          \\
+          Taille des messages fixe                  & \checkmark          & \ballotx        \\
+          Peut s'affranchir de la cohérence causale & \checkmark          & \checkmark          \\
           \bottomrule
         \end{tabular}
       % }

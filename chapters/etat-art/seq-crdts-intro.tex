@@ -1,11 +1,236 @@
+La \emph{Séquence}, aussi appelée \emph{Liste}, est un type abstrait de données représentant une collection ordonnée et de taille dynamique d'éléments.
+Dans une séquence, un même élément peut apparaître à de multiples reprises.
+Chacune des occurrences de cet élément est alors considérée comme distincte.
+
+Dans le cadre de ce manuscrit, nous travaillons sur des séquences de caractères.
+Cette restriction du domaine se fait sans perte en généralité.
+Nous illustrons par la \autoref{fig:seq} notre représentation des séquences.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{0.2\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+        node[letter, label={below:0}] {H}
+        ++(0:\widthletter) node[letter, label={below:1}] {E}
+        ++(0:\widthletter) node[letter, label={below:2}] {L}
+        ++(0:\widthletter) node[letter, label={below:3}] {L}
+        ++(0:\widthletter) node[letter, label={below:4}] {O};
+    \end{tikzpicture}
+  }
+  \caption{Représentation de la séquence "HELLO"}
+  \label{fig:seq}
+\end{figure}
+
+Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique du type Séquence que nous utilisons.
+
+\begin{figure}[!ht]
+
+  \centering
+  % \resizebox{0.35\columnwidth}{!}{
+    \begin{tabular}{llll}
+      $S \in \trm{Seq}\langle V \rangle$ & & & \\
+      \\
+      $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
+      \\
+      $\trm{ins}$ & : & $S \times N \times V$ & $\longrightarrow S$   \\
+      $\trm{rmv}$ & : & $S \times N$          & $\longrightarrow S$   \\
+      \\
+      $\trm{len}$ & : & $S$                   & $\longrightarrow N$   \\
+      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle V \rangle$ \\
+    \end{tabular}
+  % }
+  \caption{Spécification algébrique du type abstrait usuel Séquence}
+  \label{fig:spec-seq}
+\end{figure}
+
+Celle-ci définit deux modifications :
 \begin{itemize}
-  \item Présentation du type Sequence et de son utilisation
-  \item Spécification du type : données, modifications
-    \mnnote{TODO: Préciser qu'on va généralement parler des modifications d'un élément, mais qu'est facilement étendable pour supporter des modifications de plusieurs éléments.}
-  \item Présentation de conflits
-  \begin{itemize}
-    \item dOpt puzzle
-  \end{itemize}
-  \item Introduction des principales approches pour Sequence \acp{CRDT}.
-    Préciser que, sauf mention contraire, ces \acp{CRDT} adoptent le modèle de synchronisation par opérations en raison de la taille non-bornée de l'état.
+  \item $\trm{ins}$, qui permet d'insérer un élément donné $v$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+    Cette modification renvoie une nouvelle séquence construite de la manière suivante :
+    \begin{multline*}
+      \forall s \in S, v \in V, i \in [0,m]~|~m = \trm{len}(s) - 1,
+      s = \langle v_0, ..., v_{i-1}, v_{i}, ..., v_m \rangle~\cdot \\
+      \trm{ins}(s,i,v) = \langle v_0, ..., v_{i-1}, v, v_{i}, ..., v_m  \rangle
+    \end{multline*}
+  \item $\trm{rmv}$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
+    Cette modification renvoie une nouvelle séquence construite de la manière suivante :
+    \begin{multline*}
+      \forall s \in S, v \in V, i \in [0,m]~|~m = \trm{len}(s) - 1,
+      s = \langle v_0, ..., v_{i-1}, v_{i}, v{i+1}, ..., v_m \rangle~\cdot \\
+      \trm{rmv}(s,i) = \langle v_0, ..., v_{i-1}, v_{i+1}, ..., v_m  \rangle
+    \end{multline*}
 \end{itemize}
+Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
+Cette simplification du type se fait cependant sans perte de généralité, la spécification pouvant être étendue pour insérer successivement plusieurs éléments à partir d'un index donné ou retirer plusieurs éléments consécutifs.
+
+Cette spécification du type Séquence est une spécification séquentielle.
+Les modifications sont définies pour être effectuées l'une après l'autre.
+Si plusieurs noeuds répliquent une même séquence et la modifient en concurrence, l'intégration de leurs opérations respectives dans des ordres différents résulte en des états différents.
+Nous illustrons ce point avec la \autoref{fig:seq-conflit}.
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+
+      \newcommand\initialstate[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[letter, label={#3:0}] {W}
+          ++(0:\widthletter) node[letter, label={#3:1}] {R}
+          ++(0:\widthletter) node[letter, label={#3:2}] {D}
+      }
+
+      \newcommand\inso[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[letter, label={#3:0}] {W}
+          ++(0:\widthletter) node[letter, label={#3:1}] {O}
+          ++(0:\widthletter) node[letter, label={#3:2}] {R}
+          ++(0:\widthletter) node[letter, label={#3:3}] {D}
+      }
+
+      \newcommand\insl[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[letter, label={#3:0}] {W}
+          ++(0:\widthletter) node[letter, label={#3:1}] {R}
+          ++(0:\widthletter) node[letter, label={#3:2}] {L}
+          ++(0:\widthletter) node[letter, label={#3:3}] {D}
+      }
+
+      \newcommand\finalstatea[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[letter, label={#3:0}] {W}
+          ++(0:\widthletter) node[letter, label={#3:1}] {O}
+          ++(0:\widthletter) node[letter, label={#3:2}] {L}
+          ++(0:\widthletter) node[letter, label={#3:3}] {R}
+          ++(0:\widthletter) node[letter, label={#3:4}] {D}
+      }
+
+      \newcommand\finalstateb[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[letter, label={#3:0}] {W}
+          ++(0:\widthletter) node[letter, label={#3:1}] {O}
+          ++(0:\widthletter) node[letter, label={#3:2}] {R}
+          ++(0:\widthletter) node[letter, label={#3:3}] {L}
+          ++(0:\widthletter) node[letter, label={#3:4}] {D}
+      }
+
+      \newcommand\offseta{ (90:0.7) }
+      \newcommand\offsetb{ (270:0.7) }
+
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:30) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(1, O)$}] (a-ins-o) {}
+          +(0:20) node[point] (a-recv-ins-l) {}
+          +(0:28) node (a-final) {};
+
+      \initialstate{(a-initial)}{\offseta}{90};
+      \inso{(a-ins-o)}{\offseta}{90};
+      \finalstatea{(a-recv-ins-l)}{\offseta}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-o) --  (a-recv-ins-l) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:30) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:12) node[point, label=170:{$\trm{ins}(2, L)$}] (b-ins-l) {}
+          +(0:20) node[point] (b-recv-ins-o) {}
+          +(0:28) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb}{-90};
+      \insl{(b-ins-l)}{\offsetb}{-90};
+      \finalstateb{(b-recv-ins-o)}{\offsetb}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-ins-l) -- (b-recv-ins-o) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ins-o) -- (b-recv-ins-o);
+      \draw[->, dashed, shorten >= 1] (b-ins-l) -- (a-recv-ins-l);
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes d'une séquence}
+  \label{fig:seq-conflit}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une même séquence.
+Celle-ci correspond initialement à la chaîne de caractères "WRD".
+Le noeud A insère le caractère "O" à l'index 1, obtenant ainsi la séquence "WORD".
+En concurrence, le noeud B insère lui le caractère "L" à l'index 2 pour obtenir "WRLD".
+
+Les deux noeuds diffusent ensuite leur opération respective puis intègre celle de leur pair.
+Nous constatons alors une divergence.
+En effet, l'intégration de la modification $\trm{ins}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD.
+
+Cette divergence est dûe à la non-commutativité de la modification $\trm{ins}$ avec elle-même.
+En effet, celle-ci se base sur un index pour déterminer où placer le nouvel élément.
+Cependant, les index sont eux-mêmes modifiés par $\trm{ins}$.
+Ainsi, l'intégration dans des ordres différents de modifications $\trm{ins}$ sur un même état initial résulte en des états différents.
+Plus généralement, nous observons que chaque paire possible de modifications du type Séquence, \ie $\langle \trm{ins},\trm{ins} \rangle$, $\langle \trm{ins},\trm{del} \rangle$ et $\langle \trm{del},\trm{del} \rangle$, n'est pas commutative.
+
+La non-commutativité des modifications du type Séquence fut l'objet de nombreux travaux de recherche dans le domaine de l'édition collaborative.
+Pour résoudre ce problème, l'approche \ac{OT} \cite{1989-grove-ellis-gibbs, 1998-ot-issues-algorithms-achievements-sun} fut initialement proposée.
+Cette approche propose de transformer une modification par rapport aux modifications concurrentes intégrées pour tenir compte de leur effet.
+Elle se décompose en deux parties :
+\begin{itemize}
+  \item Un algorithme de contrôle \cite{1996-adopted-ressel-nitsch-ruhland-gunzenhauser, 1996-reduce-sun-yang-zhang-chen, 2009-cot-sun}, qui définit par rapport à quelles modifications une nouvelle modification distante doit être transformée avant d'être intégrée à la copie.
+  \item Des fonctions de transformations \mnnote{TODO: Ajouter refs}, qui définissent comment une modification doit être transformée par rapport à une autre modification pour tenir compte de son effet.
+\end{itemize}
+
+Cependant, bien que de nombreuses fonctions de transformations pour le type Séquence ont été proposées, seule la correction des \acfp{TTF} \cite{2006-tombstone-transformation-functions-oster} a été éprouvée à notre connaissance.
+\mnnote{TODO: Vérifier que c'est pas plutôt les seules fonctions de transformations qui sont correctes et compatibles avec un système P2P.}
+De plus, les algorithmes de contrôle compatibles reposent sur une livraison causale des modifications, et donc l'utilisation de vecteurs d'horloges.
+Cette approche est donc inadaptée aux systèmes \ac{P2P} dynamiques.
+
+Néanmoins, une contribution importante de l'approche \ac{OT} fut la définition d'un modèle de cohérence que doivent respecter les systèmes d'édition collaboratif : le modèle \ac{CCI} \cite{1998-cci-sun}.
+
+\begin{definition}[Modèle \ac{CCI}]
+  Le modèle de cohérence \ac{CCI} définit qu'un système d'édition collaboratif doit respecter les critères suivants :
+  \begin{subdefinition}[Convergence]
+    Le critère de \emph{Convergence} indique que des noeuds ayant intégrés le même ensemble de modifications convergent à un état équivalent.
+  \end{subdefinition}
+  \begin{subdefinition}[Causality preservation]
+    \label{def:causality}
+    Le critère de \emph{Causality preservation} indique que si une modification $m_1$ précède une autre modification $m_2$ d'après la relation \emph{happens-before}, \ie $m_1 \rightarrow m_2$, $m_1$ doit être intégrée avant $m_2$ par les noeuds du système.
+  \end{subdefinition}
+  \begin{subdefinition}[Intention preservation]
+    Le critère de \emph{Intention preservation} indique que l'intégration d'une modification par un noeud distant doit reproduire l'effet de la modification sur la copie du noeud d'origine, indépendamment des modifications concurrentes intégrées.
+  \end{subdefinition}
+\end{definition}
+
+De manière similaire à \cite{2009-logoot-weiss}, nous ajoutons le critère de \emph{Scalability} à ces critères :
+
+\begin{definition}[Scalability]
+  \label{def:scalability}
+  Le critère de \emph{Scalability} indique que le nombre de noeuds du système ne doit avoir qu'un impact sous-linéaire sur les complexités en temps, en espace et sur le nombre et la taille des messages.
+\end{definition}
+
+Nous constatons cependant que les critères \ref{def:causality} et \ref{def:scalability} peuvent être contraires.
+En effet, pour respecter le modèle de cohérence causale, un système peut nécessiter une livraison causale des modifications, \eg un \ac{CRDT} synchronisé par opérations dont seules les opérations concurrentes sont commutatives.
+La livraison causale implique un surcoût computationnel, en métadonnées et en taille des messages qui est fonction du nombre de participants du système \cite{1991-concerning-size-logical-clocks-charron-bost}.
+Ainsi, dans le cadre de nos travaux, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
+
+C'est dans une optique similaire que fut proposé \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
+Depuis, plusieurs \acp{CRDT} pour Séquence furent définies \cite{ROH2011354, 2009-treedoc-preguica, 2009-logoot-weiss}.
+Ces \acp{CRDT} peuvent être répartis en deux approches : l'approche à pierres tombales \cite{2006-woot-oster,ROH2011354} et l'approche à identifiants densément ordonnés \cite{2009-treedoc-preguica,2009-logoot-weiss}.
+L'état d'une séquence pouvant croître de manière infinie, ces \acp{CRDT} sont synchronisés par opérations pour limiter la taille des messages diffusés.
+À notre connaissance, seul \cite{2021-these-vic} propose un \ac{CRDT} pour Séquence synchronisé par différence d'états.
+
+Dans la suite de cette section, nous présentons les différents \acp{CRDT} pour Séquence de la littérature.

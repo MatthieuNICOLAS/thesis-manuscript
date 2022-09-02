@@ -11,7 +11,7 @@
   \item Besoin de vector clocks sur chaque opération pour détecter la concurrence.
     Vector clocks adaptés dans systèmes à nombre de pairs fixe, mais pas aux systèmes dynamiques (revoir causal barrier pour p-e nuancer ce propos).
   \item Néanmoins, cette approche a permis de démocratiser les systèmes collaboratifs via son adoption par des services tels que Google Docs, Overleaf, Framapad
-  \item De plus, dans le cadre de ces travaux, ont été définies les propriétés CCI \cite{10.1145/274444.274447}.
+  \item De plus, dans le cadre de ces travaux, ont été définies les propriétés CCI \cite{1998-cci-sun}.
   \item Remettre en question la propriété Causalité des CCI.
     Généralement, confond causalité et happen-before et exprime en finalité une contrainte trop forte.
     Cette contrainte peut réduire la réactivité du système (exemple avec 2 insertions sans liens mais qui force d'attendre la 1ère pour intégrer la 2nde).
