@@ -522,8 +522,8 @@ qui fut la première de toutes.
         \[
           id \lid id' \quad \trm{iff} \quad
           \begin{cases}
-            n < m \wedge \forall i \in [1,n] \cdot t_i = t'_j                                   & \text{or} \\
-            \exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \wedge t_j \ltuple t'_j &           \\
+            n < m \land \forall i \in [1,n] \cdot t_i = t'_j                                   & \text{or} \\
+            \exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \land t_j \ltuple t'_j &           \\
           \end{cases}
         \]
     \end{definition}
@@ -536,8 +536,8 @@ qui fut la première de toutes.
           t \ltuple t' \quad \trm{iff} \quad
           \begin{cases}
             \trm{pos} < \trm{pos}'                                            & \text{or} \\
-            \trm{pos} = \trm{pos'} \wedge \trm{nodeId} < \trm{nodeId'}                    & \text{or} \\
-            \trm{pos} = \trm{pos'} \wedge \trm{nodeId} = \trm{nodeId'} \wedge \trm{seq} < \trm{seq'}  &           \\
+            \trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}                    & \text{or} \\
+            \trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} < \trm{seq'}  &           \\
           \end{cases}
         \]
     \end{definition}

@@ -46,7 +46,7 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 \end{figure}
 
 Celle-ci définit deux modifications :
-\begin{itemize}
+\begin{enumerate}[label=(\roman*)]
   \item $\trm{ins}$, qui permet d'insérer un élément donné $v$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
@@ -61,7 +61,7 @@ Celle-ci définit deux modifications :
       s = \langle v_0, ..., v_{i-1}, v_{i}, v{i+1}, ..., v_m \rangle~\cdot \\
       \trm{rmv}(s,i) = \langle v_0, ..., v_{i-1}, v_{i+1}, ..., v_m  \rangle
     \end{multline*}
-\end{itemize}
+\end{enumerate}
 Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
 Cette simplification du type se fait cependant sans perte de généralité, la spécification pouvant être étendue pour insérer successivement plusieurs éléments à partir d'un index donné ou retirer plusieurs éléments consécutifs.
 
@@ -189,10 +189,10 @@ La non-commutativité des modifications du type Séquence fut l'objet de nombreu
 Pour résoudre ce problème, l'approche \ac{OT} \cite{1989-grove-ellis-gibbs, 1998-ot-issues-algorithms-achievements-sun} fut initialement proposée.
 Cette approche propose de transformer une modification par rapport aux modifications concurrentes intégrées pour tenir compte de leur effet.
 Elle se décompose en deux parties :
-\begin{itemize}
+\begin{enumerate}[label=(\roman*)]
   \item Un algorithme de contrôle \cite{1996-adopted-ressel-nitsch-ruhland-gunzenhauser, 1996-reduce-sun-yang-zhang-chen, 2009-cot-sun}, qui définit par rapport à quelles modifications une nouvelle modification distante doit être transformée avant d'être intégrée à la copie.
   \item Des fonctions de transformations \mnnote{TODO: Ajouter refs}, qui définissent comment une modification doit être transformée par rapport à une autre modification pour tenir compte de son effet.
-\end{itemize}
+\end{enumerate}
 
 Cependant, bien que de nombreuses fonctions de transformations pour le type Séquence ont été proposées, seule la correction des \acfp{TTF} \cite{2006-tombstone-transformation-functions-oster} a été éprouvée à notre connaissance.
 \mnnote{TODO: Vérifier que c'est pas plutôt les seules fonctions de transformations qui sont correctes et compatibles avec un système P2P.}
