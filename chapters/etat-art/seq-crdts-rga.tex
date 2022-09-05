@@ -1,163 +1,230 @@
-\begin{itemize}
-  \item \acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} appartenant à l'approche à pierres tombales.
-    Spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de Replicated Abstract Data Types (RADTs).
-  \item Dans cet article, définissent et se basent sur 2 principes pour concevoir RADTs.
-    Le premier d'entre eux est Operation Commutativity (OC).
-    Celui-ci indique que toutes paires possibles d'opérations concurrentes doit être commutative.
-    Permet de garantir que l'intégration par des noeuds différents d'une même séquence d'opérations concurrentes, mais dans des ordres différents, produira un état équivalent.
-  \item Le second principe sur lequel repose les RADTs est la Precedence Transitivity (PT).
-    Définit une relation de précédence, $\dashrightarrow$ , qui permet d'établir un ordre de priorité sur les intentions des opérations, pour déterminer laquelle conserver en cas de conflits.
-    Precedence Transitivity définit que pour tout trio d'opérations a, b et c, si on a $a \dashrightarrow b$ et $b \dashrightarrow c$, on a $a \dashrightarrow c$.
-  \item À partir de ces principes, proposent plusieurs RADTs : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et \acf{RGA}, qui nous intéresse ici.
-  \item Dans \ac{RGA}, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
-    Ainsi, \ac{RGA} se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
-    De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
-    Nommé S4Vector, ces identifiants sont de la forme suivante $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec:
-    \begin{itemize}
-      \item $\trm{ssid}$, identifiant de la session de collaboration
-      \item $\trm{sum}$, somme du vecteur d'horloges courant du noeud auteur de l'élément à son insertion
-      \item $\trm{ssn}$, identifiant du noeud auteur de l'élément
-      \item $\trm{seq}$, numéro de séquence de l'auteur de l'élément à son insertion
-    \end{itemize}
-    L'insertion est donc définie de la manière suivante : $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
-    Dans présentations suivantes de \ac{RGA}, utilisent horloge de Lamport \cite{1978-happen-before-lamport} plutôt.
-    Nous abstrayons donc ici la structure des identifiants avec le symbole $t$.
-  \item Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
-    Pour cela, utilise l'ordre lexicographique sur les composants des identifiants des éléments.
-    Par exemple, dans le cadre des S4Vector, on a $\langle 1, 10, A, 2\rangle < \langle 2, 5, B, 1 \rangle$ ou $\langle 1, 10, A, 2 \rangle < \langle 1, 15, B, 1 \rangle$.
-    L'utilisation de cet ordre comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
-  \item Concernant les suppressions, \ac{RGA} se comporte de manière similaire à WOOT : la séquence conserve une tombstone pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
-    Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
-  \item Nous récapitulons le fonctionnement de \ac{RGA} à l'aide de la \autoref{fig:rga}.
-    \begin{figure}[!ht]
+\acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} pour Séquence appartenant à l'approche à pierres tombales.
+Il a été spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de \acp{RADT}.
 
-      \centering
-      \resizebox{\columnwidth}{!}{
-        \begin{tikzpicture}
-          \newcommand\initialstate[2]{
-            \path
-              #1
-              ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
-              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
-          }
+Dans cet article, les auteurs définissent et se basent sur 2 principes pour concevoir RADTs.
+Le premier d'entre eux est l'\ac{OC}.
+\begin{definition}[\acl{OC}]
+  L'\acf{OC} définit que toute paire possible d'opérations concurrentes du \ac{RADT} doit être commutative.
+\end{definition}
+Ce principe permet de garantir que l'intégration par différents noeuds d'une même séquence d'opérations concurrentes, mais dans des ordres différents, résultera en un état équivalent.
 
-          \newcommand\insl[2]{
-            \path
-              #1
-              ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
-              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
-          }
+Le second principe sur lequel reposent les RADTs est la \ac{PT}.
+\begin{definition}[\acl{PT}]
+  La \acf{PT} se base sur une relation de précédence, notée $\dashrightarrow$.
+  \begin{subdefinition}[Relation de précédence]
+    La relation de précédence définit qu'étant donné deux opérations, $o_1$ et $o_2$, l'intention de $o_2$ doit être préservée par rapport à celle de $o_1$, noté $o_1 \dashrightarrow o_2$, si et seulement si :
+    \begin{enumerate}[label=(\roman*)]
+      \item $o_1 \rightarrow o_2$ ou
+      \item $o_1 || o_2$ et $o_2$ a une priorité supérieure à $o_1$.
+    \end{enumerate}
+  \end{subdefinition}
+  \ac{PT} définit qu'étant donné trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors on a $o_1 \dashrightarrow o_3$.
+\end{definition}
+Ce second principe offre une méthode pour concevoir un ensemble d'opérations commutatives.
+Il permet aussi d'exprimer la priorité des opérations par rapport aux opérations dont elles dépendent causalement.
 
-          \newcommand\rmvm[2]{
-            \path
-              #1
-              ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
-              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
-          }
+À partir de ces principes, les auteurs proposent plusieurs \acp{RADT} : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et \acf{RGA}, qui nous intéresse ici.
 
-          \newcommand\finalstate[2]{
-            \path
-              #1
-              ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
-              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
-              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
-          }
+Dans \ac{RGA}, l'intention de l'insertion est définit comme l'insertion d'un nouvel élément directement après un élément existant.
+Ainsi, \ac{RGA} se base sur le prédecesseur d'un élément pour déterminer où l'insérer.
+De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
 
-          \path
-              node {\textbf{A}}
-              ++(0:0.5) node (a) {}
-              +(0:30) node (a-end) {}
-              +(0:2) node[point] (a-initial) {}
-              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=5em]-10:{$\trm{ins(t_2 \prec \langle t_6,L \rangle)}$}}] (a-ins-l) {}
-              +(0:20) node[point] (a-recv-rmv-m) {}
-              +(0:28) node (a-final) {};
+Les auteurs proposent le modèle de données suivant comme identifiants :
+\begin{definition}[Identifiants S4Vector]
+  Les identifiants S4Vector sont de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
+  \begin{enumerate}[label=(\roman*)]
+    \item $\trm{ssid}$, l'identifiant de la session de collaboration.
+    \item $\trm{sum}$, la somme du vecteur d'horloges courant du noeud auteur de l'élément.
+    \item $\trm{ssn}$, l'identifiant du noeud auteur de l'élément.
+    \item $\trm{seq}$, le numéro de séquence de l'auteur de l'élément à son insertion.
+  \end{enumerate}
+\end{definition}
+Cependant, dans les présentations suivantes de \ac{RGA} \cite{shapiro_2011_crdt, 2016-specification-complexity-collaborative-text-editing-attiya}, les auteurs utilisent des horloges de Lamport \cite{1978-happen-before-lamport} en lieu et place des identifiants S4Vector.
+Nous procédons donc ici à la même simplification, et abstrayons la structure des identifiants utilisée avec le symbole $t$.
 
-          \initialstate{(a-initial)}{90};
-          \insl{(a-ins-l)}{90};
-          \finalstate{(a-recv-rmv-m)}{90};
+À l'aide des identifiants, \ac{RGA} redéfinit les modifications de la séquence de la manière suivante :
+\begin{enumerate}[label=(\roman*)]
+  \item $\trm{ins}$ devient $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
+  \item $\trm{rmv}$ devient $\trm{rmv}(\trm{id})$.
+\end{enumerate}
 
-          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
+Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
+Pour cela, \ac{RGA} définit $\lid$ :
+\begin{definition}[Relation $\lid$]
+  La relation $\lid$ définit un ordre strict total sur les identifiants en se basant sur l'ordre lexicographique leurs composants.
+  Par exemple, étant donné deux identifiants $t_1 = \langle \trm{ssid_1},\trm{sum_1},\trm{ssn_1},\trm{seq_1} \rangle$ et $t_2 = \langle \trm{ssid_2},\trm{sum_2},\trm{ssn_2},\trm{seq_2} \rangle$, nous avons :
+  \begin{equation*}
+    \begin{split}
+      t_1 \lid t_2 \quad \trm{iff} \quad  & (\trm{ssid_1} < \trm{ssid_2}) \quad \lor \\
+                                            & (\trm{ssid_1} = \trm{ssid_2} \land \trm{sum_1} < \trm{sum_2}) \quad \lor \\
+                                            & (\trm{ssid_1} = \trm{ssid_2} \land \trm{sum_1} = \trm{sum_2} \land \trm{ssn_1} < \trm{ssn_2}) \quad \lor \\
+                                            & (\trm{ssid_1} = \trm{ssid_2} \land \trm{sum_1} = \trm{sum_2} \land \trm{ssn_1} = \trm{ssn_2} \land \trm{seq_1} = \trm{seq_2}) \\
+    \end{split}
+  \end{equation*}
+\end{definition}
+L'utilisation de $\lid$ comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
 
-          \path
-              ++(270:3) node {\textbf{B}}
-              ++(0:0.5) node (b) {}
-              +(0:30) node (b-end) {}
-              +(0:2) node[point] (b-initial) {}
-              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=5em]10:{$\trm{rmv(t_3)}$}}] (b-rmv-m) {}
-              +(0:20) node[point] (b-recv-ins-l) {}
-              +(0:28) node (b-final) {};
+Concernant les suppressions, \ac{RGA} se comporte de manière similaire à WOOT : la séquence conserve une pierre tombale pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
+Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
 
-          \initialstate{(b-initial)}{-90};
-          \rmvm{(b-rmv-m)}{-90};
-          \finalstate{(b-recv-ins-l)}{-90};
+Nous récapitulons le fonctionnement de \ac{RGA} à l'aide de la \autoref{fig:rga}.
+\begin{figure}[!ht]
 
-          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-          \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
-
-          \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
-          \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
-        \end{tikzpicture}
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \newcommand\initialstate[2]{
+        \path
+          #1
+          ++(0:0.5)
+          ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+          ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+          ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
+          ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
       }
-      \caption{Modifications concurrentes d'une séquence répliquée \ac{RGA}}
-      \label{fig:rga}
-    \end{figure}
-    \mnnote{TODO: Trouver exemple et le présenter.}
-  \item À la différence des auteurs de WOOT, \textcite{ROH2011354} jugent le coût des tombstones trop élévé.
-    Ils proposent alors un mécanisme de \ac{GC} des tombstones.
-    Ce mécanisme repose sur deux conditions :
-    \begin{enumerate}[label=(\roman*)]
-      \item \label{item:gc-rga-1}
-        La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a observé la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
-      \item \label{item:gc-rga-2}
-        L'impossibilité pour l'ensemble des noeuds de générer un \emph{S4Vector} plus petit que l'élément suivant la tombstone\footnote{On constate cependant que la condition \ref{item:gc-rga-1} implique la condition \ref{item:gc-rga-2}, puisque tout noeud ayant observé l'insertion de l'élément suivant possédera un vecteur d'horloges supérieur.}.
-    \end{enumerate}
-  \item Concernant le modèle de livraison adopté, \ac{RGA} repose sur une livraison causale des opérations.
-    \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
-    Ce point est néanmoins laissé comme piste de recherche future.
-    À notre connaissance, celle-ci n'a pas été explorée dans la littérature.
-    Néanmoins \textcite{2021-these-vic} indique que \ac{RGA} pourrait adopter le même modèle de livraison que WOOT.
-    Pour rappel, celui-ci consiste en :
-    \begin{enumerate}[label=(\roman*)]
-      \item L'opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
-      \item L'opération $\trm{rmv}(\trm{id})$ ne peut être délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
-    \end{enumerate}
-    Nous secondons cette observation.
-  \item \mnnote{TODO: Ajouter quelques lignes sur efficacité de \ac{RGA}.
-      Meilleure complexité en temps pour l'intégration des opérations.
-      \cite{10.1145/2933057.2933090, ATTIYA2021141} montrent que \ac{RGA} est optimal du point de vue complexité spatiale comme \ac{CRDT} pour Séquence par élément basée sur l'approche tombstone.
-      Implémenté dans Yjs et Automerge.
-    }
-  \item Plusieurs extensions de \ac{RGA} furent proposées par la suite.
-   \textcite{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
-    Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un feedback immédiat de la part de l'application.
-    Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
-    Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
-    Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
-    \textcite{briot:hal-01343941} combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
-    Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
-  \item \textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} mettent en lumière un problème des \acp{CRDT} pour Séquence.
-    Lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
-    Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
-    \begin{figure}[!ht]
 
+      \newcommand\insl[2]{
+        \path
+          #1
+          ++(0:0.5)
+          ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+          ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+          ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {M}
+          ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
+      }
+
+      \newcommand\rmvm[2]{
+        \path
+          #1
+          ++(0:0.5)
+          ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+          ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+          ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
+          ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
+      }
+
+      \newcommand\finalstate[2]{
+        \path
+          #1
+          ++(0:0.5)
+          ++(#2:0.5) node[letter, label=#2:{$t_1$}] {H}
+          ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {E}
+          ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {\cancel{M}}
+          ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {L}
+          ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {O};
+      }
+
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:30) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(M \prec L)$}, label={[xshift=5em]-10:{$\trm{ins}(t_3 \prec \langle t_6,L \rangle)$}}] (a-ins-l) {}
+          +(0:20) node[point] (a-recv-rmv-m) {}
+          +(0:28) node (a-final) {};
+
+      \initialstate{(a-initial)}{90};
+      \insl{(a-ins-l)}{90};
+      \finalstate{(a-recv-rmv-m)}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:30) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=5em]10:{$\trm{rmv}(t_3)$}}] (b-rmv-m) {}
+          +(0:20) node[point] (b-recv-ins-l) {}
+          +(0:28) node (b-final) {};
+
+      \initialstate{(b-initial)}{-90};
+      \rmvm{(b-rmv-m)}{-90};
+      \finalstate{(b-recv-ins-l)}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
+      \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes d'une séquence répliquée \ac{RGA}}
+  \label{fig:rga}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée \ac{RGA}.
+Initialement, ils possèdent le même état : la séquence contient les éléments "HEMLO", et à chaque élément est associé un identifiant, \eg $t_1$, $t_2$, $t_3$...
+
+Le noeud A insère l'élément "L" après l'élément et "M", \ie $\trm{ins}(M \prec L)$.
+RGA convertit cette modification en opération $\trm{ins}(t_3 \prec \langle t_6,L \rangle)$.
+L'opération est intégrée à la copie locale, ce qui produit l'état "HEMLLO", puis diffusée sur le réseau.
+
+En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{rmv}(M)$.
+De la même manière, \ac{RGA} génère l'opération correspondante $\trm{rmv}(t_3)$.
+Comme expliqué précédemment, l'intégration de cette opération ne supprime pas l'élément "M" de l'état mais se contente de le masquer.
+L'état produit est donc "HE\cancel{M}LO".
+L'opération est ensuite diffusée.
+
+A (resp. B) reçoit ensuite l'opération de B, $\trm{rmv}(t_3)$ (resp. A, $\trm{ins}(t_3 \prec \langle t_6,L \rangle)$), et l'intègre à sa copie.
+Les opérations de \ac{RGA} étant commutatives, les noeuds obtiennent le même état final : "HE\cancel{M}LLO".
+
+À la différence des auteurs de WOOT, \textcite{ROH2011354} jugent le coût des pierres tombales trop élévé.
+Ils proposent alors un mécanisme de \ac{GC} des pierres tombales.
+Ce mécanisme repose sur deux conditions :
+\begin{enumerate}[label=(\roman*)]
+  \item \label{item:gc-rga-1}
+    La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a observé la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
+  \item \label{item:gc-rga-2}
+    L'impossibilité pour l'ensemble des noeuds de générer un identifiant inférieur à celui de l'élément suivant la pierre tombale d'après $\lid$.
+\end{enumerate}
+L'intuition de la condition \ref{item:gc-rga-1} est de s'assurer qu'aucune opération $\trm{ins}$ concurrente à l'exécution du mécanisme ne peut utiliser la pierre tombale comme prédecesseur, les opérations $\trm{ins}$ ne pouvant reposer que sur les éléments.
+L'intuition de la condition \ref{item:gc-rga-2} est de s'assurer que l'intégration d'une opération $\trm{ins}$, concurrente à l'exécution du mécanisme et devant résulter en l'insertion de l'élément avant la pierre tombale, ne sera altérée par la suppression de cette dernière.
+
+Concernant le modèle de livraison adopté, \ac{RGA} repose sur une livraison causale des opérations.
+Cependant, \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
+Ce point est néanmoins laissé comme piste de recherche future.
+À notre connaissance, cette dernière n'a pas été explorée dans la littérature.
+Néanmoins \textcite{2021-these-vic} indique que \ac{RGA} pourrait adopter un modèle de livraison similaire à celui de WOOT.
+Ce modèle consisterait :
+\begin{definition}[Modèle livraison \ac{RGA}]
+  Le modèle de livraison \ac{RGA} définit que :
+  \begin{enumerate}[label=(\roman*)]
+    \item Une opération doit être livrée exactement une fois à chaque noeud.
+    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
+    \item Une opération $\trm{rmv}(\trm{id})$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+  \end{enumerate}
+\end{definition}
+Nous secondons cette observation.
+
+Un des avantages de \ac{RGA} est son efficacité.
+En effet, son algorithme d'intégration des insertions offre une meilleure complexité en temps que celui de WOOT : \bigO{H}, avec $H$ le nombre de modifications ayant été effectuées sur le document \cite{2011-evaluation-crdts-ahmed-nacer}.
+De plus, \cite{2016-specification-complexity-collaborative-text-editing-attiya,2021-specification-complexity-collaborative-text-editing-attiya} montrent que le modèle de données de \ac{RGA} est optimal d'un point de vue complexité en espace comme \ac{CRDT} pour Séquence par élément sans mécanisme de \ac{GC}.
+\ac{RGA} est ainsi utilisé dans plusieurs implémentations \cite{automerge}.
+
+Plusieurs extensions de \ac{RGA} ont par la suite été proposées.
+\textcite{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
+Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un retour immédiat de la part de l'application.
+Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
+
+Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
+Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
+Les auteurs combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
+Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
+
+Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, les auteurs mettent en lumière un problème récurrent des \acp{CRDT} pour Séquence : lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
+Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
+La \autoref{fig:rga-interleaving} présente un tel cas de figure :
+
+\begin{figure}[!ht]
+  \subfloat[Modifications concurrentes d'une séquence répliquée \ac{RGA}]{
+    \begin{minipage}{\linewidth}
       \centering
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
@@ -230,73 +297,156 @@
               ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
           }
 
-          \newcommand\finalstate[2]{
-            \path
-              #1
-              ++(0:0.5)
-              ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
-              ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
-              ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
-              ++(0:\widthletter) node[letter, label=#2:{$t_9$}] {D}
-              ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
-              ++(0:\widthletter) node[letter, label=#2:{$t_8$}] {H}
-              ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
-              ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
-              ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
-          }
-
           \path
               node {\textbf{A}}
               ++(0:0.5) node (a) {}
-              +(0:49) node (a-end) {}
+              +(0:33) node (a-end) {}
               +(0:2) node[point] (a-initial) {}
-              +(0:9) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
-              +(0:17) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
-              +(0:26) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
-              +(0:35) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
-              +(0:39) node[point] (a-recv-sync) {}
-              +(0:47) node (a-final) {};
+              +(0:8) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
+              +(0:16) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
+              +(0:24) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
+              +(0:31) node (a-final) {};
 
           \initialstate{(a-initial)}{90};
           \inse{(a-ins-e)}{90};
           \insf{(a-ins-f)}{90};
           \insd{(a-ins-d)}{90};
-          \finalstate{(a-recv-sync)}{90};
 
           \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-          \draw[->, thick] (a-initial) --  (a-ins-e) --  (a-ins-f) --  (a-ins-d) --  (a-send-sync) --  (a-recv-sync) -- (a-final);
+          \draw[->, thick] (a-initial) --  (a-ins-e) --  (a-ins-f) --  (a-ins-d) -- (a-final);
 
           \path
               ++(270:3) node {\textbf{B}}
               ++(0:0.5) node (b) {}
-              +(0:49) node (b-end) {}
+              +(0:33) node (b-end) {}
               +(0:2) node[point] (b-initial) {}
-              +(0:9) node[point, label=170:{$\trm{ins}(C \prec G)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_3 \prec \langle t7,G \rangle)$}}] (b-ins-g) {}
-              +(0:17) node[point, label=170:{$\trm{ins}(G \prec H)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_7 \prec \langle t8,H \rangle)$}}] (b-ins-h) {}
-              +(0:35) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
-              +(0:39) node[point] (b-recv-sync) {}
-              +(0:47) node (b-final) {};
+              +(0:13) node[point, label=170:{$\trm{ins}(C \prec G)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_3 \prec \langle t7,G \rangle)$}}] (b-ins-g) {}
+              +(0:24) node[point, label=170:{$\trm{ins}(G \prec H)$}, label={[xshift=0.3em]10:{$\trm{ins}(t_7 \prec \langle t8,H \rangle)$}}] (b-ins-h) {}
+              +(0:31) node (b-final) {};
 
           \initialstate{(b-initial)}{-90};
           \insg{(b-ins-g)}{-90};
           \insh{(b-ins-h)}{-90};
-          \finalstate{(b-recv-sync)}{-90};
 
           \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-          \draw[->, thick] (b-initial) --  (b-ins-g) --  (b-ins-h) --  (b-send-sync) -- (b-recv-sync) -- (b-final);
-
-          \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
-          \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+          \draw[->, thick] (b-initial) --  (b-ins-g) --  (b-ins-h) -- (b-final);
         \end{tikzpicture}
+        \label{fig:rga-interleaving-setup}
       }
-      \caption{Entrelacement d'éléments insérés de manière concurrente}
-      \label{fig:rga-interleaving}
-    \end{figure}
-    \mnnote{TODO: Insérer et présenter exemple}
-    Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
-    Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{10.1145/2933057.2933090, ATTIYA2021141}, cette nouvelle spécification ajoute comme propriété que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
-    \textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
-    Pour cela, les auteurs ajoutent à l'opération $\trm{ins}$ un paramètre, $\trm{samePredId}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
-    En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{ins}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
-    Cependant, les auteurs ne prouvent pas dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} que cette extension empêche tout entrelacement\footnote{Un travail en cours \cite{2022-no-doubly-non-interleaving-crdts-weidner} indique en effet qu'une séquence répliquée empêchant tout entrelacement est impossible.}.
-\end{itemize}
+      \end{minipage}
+    }
+    \hfil
+    \subfloat[Synchronisation résultant en un entrelacement des modifications concurrentes]{
+      \begin{minipage}{\linewidth}
+        \centering
+        \resizebox{\columnwidth}{!}{
+          \begin{tikzpicture}
+
+            \newcommand\insd[2]{
+              \path
+                #1
+                ++(0:0.5)
+                ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+                ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+                ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+                ++(0:\widthletter) node[letter, label=#2:{$t_9$}] {D}
+                ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+                ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
+                ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+            }
+
+            \newcommand\insh[2]{
+              \path
+                #1
+                ++(0:0.5)
+                ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+                ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+                ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+                ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
+                ++(0:\widthletter) node[letter, label=#2:{$t_8$}] {H}
+                ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+            }
+
+            \newcommand\finalstate[2]{
+              \path
+                #1
+                ++(0:0.5)
+                ++(#2:0.5) node[letter, label=#2:{$t_1$}] {A}
+                ++(0:\widthletter) node[letter, label=#2:{$t_2$}] {B}
+                ++(0:\widthletter) node[letter, label=#2:{$t_3$}] {C}
+                ++(0:\widthletter) node[letter, label=#2:{$t_9$}] {D}
+                ++(0:\widthletter) node[letter, label=#2:{$t_7$}] {G}
+                ++(0:\widthletter) node[letter, label=#2:{$t_8$}] {H}
+                ++(0:\widthletter) node[letter, label=#2:{$t_5$}] {E}
+                ++(0:\widthletter) node[letter, label=#2:{$t_6$}] {F}
+                ++(0:\widthletter) node[letter, label=#2:{$t_4$}] {!}
+            }
+
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:26) node (a-end) {}
+                +(0:2) node[point] (a-initial) {}
+                +(0:10) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
+                +(0:14) node[point] (a-recv-sync) {}
+                +(0:24) node (a-final) {};
+
+            \insd{(a-initial)}{90};
+            \finalstate{(a-recv-sync)}{90};
+
+            \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-send-sync) --  (a-recv-sync) -- (a-final);
+
+            \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:26) node (b-end) {}
+                +(0:2) node[point] (b-initial) {}
+                +(0:10) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
+                +(0:14) node[point] (b-recv-sync) {}
+                +(0:24) node (b-final) {};
+
+            \insh{(b-initial)}{-90};
+            \finalstate{(b-recv-sync)}{-90};
+
+            \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+            \draw[->, thick] (b-initial) -- (b-send-sync) -- (b-recv-sync) -- (b-final);
+
+            \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
+            \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+          \end{tikzpicture}
+          \label{fig:rga-interleaving-done}
+        }
+      \end{minipage}
+    }
+  \caption{Entrelacement d'éléments insérés de manière concurrente}
+  \label{fig:rga-interleaving}
+\end{figure}
+
+Dans la \autoref{fig:rga-interleaving-setup}, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée \ac{RGA}.
+Initialement, ils possèdent le même état : la séquence contient les éléments "ABC!", et à chaque élément est associé un identifiant, \eg $t_1$, $t_2$, $t_3$ et $t_4$.
+
+Le noeud A insère après l'élément "C" les éléments "E" et F.
+RGA génère les opérations $\trm{ins}(t_3 \prec \langle t_5,E \rangle)$ et $\trm{ins}(t_5 \prec \langle t_6,F \rangle)$.
+En concurrence, le noeud B insère les éléments "G" et "H" de manière similaire, produisant les opérations  $\trm{ins}(t_3 \prec \langle t_7,G \rangle)$ et $\trm{ins}(t_7 \prec \langle t_8,H \rangle)$.
+Finalement, toujours en concurrence, le noeud A insère un nouvel élément après l'élément "C", l'élément "D", ce qui résulte en l'opération $\trm{ins}(t_9 \prec \langle t_3,D \rangle)$.
+Pour la suite de notre exemple, nous supposons que $t_5 \lid t_6 \lid t_7 \lid t_8 \lid t_9$.
+
+Nous poursuivons notre exemple dans la \autoref{fig:rga-interleaving-done}.
+Dans cette figure, les noeuds A et B se synchronisent et échangent leurs opérations respectives.
+À la réception de l'opération de B $\trm{ins}(t_3 \prec \langle t_7,G \rangle)$, le noeud A compare $t_7$ avec les identifiants des éléments se trouvant après $t_3$.
+Il place l'élément "G" qu'après les éléments ayant des identifiants supérieurs à $t_7$.
+Ainsi, il insère "G" après "D" ($t_9$), mais avant "E" ($t_5$).
+L'élément "H" ($t_7$) est inséré de manière similaire avant "E" ($t_5$).
+
+Le noeud B procède de manière similaire.
+Les noeuds A et B convergent alors à un état équivalent : "ABCDGHEF!".
+Nous remarquons ainsi que les modifications de B, la chaîne "GH", s'est intercalée dans la chaîne insérée par A en concurrence, "DHEF".
+
+Pour remédier à ce problème, les auteurs définissent une nouvelle spécification que doivent respecter les approches pour la mise en place de séquences répliquées : \emph{la spécification forte sans entrelacement des séquences répliquées}.
+Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{2016-specification-complexity-collaborative-text-editing-attiya, 2021-specification-complexity-collaborative-text-editing-attiya}, cette nouvelle spécification précise que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
+\textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
+
+Pour cela, les auteurs ajoutent à l'opération $\trm{ins}$ un paramètre, $\trm{samePredIds}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
+En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{ins}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
+Cependant, les auteurs ne prouvent pas dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} que cette extension empêche tout entrelacement\footnote{Un travail en cours \cite{2022-no-doubly-non-interleaving-crdts-weidner} indique en effet qu'une séquence répliquée empêchant tout entrelacement est impossible.}.

@@ -110,7 +110,7 @@ Nous récapitulons son fonctionnement à l'aide de la \autoref{fig:woot}.
           ++(0:0.5) node (a) {}
           +(0:30) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
-          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(A2 \prec \langle A5,L \rangle \prec A1)}$}}] (a-ins-l) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(A2 \prec \langle A5,L \rangle \prec B1)}$}}] (a-ins-l) {}
           +(0:20) node[point] (a-recv-rmv-m) {}
           +(0:28) node (a-final) {};
 
@@ -149,7 +149,8 @@ Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une
 Initialement, ils possèdent le même état : la séquence contient les éléments "HEMLO", et à chaque élément est associé un identifiant, \eg $A1$, $B1$, $A2$...
 
 Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{ins}(E \prec L \prec M)$.
-WOOT convertit cette modification en opération $\trm{ins}(A2 \prec \langle A5,L \rangle \prec B1)$. L'opération est intégrée à la copie locale, ce qui produit l'état "HELMLO", puis diffusée sur le réseau.
+WOOT convertit cette modification en opération $\trm{ins}(A2 \prec \langle A5,L \rangle \prec B1)$.
+L'opération est intégrée à la copie locale, ce qui produit l'état "HELMLO", puis diffusée sur le réseau.
 
 En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{rmv}(M)$.
 De la même manière, WOOT génère l'opération correspondante $\trm{rmv}(B1)$.
@@ -165,11 +166,11 @@ WOOT met en place un modèle de livraison sur-mesure basé sur les pré-conditio
 \begin{definition}[Modèle de livraison WOOT]
   Le modèle de livraison WOOT définit que :
   \begin{enumerate}[label=(\roman*)]
-    \item Une opération doit être livrée au moins une fois à chaque noeud\footnotemark.
-      \footnotetext{Pour être précis, l'algorithme décrivant l'intégration de l'opération $\trm{ins}$ dans \cite{2006-woot-oster} impose une livraison en exactement un exemplaire de l'opération.
-      Il peut cependant être amélioré pour devenir idempotent, et donc permettre une livraison répétée de la même opération, en vérifiant au préalable la présence de l'identifiant dans la séquence.}
+    \item Une opération doit être livrée exactement une fois à chaque noeud\footnotemark.
+      \footnotetext{Néanmoins, les algorithmes d'intégration des opérations, notamment celui pour l'opération $\trm{ins}$, pourraient être aisément modifiés pour être idempotents.
+      Ainsi, la livraison répétée d'une même opération deviendrait possible, ce qui permettrait de relaxer cette contrainte en \emph{une livraison au moins une fois}.}
     \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle \prec \trm{succId})$ ne peut être délivrée à un noeud qu'après la livraison des opérations d'insertion des éléments associés à $\trm{predId}$ et $\trm{succId}$.
-    \item L'opération $\trm{rmv}(id)$ ne peut être délivrée à un noeudd qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
+    \item L'opération $\trm{rmv}(id)$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
   \end{enumerate}
 \end{definition}
 Ce modèle de livraison ne requiert qu'une quantité fixe de métadonnées associées à chaque opération pour être respecté.
