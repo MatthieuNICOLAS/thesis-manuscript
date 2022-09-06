@@ -1,262 +1,359 @@
-\begin{itemize}
-  \item \cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour CRDTs pour Séquence.
-    Se base sur des identifiants de position, respectant les propriétés suivantes :
-    \begin{enumerate}[label=(\roman*)]
-      \item Chaque élément se voit attribuer un identifiant.
-      \item \label{item:uniqueness} Aucune paire d'éléments ne partage le même identifiant.
-      \item L'identifiant d'un élément est immuable.
-      \item Il existe un ordre total strict sur les identifiants, $\lid$, cohérent avec l'ordre des éléments dans la séquence.
-      \item \label{item:dense-space}
-        Les identifiants sont tirés d'un ensemble dense, noté $\mathbb{I}$.
-    \end{enumerate}
-  \item La propriété \ref{item:dense-space} signifie que :
-    \[\forall \trm{predId}, \trm{succId} \in \mathbb{I}, \exists \trm{id} \in \mathbb{I} \cdot \trm{predId} \lid \trm{id} \lid \trm{succId} \]
-    Par exemple, les nombres réels forment un ensemble dense.
-    Ceux-ci sont néanmoins inutilisables en informatique puisqu'ils nécessiteraient une précision infinie.
-    \cite{2009-treedoc-preguica} utilise donc un type dédié pour les émuler.
-  \item L'utilisation d'identifiants de position permet de redéfinir les modifications :
-    \begin{enumerate}[label=(\roman*)]
-      \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins(\trm{id}, \trm{elt})}$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
-      \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
-    \end{enumerate}
-    Ces redéfinitions permettent d'obtenir une spécification de la séquence avec des modifications commutatives.
-  \item À partir de cette spécification, \citeauthor{2009-treedoc-preguica} propose un CRDT pour Séquence : \emph{Treedoc}.
-    Ce dernier se base sur un arbre binaire pour générer les identifiants de position.
-  \item La racine de l'arbre binaire, notée $\epsilon$, correspond à l'identifiant du premier élément inséré dans la séquence répliquée.
-    Puis, pour générer l'identifiant d'un nouvel élément inséré à gauche (resp. à droite) d'un noeud de l'arbre binaire, Treedoc concatène un $0$ (resp. un $1$) à l'identifiant de ce dernier.
-    \begin{figure}[!ht]
+\cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour CRDTs pour Séquence.
+La particuliarité de cette approche est de se baser sur des identifiants de position, respectant un ensemble de propriétés :
+\begin{definition}[Propriétés des identifiants de position]
+  Les propriétés que les identifiants de position doivent respecter sont les suivantes :
+  \begin{enumerate}[label=(\roman*)]
+    \item Chaque identifiant est attribué à un élément de la séquence.
+    \item \label{item:uniqueness}
+      Aucune paire d'éléments ne partage le même identifiant.
+    \item L'identifiant d'un élément est immuable.
+    \item \label{item:lid}
+      Il existe un ordre total strict sur les identifiants, $\lid$, cohérent avec l'ordre des éléments dans la séquence.
+    \item \label{item:dense-space}
+      Les identifiants sont tirés d'un ensemble dense, que nous notons $\mathbb{I}$.
+  \end{enumerate}
+\end{definition}
 
-      \centering
-      \resizebox{0.2\columnwidth}{!}{
-        \begin{tikzpicture}
-          \newcommand\rightedge{ edge from parent node[right] {1} }
-          \newcommand\leftedge{ edge from parent node[left] {0} }
+Intéressons-nous un instant à la propriété \ref{item:dense-space}.
+Cette propriété signifie que :
+\begin{equation*}
+  \forall \trm{predId}, \trm{succId} \in \mathbb{I}, \exists \trm{id} \in \mathbb{I} | \trm{predId} \lid \trm{id} \lid \trm{succId}
+\end{equation*}
+Cette propriété garantit donc qu'il sera toujours possible de générer un nouvel identifiant de position entre deux autres, \ie qu'il sera toujours possible d'insérer un nouvel élément entre deux autres (d'après la propriété \ref{item:lid}).
 
-          \path
-              node[node] {C}
-                child {
-                  node[node] {A}
-                    child[missing]
-                    child {node[node] {B} \rightedge}
-                    \leftedge
-                }
-                child {
-                  node[node] {D}
-                    child[missing]
-                    child {node[node] {E} \rightedge}
-                    \rightedge
-                };
-        \end{tikzpicture}
+L'utilisation d'identifiants de position permet de redéfinir les modifications de la séquence :
+\begin{enumerate}[label=(\roman*)]
+  \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
+  \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+\end{enumerate}
+Ces redéfinitions permettent de proposer une spécification de la séquence avec des modifications commutatives.
+
+À partir de cette spécification, \citeauthor{2009-treedoc-preguica} propose un CRDT pour Séquence : \emph{Treedoc}
+Ce dernier tire son nom de l'approche utilisée pour émuler un ensemble dense pour générer les identifiants de position : Treedoc utilise pour cela les chemins d'un arbre binaire.
+
+La \autoref{fig:treedoc-ids} illustre le fonctionnement de cette approche.
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{0.2\columnwidth}{!}{
+    \begin{tikzpicture}
+      \newcommand\rightedge{ edge from parent node[right] {1} }
+      \newcommand\leftedge{ edge from parent node[left] {0} }
+
+      \path
+          node[point, label={above:$\epsilon$}] {}
+            child {
+              node[point] {}
+                child[missing]
+                child {node[point] {} \rightedge}
+                \leftedge
+            }
+            child {
+              node[point] {}
+                child[missing]
+                child {node[point] {} \rightedge}
+                \rightedge
+            };
+    \end{tikzpicture}
+  }
+  \caption{Identifiants de positions}
+  \label{fig:treedoc-ids}
+\end{figure}
+La racine de l'arbre binaire, notée $\epsilon$, correspond à l'identifiant de position du premier élément inséré dans la séquence répliquée.
+Pour générer les identifiants des éléments suivants, Treedoc utilise l'identifiant de leur prédecesseur ou successeur : Treedoc concatène (noté $\oplus$) à ce dernier le chiffre 0 (resp. 1) en fonction de si l'élément doit être placé à gauche (resp. à droite) de l'identifiant utilisé comme base.
+Par exemple, pour insérer un nouvel élément à la fin de la séquence dont les identifiants de position sont représentés par la \autoref{fig:treedoc-ids}, Treedoc lui associerait l'identifiant $\trm{id} = \epsilon \oplus 1 \oplus 1 \oplus 1$.
+Ainsi, Treedoc suit l'ordre du parcours infixe de l'arbre binaire pour ordonner les identifiants de position.
+
+Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du système peuvent associer un même identifiant à des éléments insérés en concurrence, contravenant alors à la propriété \ref{item:uniqueness}.
+Pour corriger cela, Treedoc ajoute à chaque noeud de l'arbre un désambiguateur par élément : un \emph{Dot} (cf. \autoref{def:dot}).
+Nous représentons ces derniers avec la notation $d_i$.
+
+Ainsi, un noeud de l'arbre des identifiants peut correspondre à plusieurs éléments, ayant tous le même identifiant à l'exception de leur désambiguateur.
+Ces éléments sont alors ordonnés les uns par rapport aux autres en respectant l'ordre défini sur leur désambiguateur.
+
+Afin de réduire le surcoût des désambiguateurs, ces derniers ne sont ajoutés au chemin formant un identifiant qu'uniquement lorsqu'ils sont nécessaires, \ie :
+\begin{enumerate}[label=(\roman*)]
+  \item Le noeud courant est le noeud final de l'identifiant.
+  \item Le noeud courant nécessite désambiguation, \ie plusieurs éléments utilisent l'identifiant correspondant à ce noeud.
+\end{enumerate}
+La \autoref{fig:treedoc-dis} présente un exemple de cette situation.
+\begin{figure}[!ht]
+
+  \centering
+  % \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}[]
+      \newcommand\treedocnode[1]{
+        node[rounded corners, draw] {$d_#1$}
       }
-      \caption{Identifiants de positions}
-      \label{fig:treedoc-ids}
-    \end{figure}
-  \item Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du systèmes peuvent générer un même identifiant pour des éléments insérés en concurrence, contravenant alors à la propriété \ref{item:uniqueness}.
-    Pour corriger cela, Treedoc ajoute aux identifiants des désambiguateurs : un \emph{Dot}.
-    Un désambiguateur est ajouté à chaque partie d'un identifiant lorsque nécessaire, \ie
-    \begin{enumerate}[label=(\roman*)]
-      \item La partie courante de l'identifiant est la fin de l'identifiant.
-      \item La partie courante de l'identifiant nécessite désambiguation, \ie plusieurs éléments utilisent ce même identifiant.
-    \end{enumerate}
-    Il convient de noter que les noeuds de l'arbre binaire des identifiants peuvent ainsi contenir une liste d'identifiants en cas d'insertions concurrentes.
-    \begin{figure}[!ht]
 
-      \centering
-      \resizebox{\columnwidth}{!}{
-        \begin{tikzpicture}[level distance=80, level/.style={sibling distance=80/#1}]
-          \newcommand\treedocnode[2]{
-            node[rounded corners, matrix, draw] {
-              \node {$d_#1$};           \\
-              \node[circle, draw] {#2}; \\
-            }
-          }
-
-          \newcommand\treedoccancelnode[2]{
-            node[rounded corners, matrix, draw] {
-              \node {$d_#1$};           \\
-              \node[circle, draw] {\cancel{#2}}; \\
-            }
-          }
-
-          \newcommand\nodem{ \treedocnode{1}{M} }
-          \newcommand\nodecancelm{ \treedoccancelnode{1}{M} }
-          \newcommand\nodeh{ \treedocnode{2}{H} }
-          \newcommand\nodee{ \treedocnode{3}{E} }
-          \newcommand\nodela{ \treedocnode{4}{L} }
-          \newcommand\nodelb{ \treedocnode{5}{L} }
-          \newcommand\nodeo{ \treedocnode{6}{O} }
-
-          \newcommand\treedocsupernode[4]{
-            node[rounded corners, matrix, draw, ampersand replacement=\&, column sep=3] {
-              \node {$d_#1$};            \& \node {$d_#3$};           \\
-              \node[circle, draw] {#2}; \& \node[circle, draw] {#4}; \\
-            }
-          }
-
-          \newcommand\nodell{ \treedocsupernode{4}{L}{5}{L} }
-
-          \newcommand\initialstate[2]{
-            \path
-              #1
-              ++#2
-              \nodem
-                child {
-                    \nodeh
-                      child[missing]
-                      child {\nodee edge from parent node[right] {1}}
-                      edge from parent node[left] {0}
-                  }
-                child[missing];
-          }
-
-          \newcommand\hemla[2]{
-            \path
-              #1
-              ++#2
-              \nodem
-                child {
-                  \nodeh
-                    child[missing]
-                    child {\nodee edge from parent node[right] {1}}
-                    edge from parent node[left] {0}
-                  }
-                child {
-                  \nodela edge from parent node[right] {1}
-                };
-          }
-
-          \newcommand\hemlb[2]{
-            \path
-              #1
-              ++#2
-              \nodem
-                child {
-                  \nodeh
-                    child[missing]
-                    child {\nodee edge from parent node[right] {1}}
-                    edge from parent node[left] {0}
-                  }
-                child {
-                  \nodelb edge from parent node[right] {1}
-                };
-          }
-
-          \newcommand\hemlo[2]{
-            \path
-              #1
-              ++#2
-              \nodem
-                child {
-                  \nodeh
-                    child[missing]
-                    child {\nodee edge from parent node[right] {1}}
-                    edge from parent node[left] {0}
-                  }
-                child {
-                  \nodela
-                    child[missing]
-                    child {\nodeo edge from parent node[right] {1}}
-                    edge from parent node[right] {1}
-                };
-          }
-
-          \newcommand\hel[2]{
-            \path
-              #1
-              ++#2
-              \nodecancelm
-                child {
-                  \nodeh
-                    child[missing]
-                    child {\nodee edge from parent node[right] {1}}
-                    edge from parent node[left] {0}
-                  }
-                child {
-                  \nodelb edge from parent node[right] {1}
-                };
-          }
-
-          \newcommand\finalstate[2]{
-            \path
-              #1
-              ++#2
-              \nodecancelm
-                child {
-                  \nodeh
-                    child[missing]
-                    child {\nodee edge from parent node[right] {1}}
-                    edge from parent node[left] {0}
-                  }
-                child {
-                  \nodell
-                    child[missing]
-                    child {\nodeo edge from parent node[right] {1}}
-                    edge from parent node[right] {1}
-                };
-          }
-
-          \newcommand\offseta{ (90:7) }
-          \newcommand\offsetb{ (270:1.5) }
-
-          \path
-              node {\textbf{A}}
-              ++(0:0.5) node (a) {}
-              +(0:28) node (a-end) {}
-              +(0:2) node[point] (a-initial) {}
-              +(0:6) node[point, label=-170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]-10:{$\trm{ins}(\langle 1,d_4 \rangle,L)$}}] (a-ins-l) {}
-              +(0:14) node[point, label=-170:{$\trm{ins}(L \prec O)$}, label={[xshift=1em]-10:{$\trm{ins}(1 \odot \langle 1,d_6 \rangle,O)$}}] (a-ins-o) {}
-              +(0:20) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
-              +(0:24) node[point] (a-recv-sync) {}
-              +(0:26) node (a-final) {};
-
-
-          \initialstate{(a-initial)}{\offseta};
-          \hemla{(a-ins-l)}{\offseta};
-          \hemlo{(a-ins-o)}{\offseta};
-          \finalstate{(a-recv-sync)}{\offseta};
-
-          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-ins-o) -- (a-send-sync) -- (a-recv-sync) -- (a-final);
-
-          \path
-              ++(270:3) node {\textbf{B}}
-              ++(0:0.5) node (b) {}
-              +(0:28) node (b-end) {}
-              +(0:2) node[point] (b-initial) {}
-              +(0:6) node[point, label=170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]10:{$\trm{ins}(\langle 1, d_5 \rangle,L)$}}] (b-ins-l) {}
-              +(0:14) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=1em]10:{$\trm{rmv}(\langle \epsilon, d_1 \rangle)$}}] (b-rmv-m) {}
-              +(0:20) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
-              +(0:24) node[point] (b-recv-sync) {}
-              +(0:26) node (b-final) {};
-
-          \initialstate{(b-initial)}{\offsetb};
-          \hemlb{(b-ins-l)}{\offsetb};
-          \hel{(b-rmv-m)}{\offsetb};
-          \finalstate{(b-recv-sync)}{\offsetb};
-
-          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-          \draw[->, thick] (b-initial) --  (b-ins-l) -- (b-rmv-m) -- (b-send-sync) -- (b-recv-sync) -- (b-final);
-
-          \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
-          \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
-        \end{tikzpicture}
+      \newcommand\treedocsupernode[2]{
+        node[rounded corners, matrix, draw, ampersand replacement=\&, column sep=3] {
+          \node {$d_#1$};            \& \node {$d_#2$};           \\
+        }
       }
-      \caption{Modifications concurrentes d'une séquence répliquée Treedoc}
-      \label{fig:treedoc}
-    \end{figure}
-  \item Concernant le modèle de livraison utilisé, \cite{2009-treedoc-preguica} indique reposer sur le modèle de livraison causal.
-    En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
-    \begin{enumerate}[label=(\roman*)]
-      \item Les opérations $\trm{ins}$ peuvent être livrées dans n'importe quel ordre.
-      \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
-    \end{enumerate}
-  \item Treedoc souffre néanmoins de plusieurs limites.
-    Tout d'abord, le mécanisme d'identifiants de positions proposé est couplé à la structure d'arbre binaire.
-    Cependant, les utilisateur-rices ont tendance à écrire de manière séquentielle, \ie dans le sens d'écriture de la langue utilisée.
-    Les nouveaux identifiants forment donc généralement une liste chaînée, qui déséquilibre l'arbre.
-  \item Ensuite, Treedoc doit conserver un noeud de l'arbre des identifiants malgré sa suppression lorsque ce dernier possède des enfants.
-    Ce noeud de l'arbre devient alors une pierre tombale.
-    Le mécanisme de \ac{GC} des pierres tombales de Treedoc ne repose cependant pas sur la stabilité causale d'opérations, mais sur l'état du noeud de l'arbre, \ie si la pierre tombale devient une feuille.
-    Néanmoins, l'évaluation de \cite{2009-treedoc-preguica} a montré que les pierres tombales pouvait représenter jusqu'à 95\% des noeuds de l'arbre.
-  \item Finalement, Treedoc souffre du problème de l'entrelacement d'éléments insérés de manière concurrente, contrairement à ce qui est conjecturé dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
-\end{itemize}
+
+      \newcommand\rightedge{ edge from parent node[right] {1} }
+      \newcommand\leftedge{ edge from parent node[left] {0} }
+
+      \path
+          node[rounded corners, draw, label={above:$\epsilon$}] {$d_1$}
+            child {
+              \treedocnode{2}
+                child[missing]
+                child {\treedocnode{3} \rightedge}
+                \leftedge
+            }
+            child {
+              \treedocsupernode{4}{5}
+                \rightedge
+            };
+    \end{tikzpicture}
+  % }
+  \caption{Identifiants de position avec désambiguateurs}
+  \label{fig:treedoc-dis}
+\end{figure}
+Dans cet exemple, deux identifiants furent insérés en concurrence en fin de séquence : $id_4 = \epsilon \oplus \langle 1,d_4 \rangle$ et $id_5 = \epsilon \oplus \langle 1,d_5 \rangle$.
+Pour développer cet exemple, Treedoc générerait les identifiants :
+\begin{enumerate}[label=(\roman*)]
+  \item $id_6 = \epsilon \oplus 1 \oplus \langle 1,d_6 \rangle$ à l'insertion d'un nouvel élément en fin de liste.
+  \item $id_7 = \epsilon \oplus \langle 1,d_4 \rangle \oplus \langle 1,d_7 \rangle$ à l'insertion d'un nouvel élément entre les éléments ayant pour identifiants $id_4$ et $id_5$.
+\end{enumerate}
+
+Nous récapitulons le fonctionnement complet de Treedoc dans la \autoref{fig:treedoc}.
+Par souci de cohésion, nous utilisons ici à la fois l'arbre binaire pour représenter les identifiants de position des éléments et les éléments eux-mêmes.
+Nous omettons aussi le chemin vide $\epsilon$ dans la représentation des identifiants lorsque non-nécessaire.
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}[level distance=80, level/.style={sibling distance=80/#1}]
+      \newcommand\treedocnode[2]{
+        node[rounded corners, matrix, draw] {
+          \node {$d_#1$};           \\
+          \node[circle, draw] {#2}; \\
+        }
+      }
+
+      \newcommand\treedoccancelnode[2]{
+        node[rounded corners, matrix, draw] {
+          \node {$d_#1$};           \\
+          \node[circle, draw] {\cancel{#2}}; \\
+        }
+      }
+
+      \newcommand\nodem{ \treedocnode{1}{M} }
+      \newcommand\nodecancelm{ \treedoccancelnode{1}{M} }
+      \newcommand\nodeh{ \treedocnode{2}{H} }
+      \newcommand\nodee{ \treedocnode{3}{E} }
+      \newcommand\nodela{ \treedocnode{4}{L} }
+      \newcommand\nodelb{ \treedocnode{5}{L} }
+      \newcommand\nodeo{ \treedocnode{6}{O} }
+
+      \newcommand\treedocsupernode[4]{
+        node[rounded corners, matrix, draw, ampersand replacement=\&, column sep=3] {
+          \node {$d_#1$};            \& \node {$d_#3$};           \\
+          \node[circle, draw] {#2}; \& \node[circle, draw] {#4}; \\
+        }
+      }
+
+      \newcommand\nodell{ \treedocsupernode{4}{L}{5}{L} }
+
+      \newcommand\initialstate[2]{
+        \path
+          #1
+          ++#2
+          \nodem
+            child {
+                \nodeh
+                  child[missing]
+                  child {\nodee edge from parent node[right] {1}}
+                  edge from parent node[left] {0}
+              }
+            child[missing];
+      }
+
+      \newcommand\hemla[2]{
+        \path
+          #1
+          ++#2
+          \nodem
+            child {
+              \nodeh
+                child[missing]
+                child {\nodee edge from parent node[right] {1}}
+                edge from parent node[left] {0}
+              }
+            child {
+              \nodela edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\hemlb[2]{
+        \path
+          #1
+          ++#2
+          \nodem
+            child {
+              \nodeh
+                child[missing]
+                child {\nodee edge from parent node[right] {1}}
+                edge from parent node[left] {0}
+              }
+            child {
+              \nodelb edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\hemlo[2]{
+        \path
+          #1
+          ++#2
+          \nodem
+            child {
+              \nodeh
+                child[missing]
+                child {\nodee edge from parent node[right] {1}}
+                edge from parent node[left] {0}
+              }
+            child {
+              \nodela
+                child[missing]
+                child {\nodeo edge from parent node[right] {1}}
+                edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\hel[2]{
+        \path
+          #1
+          ++#2
+          \nodecancelm
+            child {
+              \nodeh
+                child[missing]
+                child {\nodee edge from parent node[right] {1}}
+                edge from parent node[left] {0}
+              }
+            child {
+              \nodelb edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\finalstate[2]{
+        \path
+          #1
+          ++#2
+          \nodecancelm
+            child {
+              \nodeh
+                child[missing]
+                child {\nodee edge from parent node[right] {1}}
+                edge from parent node[left] {0}
+              }
+            child {
+              \nodell
+                child[missing]
+                child {\nodeo edge from parent node[right] {1}}
+                edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\offseta{ (90:7) }
+      \newcommand\offsetb{ (270:1.5) }
+
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:28) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:6) node[point, label=-170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]-10:{$\trm{ins}(\langle 1,d_4 \rangle,L)$}}] (a-ins-l) {}
+          +(0:14) node[point, label=-170:{$\trm{ins}(L \prec O)$}, label={[xshift=1em]-10:{$\trm{ins}(1 \oplus \langle 1,d_6 \rangle,O)$}}] (a-ins-o) {}
+          +(0:20) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
+          +(0:24) node[point] (a-recv-sync) {}
+          +(0:26) node (a-final) {};
+
+
+      \initialstate{(a-initial)}{\offseta};
+      \hemla{(a-ins-l)}{\offseta};
+      \hemlo{(a-ins-o)}{\offseta};
+      \finalstate{(a-recv-sync)}{\offseta};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-ins-o) -- (a-send-sync) -- (a-recv-sync) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:28) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:6) node[point, label=170:{$\trm{ins}(M \prec L)$}, label={[xshift=1em]10:{$\trm{ins}(\langle 1, d_5 \rangle,L)$}}] (b-ins-l) {}
+          +(0:14) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=1em]10:{$\trm{rmv}(\langle \epsilon, d_1 \rangle)$}}] (b-rmv-m) {}
+          +(0:20) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
+          +(0:24) node[point] (b-recv-sync) {}
+          +(0:26) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb};
+      \hemlb{(b-ins-l)}{\offsetb};
+      \hel{(b-rmv-m)}{\offsetb};
+      \finalstate{(b-recv-sync)}{\offsetb};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-ins-l) -- (b-rmv-m) -- (b-send-sync) -- (b-recv-sync) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
+      \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes d'une séquence répliquée Treedoc}
+  \label{fig:treedoc}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée Treedoc.
+Initialement, ils possèdent le même état : la séquence contient les éléments "HEM".
+
+Le noeud A insère l'élément "L" en fin de séquence, \ie $\trm{ins}(M \prec L)$.
+Treedoc génère l'opération correspondante, $\trm{ins}(\langle 1,d_4 \rangle, L)$, et l'intègre à sa copie locale.
+Puis A insère l'élément "O", toujours en fin de séquence.
+La modification $\trm{ins}(L \prec O)$ est convertie en opération $\trm{ins}(1 \oplus \langle 1,d_6 \rangle, O)$ et intégrée.
+
+En concurrence, le noeud B insère aussi un élément "L" en fin de séquence.
+Cette modification résulte en l'opération $\trm{ins}(\langle 1,d_5 \rangle, L)$, qui est intégrée.
+Le noeud B supprime ensuite l'élément "M" de la séquence, ce qui produit l'opération $\trm{rmv}(\langle \epsilon,d_1 \rangle)$.
+Cette dernière est intégrée à sa copie locale.
+Notons ici que le noeud de l'arbre des identifiants n'est pas supprimé suite à cette opération : l'élément associé est supprimé mais le noeud est conservé et devient une pierre tombale.
+Nous détaillons ci-après le fonctionnement des pierres tombales dans Treedoc.
+
+Les deux noeuds procèdent ensuite à une synchronisation, échangeant leurs opérations respectives.
+Lorsque A (resp. B) intègre $\trm{ins}(\langle 1,d_5 \rangle, L)$ (resp. $\trm{ins}(\langle 1,d_4 \rangle, L)$), il ajoute cet élément avec son désambiguateur dans noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_4 < d_5$).
+
+B intègre ensuite $\trm{ins}(1 \oplus \langle 1,d_6 \rangle, O)$.
+Il existe cependant une ambiguité sur la position de "O" : cet élément doit-il être placé après l'élément "L" ayant pour identifiant $\langle 1,d_4 \rangle$, ou l'élément "L" ayant pour identifiant $\langle 1,d_5 \rangle$ ?
+Treedoc résout de manière déterministe cette ambiguité en insérant l'élément en tant qu'enfant droit du noeud $1$ et de ses éléments.
+Ainsi, les noeuds A et B convergent à l'état "HELLO".
+
+Intéressons-nous dorénavant au modèle de livraison requis par Treedoc.
+Dans \cite{2009-treedoc-preguica}, les auteurs indiquent reposer sur le modèle de livraison causal.
+En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
+\begin{definition}[Modèle livraison Treedoc]
+  Le modèle de livraison Treedoc définit que :
+  \begin{enumerate}[label=(\roman*)]
+    \item Une opération doit être livrée exactement une fois à chaque noeud.
+    \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
+    \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+  \end{enumerate}
+\end{definition}
+
+Treedoc souffre néanmoins de plusieurs limites.
+Tout d'abord, le mécanisme d'identifiants de positions proposé est couplé à la structure d'arbre binaire.
+Cependant, les utilisateur-rices ont tendance à écrire de manière séquentielle, \ie dans le sens d'écriture de la langue utilisée.
+Les nouveaux identifiants forment donc généralement une liste chaînée, qui déséquilibre l'arbre.
+
+Ensuite, comme illustré dans la \autoref{fig:treedoc}, Treedoc doit conserver un noeud de l'arbre des identifiants malgré sa suppression lorsque ce dernier possède des enfants.
+Ce noeud de l'arbre devient alors une pierre tombale.
+Comparé à l'approche à pierres tombales, Treedoc a pour avantage que son mécanisme de \ac{GC} ne repose pas sur la stabilité causale d'opérations.
+En effet, Treedoc peut supprimer définitivement un noeud de l'arbre binaire des identifiants dès lors que celui-ci est une pierre tombale et une feuille de l'arbre.
+Ainsi, Treedoc ne nécessite pas de coordination asynchrone avec l'ensemble des noeuds du système pour purger les pierres tombales.
+Néanmoins, l'évaluation de \cite{2009-treedoc-preguica} a montré que les pierres tombales pouvait représenter jusqu'à 95\% des noeuds de l'arbre.
+
+Finalement, Treedoc souffre du problème de l'entrelacement d'éléments insérés de manière concurrente, contrairement à ce qui est conjecturé dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+En effet, nous présentons un contre-exemple correspondant dans l'\autoref{app:treedoc-interleaving}.

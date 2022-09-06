@@ -737,6 +737,25 @@ Dans le cadre des Delta-based \acp{CRDT}, pourrait évaluer un protocole de diff
   \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
 \end{itemize}
 
+\Annex{Entrelacement d'insertions concurrentes dans Treedoc}
+
+\label{app:treedoc-interleaving}
+
+\begin{figure}[!ht]
+
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \includegraphics{img/contre-exemple-treedoc}
+  }
+  \caption{Modifications concurrentes d'une séquence Treedoc résultant en un entrelacement}
+\end{figure}
+
+\mnnote{
+  TODO: Réaliser au propre contre-exemple.
+  Nécessite que $d_E < d_O$, inverser A et B histoire d'éviter toute confusion.
+  En soi, C pas nécessaire, à voir si le conserve.
+}
+
 \Annex{Algorithmes \textsc{renameId}}
 
 \label{app:rename-id}

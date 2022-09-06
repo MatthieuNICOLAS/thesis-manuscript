@@ -15,7 +15,7 @@ Le second principe sur lequel reposent les RADTs est la \ac{PT}.
     La relation de précédence définit qu'étant donné deux opérations, $o_1$ et $o_2$, l'intention de $o_2$ doit être préservée par rapport à celle de $o_1$, noté $o_1 \dashrightarrow o_2$, si et seulement si :
     \begin{enumerate}[label=(\roman*)]
       \item $o_1 \rightarrow o_2$ ou
-      \item $o_1 || o_2$ et $o_2$ a une priorité supérieure à $o_1$.
+      \item $o_1 \parallel o_2$ et $o_2$ a une priorité supérieure à $o_1$.
     \end{enumerate}
   \end{subdefinition}
   \ac{PT} définit qu'étant donné trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors on a $o_1 \dashrightarrow o_3$.
