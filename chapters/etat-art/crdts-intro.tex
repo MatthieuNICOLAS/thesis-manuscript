@@ -10,7 +10,7 @@ Nous l'adaptons ci-dessous à notre contexte :
 
 \begin{definition}[Relation \hb]
   La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
     \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
     \item Il existe une modification $m$ telle que $m_1 \rightarrow m \land m \rightarrow m_2$.
@@ -86,7 +86,7 @@ Les \acfp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 20
   Ces nouvelles spécifications sont conçues pour être utilisées dans des systèmes distribués adoptant la réplication optimiste.
   Ainsi, elles offrent les deux propriétés suivantes :
 
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item Les \acp{CRDT} peuvent être modifiés sans coordination avec les autres noeuds.
     \item Les \acp{CRDT} garantissent la \emph{convergence forte} \cite{shapiro_2011_crdt}.
   \end{enumerate}
@@ -99,7 +99,7 @@ Les \acfp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 20
 
 Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis \cite{2002-intro-lattices-order-davey} :
 
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
   \item Les modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
   \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.

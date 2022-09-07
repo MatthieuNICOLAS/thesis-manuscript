@@ -1,238 +1,317 @@
-\begin{itemize}
-  \item En parallèle à Treedoc \cite{2009-treedoc-preguica}, \textcite{2009-logoot-weiss} proposent Logoot.
-    Ce nouvel \ac{CRDT} pour Séquence repose sur idée similaire à celle de Treedoc : il associe un identifiant de position, provenant d'un espace dense, à chaque élément de la séquence.
-  \item Dans \cite{2009-logoot-weiss}, les identifiants de positions sont de la forme $\langle \trm{tuples},\trm{seq} \rangle$ avec
+En parallèle à Treedoc \cite{2009-treedoc-preguica}, \textcite{2009-logoot-weiss} proposent Logoot.
+Ce nouvel \ac{CRDT} pour Séquence repose sur idée similaire à celle de Treedoc : il associe un identifiant de position, provenant d'un espace dense, à chaque élément de la séquence.
+Ainsi, ces identifiants ont les mêmes propriétés que celles décrites dans \autoref{def:dense-ids}.
+
+Dans \cite{2009-logoot-weiss}, les identifiants de positions sont décrits de la manière suivante :
+\begin{definition}[Identifiant Logoot v1]
+  Un identifiant Logoot est une paire $\langle \trm{tuples},\trm{seq} \rangle$ avec
   \begin{itemize}
-    \item $\trm{seq}$, le numéro de séquence du noeud à l'insertion de l'élément
-    \item $\trm{tuples}$, une liste de paires $\langle \trm{pos},\trm{nodeId} \rangle$ avec
-    \item $\trm{pos}$, un entier
-    \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément.
+    \item $\trm{tuples}$, une liste de tuples Logoot,
+    \item $\trm{seq}$, le numéro de séquence courant du noeud auteur de l'élément.
   \end{itemize}
-  \item Par la suite, \cite{2010-logoot-undo-weiss} re-spécifie les identifiants de positions de la manière suivante :
-  \begin{itemize}
-    \item liste de tuples avec chaque tuple un triplet <pos, site, seq> avec
-    \begin{itemize}
-      \item pos un entier
-      \item site l'identifiant de site
-      \item seq le numéro de séquence du site à l'ins de l'élément
-    \end{itemize}
-  \end{itemize}
-  \item Dans le cadre de cette section, nous nous basons sur cette dernière spécification.
-    Nous utiliserons la notation suivante $\betterid{pos}{nodeId~seq}{}$ pour représenter chacun des tuples composant un identifiant de position Logoot.
-    Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers pour $\trm{seq}$.
-    Par exemple, l'identifiant $\langle \langle i,A,1 \rangle \langle f,B,1 \rangle \rangle$ est représenté par $\betterid{i}{A1}{}\betterid{f}{B1}{}$.
-  \item Logoot définit un ordre strict total $\lid$ sur les identifiants de position.
-    Cet ordre lui permet de les ordonner relativement les uns aux autres, et ainsi ordonner les éléments associés.
-    Pour définir $\lid$, Logoot se base sur l'ordre lexicographique.
-    \begin{definition}[Relation $\lid$]
-      Étant donné deux identifiants $id = t_1 \oplus t_2 \oplus ... \oplus t_n$ et $id' = t'_1 \oplus t'_2 \oplus ... \oplus t'_m$, on a :
-        \[
-          id \lid id' \quad \trm{iff} \quad
-          \begin{cases}
-            n < m \land \forall i \in [1,n] \cdot t_i = t'_j                                   & \text{or} \\
-            \exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \land t_j \ltuple t'_j &           \\
-          \end{cases}
-        \]
-    \end{definition}
-
-    avec :
-
-    \begin{definition}[Relation $\ltuple$]
-      Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{seq'} \rangle$, on a :
-        \[
-          t \ltuple t' \quad \trm{iff} \quad
-          \begin{cases}
-            \trm{pos} < \trm{pos}'                                            & \text{or} \\
-            \trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}                    & \text{or} \\
-            \trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} < \trm{seq'}  &           \\
-          \end{cases}
-        \]
-    \end{definition}
-  \item Logoot spécifie une fonction \texttt{generateId}.
-    Cette fonction permet de générer un nouvel identifiant de position, $\trm{id}$, entre deux identifiants donnés, $\trm{predId}$ et $\trm{succId}$, tel que $\trm{predId} \prec \trm{id} \prec \trm{succId}$.
-    Plusieurs algorithmes peuvent être utilisés pour cela.
-    Notamment, \cite{2009-logoot-weiss} présente un algorithme permettant de générer $N$ identifiants de manière aléatoire entre les identifiants $\trm{predId}$ et $\trm{succId}$.
-    Nous présentons ci-dessous un algoritme naïf.
-    \mnnote{TODO: Insérer algo}
-    % \begin{itemize}
-    %   \item Travaille sur predId et nextId, transformée en chaîne infinie
-    %   \item Consiste à comparer séquentiellement les tuples de predId et de nextId et à les recopier tant qu'il s'agit de leur préfixe commun
-    %   \item Une fois une différence détectée, vérifie si intervalle suffisament grand pour insérer nbIds
-    %   \item Si ce n'est pas le cas, concatène tuple de predId, passe au tuple suivant et "épuise" nextId
-    %   \item Concatène au préfixe un nouveau tuple <pos,site,seq> avec pos une valeur aléatoire de l'intervalle, bornes exclues
-    % \end{itemize}
-  \item Pour illustrer cet algorithme, considérons \texttt{generateId(predId, nextId, nodeId, seq)} avec  $\trm{nodeId} = \trm{C}$ et $\trm{seq} = 1$ et
-    \begin{enumerate}[label=(\roman*)]
-      \item $\trm{predId} = \betterid{e}{A1}{}$, $\trm{nextId} = \betterid{m}{B1}{}$.
-        Ces deux identifiants n'ayant aucun préfixe commun, \texttt{generateId} renvoie un identifiant composé d'un tuple avec une position aléatoire choisie entre leur positions respectives, \ie dans $]\trm{e},\trm{m}[$, et avec les valeurs $\trm{nodeId}$ et $\trm{seq}$, \eg $\betterid{l}{C1}{}$.
-      \item $\trm{predId} = \betterid{i}{A1}{}\betterid{f}{A2}{}$, $\trm{succId} = \betterid{i}{A1}{}\betterid{g}{B1}{}$.
-        Ici, les deux identifiants ont un préfixe commun, $\betterid{i}{A1}{}$, que \texttt{generateId} récupère.
-        \texttt{generateId} compare ensuite les tuples suivants de $\trm{predId}$ et $\trm{succId}$ pour déterminer si l'intervalle entre les deux est suffisant pour insérer un nouvel identifiant.
-        Ces tuples étant respectivement $\betterid{f}{A2}{}$ et $\betterid{g}{B1}{}$, ce n'est pas le cas ici.
-        \texttt{generateId} copie alors le tuple courant de $\trm{predId}$, récupère le prochain tuple de $\trm{predId}$ et utilise $MAXTUPLE$ à la place du prochain tuple $\trm{succId}$.
-        Il génère finalement un nouveau tuple avec une valeur aléatoire de position choisie dans $]MINPOS,MAXPOS]$\footnotemark, et avec les valeurs $\trm{nodeId}$ et $\trm{seq}$, \eg $\betterid{i}{A1}{}\betterid{f}{A2}{}\betterid{m}{C1}{}$.
-        \footnotetext{Il est important d'exclure $\trm{MINPOS}$ des valeurs possibles pour $\trm{pos}$ du dernier tuple d'un identifiant $\trm{id}$ afin de garantir que l'espace reste dense, notamment pour garantir qu'un noeud sera toujours en mesure de générer un nouvel identifiant $\trm{id'}$ tel que $\trm{id'} \lid \trm{id}$.}
+  avec les tuples Logoot définis de la manière suivante :
+  \begin{subdefinition}[Tuple Logoot v1]
+    Un tuple Logoot est une paire $\langle \trm{pos},\trm{nodeId} \rangle$ avec
+    \begin{enumerate}
+      \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense,
+      \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément.
     \end{enumerate}
-  \item L'utilisation d'identifiants de position permet de redéfinir les modifications :
-    \begin{enumerate}[label=(\roman*)]
-      \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins(\trm{id}, \trm{elt})}$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
-      \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+  \end{subdefinition}
+\end{definition}
+
+Par la suite, \cite{2010-logoot-undo-weiss} re-spécifie les identifiants de positions de la manière suivante :
+\begin{definition}[Identifiant Logoot v2]
+  Un identifiant Logoot est une liste de tuples Logoot avec les tuples Logoot définis de la manière suivante :
+  \begin{subdefinition}[Tuple Logoot v2]
+    Un tuple Logoot est un triplet $\langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ avec
+    \begin{enumerate}
+      \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense,
+      \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément,
+      \item $\trm{seq}$, le numéro de séquence courant du noeud auteur de l'élément.
     \end{enumerate}
-  \item Nous illustrons à présent son fonctionnement à l'aide de la \autoref{fig:logoot}.
-    \begin{figure}[!ht]
+  \end{subdefinition}
+\end{definition}
 
-      \centering
-      \resizebox{\columnwidth}{!}{
-        \begin{tikzpicture}
-          \newcommand\nodeh[1]{
-            node[letter, label=#1:{$\betterid{i}{A1}{}$}] {H}
-          }
-          \newcommand\nodee[1]{
-            node[letter, label=#1:{$\betterid{m}{B1}{}$}] {E}
-          }
-          \newcommand\nodela[1]{
-            node[letter, label=#1:{$\betterid{m}{B1}{}\betterid{o}{A3}{}$}] {L}
-          }
-          \newcommand\nodem[1]{
-            node[letter, label=#1:{$\betterid{n}{B2}{}$}] {M}
-          }
-          \newcommand\nodel[1]{
-            node[letter, label=#1:{$\betterid{s}{A2}{}$}] {L}
-          }
-          \newcommand\nodeo[1]{
-            node[letter, label=#1:{$\betterid{u}{B3}{}$}] {O}
-          }
+Dans le cadre de cette section, nous nous basons sur cette dernière spécification.
+Nous utiliserons la notation suivante $\betterid{pos}{nodeId~seq}{}$ pour représenter un tuple Logoot.
+Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers pour $\trm{seq}$.
+Par exemple, l'identifiant $\langle \langle i,A,1 \rangle \langle f,B,1 \rangle \rangle$ est représenté par $\betterid{i}{A1}{}\betterid{f}{B1}{}$.
 
+Logoot définit un ordre strict total $\lid$ sur les identifiants de position.
+Cet ordre lui permet de les ordonner relativement les uns aux autres, et ainsi ordonner les éléments associés.
+Pour définir $\lid$, Logoot se base sur l'ordre lexicographique.
+\begin{definition}[Relation $\lid$]
+  Étant donné deux identifiants $id = t_1 \oplus t_2 \oplus ... \oplus t_n$ et $id' = t'_1 \oplus t'_2 \oplus ... \oplus t'_m$, on a :
+  \begin{equation*}
+    \begin{split}
+      id \lid id' \quad \trm{iff} \quad     & (n < m \land \forall i \in [1,n] \cdot t_i = t'_j) \quad \lor \\
+                                            & (\exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \land t_j \ltuple t'_j) \\
+    \end{split}
+  \end{equation*}
+  avec $\ltuple$ défini de la manière suivante :
+  \begin{subdefinition}[Relation $\ltuple$]
+    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{seq'} \rangle$, on a :
+    \begin{equation*}
+      \begin{split}
+        t \ltuple t' \quad \trm{iff} \quad  & (\trm{pos} < \trm{pos}') \quad \lor \\
+                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}) \quad \lor \\
+                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} < \trm{seq'}) \\
+      \end{split}
+    \end{equation*}
+  \end{subdefinition}
+\end{definition}
 
-          \newcommand\initialstate[3]{
-            \path
-              #1
-              ++#2
-              ++(0:0.5)
-              ++(#3:0.5) \nodeh{#3}
-              ++(0:\widthletter) \nodee{-#3}
-              ++(0:\widthletter) \nodem{#3}
-              ++(0:\widthletter) \nodel{-#3}
-              ++(0:\widthletter) \nodeo{#3};
-          }
+Logoot spécifie une fonction \texttt{generateId}.
+Cette fonction permet de générer un nouvel identifiant de position, $\trm{id}$, entre deux identifiants donnés, $\trm{predId}$ et $\trm{succId}$, tel que $\trm{predId} \prec \trm{id} \prec \trm{succId}$.
+Plusieurs algorithmes peuvent être utilisés pour cela.
+Notamment, \cite{2009-logoot-weiss} présente un algorithme permettant de générer $N$ identifiants de manière aléatoire entre des identifiants $\trm{predId}$ et $\trm{succId}$, mais reposant sur une représentation efficace des tuples en mémoire.
+Par souci de simplicité, nous présentons dans \autoref{alg:logoot-generateId} un algorithme naïf pour \texttt{generateId}.
 
-          \newcommand\insl[3]{
-            \path
-              #1
-              ++#2
-              ++(0:0.5)
-              ++(#3:0.5) \nodeh{#3}
-              ++(0:\widthletter) \nodee{-#3}
-              ++(0:\widthletter) \nodela{#3}
-              ++(0:\widthletter) \nodem{-#3}
-              ++(0:\widthletter) \nodel{#3}
-              ++(0:\widthletter) \nodeo{-#3};
-          }
+\begin{algorithm}[!ht]
+  \footnotesize
+  \begin{algorithmic}[1]
+    \Function{generateId}{predId $\in \mathbb{I}$, succId $\in \mathbb{I}$, nodeId $\in \mathbb{N}$, seq $\in \mathbb{N^{*}}$}
+      \Statex \Comment \textbf{precondition:} $\text{predId} \lid \text{succId}$
+      \If{$\text{succId} = \text{predId} \oplus \logootuple{j} \oplus ...$} \label{alg:logoot-generateId-if-start}
+        \Statex \Comment predId is a prefix of succId
+        \State $\text{pos} \gets \text{random} \in ]\botn, \text{pos}_j[$
+        \State $\text{id} \gets \text{predId} \oplus \logootuple{}$ \label{alg:logoot-generateId-if-end}
+      \ElsIf{
+          $\text{predId} = \text{common} \oplus \logootuple{i} \oplus ... \land$ \\
+          $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus ... \land$ \\
+          $\text{pos}_j - \text{pos}_i \leq 1$
+        } \label{alg:logoot-generateId-elsif-start}
+        \Statex \Comment Not enough space between predId and succId
+        \Statex \Comment to insert new id with same length
+        \Statex \Comment common may be empty
+        \State $\text{pos} \gets \text{random} \in ]\text{pos}_{i+1}, \topn]$
+        \State $\text{id} \gets \text{common} \oplus \logootuple{i} \oplus \logootuple{}$ \label{alg:logoot-generateId-elsif-end}
+      \Else \label{alg:logoot-generateId-else-start}
+        \Statex \Comment  $\text{predId} = \text{common} \oplus \logootuple{i} \oplus ... \land$
+        \Statex \Comment $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus ... \land$
+        \Statex \Comment $\text{pos}_j - \text{pos}_i > 1$
+        \Statex \Comment common may be empty
+        \State $\text{pos} \gets \text{random} \in ]\text{pos}_i,\text{pos}_j[$
+        \State $\text{id} \gets \text{common} \oplus \logootuple{}$ \label{alg:logoot-generateId-else-end}
+      \EndIf
+      \State \Return id
+      \Comment \textbf{postcondition:} $\text{predId} \lid \text{id} \lid \text{succId}$
+    \EndFunction
+  \end{algorithmic}
+  \caption{Algorithme de génération d'un nouvel identifiant}
+  \label{alg:logoot-generateId}
+\end{algorithm}
 
-          \newcommand\rmvm[3]{
-            \path
-              #1
-              ++#2
-              ++(0:0.5)
-              ++(#3:0.5) \nodeh{#3}
-              ++(0:\widthletter) \nodee{-#3}
-              ++(0:\widthletter) \nodel{#3}
-              ++(0:\widthletter) \nodeo{-#3};
-          }
+Pour illustrer cet algorithme, considérons son exécution avec :
+\begin{enumerate}
+  \item $\trm{predId} = \betterid{e}{A1}{}$, $\trm{nextId} = \betterid{m}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{seq} = 1$.
+    \texttt{generateId} commence par déterminer où fini le préfixe commun entre les deux identifiants.
+    Dans cet exemple, $\trm{predId}$ et $\trm{succId}$ n'ont aucun préfixe commun, \ie $common = \emptyset$.
+    \texttt{generateId} compare donc les valeurs de $\trm{pos}$ de leur premier tuple respectifs, \ie $e$ et $m$, pour déterminer si un nouvel identifiant de taille 1 peut être inséré dans cet intervalle.
+    S'agissant du cas ici, \texttt{generateId} choisit une valeur aléatoire dans $]e,m[$, \eg $l$, et renvoie un identifiant composé de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{seq}$, \ie $id = \betterid{l}{C1}{}$ (lignes \ref{alg:logoot-generateId-else-start}-\ref{alg:logoot-generateId-else-end}).
+  \item $\trm{predId} = \betterid{i}{A1}{}\betterid{f}{A2}{}$, $\trm{succId} = \betterid{i}{A1}{}\betterid{g}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{seq} = 1$.
+    De manière similaire à précédemment, \texttt{generateId} détermine le préfixe commun entre $\trm{predId}$ et $\trm{succId}$.
+    Ici, $\trm{common} = \betterid{i}{A1}{}$.
+    \texttt{generateId} compare ensuite les valeurs de $\trm{pos}$ de leur second tuple respectifs, \ie $f$ et $g$, pour déterminer si un nouvel identifiant de taille 2 peut être inséré dans cet intervalle.
+    Ce n'est point le cas ici, \texttt{generateId} doit donc recopier le second tuple de $\trm{predId}$ pour former $\trm{id}$ et y concaténer un nouveau tuple.
+    Pour générer ce nouveau tuple, \texttt{generateId} choisit une valeur aléatoire entre la valeur de $\trm{pos}$ du troisième tuple de $\trm{predId}$ et la valeur maximale notée $\topn$.
+    $\trm{predId}$ n'ayant pas de troisième tuple, \texttt{generateId} utilise la valeur minimale pour $\trm{pos}$, $\botn$.
+    \texttt{generateId} choisit donc une valeur aléatoire dans $]\botn,\topn]$\footnotemark, \eg $m$, et renvoie un identifiant composé du préfixe commun, du tuple suivant de $\trm{predId}$ et d'un tuple formé à partir de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{seq}$, \ie $id = \betterid{i}{A1}{}\betterid{f}{A2}{}\betterid{m}{C1}{}$ (lignes \ref{alg:logoot-generateId-elsif-start}-\ref{alg:logoot-generateId-elsif-end}).
+    \footnotetext{Il est important d'exclure $\botn$ des valeurs possibles pour $\trm{pos}$ du dernier tuple d'un identifiant $\trm{id}$ afin de garantir que l'espace reste dense, notamment pour garantir qu'un noeud sera toujours en mesure de générer un nouvel identifiant $\trm{id'}$ tel que $\trm{id'} \lid \trm{id}$.}
+\end{enumerate}
 
-          \newcommand\finalstate[3]{
-            \path
-              #1
-              ++#2
-              ++(0:0.5)
-              ++(#3:0.5) \nodeh{#3}
-              ++(0:\widthletter) \nodee{-#3}
-              ++(0:\widthletter) \nodela{#3}
-              ++(0:\widthletter) \nodem{-#3}
-              ++(0:\widthletter) \nodel{#3}
-              ++(0:\widthletter) \nodeo{-#3};
-          }
+Comme pour Treedoc, l'utilisation d'identifiants de position permet de redéfinir les modifications :
+\begin{enumerate}
+  \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins(\trm{id}, \trm{elt})}$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
+  \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+\end{enumerate}
+Les auteurs proposent ainsi une séquence répliquée avec des opérations commutatives.
 
-          \newcommand\offseta{ (90:0.5) }
-          \newcommand\offsetb{ (270:0.7) }
+Nous illustrons cela à l'aide de la \autoref{fig:logoot}.
+\begin{figure}[!ht]
 
-          \path
-              node {\textbf{A}}
-              ++(0:0.5) node (a) {}
-              +(0:30) node (a-end) {}
-              +(0:2) node[point] (a-initial) {}
-              +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=5em]-10:{$\trm{ins}(\langle \betterid{m}{B1}{}\betterid{o}{A3}{},L \rangle)$}}] (a-ins-l) {}
-              +(0:20) node[point] (a-recv-rmv-m) {}
-              +(0:28) node (a-final) {};
-
-          \initialstate{(a-initial)}{\offseta}{90};
-          \insl{(a-ins-l)}{\offseta}{90};
-          \finalstate{(a-recv-rmv-m)}{\offseta}{90};
-
-          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-          \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
-
-          \path
-              ++(270:3) node {\textbf{B}}
-              ++(0:0.5) node (b) {}
-              +(0:30) node (b-end) {}
-              +(0:2) node[point] (b-initial) {}
-              +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=5em]10:{$\trm{rmv}(\betterid{n}{B2}{})$}}] (b-rmv-m) {}
-              +(0:20) node[point] (b-recv-ins-l) {}
-              +(0:28) node (b-final) {};
-
-          \initialstate{(b-initial)}{\offsetb}{-90};
-          \rmvm{(b-rmv-m)}{\offsetb}{-90};
-          \finalstate{(b-recv-ins-l)}{\offsetb}{-90};
-
-          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-          \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
-
-          \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
-          \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
-        \end{tikzpicture}
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \newcommand\nodeh[1]{
+        node[letter, label=#1:{$\betterid{i}{A1}{}$}] {H}
       }
-      \caption{Modifications concurrentes d'une séquence répliquée Logoot}
-      \label{fig:logoot}
-    \end{figure}
-  \item Concernant le modèle de livraison de Logoot, \cite{2009-logoot-weiss} indique se reposer sur le modèle de livraison causal.
-    Nous constatons cependant que :
-    \begin{itemize}
-      \item Les opérations $\trm{ins}$ sont commutatives, elles peuvent donc être délivrées dans le désordre.
-      \item Les opérations $\trm{ins}$ et $\trm{rmv}$ d'un même élément ne sont pas commutatives, les opérations $\trm{rmv}$ doivent être délivrées après les opérations $\trm{ins}$ correspondantes.
-    \end{itemize}
-    Logoot peut donc adopter le modèle de livraison \emph{Exactly-once + Causal Remove} comme indiqué dans \cite{2021-these-vic}.
-  \item Limites
-  \begin{itemize}
-    \item Croissance non-bornée des identifiants
-    \item Même si expérience montre que taille reste limitée
-  \end{itemize}
-  \item Plusieurs extensions furent proposées pour Logoot.
-    \textcite{2010-logoot-undo-weiss} proposent une nouvelle stratégie d'allocation des identifiants pour \texttt{generateId}.
-    Cette stratégie consiste à limiter la distance entre deux identifiants insérés au cours de la même modification $\trm{ins}$, au lieu des les répartir de manière aléatoire entre $\trm{predId}$ et $\trm{succId}$.
-    Ceci permet de regrouper les identifiants des éléments insérés par une même modification et de laisser plus d'espace pour les insertions suivantes.
-    En réduisant la vitesse à laquelle l'espace d'identifiants se sature pour une taille donnée d'identifiants, et donc la vitesse de croissance des identifiants, ce nouvel algorithme permet de réduire le surcoût en métadonnées, calculs et bande-passant du \ac{CRDT}.
-  \item Toujours dans \cite{2010-logoot-undo-weiss}, les auteurs introduisent \emph{Logoot-Undo}, une version de Logoot dotée d'un mécanisme d'undo.
-    Ce mécanisme prend la forme d'une nouvelle modification, $\trm{undo}$, qui permet d'annuler l'effet d'une ou plusieurs modifications passées.
-    Cette modification, et l'opération en résultant, est spécifiée de manière à être commutative avec toutes autres opérations concurrentes, \ie $\trm{ins}$, $\trm{rmv}$ et $\trm{undo}$ elle-même.
-  \item Pour définir $\trm{undo}$, une notion de \emph{degrée de visibilité} d'un élément est introduite.
-    Elle permet à Logoot-Undo de déterminer si l'élément doit être affiché ou non.
-    Pour cela, Logoot-Undo maintient une structure auxiliaire, le \emph{Cimetière}, qui référence les identifiants des éléments dont le degrée est inférieur à 0\footnote{Nous pouvons dès lors inférer le degrée des identifiants restants en fonction de s'ils se trouvent dans la séquence (1) ou s'ils sont absents à la fois de la séquence et du cimetière (0).}.
-    Ainsi, Logoot-Undo ne référence qu'un nombre réduit de pierres tombales.
-    Qui plus est, ces pierres tombales sont stockées en dehors de la structure représentant la séquence et n'impactent donc pas les performances des modifications ultérieures.
-  \item Nous illustrons le fonctionnement de ce mécanisme à l'aide de la \autoref{fig:logoot-undo}.
-  \begin{figure}[!ht]
+      \newcommand\nodee[1]{
+        node[letter, label=#1:{$\betterid{m}{B1}{}$}] {E}
+      }
+      \newcommand\nodela[1]{
+        node[letter, label=#1:{$\betterid{m}{B1}{}\betterid{o}{A3}{}$}] {L}
+      }
+      \newcommand\nodem[1]{
+        node[letter, label=#1:{$\betterid{n}{B2}{}$}] {M}
+      }
+      \newcommand\nodel[1]{
+        node[letter, label=#1:{$\betterid{s}{A2}{}$}] {L}
+      }
+      \newcommand\nodeo[1]{
+        node[letter, label=#1:{$\betterid{u}{B3}{}$}] {O}
+      }
 
-    \centering
-    TODO
-    \caption{Modifications concurrentes d'une séquence répliquée Logoot-Undo}
-    \label{fig:logoot-undo}
-  \end{figure}
-  \item Il convient de noter que l'ajout du degrée de visibilité des éléments permet de rendre commutatives l'opération $\trm{ins}$ avec l'opération $\trm{rmv}$ d'un même élément.
-    Ainsi, Logoot-Undo ne nécessite comme modèle de livraison que le modèle \emph{Eventual Delivery}.
-  \item Finalement, \textcite{2013-logootsplit} introduit \emph{LogootSplit}.
-    Reprenant les idées introduites par \cite{2012-string-wise}, ce travail présente un mécanisme d'aggrégation dynamiques des élements en blocs.
-    Ceci permet de réduire la granularité des éléments stockés dans la séquence, et ainsi de réduire le surcoût en métadonnées, calculs et bande-passante du \ac{CRDT}.
-    Nous utilisons ce \ac{CRDT} pour séquence comme base pour les travaux présentés dans ce manuscrit.
-    Nous dédions donc la \autoref{sec:logootsplit} à sa présentation en détails.
-\end{itemize}
+
+      \newcommand\initialstate[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5)
+          ++(#3:0.5) \nodeh{#3}
+          ++(0:\widthletter) \nodee{-#3}
+          ++(0:\widthletter) \nodem{#3}
+          ++(0:\widthletter) \nodel{-#3}
+          ++(0:\widthletter) \nodeo{#3};
+      }
+
+      \newcommand\insl[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5)
+          ++(#3:0.5) \nodeh{#3}
+          ++(0:\widthletter) \nodee{-#3}
+          ++(0:\widthletter) \nodela{#3}
+          ++(0:\widthletter) \nodem{-#3}
+          ++(0:\widthletter) \nodel{#3}
+          ++(0:\widthletter) \nodeo{-#3};
+      }
+
+      \newcommand\rmvm[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5)
+          ++(#3:0.5) \nodeh{#3}
+          ++(0:\widthletter) \nodee{-#3}
+          ++(0:\widthletter) \nodel{#3}
+          ++(0:\widthletter) \nodeo{-#3};
+      }
+
+      \newcommand\finalstate[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5)
+          ++(#3:0.5) \nodeh{#3}
+          ++(0:\widthletter) \nodee{-#3}
+          ++(0:\widthletter) \nodela{#3}
+          ++(0:\widthletter) \nodel{-#3}
+          ++(0:\widthletter) \nodeo{#3};
+      }
+
+      \newcommand\offseta{ (90:0.5) }
+      \newcommand\offsetb{ (270:0.7) }
+
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:30) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=5em]-10:{$\trm{ins}(\langle \betterid{m}{B1}{}\betterid{o}{A3}{},L \rangle)$}}] (a-ins-l) {}
+          +(0:20) node[point] (a-recv-rmv-m) {}
+          +(0:28) node (a-final) {};
+
+      \initialstate{(a-initial)}{\offseta}{90};
+      \insl{(a-ins-l)}{\offseta}{90};
+      \finalstate{(a-recv-rmv-m)}{\offseta}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-l) --  (a-recv-rmv-m) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:30) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=5em]10:{$\trm{rmv}(\betterid{n}{B2}{})$}}] (b-rmv-m) {}
+          +(0:20) node[point] (b-recv-ins-l) {}
+          +(0:28) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb}{-90};
+      \rmvm{(b-rmv-m)}{\offsetb}{-90};
+      \finalstate{(b-recv-ins-l)}{\offsetb}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-rmv-m) -- (b-recv-ins-l) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ins-l) -- (b-recv-ins-l);
+      \draw[->, dashed, shorten >= 1] (b-rmv-m) -- (a-recv-rmv-m);
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes d'une séquence répliquée Logoot}
+  \label{fig:logoot}
+\end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée Logoot.
+Les deux noeuds possèdent le même état initial : une séquence contenant les éléments "HEMLO", avec leur identifiants respectifs.
+
+Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{ins}(E \prec L \prec M)$.
+Logoot doit alors associer à cet élément un identifiant $\trm{id}$ tel que $\betterid{m}{B1}{} \prec \trm{id} \prec \betterid{n}{B2}{}$.
+Dans cet exemple, Logoot choisit l'identifiant $\betterid{m}{B1}{}\betterid{o}{A3}{}$.
+L'opération correspondante à l'insertion, $\trm{ins}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$, est générée, intégrée à la copie locale et diffusée.
+
+En concurrence, le noeud B supprime l'élément "M" de la séquence.
+Logoot retrouve l'identifiant de cet élément, $\betterid{n}{B2}{}$ et produit l'opération $\trm{rmv}(\betterid{n}{B2}{})$.
+Cette dernière est intégrée à sa copie locale et diffusée.
+
+À la réception de l'opération $\trm{rmv}(\betterid{n}{B2}{})$, le noeud A parcourt sa copie locale.
+Il identifie l'élément possèdant cet identifiant, "M", et le supprime de sa séquence.
+De son côté, le noeud B reçoit l'opération $\trm{ins}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$.
+Il parcourt sa copie locale jusqu'à trouver un identifiant supérieur à celui de l'opération : $\betterid{s}{B2}{}$.
+Il insère alors l'élément reçu avant ce dernier.
+Les noeuds convergent alors à l'état "HELLO".
+
+Concernant le modèle de livraison de Logoot, \cite{2009-logoot-weiss} indique se reposer sur le modèle de livraison causal.
+Nous constatons cependant que nous pouvons proposer un modèle de livraison moins contraint :
+\begin{definition}[Modèle livraison Logoot]
+  Le modèle de livraison Logoot définit que :
+  \begin{enumerate}
+    \item Une opération doit être livrée exactement une fois à chaque noeud.
+    \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
+    \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+  \end{enumerate}
+\end{definition}
+Ainsi, Logoot peut adopter le même modèle de livraison que Treedoc, comme indiqué dans \cite{2021-these-vic}.
+
+En contrepartie, Logoot souffre d'un problème de croissance de la taille des identifiants.
+Comme mis en lumière dans la \autoref{fig:logoot}, Logoot génère des identifiants composés de plus en plus de tuples au fur et à mesure que l'espace des identifiants pour une taille donnée se sature.
+La croissance des identifiants a cependant plusieurs impacts négatifs :
+\begin{enumerate}
+  \item Les identifiants sont stockés au sein de la séquence répliquée.
+    Leur croissance augmente donc le surcoût en métadonnées du \ac{CRDT}.
+  \item Les identifiants sont diffusés sur le réseau par le biais des opérations.
+    Leur croissance augmente donc le surcoût en bande-passante du \ac{CRDT}.
+  \item Les identifiants sont comparés entre eux lors de l'intégration des opérations.
+    Leur croissance augmente donc le surcoût en calculs du \ac{CRDT}.
+\end{enumerate}
+Un objectif de l'algorithme \texttt{generateId} est donc de limiter le plus possible la vitesse de croissance des identifiants.
+
+Plusieurs extensions furent proposées pour Logoot.
+\textcite{2010-logoot-undo-weiss} proposent une nouvelle stratégie d'allocation des identifiants pour \texttt{generateId}.
+Cette stratégie consiste à limiter la distance entre deux identifiants insérés au cours de la même modification $\trm{ins}$, au lieu des les répartir de manière aléatoire entre $\trm{predId}$ et $\trm{succId}$.
+Ceci permet de regrouper les identifiants des éléments insérés par une même modification et de laisser plus d'espace pour les insertions suivantes.
+Les expérimentations présentées montrent que cette stratégie permet de ralentir la croissance des identifiants en fonction du nombre d'insertions.
+Ce résultat est confirmé par la suite dans \cite{2011-evaluation-crdts-ahmed-nacer}.
+Ainsi, en réduisant la vitesse de croissance des identifiants, ce nouvel algorithme permet de réduire le surcoût en métadonnées, calculs et bande-passante du \ac{CRDT}.
+
+Toujours dans \cite{2010-logoot-undo-weiss}, les auteurs introduisent \emph{Logoot-Undo}, une version de Logoot dotée d'un mécanisme d'undo.
+Ce mécanisme prend la forme d'une nouvelle modification, $\trm{undo}$, qui permet d'annuler l'effet d'une ou plusieurs modifications passées.
+Cette modification, et l'opération en résultant, est spécifiée de manière à être commutative avec toutes autres opérations concurrentes, \ie $\trm{ins}$, $\trm{rmv}$ et $\trm{undo}$ elle-même.
+
+Pour définir $\trm{undo}$, une notion de \emph{degrée de visibilité} d'un élément est introduite.
+Elle permet à Logoot-Undo de déterminer si l'élément doit être affiché ou non.
+Pour cela, Logoot-Undo maintient une structure auxiliaire, le \emph{Cimetière}, qui référence les identifiants des éléments dont le degrée est inférieur à 0\footnote{Nous pouvons dès lors inférer le degrée des identifiants restants en fonction de s'ils se trouvent dans la séquence (1) ou s'ils sont absents à la fois de la séquence et du cimetière (0).}.
+Ainsi, Logoot-Undo ne référence qu'un nombre réduit de pierres tombales.
+Qui plus est, ces pierres tombales sont stockées en dehors de la structure représentant la séquence et n'impactent donc pas les performances des modifications ultérieures.
+
+De plus, il convient de noter que l'ajout du degrée de visibilité des éléments permet de rendre commutatives l'opération $\trm{ins}$ avec l'opération $\trm{rmv}$ d'un même élément.
+Ainsi, Logoot-Undo ne nécessite pour son modèle de livraison qu'une \emph{livraison en exactement un exemplaire à chaque noeud}.
+
+Finalement, \textcite{2013-logootsplit} introduisent \emph{LogootSplit}.
+Reprenant les idées introduites par \cite{2012-string-wise}, ce travail présente un mécanisme d'aggrégation dynamiques des élements en blocs.
+Ceci permet de réduire la granularité des éléments stockés dans la séquence, et ainsi de réduire le surcoût en métadonnées, calculs et bande-passante du \ac{CRDT}.
+Nous utilisons ce \ac{CRDT} pour séquence comme base pour les travaux présentés dans ce manuscrit.
+Nous dédions donc la \autoref{sec:logootsplit} à sa présentation en détails.
+

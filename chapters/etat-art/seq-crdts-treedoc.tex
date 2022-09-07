@@ -1,8 +1,9 @@
 \cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour CRDTs pour Séquence.
 La particuliarité de cette approche est de se baser sur des identifiants de position, respectant un ensemble de propriétés :
 \begin{definition}[Propriétés des identifiants de position]
+  \label{def:dense-ids}
   Les propriétés que les identifiants de position doivent respecter sont les suivantes :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item Chaque identifiant est attribué à un élément de la séquence.
     \item \label{item:uniqueness}
       Aucune paire d'éléments ne partage le même identifiant.
@@ -22,7 +23,7 @@ Cette propriété signifie que :
 Cette propriété garantit donc qu'il sera toujours possible de générer un nouvel identifiant de position entre deux autres, \ie qu'il sera toujours possible d'insérer un nouvel élément entre deux autres (d'après la propriété \ref{item:lid}).
 
 L'utilisation d'identifiants de position permet de redéfinir les modifications de la séquence :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
   \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
 \end{enumerate}
@@ -72,7 +73,7 @@ Ainsi, un noeud de l'arbre des identifiants peut correspondre à plusieurs élé
 Ces éléments sont alors ordonnés les uns par rapport aux autres en respectant l'ordre défini sur leur désambiguateur.
 
 Afin de réduire le surcoût des désambiguateurs, ces derniers ne sont ajoutés au chemin formant un identifiant qu'uniquement lorsqu'ils sont nécessaires, \ie :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item Le noeud courant est le noeud final de l'identifiant.
   \item Le noeud courant nécessite désambiguation, \ie plusieurs éléments utilisent l'identifiant correspondant à ce noeud.
 \end{enumerate}
@@ -114,7 +115,7 @@ La \autoref{fig:treedoc-dis} présente un exemple de cette situation.
 \end{figure}
 Dans cet exemple, deux identifiants furent insérés en concurrence en fin de séquence : $id_4 = \epsilon \oplus \langle 1,d_4 \rangle$ et $id_5 = \epsilon \oplus \langle 1,d_5 \rangle$.
 Pour développer cet exemple, Treedoc générerait les identifiants :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item $id_6 = \epsilon \oplus 1 \oplus \langle 1,d_6 \rangle$ à l'insertion d'un nouvel élément en fin de liste.
   \item $id_7 = \epsilon \oplus \langle 1,d_4 \rangle \oplus \langle 1,d_7 \rangle$ à l'insertion d'un nouvel élément entre les éléments ayant pour identifiants $id_4$ et $id_5$.
 \end{enumerate}
@@ -336,7 +337,7 @@ Dans \cite{2009-treedoc-preguica}, les auteurs indiquent reposer sur le modèle 
 En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
 \begin{definition}[Modèle livraison Treedoc]
   Le modèle de livraison Treedoc définit que :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
     \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
     \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.

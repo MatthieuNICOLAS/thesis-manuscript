@@ -13,6 +13,7 @@
 \usepackage{hyperref}
 \hypersetup{hidelinks}
 \usepackage[inline]{enumitem}
+\setlist[enumerate]{label=(\roman*)} %% <- set the base level label separately
 \usepackage{import} % \import
 \usepackage[french]{minitoc}
 
@@ -47,6 +48,27 @@
 
 \usepackage{algorithm, algpseudocode}
 \floatname{algorithm}{Algorithme} % Renomme caption de "Algorithm" -> "Algorithme"
+
+\newcommand\CONDITION[2]%
+  {\begin{tabular}[t]{@{}l@{}l@{}}
+     #1&#2
+   \end{tabular}%
+  }
+  \algdef{SE}[WHILE]{While}{EndWhile}[1]%
+  {\algorithmicwhile\ \CONDITION{#1}{\ \algorithmicdo}}%
+  {\algorithmicend\ \algorithmicwhile}
+\algdef{SE}[FOR]{For}{EndFor}[1]%
+  {\algorithmicfor\ \CONDITION{#1}{\ \algorithmicdo}}%
+  {\algorithmicend\ \algorithmicfor}
+\algdef{S}[FOR]{ForAll}[1]%
+  {\algorithmicforall\ \CONDITION{#1}{\ \algorithmicdo}}
+\algdef{SE}[REPEAT]{Repeat}{Until}{\algorithmicrepeat}[1]%
+  {\algorithmicuntil\ \CONDITION{#1}{}}
+\algdef{SE}[IF]{If}{EndIf}[1]%
+  {\algorithmicif\ \CONDITION{#1}{\ \algorithmicthen}}%
+  {\algorithmicend\ \algorithmicif}%
+\algdef{C}[IF]{IF}{ElsIf}[1]%
+  {\algorithmicelse\ \algorithmicif\ \CONDITION{#1}{\ \algorithmicthen}}
 
 \usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
@@ -86,6 +108,10 @@
 \newcommand{\lepoch}{$<_{\varepsilon}$~}
 \newcommand{\leqepoch}{$\leq_{\varepsilon}$~}
 \newcommand{\ltuple}{<_{t}}
+
+\newcommand{\botn}{\bot_\mathbb{N}}
+\newcommand{\topn}{\top_\mathbb{N}}
+\newcommand{\logootuple}[1]{\langle \text{pos}_{#1},\text{nodeId}_{#1},\text{seq}_{#1} \rangle}
 
 \newcommand{\bigO}[1]{$\mathcal{O}(#1)$}
 
@@ -414,7 +440,7 @@ qui fut la première de toutes.
   \item Mais ces systèmes introduisent une dépendance des utilisateur-rices envers ces mêmes autorités centrales, une perte de confidentialité et de souveraineté.
   \item Pouvons-nous concevoir un éditeur de texte collaboratif sans autorités centrales, \ie un éditeur de texte collaboratif à large échelle pair-à-pair ?
   \item Ce changement de modèle, d'une architecture décentralisée à une architecture pair-à-pair, introduit un ensemble de problématiques de domaines variés, \eg
-    \begin{enumerate}[label=(\roman*)]
+    \begin{enumerate}
       \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
       \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
       \item Comment structurer le réseau de manière efficace, \ie en limitant le nombre de connexion par pair ?
@@ -888,7 +914,7 @@ Dans le cadre des Delta-based \acp{CRDT}, pourrait évaluer un protocole de diff
     Le but de cette thèse est de proposer des solutions pour pallier ce problème.
 
     Nous présentons dans cette thèse deux contributions visant à répondre à ce problème :
-    \begin{enumerate*}[label=(\roman*)]
+    \begin{enumerate*}
       \item Un nouveau CRDT pour Séquence, RenamableLogootSplit, qui intègre un mécanisme de renommage à sa spécification.
       Ce mécanisme de renommage permet aux noeuds du système de réattribuer des identifiants de taille minimale aux éléments de la séquence.
       Cependant, cette première version requiert une coordination entre les noeuds pour effectuer un renommage.

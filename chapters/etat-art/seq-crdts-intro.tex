@@ -46,7 +46,7 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 \end{figure}
 
 Celle-ci définit deux modifications :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item $\trm{ins}$, qui permet d'insérer un élément donné $v$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
@@ -189,7 +189,7 @@ La non-commutativité des modifications du type Séquence fut l'objet de nombreu
 Pour résoudre ce problème, l'approche \ac{OT} \cite{1989-grove-ellis-gibbs, 1998-ot-issues-algorithms-achievements-sun} fut initialement proposée.
 Cette approche propose de transformer une modification par rapport aux modifications concurrentes intégrées pour tenir compte de leur effet.
 Elle se décompose en deux parties :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item Un algorithme de contrôle \cite{1996-adopted-ressel-nitsch-ruhland-gunzenhauser, 1996-reduce-sun-yang-zhang-chen, 2009-cot-sun}, qui définit par rapport à quelles modifications une nouvelle modification distante doit être transformée avant d'être intégrée à la copie.
   \item Des fonctions de transformations \mnnote{TODO: Ajouter refs}, qui définissent comment une modification doit être transformée par rapport à une autre modification pour tenir compte de son effet.
 \end{enumerate}

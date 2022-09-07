@@ -9,7 +9,7 @@
 Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{nicolas:hal-01932552,nicolas:hal-02526724}.
 Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
 Nous introduisons une opération \emph{rename} qui permet de
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item réassigner des identifiants plus courts aux différents éléments de la séquence
   \item fusionner les blocs composant la séquence.
 \end{enumerate*}
@@ -463,7 +463,7 @@ Il est donc nécessaire d'empêcher ce scénario de se produire.
 Pour cela, nous proposons de faire évoluer le modèle de livraison des opérations de RenamableLogootSplit.
 Celui-ci repose sur celui de LogootSplit, que nous avions défini dans la \autoref{def:ls-delivery-model}.
 Pour rappel, ce modèle requiert que
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item les opérations soient livrées qu'une seule et unique fois au \ac{CRDT},
   \item les opérations \emph{remove} soient livrées au \ac{CRDT} qu'après les opérations \emph{insert} ajoutant les éléments à supprimer.
 \end{enumerate*}
@@ -884,7 +884,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 \end{algorithm}
 
 Les objectifs de \textsc{revertRenameId} sont les suivants :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item \label{item:revert-rename-1}
     Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée
   \item \label{item:revert-rename-2}
@@ -1157,7 +1157,7 @@ Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc 
 \subsection{Processus d'intégration d'une opération}
 
 Le processus d'intégration d'une opération distante distingue deux cas différents :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}
   \item le cas de figure où l'opération reçue est une opération \emph{rename}.
 \end{enumerate*}
@@ -1329,7 +1329,7 @@ Pour cela, le noeud doit identifier les transformations à appliquer à l'opéra
 Pour ce faire, le noeud calcule le chemin entre l'époque de l'opération et l'époque courante à l'aide de la fonction \textsc{getPathBetweenEpochs} (ligne \ref{alg:insertRemote-get-path}).
 
 La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item elle calcule le chemin entre l'époque de l'opération et la racine de l'\emph{arbre des époques} ([\epoch{A2}, \epoch{0}])
   \item elle calcule le chemin entre l'époque courante et la racine de l'\emph{arbre des époques} ([\epoch{B2}, \epoch{0}])
   \item elle détermine la première intersection entre ces deux chemins (\epoch{0}).
@@ -1778,7 +1778,7 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
 Étudions à présent la complexité en temps de l'opération \emph{rename}.
 
 L'opération \emph{rename} locale se décompose en 2 étapes :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op})
   \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
 \end{enumerate*}
@@ -1789,7 +1789,7 @@ Cette seconde étape s'effectue en \bigO{1}.
 L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
 
 L'intégration de l'opération \emph{rename} se décompose en les étapes suivantes :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}
   \item La récupération des $n$ identifiants formant l'état courant
   \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible
@@ -1807,7 +1807,7 @@ Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n +
 
 Nous pouvons néanmoins améliorer ce premier résultat.
 Notamment, nous pouvons tirer parti des faits suivants :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe
   \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
 \end{enumerate*}
@@ -1915,7 +1915,7 @@ Des améliorations de ce mécanisme doivent donc être possibles.
 
 Afin de valider l'approche que nous proposons, nous avons procédé à une évaluation expérimentale.
 Les objectifs de cette évaluation étaient de mesurer
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item le surcoût mémoire de la séquence répliquée
   \item le surcoût en calculs ajouté aux opérations \emph{insert} et \emph{remove} par le mécanisme de renommage
   \item le coût d'intégration des opérations \emph{rename}.
@@ -2017,7 +2017,7 @@ Nous avons ensuite comparé l'évolution du temps d'intégration des opérations
 Puisque les deux types d'opérations partagent la même complexité en temps, nous avons seulement utilisé des opérations \emph{insert} dans nos benchmarks.
 Nous faisons par contre la différence entre les mises à jours \emph{locales} et \emph{distantes}.
 Conceptuellement, les modifications locales peuvent être décomposées comme présenté dans \cite{baquero2017pure} en les deux étapes suivantes :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item la génération de l'opération correspondante
   \item l'application de l'opération correspondante sur l'état local.
 \end{enumerate*}
@@ -2113,7 +2113,7 @@ Le principal résultat de ces mesures est que les opérations \emph{rename} sont
 Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse 40k éléments.
 Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
 Il est donc nécessaire de prendre en compte ce résultat et de
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur
   \item proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration :
 \end{enumerate*}
@@ -2252,7 +2252,7 @@ Dans de tels systèmes, nous viserions donc à conserver le temps d'intégration
 
 Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
 Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item des noeuds ont émis récemment des opérations \emph{rename}
   \item des noeuds se sont récemment reconnectés.
 \end{enumerate*}
@@ -2441,7 +2441,7 @@ Le mécanisme consiste à réduire le nombre d'opérations transmises à un nouv
 L'opération \emph{rename} ayant introduite l'époque courante fournit un état initial au nouveau pair.
 À partir de cet état initial, le nouveau pair peut obtenir l'état courant en intégrant les opérations \emph{insert} et \emph{remove} qui ont été générées de manière concurrente ou causale par rapport à l'opération \emph{rename}.
 En réponse à une demande de synchronisation d'un nouveau pair, un pair peut donc simplement lui envoyer un sous-ensemble de son log composé de :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item l'opération \emph{rename} ayant introduite son époque courante
   \item les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
 \end{enumerate*}
@@ -2485,7 +2485,7 @@ Nous présentons les avantages et inconvénients de cette approche dans la sous-
 
 Nous avons décrit précédemment dans la \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item identifier le chemin entre l'époque courante et l'époque cible
   \item appliquer les fonctions de transformations \textsc{revertRenameId} et \textsc{renameId} à l'ensemble des identifiants composant l'état courant
   \item re-créer une séquence à partir des nouveaux identifiants calculés et du contenu courant.
@@ -2495,14 +2495,14 @@ Dans cette section, nous abordons une implémentation alternative de l'intégrat
 Cette implémentation repose sur le log des opérations.
 
 Cette implémentation se base sur les observations suivantes :
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item L'état courant est obtenu en intégrant successivement l'ensemble des opérations.
   \item L'opération \emph{rename} est une opération subsumant les opérations passées : elle prend un état donné (l'\emph{ancien état}), somme des opérations précédentes, et génère un nouvel état équivalent compacté.
   \item L'ordre d'intégration des opérations concurrentes n'a pas d'importance sur l'état final obtenu.
 \end{enumerate*}
 
 Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
-\begin{enumerate*}[label=(\roman*)]
+\begin{enumerate*}
   \item générer l'état correspondant au renommage de l'\emph{ancien état}
   \item identifier le chemin entre l'époque courante et l'époque cible
   \item identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son log

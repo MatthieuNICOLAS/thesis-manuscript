@@ -13,7 +13,7 @@ WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
 \begin{definition}[Identifiant WOOT]
   \label{def:dot}
   Un identifiant WOOT est un couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ avec
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item $\trm{nodeId}$, l'identifiant du noeud qui génère cet identifiant WOOT.
       Est supposé unique.
     \item $\trm{seq}$, un entier propre au noeud, servant d'horloge logique.
@@ -166,7 +166,7 @@ Grâce à la commutativité de ses opérations, WOOT s'affranchit du modèle de 
 WOOT met en place un modèle de livraison sur-mesure basé sur les pré-conditions des opérations :
 \begin{definition}[Modèle de livraison WOOT]
   Le modèle de livraison WOOT définit que :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud\footnotemark.
       \footnotetext{Néanmoins, les algorithmes d'intégration des opérations, notamment celui pour l'opération $\trm{ins}$, pourraient être aisément modifiés pour être idempotents.
       Ainsi, la livraison répétée d'une même opération deviendrait possible, ce qui permettrait de relaxer cette contrainte en \emph{une livraison au moins une fois}.}

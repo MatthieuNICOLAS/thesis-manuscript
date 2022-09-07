@@ -13,7 +13,7 @@ Le second principe sur lequel reposent les RADTs est la \ac{PT}.
   La \acf{PT} se base sur une relation de précédence, notée $\dashrightarrow$.
   \begin{subdefinition}[Relation de précédence]
     La relation de précédence définit qu'étant donné deux opérations, $o_1$ et $o_2$, l'intention de $o_2$ doit être préservée par rapport à celle de $o_1$, noté $o_1 \dashrightarrow o_2$, si et seulement si :
-    \begin{enumerate}[label=(\roman*)]
+    \begin{enumerate}
       \item $o_1 \rightarrow o_2$ ou
       \item $o_1 \parallel o_2$ et $o_2$ a une priorité supérieure à $o_1$.
     \end{enumerate}
@@ -32,7 +32,7 @@ De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il a
 Les auteurs proposent le modèle de données suivant comme identifiants :
 \begin{definition}[Identifiants S4Vector]
   Les identifiants S4Vector sont de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item $\trm{ssid}$, l'identifiant de la session de collaboration.
     \item $\trm{sum}$, la somme du vecteur d'horloges courant du noeud auteur de l'élément.
     \item $\trm{ssn}$, l'identifiant du noeud auteur de l'élément.
@@ -43,7 +43,7 @@ Cependant, dans les présentations suivantes de \ac{RGA} \cite{shapiro_2011_crdt
 Nous procédons donc ici à la même simplification, et abstrayons la structure des identifiants utilisée avec le symbole $t$.
 
 À l'aide des identifiants, \ac{RGA} redéfinit les modifications de la séquence de la manière suivante :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item $\trm{ins}$ devient $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
   \item $\trm{rmv}$ devient $\trm{rmv}(\trm{id})$.
 \end{enumerate}
@@ -178,7 +178,7 @@ Les opérations de \ac{RGA} étant commutatives, les noeuds obtiennent le même 
 À la différence des auteurs de WOOT, \textcite{ROH2011354} jugent le coût des pierres tombales trop élévé.
 Ils proposent alors un mécanisme de \ac{GC} des pierres tombales.
 Ce mécanisme repose sur deux conditions :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item \label{item:gc-rga-1}
     La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a observé la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
   \item \label{item:gc-rga-2}
@@ -195,7 +195,7 @@ Néanmoins \textcite{2021-these-vic} indique que \ac{RGA} pourrait adopter un mo
 Ce modèle consisterait :
 \begin{definition}[Modèle livraison \ac{RGA}]
   Le modèle de livraison \ac{RGA} définit que :
-  \begin{enumerate}[label=(\roman*)]
+  \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
     \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
     \item Une opération $\trm{rmv}(\trm{id})$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.

@@ -1,6 +1,6 @@
 \textcite{almeida2015delta} introduisent un nouveau modèle de synchronisation pour \acp{CRDT}.
 La proposition de ce modèle est nourrie par les observations suivantes :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item Les \acp{CRDT} synchronisés par opérations sont vulnérables aux défaillances du réseau et nécessitent généralement pour pallier à cette vulnérabilité une livraison des opérations en exactement un exemplaire et respectant l'ordre causal.
   \item Les \acp{CRDT} synchronisés par états pâtissent du surcoût induit par la diffusion de leurs états complets, généralement croissant continuellement.
 \end{enumerate}
@@ -14,7 +14,7 @@ Un delta encode la modification effectuée sous la forme d'un état du lattice.
 Les deltas étant des états, ils peuvent être diffusés puis intégrés par les autres noeuds à l'aide de la fonction \texttt{merge}.
 Ceci permet de bénéficier des propriétés d'associativité, de commutativité et d'idempotence offertes par cette fonction.
 Les \acp{CRDT} synchronisés par différences d'états offrent ainsi :
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}
   \item Une diffusion des modifications avec un surcoût pour le réseau proche de celui des \acp{CRDT} synchronisés par opérations.
   \item Une résistance aux défaillances réseaux similaire celle des \acp{CRDT} synchronisés par états.
 \end{enumerate}
