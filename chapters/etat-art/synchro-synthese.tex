@@ -7,13 +7,13 @@ Nous récapitulons les principales propriétés et différences des modèles de 
   \resizebox{\columnwidth}{!}{
     \begin{tabular}{lccc}
       \toprule
-                                                & Synchro. par états & Synchro. par opérations    & Synchro. par diff. d'états \\
+                                                & Sync. par états & Sync. par opérations    & Sync. par diff. d'états \\
       \midrule
-      États forment sup-demi-treillis           & \checkmark  & \checkmark  & \checkmark  \\
+      Est un sup-demi-treillis                  & \checkmark  & \checkmark  & \checkmark  \\
       Intègre modifications par fusion d'états  & \checkmark  & \ballotx    & \checkmark  \\
       Intègre modifications de manière atomique & \ballotx    & \checkmark  & \checkmark  \\
-      Résistant aux défaillances réseau         & \checkmark  & \ballotx    & \checkmark  \\
-      Peut s'affranchir de la cohérence causale & \ballotx    & \checkmark  & \checkmark  \\
+      Résiste aux défaillances réseau           & \checkmark  & \ballotx    & \checkmark  \\
+      Offre de la cohérence causale             & \checkmark  & \ballotx    & \ballotx  \\
       Adapté pour systèmes temps réel           & \ballotx    & \checkmark  & \checkmark  \\
       \bottomrule
     \end{tabular}
