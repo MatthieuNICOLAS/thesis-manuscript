@@ -1,32 +1,128 @@
-\begin{itemize}
-  \item Deux approches différentes pour la résolution de conflits ont été proposées pour \acp{CRDT} pour Séquence.
-    Chacune de ces approches visent à minimiser surcoût du type répliqué, que ce soit d'un point de vue mémoire, computations et réseau.
-  \item Au fil des années, ces approches ont été raffinées avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
-  \item Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
-    Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
-    L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
-    L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
-    L'approche basée sur pierres tombales et l'approche basée sur identifiants densément ordonnés souffrent toutes les deux d'une augmentation théorique de leur surcoût en mémoire et en computations, respectivement dûe au nombre forcément croissant d'éléments stockées dans la Séquence et à la taille croissante\footnote{\cite{2011-evaluation-crdts-ahmed-nacer} montre expérimentalement que les performances de l'approche basée sur identifiants densément ordonnés restent stables tout au long des tâches d'édition collaborative proposées.} des identifiants associés aux éléments de la Séquence.
+Depuis l'introduction des \acp{CRDT}, deux approches différentes pour la résolution de conflits ont été proposées pour le type Séquence : l'\emph{approche basée sur des pierres tombales} et l'\emph{approche basée à identifiants densément ordonnés}.
+Chacune de ces approches visent à permettre l'édition concurrente tout en minimisant le surcoût du type répliqué, que ce soit d'un point de vue métadonnées, calculs et bande-passante.
+Au fil des années, chacune de ces approches a été raffinée avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
 
-    \begin{table}[!ht]
-      \centering
-      \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour Séquence}
-      \label{tab:sequence-crdts}
-      % \resizebox{\columnwidth}{!}{
-        \begin{tabular}{lcc}
-          \toprule
-                                                    & Pierres tombales  & Identifiants denséments ordonnés  \\
-          \midrule
-          Performances stables en fct. de la taille de la séq.  & \ballotx            & \ballotx          \\
-          Identifiants de taille fixe               & \checkmark          & \ballotx        \\
-          Eléments réellement supprimés             & \ballotx            & \checkmark          \\
-          Taille des messages fixe                  & \checkmark          & \ballotx        \\
-          Peut s'affranchir de la cohérence causale & \checkmark          & \checkmark          \\
-          \bottomrule
-        \end{tabular}
-      % }
-    \end{table}
+Cependant, une faiblesse de la littérature est à notre sens le couplage entre mécanismes de résolution de conflits et choix d'implémentations : plusieurs travaux \cite{2009-logoot-weiss, 2013-logootsplit,briot:hal-01343941} ne séparent pas l'approche proposée pour rendre les modifications concurrentes commutatives des structures de données et algorithmes choisis pour représenter et manipuler la séquence et les identifiants, \eg tableau dynamique, liste chaînée, liste chaînée + table de hachage + arbre binaire de recherche...
+\mnnote{TODO: Revoir refs utilisées ici}
+Il en découle que les évaluations proposées par la communautée comparent au final des efforts d'implémentations plutôt que les approches elles-mêmes.
+En conséquence, la littérature ne permet pas d'établir la supériorité d'une approche sur l'autre.
 
-  \item Pour la suite de ce manuscrit, nous prenons LogootSplit comme base de travail.
-    Nous détaillons donc son fonctionnement dans la section suivante.
-\end{itemize}
+Nous conjecturons que le surcoût des pierres tombales et le surcoût des identifiants densément ordonnés ne sont que les facettes d'une même pièce, \ie le surcoût inhérent à un mécanisme de résolution de conflits pour séquence répliquée.
+Ce surcoût s'exprime sous la forme de compromis différents selon l'approche choisie.
+Nous proposons donc une comparaison de ces approches se focalisant sur leurs différences pour indiquer plus clairement le compromis que chacune d'entre elle propose.
+
+% Mais tout d'abord, il convient de rappeler que chacune de ces approches voit son surcoût en mémoire augmenter au cours de la durée de vie de la séquence répliquée, indépendamment du nombre effectif d'éléments présent au final dans la séquence :
+% \begin{enumerate}
+%   \item L'approche à pierres tombales, de manière équivoque, maintient des pierres tombales pour les éléments supprimés.
+%     Ainsi, une séquence répliquée avec cette approche ne contenant que quelques centaines d'éléments peut de manière effective maintenir des milliers de pierres tombales en coulisses par exemple.
+%   \item L'approche à identifiants densément ordonnés repose sur des identifiants de tailles de plus en plus importantes au fur et à mesure que l'espace dense pour une taille donnée est saturé.
+%     Ainsi, une séquence répliquée avec cette approche contenant un nombre d'éléments donné peut nécessiter une taille mémoire bien supérieure à une séquence répliquée équivalente si sa stratégie d'allocation des identifiants a dû avoir recours à des identifiants plus longs, \eg insertions répétées dans une partie de l'espace dense saturée.
+% \end{enumerate}
+
+La principale différence entre les deux approches porte sur les identifiants.
+Chaque approche repose sur des identifiants attachés aux éléments, mais leurs rôles et utilisations diffèrent :
+\begin{enumerate}
+  \item Dans l'approche à pierres tombales, les identifiants servent à référencer de manière unique et immuable les éléments, \ie de manière indépendante de leur index courant.
+    Ils sont aussi utilisés pour ordonner les éléments insérés de manière concurrente à une même position.
+  \item Dans l'approche à identifiants densément ordonnés, les identifiants incarnent les positions uniques et immuables des éléments dans un espace dense, avec l'ordre entre les positions des éléments dans cet espace qui correspond avec l'intention des insertions effectuées.
+\end{enumerate}
+
+Ainsi, les contraintes qui pèsent sur les identifiants sont différentes.
+Nous les présentons ci-dessous.
+\begin{definition}[Propriétés des identifiants dans approche à pierres tombales] % \footnotemark]
+  % \footnotetext{Nous conjecturons que les identifiants associés aux élements dans les \acp{CRDT} pour des types différents, \eg l'Ensemble, partagent ces propriétés.}
+  Les propriétés que doivent respecter les identifiants dans l'approche à pierres tombales sont les suivantes :
+  \begin{enumerate}
+    \item Chaque identifiant est attribué à un élément de la séquence.
+    \item Aucune paire d'éléments ne partage le même identifiant.
+    \item L'identifiant d'un élément est immuable.
+    \item Il existe un ordre total strict sur les identifiants, $\lid$, qui permet d'ordonner les éléments insérés en concurrence à une même position.
+  \end{enumerate}
+\end{definition}
+\begin{definition}[Propriétés des identifiants dans approche à identifiants densément ordonnés]
+  Les propriétés que doivent respecter les identifiants dans l'approche à identifiants densément ordonnés sont les suivantes :
+  \begin{enumerate}
+    \item \label{def:id-prop-1} Chaque identifiant est attribué à un élément de la séquence.
+    \item \label{def:id-prop-2} Aucune paire d'éléments ne partage le même identifiant.
+    \item \label{def:id-prop-3} L'identifiant d'un élément est immuable.
+    \item \label{def:id-prop-4} Il existe un ordre total strict sur les identifiants, $\lid$, qui permet d'ordonner les éléments insérés dans la séquence de manière cohérente avec l'ordre souhaité.
+    \item \label{def:id-prop-5} Les identifiants sont tirés d'un ensemble dense.
+  \end{enumerate}
+\end{definition}
+Les identifiants des deux approches partagent donc les propriétés \ref{def:id-prop-1}, \ref{def:id-prop-2} et \ref{def:id-prop-3}.
+
+Pour respecter les propriétés \ref{def:id-prop-1} et \ref{def:id-prop-2}, les \acp{CRDT} reposent généralement sur des dots \cf{def:dot}.
+Ainsi, un couple de taille fixe, $\langle \trm{nodeId},\trm{seq} \rangle$, permet de respecter la contrainte d'unicité des identifiants.
+
+Le rôle des identifiants diffère entre les approches au niveau des propriétés \ref{def:id-prop-4} et \ref{def:id-prop-5} : les identifiants dans l'approche à pierres tombales doivent permettre d'ordonner un élément par rapport aux éléments insérés en concurrence uniquement, tandis que ceux de la seconde approche doivent permettre d'ordonner un élément par rapport à l'ensemble des éléments insérés.
+Cette nuance se traduit dans la structure des identifiants, notamment leur taille.
+
+Pour ordonner un identifiant par rapport à ceux générés en concurrence, l'approche à pierres tombales peut définir une relation d'ordre total strict sur leur dot respectif, \eg en se basant sur l'ordre lexicographique.
+Un élément tiers peut y être ajouté si nécessaire, \eg RGA et son horloge de Lamport \cite{1978-happen-before-lamport}.
+Ainsi, les identifiants de cette approche peuvent être définis tout en ayant une taille fixe, \ie un nombre de composants fixe.
+
+D'après \ref{def:id-prop-4}, l'approche à identifiants densément ordonnés doit elle définir une relation d'ordre total strict sur l'ensemble de ses identifiants.
+Il en découle qu'elle doit aussi permettre de générer un nouvel identifiant de position entre deux autres, \ie la propriété \ref{def:id-prop-5}.
+Ainsi, cette propriété requiert de l'ensemble des identifiants d'émuler l'ensemble des réels.
+La précision étant finie en informatique, la seule approche proposée à notre connaissance pour répondre à ce besoin consiste à permettre à la taille des identifiants de varier et de baser la relation d'ordre $\lid$ sur l'ordre lexicographique.
+
+L'augmentation non-bornée de la taille des identifiants se répercute sur plusieurs aspects du surcoût de l'approche à identifiants densément ordonnés :
+\begin{enumerate}
+  \item Les métadonnées attachées par élément, \ie le surcoût mémoire.
+  \item Les métadonnées transmises par message, les identifiants étant intégrés dans les opérations, \ie le surcoût en bande-passante.
+  \item Le nombre de comparaisons effectuées lors d'une recherche ou manipulation de la séquence, les identifiants étant comparés pour déterminer où trouver ou placer un élément, \ie le surcoût en calculs.
+\end{enumerate}
+
+En contrepartie, les identifiants densément ordonnés permettent l'intégration chaque élément de manière indépendante des autres.
+Les identifiants de l'approche à pierres tombales, eux, n'offrent pas cette possibilité puisque la relation d'ordre associée, $\lid$, ne correspond pas à l'ordre souhaité des éléments.
+Pour respecter cet ordre souhaité, l'approche à pierres tombales repose sur l'utilisation du prédecesseur et/ou successeur du nouvel élément inséré.
+Ce mécanisme implique la nécessité de conserver des pierres tombales dans la séquence, tant qu'elles peuvent être utilisées par une opération encore inconnue, \ie tant que l'opération de suppression correspondante n'est pas causalement stable.
+
+La présence de pierres tombales dans la séquence impacte aussi plusieurs aspects du surcoût de l'approche à pierres tombales :
+\begin{enumerate}
+  \item Les métadonnées de la séquence ne dépendent pas de son nombre courant d'éléments, mais du nombre d'insertions effectuées, \ie le surcoût mémoire.
+  \item Le nombre de comparaisons effectuées lors d'une recherche ou manipulation de la séquence, les identifiants des pierres tombales étant aussi comparés lors de la recherche ou insertion d'un élément, \ie le surcoût en calculs.
+\end{enumerate}
+
+Pour compléter notre étude de ces approches, intéressons nous au modèle de livraison requis par ces dernières.
+Contrairement à ce qui peut être conjecturé après une lecture de la littérature, nous notons qu'aucune de ces approches ne requiert de manière intrinsèque une livraison causale de ses opérations.
+Ces deux approches sont donc adaptées aux systèmes distribués \ac{P2P}.
+
+Finalement, nous notons que l'ensemble des \acp{CRDT} pour Séquence proposés souffrent du problème de l'entrelacement présenté dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+Nous conjecturons cependant que les \acp{CRDT} pour Séquence à pierres tombales sont moins sujets à ce problème.
+En effet, dans cette approche, l'algorithme d'intégration des nouveaux éléments repose généralement sur l'élément précédent.
+Ainsi, une séquence d'insertions séquentielles produit une sous-chaîne d'éléments.
+L'algorithme d'intégration permet ensuite d'intégrer sans entrelacement de telles sous-chaînes générées en concurrence, \eg dans le cadre de sessions de travail asynchrones.
+Cependant, il s'agit d'une garantie offerte par l'approche à pierres tombales dont nous ne retrouvons pas d'équivalent dans l'approche à identifiants densément ordonnés.
+Pour confirmer notre conjecture et évaluer son impact sur l'expérience utilisateur, il conviendrait de mener un ensemble d'expériences utilisateurs dans la lignée de \cite{2011-evaluation-crdts-ahmed-nacer,2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
+
+Nous récapitulons cette discussion dans le \autoref{tab:sequence-crdts}.
+
+% Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
+% Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
+% L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
+% L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
+% L'approche basée sur pierres tombales et l'approche basée sur identifiants densément ordonnés souffrent toutes les deux d'une augmentation théorique de leur surcoût en mémoire et en computations, respectivement dûe au nombre forcément croissant d'éléments stockées dans la Séquence et à la taille croissante\footnote{\cite{2011-evaluation-crdts-ahmed-nacer} montre expérimentalement que les performances de l'approche basée sur identifiants densément ordonnés restent stables tout au long des tâches d'édition collaborative proposées.} des identifiants associés aux éléments de la Séquence.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour Séquence}
+  \label{tab:sequence-crdts}
+  \resizebox{\columnwidth}{!}{
+    \begin{tabular}{lcc}
+      \toprule
+                                                & Pierres tombales  & Identifiants densément ordonnés  \\
+      \midrule
+      Performances en fct. de la taille de la séq.  & \ballotx            & \ballotx          \\
+      Identifiants de taille fixe               & \checkmark          & \ballotx        \\
+      Taille des messages fixe                  & \checkmark          & \ballotx        \\
+      Eléments réellement supprimés de la séq.  & \ballotx            & \checkmark          \\
+      Livraison causale non-nécessaire          & \checkmark          & \checkmark          \\
+      Sujet à l'entrelacement                   & \checkmark          & \checkmark \\
+      \bottomrule
+    \end{tabular}
+  }
+\end{table}
+
+Pour la suite de ce manuscrit, nous prenons LogootSplit comme base de travail.
+Nous détaillons donc son fonctionnement dans la section suivante.

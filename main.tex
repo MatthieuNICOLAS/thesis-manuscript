@@ -90,6 +90,7 @@
 
 % Commands
 %---------
+\newcommand{\cf}[1]{(cf. \autoref{#1}, page \pageref{#1})}
 \newcommand{\eg}{e.g.\xspace}
 \newcommand{\ie}{c.-à-d.\xspace}
 
@@ -331,7 +332,7 @@
 
 %\DontFrameThisInToc
 \begin{ThesisAcknowledgments}
-Les remerciements.
+WIP
 \end{ThesisAcknowledgments}
 
 %-------------------------------------------------------------------
@@ -339,10 +340,7 @@ Les remerciements.
 %-------------------------------------------------------------------
 
 \begin{ThesisDedication}
-Je dédie cette thèse\\
-à ma machine.\\
-Oui, à Pandore,\\
-qui fut la première de toutes.
+WIP
 \end{ThesisDedication}
 
 
@@ -456,6 +454,8 @@ qui fut la première de toutes.
 \NumberThisInToc
 \chapter{État de l'art}
 \minitoc
+
+\section{Modèle du système}
 
 \section{Systèmes distribués}
 \input{chapters/etat-art/dist-sys}
@@ -725,9 +725,16 @@ Dans le cadre des Delta-based \acp{CRDT}, pourrait évaluer un protocole de diff
   \item Nécessiterait tout de même de faire évoluer le \ac{CRDT} pour résoudre les équivoques détectés
 \end{itemize}
 
-\subsection{Vecteur \emph{epoch-based}}
+\subsection{Vecteur de version \emph{epoch-based}}
 
 \begin{itemize}
+  \item S'agit d'une structure primordiale dans les systèmes distribués, dont pouvons difficilement nous passer.
+    Utilisé notamment pour représenter le contexte causal de l'état d'un noeud, nécessaire pour :
+    \begin{enumerate}
+      \item Déterminer quelles opérations ont été observées (anti-entropie et couche de livraison)
+      \item Déterminer quelles opérations ont observé les autres noeuds (stabilité causale)
+      \item Préciser les dépendances causales d'un message
+    \end{enumerate}
   \item Comme présenté précédemment, nous utilisons plusieurs vecteurs pour représenter des données dans l'application MUTE
   \item Notamment pour le vecteur de version, utilisé pour respecter le modèle de livraison requis par le \ac{CRDT}
   \item Et pour la liste des collaborateurs, utilisé pour offrir des informations nécessaires à la conscience de groupe aux utilisateurs
