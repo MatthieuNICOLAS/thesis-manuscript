@@ -1,7 +1,7 @@
 Pour ce faire, LogootSplit associe aux éléments des identifiants définis de la manière suivante :
 
 \begin{definition}[Identifiant LogootSplit]
-  Un identifiant Logoot est une liste de tuples LogootSplit.
+  Un identifiant LogootSplit est une liste de tuples LogootSplit.
   Les tuples LogootSplit sont définis de la manière suivante :
   \begin{subdefinition}[Tuple LogootSplit]
     Un tuple LogootSplit est un quadruplet $\langle \trm{pos},\trm{nodeId},$ \\
@@ -50,3 +50,5 @@ Par exemple, nous avons :
   \item  \id{i}{A1}{1} $\lid$ \id{i}{B1}{1} car le tuple composant le premier est inférieur au tuple composant le second, \ie \id{i}{A1}{0} $\ltuple$ \id{i}{B0}{0}.
   \item \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second.
 \end{enumerate}
+
+Il est intéressant de noter que le triplet $\langle \trm{nodeId},\trm{seq},\trm{offset} \rangle$ du dernier tuple d'un identifiant permet de l'identifier de manière unique.
