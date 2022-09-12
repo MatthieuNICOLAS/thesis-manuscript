@@ -159,7 +159,7 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
       \draw[->, dashed, shorten >= 1] (b-ins-exc) -- (a-recv-ins-exc);
     \end{tikzpicture}
   }
-  \caption{Modifications concurrentes d'une séquence répliquée Logoot}
+  \caption{Modifications concurrentes d'une séquence répliquée LogootSplit}
   \label{fig:ls-example}
 \end{figure}
 
@@ -187,7 +187,7 @@ Il génère l'opération $\trm{ins}$ correspondante, l'intègre puis la diffuse.
 
 Les noeuds se synchronisent ensuite.
 Le noeud A reçoit l'opération $\trm{ins}(\betterid{i}{B1}{5},L)$.
-Le noeud A détermine que cet élément doit être inséré à la fin de la séquence, puisque $\betterid{i}{B0}{4} \lid \betterid{i}{B0}{5}$.
+Le noeud A détermine que cet élément doit être inséré à la fin de la séquence, puisque $\betterid{i}{B1}{4} \lid \betterid{i}{B1}{5}$.
 Ces deux identifiants étant contigus, il ajoute cet élément au bloc existant.
 
 De son côté, le noeud B reçoit tout d'abord l'opération $\trm{rmv}(\betterid{i}{B1}{2})$.

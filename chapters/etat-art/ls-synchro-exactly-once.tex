@@ -1,70 +1,98 @@
-Tout d'abord, la couche de livraison de messages doit assurer que toutes les opérations soient délivrées aux noeuds, mais qu'une seule et unique fois.
-La \autoref{fig:why-exactly-once-delivery} représente un exemple illustrant la nécessité de cette contrainte.
+Ce premier exemple a pour but d'illustrer la nécessité de la propriété de livraison en \emph{exactement un exemplaire} des opérations.
+Pour cela, considérons l'exemple représenté par la \autoref{fig:why-exactly-once-delivery}.
 
 \begin{figure}[!ht]
+
   \centering
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
+      \newcommand\initialstate[3]{
         \path
-            node {\textbf{A}}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-            ++(0:21 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..4}$}] {ABCD};
+      }
 
-
+      \newcommand\insx[3]{
         \path
-            ++(270:4) node {\textbf{B}}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-            ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-            ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S3B-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {AB}
+          ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}$}] {X}
+          ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {CD};
+      }
 
-        \draw[->, thick]
-          (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
-          (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+      \newcommand\rmvx[3]{
+        \path
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {AB}
+          ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {CD};
+      }
 
-        \draw[dotted]
-          (S1A-right) -- (S2A-left)
-          (S0B) -- (S1B-left)
-          (S2B-right) -- (S3B-left);
+      \newcommand\offseta{ (90:1.2) }
+      \newcommand\offsetb{ (270:1.2) }
 
-        \draw[dashed, ->, thick, shorten >= 3]
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
-          (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
+      \path
+        node {\textbf{A}}
+        ++(0:0.5) node (a) {}
+        +(0:26) node (a-end) {}
+        +(0:2) node[point] (a-initial) {}
+        +(0:7) node[point, label=-170:{$\trm{ins}(B \prec X \prec C)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}},X)$}}] (a-ins-x) {}
+        +(0:17) node[point] (a-recv-rmv-x) {}
+        +(0:24) node (a-final) {};
+
+      \initialstate{(a-initial)}{\offseta}{90};
+      \insx{(a-ins-x)}{\offseta}{90};
+      \rmvx{(a-recv-rmv-x)}{\offseta}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-x) -- (a-recv-rmv-x) -- (a-final);
+
+      \path
+        ++(270:3) node {\textbf{B}}
+        ++(0:0.5) node (b) {}
+        +(0:26) node (b-end) {}
+        +(0:2) node[point] (b-initial) {}
+        +(0:9) node[point] (b-recv-ins-x) {}
+        +(0:15) node[point, label=170:{$\trm{rmv}(X)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}})$}}] (b-rmv-x) {}
+        +(0:22) node[point] (b-recv-ins-x-2) {}
+        +(0:24) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb}{-90};
+      \insx{(b-recv-ins-x)}{\offsetb}{-90};
+      \rmvx{(b-rmv-x)}{\offsetb}{-90};
+      \insx{(b-recv-ins-x-2)}{\offsetb}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-recv-ins-x) -- (b-rmv-x) -- (b-recv-ins-x-2) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ins-x) -- (b-recv-ins-x);
+      \draw[->, dashed, shorten >= 1] (b-rmv-x) -- (a-recv-rmv-x);
+      \draw[->, dashed, shorten >= 1] (a-ins-x) -- (b-recv-ins-x-2);
     \end{tikzpicture}
   }
-  \caption{Résurgence d'un élément supprimé suite à la relivraison de son opération \emph{insert}}
+  \caption{Résurgence d'un élément supprimé suite à la relivraison de son opération $\trm{ins}$}
   \label{fig:why-exactly-once-delivery}
 \end{figure}
 
 Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement une séquence.
-La séquence répliquée contient initialement les éléments "OGNON", qui sont associés à l'intervalle d'identifiants \id{p}{A0}{0..4}.
+La séquence répliquée contient initialement les éléments "ABCD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{1..4}$.
 
-Le noeud A commence par insérer un nouvel élément, "I", dans la séquence entre les éléments "O" et "G".
-L'opération \emph{insert} résultante, insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée au noeud B.
+Le noeud A commence par insérer l'élément "X" dans la séquence entre les éléments "B" et "C".
+A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{2}\betterid{m}{A2}{1},X)$ puis la diffuse au noeud B.
 
-À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
-Puis il supprime dans la foulée ce nouvel élément.
-L'opération \emph{remove} générée est envoyée au noeud A.
+À la réception de l'opération $\trm{ins}$, le noeud B l'intègre à son état.
+Puis il supprime dans la foulée l'élément "X" nouvellement inséré.
+B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{2}\betterid{m}{A2}{1})$ puis l'envoie au noeud A.
 
-Le noeud A intègre l'opération \emph{remove}, ce qui a pour effet de supprimer l'élément "I" associé à l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
+Le noeud A intègre l'opération $\trm{rmv}$, ce qui a pour effet de supprimer l'élément "X" associé à l'identifiant $\betterid{p}{A1}{2}\betterid{m}{A2}{1}$.
 Il obtient alors un état équivalent à celui du noeud B.
 
-Cependant, l'opération \emph{insert} insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0} est de nouveau délivrée au noeud B.
+Cependant, l'opération $\trm{ins}$ insérant l'élément "X" à la position $\betterid{p}{A1}{2}\betterid{m}{A2}{1}$ est de nouveau délivrée au noeud B.
 De multiples raisons peuvent être à l'origine de cette nouvelle livraison : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
-Le noeud B ré-intègre alors l'opération \emph{insert}, ce qui fait revenir l'élément "I" et l'identifiant associé.
+Le noeud B ré-intègre alors l'opération $\trm{ins}$, ce qui fait revenir l'élément "X" et l'identifiant associé.
 L'état du noeud B diverge désormais de celui-ci du noeud A.
 
 Pour se prémunir de ce type de scénarios, LogootSplit requiert que la couche de livraison des messages assure une livraison en exactement un exemplaire des opérations.
-Cette contrainte permet d'éviter que d'anciens éléments et identifiants ressurgissent après leur suppression chez certains noeuds uniquement à cause d'une livraison multiple de l'opération \emph{insert} correspondante.
-
-\mnnote{QUESTION: Ajouter quelques lignes ici sur comment faire ça en pratique (Ajout d'un dot aux opérations, maintien d'un dot store au niveau de la couche livraison, vérification que dot pas encore présent dans dot store avant de passer opération à la structure de données) ? Ou je garde ça pour le chapitre sur MUTE ?}
+Cette contrainte permet d'éviter que d'anciens éléments et identifiants ressurgissent après leur suppression chez certains noeuds uniquement à cause d'une livraison multiple de l'opération $\trm{ins}$ correspondante.
