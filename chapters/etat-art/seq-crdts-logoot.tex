@@ -9,7 +9,7 @@ Dans \cite{2009-logoot-weiss}, les identifiants de positions sont décrits de la
     \item $\trm{tuples}$, une liste de tuples Logoot,
     \item $\trm{seq}$, le numéro de séquence courant du noeud auteur de l'élément.
   \end{itemize}
-  avec les tuples Logoot définis de la manière suivante :
+  Les tuples Logoot sont définis de la manière suivante :
   \begin{subdefinition}[Tuple Logoot v1]
     Un tuple Logoot est une paire $\langle \trm{pos},\trm{nodeId} \rangle$ avec
     \begin{enumerate}
@@ -21,7 +21,8 @@ Dans \cite{2009-logoot-weiss}, les identifiants de positions sont décrits de la
 
 Par la suite, \cite{2010-logoot-undo-weiss} re-spécifie les identifiants de positions de la manière suivante :
 \begin{definition}[Identifiant Logoot v2]
-  Un identifiant Logoot est une liste de tuples Logoot avec les tuples Logoot définis de la manière suivante :
+  Un identifiant Logoot est une liste de tuples Logoot.
+  Les tuples Logoot sont définis de la manière suivante :
   \begin{subdefinition}[Tuple Logoot v2]
     Un tuple Logoot est un triplet $\langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ avec
     \begin{enumerate}
@@ -34,7 +35,7 @@ Par la suite, \cite{2010-logoot-undo-weiss} re-spécifie les identifiants de pos
 
 Dans le cadre de cette section, nous nous basons sur cette dernière spécification.
 Nous utiliserons la notation suivante $\betterid{pos}{nodeId~seq}{}$ pour représenter un tuple Logoot.
-Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers pour $\trm{seq}$.
+Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{seq}$.
 Par exemple, l'identifiant $\langle \langle i,A,1 \rangle \langle f,B,1 \rangle \rangle$ est représenté par $\betterid{i}{A1}{}\betterid{f}{B1}{}$.
 
 Logoot définit un ordre strict total $\lid$ sur les identifiants de position.
@@ -44,7 +45,7 @@ Pour définir $\lid$, Logoot se base sur l'ordre lexicographique.
   Étant donné deux identifiants $id = t_1 \oplus t_2 \oplus ... \oplus t_n$ et $id' = t'_1 \oplus t'_2 \oplus ... \oplus t'_m$, on a :
   \begin{equation*}
     \begin{split}
-      id \lid id' \quad \trm{iff} \quad     & (n < m \land \forall i \in [1,n] \cdot t_i = t'_j) \quad \lor \\
+      id \lid id' \quad \trm{iff} \quad     & (n < m \land \forall i \in [1,n] \cdot t_i = t'_i) \quad \lor \\
                                             & (\exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \land t_j \ltuple t'_j) \\
     \end{split}
   \end{equation*}

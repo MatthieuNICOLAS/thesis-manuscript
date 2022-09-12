@@ -2,7 +2,7 @@ Depuis l'introduction des \acp{CRDT}, deux approches différentes pour la résol
 Chacune de ces approches visent à permettre l'édition concurrente tout en minimisant le surcoût du type répliqué, que ce soit d'un point de vue métadonnées, calculs et bande-passante.
 Au fil des années, chacune de ces approches a été raffinée avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
 
-Cependant, une faiblesse de la littérature est à notre sens le couplage entre mécanismes de résolution de conflits et choix d'implémentations : plusieurs travaux \cite{2009-logoot-weiss, 2013-logootsplit,briot:hal-01343941} ne séparent pas l'approche proposée pour rendre les modifications concurrentes commutatives des structures de données et algorithmes choisis pour représenter et manipuler la séquence et les identifiants, \eg tableau dynamique, liste chaînée, liste chaînée + table de hachage + arbre binaire de recherche...
+Cependant, une faiblesse de la littérature est à notre sens le couplage entre mécanismes de résolution de conflits et choix d'implémentations : plusieurs travaux \cite{2009-treedoc-preguica, 2009-logoot-weiss, 2013-logootsplit,briot:hal-01343941} ne séparent pas l'approche proposée pour rendre les modifications concurrentes commutatives des structures de données et algorithmes choisis pour représenter et manipuler la séquence et les identifiants, \eg tableau dynamique, liste chaînée, liste chaînée + table de hachage + arbre binaire de recherche...
 \mnnote{TODO: Revoir refs utilisées ici}
 Il en découle que les évaluations proposées par la communautée comparent au final des efforts d'implémentations plutôt que les approches elles-mêmes.
 En conséquence, la littérature ne permet pas d'établir la supériorité d'une approche sur l'autre.
