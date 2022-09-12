@@ -30,15 +30,15 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
   \centering
   % \resizebox{0.35\columnwidth}{!}{
     \begin{tabular}{llll}
-      $S \in \trm{Seq}\langle V \rangle$ & & & \\
+      $S \in \trm{Seq}\langle E \rangle$ & & & \\
       \\
       $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
       \\
-      $\trm{ins}$ & : & $S \times N \times V$ & $\longrightarrow S$   \\
+      $\trm{ins}$ & : & $S \times N \times E$ & $\longrightarrow S$   \\
       $\trm{rmv}$ & : & $S \times N$          & $\longrightarrow S$   \\
       \\
       $\trm{len}$ & : & $S$                   & $\longrightarrow N$   \\
-      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle V \rangle$ \\
+      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle E \rangle$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait usuel Séquence}
@@ -47,19 +47,19 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 
 Celle-ci définit deux modifications :
 \begin{enumerate}
-  \item $\trm{ins}$, qui permet d'insérer un élément donné $v$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{ins}$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, v \in V, i \in [0,m]~|~m = \trm{len}(s) - 1,
-      s = \langle v_0, ..., v_{i-1}, v_{i}, ..., v_m \rangle~\cdot \\
-      \trm{ins}(s,i,v) = \langle v_0, ..., v_{i-1}, v, v_{i}, ..., v_m  \rangle
+      \forall s \in S, e \in E, i \in [0,m]~|~m = \trm{len}(s) - 1,
+      s = \langle e_0, ..., e_{i-1}, e_{i}, ..., e_m \rangle~\cdot \\
+      \trm{ins}(s,i,v) = \langle e_0, ..., e_{i-1}, e, e_{i}, ..., e_m  \rangle
     \end{multline*}
   \item $\trm{rmv}$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, v \in V, i \in [0,m]~|~m = \trm{len}(s) - 1,
-      s = \langle v_0, ..., v_{i-1}, v_{i}, v{i+1}, ..., v_m \rangle~\cdot \\
-      \trm{rmv}(s,i) = \langle v_0, ..., v_{i-1}, v_{i+1}, ..., v_m  \rangle
+      \forall s \in S, e \in E, i \in [0,m]~|~m = \trm{len}(s) - 1,
+      s = \langle e_0, ..., e_{i-1}, e_{i}, e{i+1}, ..., e_m \rangle~\cdot \\
+      \trm{rmv}(s,i) = \langle e_0, ..., e_{i-1}, e_{i+1}, ..., e_m  \rangle
     \end{multline*}
 \end{enumerate}
 Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
