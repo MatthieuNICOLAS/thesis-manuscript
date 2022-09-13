@@ -660,31 +660,7 @@ WIP
 \input{chapters/etat-art/ls-limites}
 
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
-
-\begin{itemize}
-  \item Plusieurs approches ont été proposées pour réduire croissance des métadonnées dans Sequence \acp{CRDT}
-  \item \ac{RGA} (et RGASplit) propose un mécanisme de GC des pierres tombales.
-    Nécessite cependant stabilité causale des opérations de suppression.
-    S'agit d'une contrainte forte, peu adaptée aux systèmes dynamiques à large échelle.
-    \mnnote{TODO: Trouver référence sur la stabilité causale dans systèmes dynamiques}
-  \item Core \& Nebula propose un mécanisme de ré-équilibrage de l'arbre pour Treedoc.
-    Le ré-équilibrage a pour effet de supprimer des potentielles pierres tombales et de réduire la taille des identifiants.
-    Repose sur un algorithme de consensus.
-    S'agit de nouveau d'une contrainte forte pour systèmes dynamique à large échelle.
-    Pour y pallier, propose de séparer les pairs entre deux ensembles : Core et Nebula.
-    Permet de limiter le nombre participant au consensus.
-    Un protocole de rattrapage permet aux noeuds de la Nebula de mettre à jour leurs modifications concurrentes à un ré-équilibrage.
-  \item LSEQ adopte une autre approche.
-    Part du constat que les identifiants dans Logoot croissent de manière linéaire.
-    Vise une croissance logarithmique des identifiants.
-    Pour cela, propose de nouvelles fonctions d'allocation des identifiants visant à maximiser le nombre d'identifiants insérés avant de devoir augmenter la taille de l'identifiant.
-    Propose aussi d'utiliser une base exponentielle pour la valeur \emph{position} des identifiants.
-    Atteint ainsi la croissance polylogarithmique des identifiants, sans coordination requise entre les noeuds et mécanisme supplémentaire.
-    Solution adaptée aux systèmes distribués à large échelle.
-    Conjecture cependant que cette approche se marie mal avec les Sequence \acp{CRDT} utilisant des blocs.
-    En effet, ajoute une raison supplémentaire à la croissance des identifiants : l'insertion entre identifiants contigus.
-    Force alors la croissance des identifiants.
-\end{itemize}
+\input{chapters/etat-art/mitig-surcout-seq-crdts}
 
 \section{Synthèse}
 

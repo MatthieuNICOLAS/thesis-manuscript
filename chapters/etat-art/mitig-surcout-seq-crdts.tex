@@ -1,0 +1,68 @@
+L'augmentation du surcoût des \acp{CRDT} pour Séquence, qu'il soit dû à des pierres tombales ou à des identifiants de taille non-bornée, est un problème bien identifié dans la littérature \cite{ROH2011354,2009-treedoc-preguica,letia:hal-01248270,zawirski:hal-01248197,lseq2013,lseq2017}.
+Plusieurs approches ont donc été proposées pour réduire sa croissance.
+
+\subsection{Mécanisme de \ac{GC} des pierres tombales}
+
+Pour réduire l'impact des pierres tombales sur les performances de \ac{RGA}, \textcite{ROH2011354} proposent un mécanisme de \ac{GC} des pierres tombales.
+Pour rappel, ce mécanisme nécessite qu'une pierre tombale ne puisse plus être utilisée comme prédecesseur par une opération $\trm{ins}$ reçue dans le futur pour pouvoir être supprimée définitivement.
+En d'autres termes, ce mécanisme repose sur la stabilité causale de l'opération de suppression pour supprimer la pierre tombale correspondante.
+
+La stabilité causale est une contrainte forte, peu adaptée aux systèmes \ac{P2P} dynamiques à large échelle.
+Notamment, la stabilité causale nécessite que chaque noeud du système fournisse régulièrement des informations sur son avancée, \ie quelles opérations il a intégré, pour progresser.
+Ainsi, il suffit qu'un noeud du système se déconnecte pour bloquer la stabilité causale, ce qui apparaît extrêmement fréquent dans le cadre d'un système \ac{P2P} dynamique dans lequel nous n'avons pas de contrôle sur les noeuds.
+
+À notre connaissance, il s'agit du seul mécanisme proposé pour l'approche à pierres tombales.
+
+\subsection{Ré-équilibrage de l'arbre des identifiants de position}
+
+Concernant l'approche à identifiants densément ordonnés, \textcite{letia:hal-01248270} puis \textcite{zawirski:hal-01248197} proposent un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour Treedoc \cite{2009-treedoc-preguica}.
+Pour rappel, Treedoc souffre des problèmes suivants :
+\begin{enumerate}
+    \item Le déséquilibrage de son arbre des identifiants de position si les insertions sont effectuées de manière séquentielle à une position.
+    \item La présence de pierres tombales dans son arbre des identifiants de position lorsque des identifiants correspondants à des noeuds intermédiaires de l'arbre sont supprimés.
+\end{enumerate}
+
+Pour répondre à ces problèmes, les auteurs présentent un mécanisme de ré-équilibrage de l'arbre supprimant par la même occasion les pierres tombales existantes, \ie un mécanisme réattribuant de nouveaux identifiants de position aux éléments encore présents.
+Ce mécanisme prend la forme d'une nouvelle opération, que nous notons $\trm{bal}$.
+
+Notons que l'opération $\trm{bal}$ contrevient à une des propriétés des identifiants de position densément ordonnés : leur \emph{immutabilité} \cf{def:id-prop}.
+L'opération $\trm{bal}$ est donc intrinséquement non-commutative avec les opérations $\trm{ins}$ et $\trm{rmv}$ concurrentes.
+Pour assurer la convergence à terme des copies, les auteurs mettent en place un mécanisme de \emph{catch-up}.
+Ce mécanisme consiste à transformer les opérations concurrentes aux opérations $\trm{bal}$ avant de les intégrer, de façon à prendre en compte les effets des ré-équilibrages.
+
+Toutefois, l'opération $\trm{bal}$ n'est pas non plus commutative avec elle-même.
+Cette approche nécessite d'empêcher la génération d'opérations $\trm{bal}$ concurrentes.
+Pour cela, les auteurs proposent de reposer sur un protocole de consensus entre les noeuds pour la génération d'opérations $\trm{bal}$.
+
+De nouveau, l'utilisation d'un protocole de consensus est une contrainte forte, peu adaptée aux systèmes \ac{P2P} dynamique à large échelle.
+Pour pallier à ce point, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
+
+Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
+Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
+Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{ins}$ et $\trm{rmv}$.
+
+Ainsi, cette solution permet d'adapter l'utilisation d'un protocole de consensus à un système \ac{P2P} dynamique.
+Cependant, elle requiert de disposer de noeuds stables et bien connectés dans le système pour former le \emph{core}.
+Cette condition est un obstacle pour le déploiement et la pérennité de cette solution.
+
+\subsection{Réduction de la croissance des identifiants de position}
+
+L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à réduire la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
+Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
+Dans ces travaux, les auteurs notent que la stratégie d'allocation des identifiants proposée dans Logoot \cite{2009-logoot-weiss} n'est adaptée qu'à un seul comportement d'édition : l'édition séquentielle.
+Si les insertions sont effectuées en suivant d'autres comportements, les identifiants générés saturent rapidement l'espace des identifiants pour une taille donnée.
+Les insertions suivantes déclenchent alors une augmentation de la taille des identifiants.
+En conséquent, la taille des identifiants dans Logoot augmente de façon linéaire au nombre d'insertions, au lieu de suivre la progression logarithmique attendue.
+
+LSEQ définit donc plusieurs stratégies d'allocation d'identifiants adaptées à différents comportements d'édition.
+Les noeuds choisissent aléatoirement une de ces stratégies pour chaque taille d'identifiants.
+De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifiants : l'intervalle des identifiants possibles double à chaque fois que la taille des identifiants augmente.
+Cela permet à LSEQ de choisir avec soin la taille des identifiants et la stratégie d'allocation en fonction des besoins.
+En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.
+
+Cette solution ne repose sur aucune coordination synchrone entre les noeuds.
+Sa complexité ne dépend pas non plus du nombre de noeuds du système.
+Elle nous apparaît donc adaptée aux systèmes \ac{P2P} dynamique à large échelle.
+
+Nous conjecturons cependant que cette approche perd ses bienfaits lorsqu'elle est couplée avec un \ac{CRDT} pour Séquence à granularité variable.
+En effet, comme évoqué précédemment, toute insertion au sein d'un bloc conduit à une croissance de l'identifiant résultant \cf{sec:growth-ids-split}.

@@ -3,6 +3,8 @@ Nous en identifions deux que nous détaillons ci-dessous : la croissance non-bor
 
 \subsubsection{Croissance non-bornée de la taille des identifiants}
 
+\label{sec:growth-ids-split}
+
 La première limite de ce \ac{CRDT}, héritée de l'approche auquel il appartient, est la taille non-bornée de ses identifiants de position.
 Comme indiqué précédemment, LogootSplit génère des identifiants composés de plus en plus de tuples au fur et à mesure que l'espace dense des identifiants se sature.
 
@@ -145,7 +147,7 @@ Les performances d'une séquence LogootSplit diminuent au fur et à mesure que c
 Cette perte d'efficacité est dûe à la taille des identifiants de position qui croît de manière non-bornée, ainsi qu'au nombre généralement croissant de blocs.
 
 Initialement, nous nous sommes focalisés sur un aspect du problème : la croissance du surcoût en métadonnées de la structure.
-Afin de quantifier ce problème, nous avons évalué par le biais de simulations\footnote{Nous décrivons dans le \autoref{chap:renamablelogootsplit} le protocole expérimental que nous avons défini pour ces simulations.} l'évolution de la taille de la séquence.
+Afin de quantifier ce problème, nous avons évalué par le biais de simulations\footnote{Nous détaillons le protocole expérimental que nous avons défini pour ces simulations dans le \autoref{chap:renamablelogootsplit}.} l'évolution de la taille de la séquence.
 La \autoref{fig:size-snapshots-content-vs-ls} présente le résultat obtenu.
 
 \begin{figure}[!ht]
@@ -162,7 +164,7 @@ Sur cette figure, nous représentons l'évolution au fur et à mesure que des mo
 Nous constatons que le contenu représente à terme moins de 1\% de taille de la structure de données.
 Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée, \ie la taille des identifiants, les blocs composant la séquence LogootSplit, mais aussi la structure de données utilisée en interne pour représenter la séquence de manière efficace.
 
-Nous jugeons donc nécessaire de proposer des mécanismes et techniques afin de mitiger les problèmes soulignés précédemments.
+Nous jugeons donc nécessaire de proposer des mécanismes et techniques afin de mitiger le surcoût des \acp{CRDT} pour Séquence et sa croissance.
 
 \mnnote{
   TODO: Serait plus intéressant de proposer des stats sur la taille des ids, le nombre de blocs composant la séquence, le nombre d'éléments par blocs et la proportion de la taille du contenu sur la taille de la structure de données en fonction du nombre d'opérations jouées.
