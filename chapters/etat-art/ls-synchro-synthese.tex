@@ -1,16 +1,15 @@
 Pour résumer, la couche de livraison des opérations associée à LogootSplit doit respecter le modèle de livraison suivant :
 
-\begin{definition}[Exactly-once + Causal remove]
-  \label{def:ls-delivery-model}
-  Le modèle de livraison \emph{Exactly-once + Causal remove} définit les 3 règles suivantes sur la livraison des opérations :
+\begin{definition}[Modèle de livraison LogootSplit]
+  Le modèle de livraison LogootSplit définit que :
   \begin{enumerate}
-    \item Une opération doit être délivrée à l'ensemble des noeuds à terme,
-    \item Une opération doit être délivrée qu'une seule et unique fois aux noeuds,
-    \item Une opération \emph{remove} doit être délivrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été délivrées à ce dernier.
+    \item Une opération doit être livrée exactement une fois à chaque noeud.
+    \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
+    \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut délivrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
   \end{enumerate}
 \end{definition}
 
-Il est à noter que \textcite{2021-these-vic} a récemment proposé dans ses travaux de thèse Dotted LogootSplit, un nouveau Sequence \ac{CRDT} basée sur les différences.
+Il est à noter que \textcite{2021-these-vic} a récemment proposé dans ses travaux de thèse Dotted LogootSplit, un nouveau \ac{CRDT} pour Séquence dont la synchronisation est basée sur les différences d'états.
 Inspiré de Logoot et LogootSplit, ce nouveau \ac{CRDT} associe une séquence à identifiants densément ordonnés à un contexte causal.
 Le contexte causal est une structure de données permettant à Dotted LogootSplit de représenter et de maintenir efficacement les informations des modifications déjà intégrées à l'état courant.
 Cette association permet à Dotted LogootSplit de fonctionner de manière autonome, sans imposer de contraintes particulières à la couche livraison autres que la livraison à terme.

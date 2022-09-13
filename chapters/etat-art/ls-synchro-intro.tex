@@ -1,15 +1,5 @@
 \label{sec:logootsplit-delivery-model}
 
-Afin de garantir son bon fonctionnement, LogootSplit doit être associé à une couche de livraison de messages garantissant plusieurs propriétés :
-
-\begin{definition}[Modèle de livraison LogootSplit]
-    Le modèle de livraison LogootSplit définit que :
-    \begin{enumerate}
-      \item Une opération doit être livrée exactement une fois à chaque noeud.
-      \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
-      \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut délivrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
-    \end{enumerate}
-\end{definition}
-
-Ce modèle de livraison est donc le même que celui utilisé par Logoot.
-Afin d'illustrer la nécessité de ces garanties, nous présentons ci-dessous des exemples d'exécutions ne respectant pas ce modèle.
+Afin de garantir son bon fonctionnement, LogootSplit doit être associé à une couche de livraison de messages.
+Cette couche de livraison doit respecter un modèle de livraison adapté, \ie offrir des garanties sur l'ordre de livraison des opérations.
+Dans cette section, nous présentons des exemples d'exécutions en l'absence de modèle de livraison pour illustrer la nécessité de ces différentes garanties.
