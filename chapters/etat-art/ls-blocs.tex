@@ -2,13 +2,16 @@
 
 Afin de réduire le surcoût de la séquence, LogootSplit propose d'aggréger de façon dynamique les éléments et leur identifiants dans des blocs.
 Pour cela, LogootSplit introduit la notion d'intervalle d'identifiants :
-\begin{definition}[Intervalle d'identifiants]
-  Un intervalle d'identifiants est un couple $\langle \trm{idBegin},\trm{offsetEnd} \rangle$ avec :
-  \begin{enumerate}
-    \item $\trm{idBegin}$, l'identifiant du premier élément de l'interval.
-    \item $\trm{offsetEnd}$, l'offset du dernier identifiant de l'interval.
-  \end{enumerate}
-\end{definition}
+
+\noindent\withmathbreak{
+  \begin{definition}[Intervalle d'identifiants]
+    Un intervalle d'identifiants est un couple $\langle \trm{idBegin},\trm{offsetEnd} \rangle$ avec :
+    \begin{enumerate}
+      \item $\trm{idBegin}$, l'identifiant du premier élément de l'interval.
+      \item $\trm{offsetEnd}$, l'offset du dernier identifiant de l'interval.
+    \end{enumerate}
+  \end{definition}
+}
 
 Les intervalles d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant de manière effective que l'identifiant de son premier élément et le dernier offset de son dernier élément.
 
@@ -26,7 +29,17 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
 
 \end{definition}
 
-Nous représentons un intervalle d'identifiants à l'aide du formalisme suivant : $\betterid{position}{nodeId~nodeSeq}{begin..end}$ où $\trm{begin}$ est l'offset du premier identifiant de l'intervalle et $\trm{end}$ du dernier.
+\withmathbreak{
+  Nous représentons un intervalle d'identifiants à l'aide du formalisme suivant : $\betterid{position}{nodeId~nodeSeq}{begin..end}$ où $\trm{begin}$ est l'offset du premier identifiant de l'intervalle et $\trm{end}$ du dernier.
+}
+
+\mnnote{
+  TODO: Ajouter MàJ de generateId ici.
+  "Pour profiter de cette fonctionnalité, LogootSplit propose une nouvelle fonction generateId.
+  Le principal ajout est un cas supplémentaire favorisant la génération d'un id contigu dans le cas où predId est le dernier élément d'un intervalle d'identifiants de l'auteur.
+  Le booléen isAppendable est nécessaire pour éviter de re-générer un identifiant avec un triplet nodeId,seq,offset déjà utilisé".
+}
+
 
 LogootSplit utilise une structure de données pour associer un intervalle d'identifiants aux éléments correspondants : les blocs.
 
@@ -85,6 +98,6 @@ Cette fonctionnalité permet d'améliorer les performances de la structure de do
     Ceci permet de réduire la taille des messages diffusés sur le réseau.
 \end{enumerate}
 
-Comme pour les identifiants, il est intéressant de noter que la paire $\langle \trm{nodeId},\trm{seq} \rangle$ du dernier tuple d'un identifiant permet d'identifier de manière unique la partie commune des identifiants de l'intervalle d'identifiants auquel il appartient.
-Ainsi, nous pouvons identifier de manière un intervalle d'identifiants avec le quadruplet $\langle \trm{nodeId}, \trm{seq}, \trm{offsetBegin}, \trm{offsetEnd} \rangle$.
+Il est intéressant de noter que la paire $\langle \trm{nodeId},\trm{seq} \rangle$ du dernier tuple d'un identifiant permet d'identifier de manière unique la partie commune des identifiants de l'intervalle d'identifiants auquel il appartient.
+Ainsi, nous pouvons identifier de manière unique un intervalle d'identifiants avec le quadruplet $\langle \trm{nodeId}, \trm{seq}, \trm{offsetBegin}, \trm{offsetEnd} \rangle$.
 Par exemple, l'intervalle d'identifiants $\betterid{i}{B1}{2}\betterid{f}{A1}{2..4}$ peut être référencé à l'aide du quadruplet $\langle A,1,2,4 \rangle$.

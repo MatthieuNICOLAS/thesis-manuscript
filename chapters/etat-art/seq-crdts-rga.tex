@@ -30,15 +30,19 @@ Ainsi, \ac{RGA} se base sur le prédecesseur d'un élément pour déterminer où
 De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il associe aux éléments pour pouvoir s'y référer par la suite.
 
 Les auteurs proposent le modèle de données suivant comme identifiants :
-\begin{definition}[Identifiants S4Vector]
-  Les identifiants S4Vector sont de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
-  \begin{enumerate}
-    \item $\trm{ssid}$, l'identifiant de la session de collaboration.
-    \item $\trm{sum}$, la somme du vecteur d'horloges courant du noeud auteur de l'élément.
-    \item $\trm{ssn}$, l'identifiant du noeud auteur de l'élément.
-    \item $\trm{seq}$, le numéro de séquence de l'auteur de l'élément à son insertion.
-  \end{enumerate}
-\end{definition}
+
+\noindent\withmathbreak{
+  \begin{definition}[Identifiants S4Vector]
+    Les identifiants S4Vector sont de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
+    \begin{enumerate}
+      \item $\trm{ssid}$, l'identifiant de la session de collaboration.
+      \item $\trm{sum}$, la somme du vecteur d'horloges courant du noeud auteur de l'élément.
+      \item $\trm{ssn}$, l'identifiant du noeud auteur de l'élément.
+      \item $\trm{seq}$, le numéro de séquence de l'auteur de l'élément à son insertion.
+    \end{enumerate}
+  \end{definition}
+}
+
 Cependant, dans les présentations suivantes de \ac{RGA} \cite{shapiro_2011_crdt, 2016-specification-complexity-collaborative-text-editing-attiya}, les auteurs utilisent des horloges de Lamport \cite{1978-happen-before-lamport} en lieu et place des identifiants S4Vector.
 Nous procédons donc ici à la même simplification, et abstrayons la structure des identifiants utilisée avec le symbole $t$.
 
