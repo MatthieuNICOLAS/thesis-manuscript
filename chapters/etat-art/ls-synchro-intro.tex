@@ -7,7 +7,7 @@ Afin de garantir son bon fonctionnement, LogootSplit doit être associé à une 
     \begin{enumerate}
       \item Une opération doit être livrée exactement une fois à chaque noeud.
       \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
-      \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+      \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut délivrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
     \end{enumerate}
 \end{definition}
 

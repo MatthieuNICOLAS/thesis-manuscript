@@ -1,77 +1,114 @@
-Une autre propriété que doit assurer la couche de livraison de messages est que les opérations \emph{remove} doivent être livrées au \ac{CRDT} après les opérations \emph{insert} correspondantes.
-La \autoref{fig:why-causal-remove} présente un exemple justifiant cette contrainte.
+La \autoref{fig:why-causal-remove} présente un second exemple illustrant la nécessité de la contrainte de livraison d'une opération $\trm{rmv}$ qu'après la livraison des opérations $\trm{ins}$ correspondantes.
 
 \begin{figure}[!ht]
+
   \centering
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
+      \newcommand\initialstate[3]{
         \path
-            node {\textbf{A}}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1A-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-            ++(0:25 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2A-left) {O}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..4}$}] {ABCD};
+      }
 
-
+      \newcommand\insx[3]{
         \path
-            ++(270:4) node {\textbf{B}}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-            ++(0:12 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1B-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-            ++(0:5 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2B-left) {O}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON};
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {AB}
+          ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}$}] {X}
+          ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {CD};
+      }
 
+      \newcommand\rmvx[3]{
         \path
-            ++(270:8) node {\textbf{C}}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
-            ++(0:30 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S1C-left) {O}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1C-right) {GNON}
-            ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-            ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+          #1
+          ++#2
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {AB}
+          ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {CD};
+      }
 
-        \draw[->, thick]
-          (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
-          (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+      \newcommand\offseta{ (90:1.2) }
+      \newcommand\offsetb{ (270:1.2) }
 
-        \draw[dotted]
-          (S1A-right) -- (S2A-left)
-          (S0B) -- (S1B-left)
-          (S0C) -- (S1C-left)
-          (S1C-right) -- (S2C-left);
+      \path
+        node {\textbf{A}}
+        ++(0:0.5) node (a) {}
+        +(0:24) node (a-end) {}
+        +(0:1) node[point] (a-initial) {}
+        +(0:6) node[point, label=-170:{$\trm{ins}(B \prec X \prec C)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}},X)$}}] (a-ins-x) {}
+        +(0:16) node[point] (a-recv-rmv-x) {}
+        +(0:19) node (a-last-display) {}
+        +(0:23) node (a-final) {};
 
-        \draw[dashed, ->, thick, shorten >= 3]
-          (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-          (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
-          (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
-          (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C-left.west);
+      \initialstate{(a-initial)}{\offseta}{90};
+      \insx{(a-ins-x)}{\offseta}{90};
+      \rmvx{(a-last-display)}{\offseta}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-x) -- (a-recv-rmv-x) -- (a-final);
+
+      \path
+        ++(270:3) node {\textbf{B}}
+        ++(0:0.5) node (b) {}
+        +(0:24) node (b-end) {}
+        +(0:1) node[point] (b-initial) {}
+        +(0:8) node[point] (b-recv-ins-x) {}
+        +(0:14) node[point, label=170:{$\trm{rmv}(X)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}})$}}] (b-rmv-x) {}
+        +(0:19) node (b-last-display) {}
+        +(0:23) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb}{-90};
+      \insx{(b-recv-ins-x)}{\offsetb}{-90};
+      \rmvx{(b-last-display)}{\offsetb}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-recv-ins-x) -- (b-rmv-x) -- (b-final);
+
+      \path
+        ++(270:6) node {\textbf{C}}
+        ++(0:0.5) node (c) {}
+        +(0:24) node (c-end) {}
+        +(0:1) node[point] (c-initial) {}
+        +(0:16) node[point] (c-recv-rmv-x) {}
+        +(0:19) node[point] (c-recv-ins-x) {}
+        +(0:23) node (c-final) {};
+
+      \initialstate{(c-initial)}{\offsetb}{-90};
+      \initialstate{(c-recv-rmv-x)}{\offsetb}{-90};
+      \insx{(c-recv-ins-x)}{\offsetb}{-90};
+
+      \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+      \draw[->, thick] (c-initial) --  (c-recv-rmv-x) -- (c-recv-ins-x) -- (c-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ins-x) -- (b-recv-ins-x);
+      \draw[->, dashed, shorten >= 1] (a-ins-x) -- (c-recv-ins-x);
+      \draw[->, dashed, shorten >= 1] (b-rmv-x) -- (a-recv-rmv-x);
+      \draw[->, dashed, shorten >= 1] (b-rmv-x) -- (c-recv-rmv-x);
     \end{tikzpicture}
   }
-  \caption{Non-effet de l'opération \emph{remove} car reçue avant l'opération \emph{insert} correspondante}
+  \caption{Non-effet de l'opération $\trm{rmv}$ car reçue avant l'opération $\trm{ins}$ correspondante}
   \label{fig:why-causal-remove}
 \end{figure}
 
 Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
-Le noeud A commence par insérer un nouvel élément, "I", dans la séquence entre les éléments "O" et "G".
-L'opération \emph{insert} résultante, insérant l'élément "I" à la position \id{p}{A0}{0}\id{m}{A1}{0}, est diffusée aux autres noeuds.
+La séquence répliquée contient initialement les éléments "ABCD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{1..4}$.
 
-À la réception de l'opération \emph{insert}, le noeud B l'intègre à son état.
-Cependant, le noeud B supprime dans la foulée l'élément nouvellement ajouté.
-Il diffuse ensuite l'opération \emph{remove} générée.
+Le noeud A commence par insérer l'élément "X" dans la séquence entre les éléments "B" et "C".
+A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{2}\betterid{m}{A2}{1},X)$ puis la diffuse.
 
-Toutefois, suite à un aléa du réseau, l'opération \emph{remove} supprimant l'élément "I" est livrée au noeud C avant l'opération \emph{insert} l'ajoutant à son état.
-Lorsque le noeud C reçoit l'opération \emph{remove}, il parcourt son état à la recherche de l'élément "I" pour le supprimer.
-Cependant, celui-ci n'est pas présent dans son état courant.
-L'intégration de l'opération s'achève donc sans effectuer de modification.
+À la réception de l'opération $\trm{ins}$, le noeud B l'intègre à son état.
+Puis il supprime dans la foulée l'élément "X" nouvellement inséré.
+B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{2}\betterid{m}{A2}{1})$ puis la diffuse.
 
-Le noeud C reçoit ensuite l'opération \emph{insert}.
-Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant (\id{p}{A0}{0} $\lid$ \id{p}{A0}{0}\id{m}{A1}{0} $\lid$ \id{p}{A0}{1}).
+Toutefois, suite à un aléa du réseau, l'opération $\trm{rmv}$ supprimant l'élément "X" est reçue par le noeud C en première.
+Ainsi, le noeud C intègre cette opération : il parcourt son état à la recherche de l'élément "X" pour le supprimer.
+Celui-ci n'est pas présent dans son état courant, l'intégration de l'opération s'achève sans effectuer de modification.
 
-Ainsi, l'état du noeud C diverge de celui-ci des autres noeuds à terme, et cela malgré que les noeuds A, B et C aient intégré le même ensemble d'opérations.
-Ce résultat transgresse la propriété de \ac{SEC} que doivent assurer les \acp{CRDT}.
-Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations \emph{remove} par rapport aux opérations \emph{insert} correspondantes.
+Le noeud C reçoit ensuite l'opération $\trm{ins}$.
+Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant.
 
-\mnnote{QUESTION: Même que pour la exactly-once delivery, est-ce que j'explique ici comment assurer cette contrainte plus en détails (Ajout des dots des opérations \emph{insert} en dépendances de l'opération \emph{remove}, vérification que dots présents dans dot store avant de passer l'opération \emph{remove} à la structure de données) ou je garde ça pour le chapitre sur MUTE ?}
+Nous constatons alors que l'état à terme du noeud C diverge de celui des noeuds A et B, et cela malgré que les noeuds A, B et C aient intégré le même ensemble d'opérations.
+Ce résultat transgresse la propriété \ac{SEC} que doivent assurer les \acp{CRDT}.
+Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations $\trm{rmv}$ par rapport aux opérations $\trm{ins}$ correspondantes.

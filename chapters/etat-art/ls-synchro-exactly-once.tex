@@ -1,5 +1,4 @@
-Ce premier exemple a pour but d'illustrer la nécessité de la propriété de livraison en \emph{exactement un exemplaire} des opérations.
-Pour cela, considérons l'exemple représenté par la \autoref{fig:why-exactly-once-delivery}.
+Ce premier exemple, représenté par la \autoref{fig:why-exactly-once-delivery}, a pour but d'illustrer la nécessité de la propriété de livraison en \emph{exactement un exemplaire} des opérations.
 
 \begin{figure}[!ht]
 
@@ -36,11 +35,11 @@ Pour cela, considérons l'exemple représenté par la \autoref{fig:why-exactly-o
       \path
         node {\textbf{A}}
         ++(0:0.5) node (a) {}
-        +(0:26) node (a-end) {}
-        +(0:2) node[point] (a-initial) {}
-        +(0:7) node[point, label=-170:{$\trm{ins}(B \prec X \prec C)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}},X)$}}] (a-ins-x) {}
-        +(0:17) node[point] (a-recv-rmv-x) {}
-        +(0:24) node (a-final) {};
+        +(0:24) node (a-end) {}
+        +(0:1) node[point] (a-initial) {}
+        +(0:6) node[point, label=-170:{$\trm{ins}(B \prec X \prec C)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}},X)$}}] (a-ins-x) {}
+        +(0:16) node[point] (a-recv-rmv-x) {}
+        +(0:23) node (a-final) {};
 
       \initialstate{(a-initial)}{\offseta}{90};
       \insx{(a-ins-x)}{\offseta}{90};
@@ -52,12 +51,12 @@ Pour cela, considérons l'exemple représenté par la \autoref{fig:why-exactly-o
       \path
         ++(270:3) node {\textbf{B}}
         ++(0:0.5) node (b) {}
-        +(0:26) node (b-end) {}
-        +(0:2) node[point] (b-initial) {}
-        +(0:9) node[point] (b-recv-ins-x) {}
-        +(0:15) node[point, label=170:{$\trm{rmv}(X)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}})$}}] (b-rmv-x) {}
-        +(0:22) node[point] (b-recv-ins-x-2) {}
-        +(0:24) node (b-final) {};
+        +(0:24) node (b-end) {}
+        +(0:1) node[point] (b-initial) {}
+        +(0:8) node[point] (b-recv-ins-x) {}
+        +(0:14) node[point, label=170:{$\trm{rmv}(X)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}})$}}] (b-rmv-x) {}
+        +(0:21) node[point] (b-recv-ins-x-2) {}
+        +(0:23) node (b-final) {};
 
       \initialstate{(b-initial)}{\offsetb}{-90};
       \insx{(b-recv-ins-x)}{\offsetb}{-90};

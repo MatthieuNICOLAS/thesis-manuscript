@@ -124,6 +124,17 @@
 \definecolor{ucl2ltgreen}{RGB}{206,211,179}
 \definecolor{ucl3ltgreen}{RGB}{220,224,201}
 \definecolor{ucl4ltgreen}{RGB}{241,243,233}
+
+\definecolor{darkgreen}{RGB}{75,70,32}
+\definecolor{darkblue}{RGB}{0,67,89}
+\definecolor{mydarkblue}{RGB}{76,123,138}
+\definecolor{mydarkblueid}{RGB}{0,67,89}
+\definecolor{mylightblue}{RGB}{168,192,209}
+\definecolor{mydarkorange}{RGB}{215,123,35}
+\definecolor{mylightorange}{RGB}{227,162,101}
+\definecolor{mydarkred}{RGB}{90,27,49}
+\definecolor{mydarkpurple}{RGB}{134,122,140}
+\definecolor{mydarkpurpleid}{RGB}{82,66,91}
 }
 
 \usepackage{amssymb}
@@ -636,14 +647,14 @@ WIP
 \subsubsection{Livraison des opérations en exactement un exemplaire}
 \input{chapters/etat-art/ls-synchro-exactly-once}
 
-% \subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
-% \input{chapters/etat-art/ls-synchro-causal-remove}
+\subsubsection{Livraison de l'opération $\trm{rmv}$ après les opérations $\trm{ins}$ correspondantes}
+\input{chapters/etat-art/ls-synchro-causal-remove}
 
 \subsubsection{Définition du modèle de livraison}
 \input{chapters/etat-art/ls-synchro-synthese}
 
-% \subsection{Limites}
-% \input{chapters/etat-art/ls-limites}
+\subsection{Limites}
+\input{chapters/etat-art/ls-limites}
 
 \section{Mitigation du surcoût des séquences répliquées sans conflits}
 
