@@ -93,8 +93,7 @@ Les \acfp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 20
 \end{definition}
 
 \begin{definition}[Convergence forte]
-  La convergence forte est une propriété de sûreté indiquant que l'ensemble des noeuds d'un système ayant observés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
-  \footnotetext{Nous considérons comme équivalents deux états pour lesquels chaque observateur du type de données renvoie un même résultat, \ie les deux états sont indifférenciables du point de vue des utilisateur-rices du système.}
+  La convergence forte est une propriété de sûreté indiquant que l'ensemble des noeuds d'un système ayant observés le même ensemble de modifications obtiendront des états équivalents, sans échange de message supplémentaire.
 \end{definition}
 
 Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis \cite{2002-intro-lattices-order-davey} :

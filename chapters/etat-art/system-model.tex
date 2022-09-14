@@ -1,0 +1,46 @@
+Le système que nous considérons est un système \acf{P2P} à large échelle.
+Il est composé d'un ensemble de noeuds dynamique.
+En d'autres termes, un noeud peut rejoindre ou quitter le système à tout moment.
+
+À un instant donné, un noeud est soit connecté, soit déconnecté.
+Nous considérons possible qu'un noeud se déconnecte de manière définitive, sans indication au préalable.
+Ainsi, du point de vue des autres noeuds du système, il est impossible de déterminer le statut d'un noeud déconnecté.
+Ce dernier peut être déconnecté de manière temporaire ou définitive.
+Nous assimilons les noeuds déconnectés de manière définitive à des noeuds ayant quittés le système.
+
+Dans ce système, nous considérons comme confondus les noeuds et clients.
+Un noeud correspond alors à un appareil d'un-e utilisateur-rice du système.
+Un-e même utilisateur-rice peut prendre part au système au travers de différents appareils, nous considérons alors chaque appareil comme un noeud distinct.
+
+Le système consiste en une application permettant de répliquer une donnée.
+Chaque noeud du système possède en local une copie de la donnée.
+Les noeuds peuvent consulter et éditer leur copie locale sans se coordonner entre eux.
+Les modifications sont appliquées à la copie locale immédiatement et de manière atomique.
+Les modifications sont ensuite transmises aux autres noeuds de manière asynchrone par le biais de messages, afin qu'ils puissent à leur tour intégrer les modifications à leur copie.
+L'application garantit la convergence à terme des copies.
+
+\begin{definition}[Convergence à terme]
+    La convergence à terme est une propriété de sûreté indiquant que l'ensemble des noeuds du système ayant intégrés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
+    \footnotetext{Nous considérons comme équivalents deux états pour lesquels chaque observateur du type de données renvoie un même résultat, \ie les deux états sont indifférenciables du point de vue des utilisateur-rices du système.}
+\end{definition}
+
+Les noeuds communiquent entre eux par l'intermédiaire d'un réseau non-fiable.
+Les messages envoyés peuvent être perdus, ré-ordonnés et/ou dupliqués.
+Le réseau est aussi sujet à des partitions, qui séparent les noeuds en des sous-groupes disjoints.
+Nous considérons toutefois que les noeuds peuvent aussi initier de leur propre chef des partitions réseau : des groupes de noeuds peuvent décider de travailler de manière isolée pendant une certaine durée, avant de se reconnecter au réseau.
+
+Pour compenser les limitations du réseau, les noeuds reposent sur une couche de livraison de messages.
+Cette couche permet de garantir un modèle de livraison donné des messages à l'application.
+Ainsi cette couche peut, en fonction des garanties du modèle de livraison sélectionné, ré-ordonner les messages reçus avant de les livrer à l'application, dé-dupliquer les messages, et détecter et ré-échanger les messages perdus.
+Nous considérons a minima que la couche de livraison garantit la livraison à terme des messages.
+
+\begin{definition}[Livraison à terme]
+    La livraison à terme est un modèle de livraison garantissant que l'ensemble des messages du système seront livrés à l'ensemble des noeuds du système à terme.
+\end{definition}
+
+Finalement, nous supposons que les noeuds du système sont honnêtes.
+Les noeuds ne peuvent dévier du protocole de la couche de livraison des messages ou de l'application.
+Les noeuds peuvent cependant rencontrer des défaillances.
+Nous considérons que les noeuds disposent d'une mémoire durable et fiable.
+Ainsi, nous considérons que les noeuds peuvent restaurer le dernier état valide, \ie pas en cours de modification, qu'il possédait juste avant la défaillance.
+% Nous considérons qu'en cas de perte de données, les noeuds quittent et re-rejoignent le système sous une autre identité.

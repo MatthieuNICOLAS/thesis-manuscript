@@ -15,26 +15,6 @@ Nous introduisons une opération \emph{rename} qui permet de
 \end{enumerate*}
 Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en métadonnées.
 
-\subsection{Modèle du système}
-
-Le système est composé d'un ensemble dynamique de noeuds, les noeuds pouvant rejoindre puis quitter la collaboration tout au long de sa durée.
-Les noeuds collaborent afin de construire et maintenir une séquence à l'aide de RenamableLogootSplit.
-Chaque noeud possède une copie de la séquence et peut l'éditer sans se coordonner avec les autres.
-Les modifications des noeuds prennent la forme d'opérations qui sont appliquées immédiatement à leur copie locale.
-Les opérations sont ensuite transmises de manière asynchrone aux autres noeuds pour qu'ils puissent à leur tour appliquer les modifications à leur copie.
-
-Les noeuds communiquement par l'intermédiaire d'un réseau \ac{P2P}.
-Ce réseau est non-fiable : les messages peuvent être perdus, ré-ordonnés ou même livrés à plusieurs reprises.
-Le réseau peut aussi être sujet à des partitions, qui séparent alors les noeuds en des sous-groupes disjoints.
-Afin de compenser les limitations du réseau, les noeuds reposent sur une couche de livraison de messages.
-
-Puisque RenamableLogootSplit est une extension de LogootSplit, cette structure de données partage les mêmes contraintes sur la livraison de messages.
-La couche de livraison de messages sert donc à livrer les messages à l'application exactement une fois.
-La couche de livraison de messages a aussi pour tâche de garantir la livraison des opérations de suppression après les opérations d'insertion correspondantes.
-Aucune autre contrainte n'existe sur l'ordre de livraison des opérations.
-Finalement, la couche de livraison intègre aussi un mécanisme d'anti-entropie \cite{1983-anti-entropy-vv}.
-Ce mécanisme permet aux noeuds de se synchroniser par paires, en détectant et ré-échangeant les messages perdus.
-
 \subsection{Définition de l'opération de renommage}
 
 \label{sec:def-rename-op}
