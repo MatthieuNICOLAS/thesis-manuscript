@@ -57,7 +57,7 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
 
 \begin{property}(Commutativité avec les opérations concurrentes)
   \label{prop:commutativity}
-  Les opérations concurrentes peuvent être délivrées dans des ordres différents à chaque noeud.
+  Les opérations concurrentes peuvent être livrées dans des ordres différents à chaque noeud.
   Afin de garantir la convergence des réplicas, l'ordre d'application d'un ensemble d'opérations concurrentes ne doit pas avoir d'impact sur l'état obtenu.
   L'opération \emph{rename} doit donc être commutative avec n'importe quelle opération concurrente.
 \end{property}
@@ -455,10 +455,10 @@ Nous obtenons donc le modèle de livraison suivant :
   \label{def:rls-delivery-model}
   Le modèle de livraison \emph{Exactly-once + Causal remove + Epoch-based} définit les 4 règles suivantes sur la livraison des opérations :
   \begin{enumerate}
-    \item Une opération doit être délivrée à l'ensemble des noeuds à terme,
-    \item Une opération doit être délivrée qu'une seule et unique fois aux noeuds,
-    \item Une opération \emph{remove} doit être délivrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été délivrées à ce dernier.
-    \item Une opération doit être délivrée à un noeud une fois que l'opération \emph{rename} une fois que l'opération \emph{rename} qui introduit son époque de génération a été delivrée à ce dernier.
+    \item Une opération doit être livrée à l'ensemble des noeuds à terme,
+    \item Une opération doit être livrée qu'une seule et unique fois aux noeuds,
+    \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
+    \item Une opération doit être livrée à un noeud une fois que l'opération \emph{rename} une fois que l'opération \emph{rename} qui introduit son époque de génération a été delivrée à ce dernier.
   \end{enumerate}
 \end{definition}
 
@@ -602,7 +602,7 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
 Après avoir diffusé son opération \emph{insert}, le noeud B effectue une opération \emph{rename} sur son état.
 Cette opération réassigne à chaque élément un nouvel identifiant à partir de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}), de l'identifiant du noeud (\textbf{B}) et de son numéro de séquence courant (2).
 Cette opération introduit aussi une nouvelle époque : \epoch{B2}.
-Puisque l'opération \emph{rename} de A n'a pas encore été délivrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
+Puisque l'opération \emph{rename} de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
 
 Puisque des époques concurrentes sont générées, les époques forment désormais l'\emph{arbre des époques}.
 Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les noeuds obtiennent une fois qu'ils se sont synchronisés à terme.
@@ -725,7 +725,7 @@ La \autoref{fig:priority-example} fournit un exemple.
 La \autoref{fig:priority-execution} décrit une exécution dans laquelle trois noeuds A, B et C générent plusieurs opérations avant de se synchroniser à terme.
 Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, nous représentons seulement ces opérations dans cette figure.
 Initialement, le noeud A génère une opération \emph{rename} qui introduit l'époque \epoch{A1}.
-Cette opération est délivrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
+Cette opération est livrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
 De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
 
 Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des époques} représenté dans la \autoref{fig:priority-epoch-tree}.
@@ -1081,13 +1081,13 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
 Dans la \autoref{fig:revertRenameId-mintuple}, les noeuds C et D répliquent une même séquence contenant les éléments "WOD".
 Dans la \autoref{fig:revertRenameId-mintuple-setup}, le noeud C commence par renommer son état.
 En concurrence, le noeud D insère l'élément "L" entre les éléments "O" et "D".
-L'opération \emph{insert} correspondante est délivrée au noeud C, qui l'intègre en suivant le comportement défini en \autoref{sec:ops-concurrent-to-rename}.
+L'opération \emph{insert} correspondante est livrée au noeud C, qui l'intègre en suivant le comportement défini en \autoref{sec:ops-concurrent-to-rename}.
 Le noeud C procède ensuite à l'insertion de l'élément "R" entre les éléments "O" et "L".
 Cette insertion dépend donc causalement de l'opération \emph{rename} effectuée précédemment par C.
 En parallèle, le noeud D effectue un renommage de son état.
 Cette opération \emph{rename} est donc concurrente à l'opération \emph{rename} générée précédemment par C.
 
-Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération \emph{rename} de D est délivrée au noeud C.
+Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération \emph{rename} de D est livrée au noeud C.
 L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C1} \lepoch \epoch{D3}), le noeud C procède à l'annulation de son opération \emph{rename}.
 
 L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération \emph{rename} annulée : \id{k}{C1}{1}\id{i}{C2}{0}.
@@ -1517,7 +1517,7 @@ Le noeud compare ensuite l'époque introduite (\epoch{B2}) à son époque couran
 Si l'époque introduite était plus petite que l'époque courante, aucun traitement supplémentaire ne serait nécessaire.
 \textsc{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées, et le nouvel \emph{arbre des époques} (ligne \ref{alg:renameRemote-return-1}).
 
-Dans le cas présent, on a \epoch{A2} \lepoch \epoch{B2}.
+Dans le cas présent, nous avons \epoch{A2} \lepoch \epoch{B2}.
 \epoch{B2} devient donc la nouvelle époque courante.
 Le noeud A procède au renommage de son état vers cette nouvelle époque.
 
@@ -1540,7 +1540,7 @@ Les noeuds peuvent alors supprimer ces époques.
 Dans cette section, nous présentons un mécanisme permettant aux noeuds de déterminer les époques obsolètes.
 
 Pour proposer un tel mécanisme, nous nous reposons sur la notion de \emph{stabilité causale des opérations} \cite{10.1007/978-3-662-43352-2_11}.
-Une opération est causalement stable une fois qu'elle a été délivrée à tous les noeuds.
+Une opération est causalement stable une fois qu'elle a été livrée à tous les noeuds.
 Dans le contexte de l'opération \emph{rename}, cela implique que tous les noeuds ont progressé à l'époque introduite par cette opération ou à une époque plus grande d'après la relation \emph{priority}.
 À partir de ce constat, nous définissons les \emph{potentielles époques courantes} :
 
@@ -1931,8 +1931,8 @@ Au cours de la première phase, la probabilité d'émettre une opération \emph{
 Une fois que leur copie locale du document atteint 60k caractères (environ 15 pages), les bots basculent à la seconde phase et redéfinissent chaque probabilité à 50\%.
 De plus, tout au long de la collaboration, les bots ont une probabilité de 5\% de déplacer leur curseur à une position aléatoire dans le document après chaque opération locale.
 
-Chaque bot doit générer 15k opérations \emph{insert} ou \emph{remove}, et s'arrête donc une fois qu'il a observé les 150k opérations.
-Pour chaque bot, nous enregistrons un instantané de son état toutes les 10k opérations observées.
+Chaque bot doit générer 15k opérations \emph{insert} ou \emph{remove}, et s'arrête donc une fois qu'il a intégré les 150k opérations.
+Pour chaque bot, nous enregistrons un instantané de son état toutes les 10k opérations intégrées.
 Nous enregistrons aussi son log des opérations à l'issue de la simulation.
 
 De plus, dans le cas de RenamableLogootSplit, 1 à 4 bots sont désignés de façon arbitraire comme des \emph{renaming bots} en fonction de la session.
@@ -2433,7 +2433,7 @@ Afin de pouvoir utiliser l'opération \emph{rename} comme état initial, il est 
 
 De plus, des informations de causalité doivent être intégrées à l'opération \emph{rename}.
 Ces informations doivent permettre aux noeuds d'identifier les opérations supplémentaires nécessaires pour obtenir l'état courant, \ie toutes les opérations desquelles l'opération \emph{rename} ne dépend pas causalement.
-L'ajout à l'opération \emph{rename} d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations observées par l'auteur de l'opération \emph{rename} au moment de sa génération, permettrait cela.
+L'ajout à l'opération \emph{rename} d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations intégrées par l'auteur de l'opération \emph{rename} au moment de sa génération, permettrait cela.
 
 Nous définissons donc de la manière suivante l'opération \emph{rename} enrichie compatible avec ce mécanisme de compression du log :
 
@@ -2493,7 +2493,7 @@ Cet algorithme est équivalent à ré-ordonner le log des opérations de façon 
 
 Cette approche présente plusieurs avantages par rapport à l'implémentation décrite dans la \autoref{sec:integration-process-rename-op}.
 Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
-La version décrite dans la \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si on dispose de \textsc{renameBlock}) de l'état courant.
+La version décrite dans la \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si nous disposons de \textsc{renameBlock}) de l'état courant.
 La version présentée ici effectue une transformation pour chaque opération du log concurrente à l'opération \emph{rename} à intégrer.
 Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
 

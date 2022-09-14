@@ -1,23 +1,23 @@
-Pour limiter la coordination entre les noeuds, les systèmes distribués adoptent le paradigme de la réplication optimiste.
+Pour limiter la coordination entre les noeuds, les systèmes distribués adoptent le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito}.
 Ce paradigme consiste à ce que chaque noeud possède une copie de la donnée.
 Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
 Les noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
 Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
 Ce paradigme offre ainsi aux noeuds une haute disponibilité \cite{2016-trade-offs-replicated-systems-guerraoui} ainsi qu'une faible latence.
 
-Afin d'ordonner les modifications effectués dans un système, la littérature repose généralement sur la relation \hb \cite{1978-happen-before-lamport}.
+Afin d'ordonner les évènements se produisant dans un système, la littérature repose généralement sur la relation \hb \cite{1978-happen-before-lamport}.
 Nous l'adaptons ci-dessous à notre contexte :
 
 \begin{definition}[Relation \hb]
-  La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est respectée :
+  La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est satisfaite :
   \begin{enumerate}
     \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
-    \item $m_1$ a été délivrée au noeud auteur de $m_2$ avant la génération de $m_2$.
+    \item $m_1$ a été livrée au noeud auteur de $m_2$ avant la génération de $m_2$.
     \item Il existe une modification $m$ telle que $m_1 \rightarrow m \land m \rightarrow m_2$.
   \end{enumerate}
 \end{definition}
 
-Dans le cadre d'un système distribué, on note que la relation \hb ne permet pas d'établir un ordre total entre les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.}.
+Dans le cadre d'un système distribué, nous notons que la relation \hb ne permet pas d'établir un ordre total entre les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.}.
 En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
 De telles modifications sont alors dites \emph{concurrentes} :
 
@@ -27,9 +27,9 @@ De telles modifications sont alors dites \emph{concurrentes} :
 
 Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
 Cependant, les modifications permises par un type de données ne sont généralement pas commutatives car de sémantiques contraires.
-Ainsi, une exécution dans un système distribué suivant le paradigme de réplication optimiste peut mener à la génération de modifications concurrentes non commutatives.
+Ainsi, une exécution distribuée peut mener à la génération de modifications concurrentes non commutatives.
 Nous parlons alors de conflits.
-La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques opposées sont générées en concurrence.
+La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques contraires sont générées en concurrence.
 
 \begin{figure}[!ht]
 
@@ -67,10 +67,10 @@ La figure \autoref{fig:set-conflict} présente un scénario où des modification
   \label{fig:set-conflict}
 \end{figure}
 
-Dans cet exemple, deux noeuds A et B répliquent et partagent un même Ensemble.
+Dans cet exemple, deux noeuds A et B répliquent et partagent une même structure de données de type Ensemble.
 Les deux noeuds possèdent le même état initial : $\{a\}$.
-Le noeud A retire l'élément $a$ de l'ensemble, $\trm{rmv}(a)$.
-Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via l'opération de modification $\trm{add}(a)$.
+Le noeud A retire l'élément $a$ de l'ensemble, en procédant à la modification $\trm{rmv}(a)$.
+Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via la modification $\trm{add}(a)$.
 En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
 Les deux noeuds se synchronisent ensuite.
 
@@ -93,24 +93,29 @@ Les \acfp{CRDT} \cite{shapiro_2011_crdt, 2018-crdts-perguica-baquero-shapiro, 20
 \end{definition}
 
 \begin{definition}[Convergence forte]
-  La convergence forte est une propriété de sûreté indiquant que l'ensemble des noeuds d'un système ayant observés le même ensemble de modifications obtiendront des états équivalents, sans échange de message supplémentaire.
+  La convergence forte est une propriété de sûreté indiquant que l'ensemble des noeuds d'un système ayant intégrés le même ensemble de modifications obtiendront des états équivalents, sans échange de message supplémentaire.
 \end{definition}
 
 Pour offrir la propriété de \emph{convergence forte}, la spécification des \acp{CRDT} reposent sur la théorie des treillis \cite{2002-intro-lattices-order-davey} :
 
-\begin{enumerate}
-  \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
-  \item Les modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
-  \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
-  On parle aussi de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
-\end{enumerate}
+\begin{definition}[Spécification des \acp{CRDT}]
+  \label{def:spec-crdts}
+  Les \acp{CRDT} sont spécifiés de la manière suivante :
+  \begin{enumerate}
+    \item Les différents états possibles d'un \ac{CRDT} forment un sup-demi-treillis, possédant une relation d'ordre partiel $\leq$.
+    \item Les modifications génèrent par inflation un nouvel état supérieur ou égal à l'état original d'après $\leq$.
+    \item \label{item:lub} Il existe une fonction de fusion qui, pour toute paire d'états, génère l'état minimal supérieur d'après $\leq$ aux deux états fusionnés.
+    Nous parlons alors de borne supérieure ou de \ac{LUB} pour catégoriser l'état résultant de cette fusion.
+  \end{enumerate}
+\end{definition}
 
-Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique, \ie le même comportement, et la même interface que les types séquentiels\footnotemark \  correspondants du point de vue des utilisateurs.
+
+Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique, \ie le même comportement, et la même interface que les types séquentiels\footnotemark \  correspondants du point de vue des utilisateur-rices.
 \footnotetext{Nous dénotons comme \emph{types séquentiels} les spécifications précédentes des types de données supposant une exécution séquentielle de leurs modifications.}
 Ainsi, les \acp{CRDT} partagent le comportement des types séquentiels dans le cadre d'exécutions séquentielles.
-Cependant, ils définissent aussi une nouvelle sémantique pour chaque nouveau scénario ne pouvant se produire que dans le cadre d'une exécution distribuée.
+Cependant, ils définissent aussi une sémantique additionnelle pour chaque type de conflit ne pouvant se produire que dans le cadre d'une exécution distribuée.
 
-Plusieurs sémantiques valides peuvent être proposées pour ces nouveaux scénarios.
+Plusieurs sémantiques valides peuvent être proposées pour résoudre un type de conflit.
 Un \ac{CRDT} se doit donc de préciser quelle sémantique il choisit.
 
 L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour propager les modifications.
@@ -118,8 +123,8 @@ Au fil des années, la littérature a établi et défini plusieurs modèles dit 
 De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
 
 Ainsi, ce qui définit un \ac{CRDT} est sa sémantique en cas de concurrence et son modèle de synchronisation.
-Dans les prochaines sections, nous présenterons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
-Puis nous présenterons les différents modèles de synchronisation proposés dans la littérature, et détaillerons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
+Dans les prochaines sections, nous présentons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
+Nous présentons ensuite les différents modèles de synchronisation proposés dans la littérature, et détaillons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
 
 \mnnote{TODO: Faire le lien avec les travaux de Burckhardt \cite{10.1145/2535838.2535848} et les MRDTs \cite{10.1145/3360580}}
 

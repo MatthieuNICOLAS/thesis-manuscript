@@ -85,7 +85,7 @@ Lorsque l'utilisateur effectue des modifications locales, celles-ci sont détect
 Elles sont transmises au modèle de données, qui les intègre alors à la structure de données répliquées.
 Le \ac{CRDT} retourne en résultat l'opération distante à propager aux autres noeuds.
 
-De manière complémentaire, lorsqu'une opération distante est délivrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
+De manière complémentaire, lorsqu'une opération distante est livrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
 Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.
 
 En plus du texte, MUTE maintient un ensemble de métadonnées par document.
@@ -120,8 +120,8 @@ Les contraintes étant différentes, il est nécessaire de distinguer ces deux d
 
 Chaque noeud maintient une structure de données représentant l'ensemble des opérations reçues par le pair.
 Elle permet de vérifier à la réception d'une opération si le dot de cette dernière est déjà connu.
-S'il s'agit d'un nouveau dot, le module \texttt{Sync} peut délivrer l'opération au \ac{CRDT} et ajouter son dot à la structure.
-Le cas échéant, cela indique que l'opération a déjà été délivrée précédemment et doit être ignorée cette fois-ci.
+S'il s'agit d'un nouveau dot, le module \texttt{Sync} peut livrer l'opération au \ac{CRDT} et ajouter son dot à la structure.
+Le cas échéant, cela indique que l'opération a déjà été livrée précédemment et doit être ignorée cette fois-ci.
 
 Plusieurs structures de données sont adaptées pour maintenir l'ensemble des opérations reçues.
 Dans le cadre de MUTE, nous avons choisi d'utiliser un vecteur de versions.
@@ -233,19 +233,19 @@ Le module \texttt{Sync} de chaque noeud maintient donc initialement le vecteur d
 Le noeud A insère l'élément "I" entre les éléments "O" et "G".
 Cette modification est alors labellisée \emph{a6} par son module \texttt{Sync} et est envoyée au noeud B.
 À la réception de cette opération, le module \texttt{Sync} de B compare son dot avec son vecteur de version local.
-L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors délivrée au \ac{CRDT} et le vecteur de version est mis à jour.
+L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors livrée au \ac{CRDT} et le vecteur de version est mis à jour.
 
 Le noeud B supprime ensuite l'élément nouvellement inséré.
 S'agissant de la première modification de B, cette modification \emph{b1} ajoute l'entrée correspondante dans le vecteur de version $\langle A:6, B:1 \rangle$.
 L'opération est envoyée au noeud A.
-Cette opération étant la prochaine opération attendue de B, elle est acceptée et délivrée.
+Cette opération étant la prochaine opération attendue de B, elle est acceptée et livrée.
 
 Finalement, le noeud B reçoit de nouveau l'opération \emph{a6}.
 Son module \texttt{Sync} détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:6, B:1 \rangle$.
 L'opération est donc ignorée, et la résurgence de l'élément "I" illustrée dans la \autoref{fig:why-exactly-once-delivery} est évitée.
 
 Il est à noter que dans le cas où un noeud reçoit une opération avec un dot plus élevé que celui attendu (\eg le noeud A reçoit une opération \emph{b3} à la fin de l'exemple), cette opération est mise en attente.
-En effet, délivrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
+En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
 L'opération \emph{b3} serait donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
 
 Ainsi, l'implémentation de livraison \emph{exactly-once} avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
@@ -253,12 +253,12 @@ Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais da
 Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme de livraison \emph{exactly-once} et son impact sur l'expérience utilisateur.
 
 Pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
-Au lieu d'enregistrer seulement le dernier dot observé par noeud, cette structure de données enregistre les intervalles de dots observés.
+Au lieu d'enregistrer seulement le dernier dot intégré par noeud, cette structure de données enregistre les intervalles de dots intégrés.
 Ceci permet une livraison \emph{out of order} des opérations tout en garantissant une livraison \emph{exactly-once} et en compactant efficacement les données stockées par le module \texttt{Sync} à terme.
 
 \subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
 
-La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération \emph{remove} doit être délivrée après les opérations \emph{insert} insérant les éléments concernés.
+La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération \emph{remove} doit être livrée après les opérations \emph{insert} insérant les éléments concernés.
 
 Pour cela, le module \texttt{Sync} ajoute un ensemble \emph{Deps} à chaque opération \emph{remove} avant de la diffuser :
 
@@ -417,12 +417,12 @@ Pour chaque élément supprimé ("I"), \texttt{Sync} récupère l'identifiant de
 L'opération est ensuite diffusée.
 
 À la réception de l'opération \emph{b1}, le noeud A vérifie s'il possède l'ensemble des dépendances de l'opération.
-Le noeud A ayant déjà observé l'opération \emph{a6}, le module \texttt{Sync} délivre l'opération \emph{b1} au \ac{CRDT}.
+Le noeud A ayant déjà intégré l'opération \emph{a6}, le module \texttt{Sync} livre l'opération \emph{b1} au \ac{CRDT}.
 
 À l'inverse, lorsque le noeud C reçoit l'opération \emph{b1}, il n'a pas encore reçu l'opération \emph{a6}.
 L'opération \emph{b1} est alors mise en attente.
-À la réception de l'opération \emph{a6}, celle-ci est délivrée.
-Le module \texttt{Sync} ré-évalue alors le cas de l'opération \emph{b1} et détermine qu'elle peut à présent être délivrée.
+À la réception de l'opération \emph{a6}, celle-ci est livrée.
+Le module \texttt{Sync} ré-évalue alors le cas de l'opération \emph{b1} et détermine qu'elle peut à présent être livrée.
 
 Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
 En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
@@ -434,7 +434,7 @@ Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le sur
 
 \subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
 
-La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être délivrée après l'opération \emph{rename} qui a introduite son époque de génération.
+La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être livrée après l'opération \emph{rename} qui a introduite son époque de génération.
 
 Pour cela, le module \texttt{Sync} doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
 Cependant, dans notre implémentation, le module \texttt{Sync} et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.
@@ -568,22 +568,22 @@ B procède de manière similaire avec l'opération \emph{b3}.
 Quand A génère l'opération \emph{a7}, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
 Le dot $\langle A:7 \rangle$ remplace ensuite ce dernier dans le vecteur des dots des opérations \emph{rename}.
 
-À la réception de l'opération \emph{b3}, le module \texttt{Sync} de C peut la délivrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
+À la réception de l'opération \emph{b3}, le module \texttt{Sync} de C peut la livrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
 Le noeud C ajoute alors à son vecteur des dots des opérations \emph{rename} le dot $\langle B:3 \rangle$.
-Il procède de même pour l'opération \emph{a1} : il la délivre et ajoute le dot $\langle A:1 \rangle$.
+Il procède de même pour l'opération \emph{a1} : il la livre et ajoute le dot $\langle A:1 \rangle$.
 Le module \texttt{Sync} ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
 
-Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été délivrée précédemment.
-L'opération est donc délivrée et le vecteur de dots des opérations \emph{rename} mis à jour avec $\langle A:7 \rangle$.
+Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été livrée précédemment.
+L'opération est donc livrée et le vecteur de dots des opérations \emph{rename} mis à jour avec $\langle A:7 \rangle$.
 
 Quand le noeud C effectue l'opération locale \emph{c1}, le module \texttt{Sync} obtient l'information de l'époque courante de la séquence : \epoch{b3}.
 C met à jour son vecteur de dots des opérations \emph{rename} pour ne conserver que l'entrée du noeud B : $\langle B:3 \rangle$.
 Ce dot est ajouté en tant que dépendance de l'opération \emph{c1} avant sa diffusion.
 
-À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par \texttt{Sync}, l'opération \emph{b3} n'ayant pas encore été délivrée.
+À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par \texttt{Sync}, l'opération \emph{b3} n'ayant pas encore été livrée.
 Le noeud reçoit ensuite l'opération \emph{b3}.
-Son vecteur des dots des opérations \emph{rename} est mis à jour et l'opération délivrée.
-Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors délivrée.
+Son vecteur des dots des opérations \emph{rename} est mis à jour et l'opération livrée.
+Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors livrée.
 
 Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispose de plusieurs avantages : sa complexité spatiale dépend linéairement du nombre de noeuds et les opérations de mise à jour du vecteur des dots des opérations \emph{rename} s'effectuent en temps constant.
 De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.
@@ -593,7 +593,7 @@ Finalement, cette implémentation ne contraint pas une livraison causale des op�
 
 \label{sec:mute-anti-entropy}
 
-La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être délivrées à tous les noeuds à terme.
+La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être livrées à tous les noeuds à terme.
 Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
 Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
 
@@ -675,12 +675,12 @@ Initialement, les trois noeuds sont synchronisés.
 Leur vecteurs de version sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
 
 Le noeud A effectue les opérations \emph{a8} puis \emph{a9} et les diffusent sur le réseau.
-Le noeud B reçoit ces opérations et les délivre à son \ac{CRDT}.
-Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et délivrée par A.
+Le noeud B reçoit ces opérations et les livre à son \ac{CRDT}.
+Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et livrée par A.
 Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
 
 De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une défaillance réseau.
-Néanmoins, cela ne l'empêche pas de délivrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
+Néanmoins, cela ne l'empêche pas de livrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
 
 Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
 Il choisit aléatoirement le noeud B comme noeud cible.
@@ -690,7 +690,7 @@ Il lui envoie un message de synchronisation avec pour contenu le vecteur de vers
 Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9}.
 B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
 
-À la réception de la réponse de B, le noeud C délivre les opérations \emph{a8} et \emph{a9}.
+À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
 Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.
 
 Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.

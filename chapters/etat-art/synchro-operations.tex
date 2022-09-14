@@ -1,5 +1,5 @@
 L'approche de la synchronisation par opérations propose quant à elle que les noeuds diffusent leurs modifications sous la forme d'opérations.
-Pour chaque modification possible, les \acp{CRDT} synchronisés par opérations doivent définir deux fonctions : \texttt{prepare} et \texttt{effect}.
+Pour chaque modification possible, les \acp{CRDT} synchronisés par opérations doivent définir deux fonctions : \texttt{prepare} et \texttt{effect} \cite{baquero2017pure}.
 
 La fonction \texttt{prepare} a pour but de générer une opération correspondant à la modification effectuée, et commutative avec les potentielles opérations concurrentes.
 Elle prend en paramètres la modification ainsi que ses paramètres, et l'état courant du noeud.
@@ -25,34 +25,34 @@ La diffusion des modifications par le biais d'opérations présentent plusieurs 
 Tout d'abord, la taille des opérations est généralement fixe et inférieure à la taille de l'état complet du \ac{CRDT}, puisque les opérations servent à encoder un de ses éléments irréductibles.
 Ensuite, l'expressivité des opérations permet de proposer plus simplement des algorithmes efficaces pour leur intégration par rapport aux modifications équivalentes dans les \acp{CRDT} synchronisés par états.
 Par exemple, la suppression d'un élément dans un Ensemble se traduit en une opération de manière presque littérale, tandis que pour les \acp{CRDT} synchronisés par états, c'est l'absence de l'élément dans l'état qui va rendre compte de la suppression effectuée.
-Ces avantages rendent possible la diffusion et l'intégration une à une des modifications et rendent ainsi utilisables les \acp{CRDT} synchronisés par opérations pour construire des systèmes temps réels.
+Ces avantages rendent possible la diffusion et l'intégration une à une des modifications et rendent ainsi plus adaptés les \acp{CRDT} synchronisés par opérations pour construire des systèmes temps réels.
 
 Il est à noter que la seule contrainte imposée aux \acp{CRDT} synchronisés par opérations est que leurs opérations concurrentes soient commutatives.
 Ainsi, il n'existe aucune contrainte sur la commutativité des opérations liées causalement.
 De la même manière, aucune contrainte n'est définie sur l'idempotence des opérations.
-Ces libertés impliquent qu'il peut être nécessaire que les opérations soient délivrées au \ac{CRDT} en respectant un ordre donné et en garantissant leur livraison en exactement une fois pour garantir la convergence.
+Ces libertés impliquent qu'il peut être nécessaire que les opérations soient livrées au \ac{CRDT} en respectant un ordre donné et en garantissant leur livraison en exactement une fois pour garantir la convergence.
 Ainsi, un intergiciel chargé de la diffusion et de la livraison des opérations est usuellement associé aux \acp{CRDT} synchronisés par opérations pour respecter ces contraintes.
+Il s'agit de la couche de livraison de messages que nous avons introduit dans le cadre de notre modèle du système \cf{sec:system-model}.
 
 Généralement, les \acp{CRDT} synchronisés par opérations sont présentés dans la littérature comme nécessitant une livraison causale des opérations.
-Ce modèle de livraison permet de respecter le modèle de cohérence causale et ainsi de simplifier raisonnement sur exécutions.
+Ce modèle de livraison permet de respecter le modèle de cohérence causale et ainsi de simplifier raisonnement sur les exécutions.
 
-Ce modèle introduit néanmoins plusieurs effets négatifs.
-Tout d'abord, ce modèle peut provoquer un délai dans la diffusion des modifications.
+Ce modèle de livraison introduit néanmoins plusieurs effets négatifs.
+Tout d'abord, ce modèle peut provoquer un délai dans l'intégration des modifications.
 En effet, la perte d'une opération par le réseau provoque la mise en attente de la livraison des opérations suivantes.
-Les opérations mises en attente ne sont délivrées qu'une fois l'opération perdue re-diffusée et délivrée.
+Les opérations mises en attente ne sont livrées qu'une fois l'opération perdue re-diffusée et livrée.
 
 De plus, il nécessite que des informations de causalité précises soient attachées à chaque opération.
-Pour cela, les systèmes reposent généralement sur l'utilisation de vecteurs de version \mnnote{TODO: Insérer ref}.
+Pour cela, les systèmes reposent généralement sur l'utilisation de vecteurs de version \cite{1988-version-vector-mattern,1991-version-vector-fidge}.
 Or, la taille de cette structure de données croît de manière linéaire avec le nombre de noeuds du système.
 Les métadonnées de causalité peuvent ainsi représenter la majorité des données diffusées sur le réseau\footnote{
   La relation de causalité étant transitive, les opérations et leurs relations de causalité forment un DAG.
   \cite{1997-causal-barrier} propose d'ajouter en dépendances causales d'une opération seulement les opérations correspondant aux extremités du DAG au moment de sa génération.
   Ce mécanisme plus complexe permet de réduire la consommation réseau, mais induit un surcoût en calculs et en mémoire utilisée.
 }.
-\mnnote{TODO: Ajouter mention que OT a été abandonné à cause de cette contrainte même.}
 Cependant, nous observons que la livraison dans l'ordre causal de toutes les opérations n'est pas toujours nécessaire.
 Par exemple, l'ordre d'intégration de deux opérations d'ajout d'éléments différents dans un Ensemble n'a pas d'importance.
-Nous pouvons alors nous affranchir de la livraison dans l'ordre causal pour accélérer la vitesse d'intégration des modifications et pour réduire les métadonnées envoyées.
+Nous pouvons alors nous affranchir du modèle de livraison causale pour accélérer la vitesse d'intégration des modifications et pour réduire les métadonnées envoyées.
 
 Une autre contrainte généralement associée aux \acp{CRDT} synchronisés par opérations est la nécessité d'une livraison en exactement un exemplaire de chaque opération.
 Cette contrainte dérive de :
@@ -140,18 +140,18 @@ Avant de conclure, nous noterons qu'il est nécessaire pour les noeuds de mainte
 En effet, les noeuds l'utilisent pour renvoyer les opérations manquées lors de l'exécution du mécanisme d'anti-entropie évoqué ci-dessus.
 Ceci se traduit par une augmentation perpétuelle des métadonnées des \acp{CRDT} synchronisés par opérations.
 Pour y pallier, des travaux \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} proposent de tronquer le journal des opérations pour en supprimer les opérations connues de tous.
-Les noeuds reposent alors sur la notion de stabilité causale pour déterminer les opérations supprimables de manière sûre.
+Les noeuds reposent alors sur la notion de stabilité causale \cite{10.1007/978-3-662-43352-2_11} pour déterminer les opérations supprimables de manière sûre.
 
 \begin{definition}[Stabilité causale]
-  Une opération est stable causalement lorsqu'elle a été observée par l'ensemble des noeuds du système.
-  Ainsi, toute opération future dépend causalement des opérations causalement stables, \ie les noeuds ne peuvent plus générer d'opérations concurrentes aux opérations causalement stables de manière honnête .
+  Une opération est stable causalement lorsqu'elle a été intégrée par l'ensemble des noeuds du système.
+  Ainsi, toute opération future dépend causalement des opérations causalement stables, \ie les noeuds ne peuvent plus générer d'opérations concurrentes aux opérations causalement stables.
 \end{definition}
 
-Un mécanisme d'instantané \mnnote{TODO: Ajouter refs} doit néanmoins être associé au mécanisme de troncage du journal pour générer un état équivalent à celui résultant des opérations supprimées.
+Un mécanisme d'instantané \mnnote{TODO: Ajouter refs} doit néanmoins être associé au mécanisme de troncature du journal pour générer un état équivalent à la partie tronquée.
 Ce mécanisme est en effet nécessaire pour permettre un nouveau noeud de rejoindre le système et d'obtenir l'état courant à partir de l'instantané et du journal tronqué.
 
-Pour résumer, cette approche permet de mettre en place simplement un système fonctionnel à l'aide d'un \ac{CRDT} synchronisé par opérations et d'un intergiciel de diffusion et de livraison RCB.
+Pour résumer, cette approche permet de mettre en place un système en composant un \ac{CRDT} synchronisé par opérations avec un intergiciel de diffusion et de livraison.
 Mais comme illustré ci-dessus, chaque \ac{CRDT} synchronisé par opérations établit les propriétés de ses différentes opérations et délègue potentiellement des responsabilités à l'intergiciel de diffusion et livraison.
-La complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{intergiciel} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
-Des approches \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} ont été proposées ces dernières années pour concevoir et structurer plus proprement ces composants et leurs relations, mais reposent encore sur une livraison causale des opérations.
+Une partie de la complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{intergiciel} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
+Des approches \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} ont proposées un patron de conception pour ces deux composants et leurs interactions, mais reposent encore sur une livraison causale des opérations.
 \mnnote{TODO: Vérifier que c'est bien le cas dans \cite{2021-improving-reactivity-pure-op-based-crdts-bauwens}}

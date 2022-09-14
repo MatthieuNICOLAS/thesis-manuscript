@@ -4,8 +4,8 @@ Pour résumer, la couche de livraison des opérations associée à LogootSplit d
   Le modèle de livraison LogootSplit définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
-    \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut délivrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
+    \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
+    \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut être livrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
   \end{enumerate}
 \end{definition}
 

@@ -1,13 +1,13 @@
 \textcite{almeida2015delta} introduisent un nouveau modèle de synchronisation pour \acp{CRDT}.
 La proposition de ce modèle est nourrie par les observations suivantes :
 \begin{enumerate}
-  \item Les \acp{CRDT} synchronisés par opérations sont vulnérables aux défaillances du réseau et nécessitent généralement pour pallier à cette vulnérabilité une livraison des opérations en exactement un exemplaire et respectant l'ordre causal.
+  \item Les \acp{CRDT} synchronisés par opérations sont sujets aux défaillances du réseau et nécessitent généralement pour pallier à cette  une livraison des opérations en exactement un exemplaire et respectant l'ordre causal.
   \item Les \acp{CRDT} synchronisés par états pâtissent du surcoût induit par la diffusion de leurs états complets, généralement croissant continuellement.
 \end{enumerate}
 
 Pour pallier aux faiblesses de chaque approche et allier le meilleur des deux mondes, les auteurs proposent les \acp{CRDT} synchronisés par différences d'états \cite{almeida2015delta,Almeida_2018, enes2019}.
 Il s'agit en fait d'une sous-famille des \acp{CRDT} synchronisés par états.
-Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} permettant de produire la LUB entre deux états, et qui est associative, commutative et idempotente.
+Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} associative, commutative et idempotente qui permet de produire la LUB entre deux états.
 
 La spécificité des \acp{CRDT} synchronisés par différences d'états est qu'une modification locale produit en retour un delta.
 Un delta encode la modification effectuée sous la forme d'un état du lattice.
@@ -20,11 +20,11 @@ Les \acp{CRDT} synchronisés par différences d'états offrent ainsi :
 \end{enumerate}
 
 Cette définition des \acp{CRDT} synchronisés par différences d'états, introduite dans \cite{almeida2015delta,Almeida_2018}, fut ensuite précisée dans \cite{enes2019}.
-Dans cet article, \citeauthor{enes2019} précisent qu'utiliser des éléments irréductibles (cf. \autoref{def:irreducible-element}) comme deltas est optimal du point de vue de la taille des deltas produits.
+Dans cet article, les auteurs précisent qu'utiliser des éléments irréductibles \cf{def:irreducible-element} comme deltas est optimal du point de vue de la taille des deltas produits.
 
 Concernant la diffusion des modifications, les \acp{CRDT} synchronisés par différences d'états autorisent un large éventail de possibilités.
 Par exemple, les deltas peuvent être diffusés et intégrés de manière indépendante.
-Une autre approche possible consiste à tirer avantage du fait que les deltas sont des états : il est possible d'agréger plusieurs deltas à l'aide la fonction \texttt{merge}, éliminant leurs éventuelles redondances.
+Une autre approche possible consiste à tirer avantage du fait que les deltas sont des états : il est possible d'agréger plusieurs deltas à l'aide de la fonction \texttt{merge}, éliminant leurs éventuelles redondances.
 Ainsi, la fusion de deltas permet ensuite de diffuser un ensemble de modifications par le biais d'un seul et unique delta, minimal.
 Et en dernier recours, les \acp{CRDT} synchronisés par différences d'états peuvent adopter le même schéma de diffusion que les \acp{CRDT} synchronisés par états, \ie diffuser leur état complet de manière périodique.
 Plusieurs de ces approches sont évaluées et comparées de manière expérimentale dans \cite{enes2019}.
@@ -81,9 +81,9 @@ Les deux noeuds convergent alors à l'état $\set{a,b,c,d,e}$.
 La synchronisation par différences d'états permet donc de réduire la taille des messages diffusés sur le réseau par rapport à la synchronisation par états.
 Cependant, il est important de noter que la décomposition en deltas entraîne la perte d'une des propriétés intrinsèques des \acp{CRDT} synchronisés par états : le respect du modèle de cohérence causale.
 En effet, sans mécanisme supplémentaire, la perte ou le ré-ordonnement de deltas par le réseau peut mener à une livraison dans le désordre des modifications à l'un des noeuds.
-S'ils souhaitent assurer une diffusion causale des modifications, les \acp{CRDT} synchronisés par différences d'états doivent donc définir et intégrer dans leur spécification un mécanisme similaire à l'intergiciel de livraison des \acp{CRDT} synchronisés par opérations.
-En revanche et à l'instar des \acp{CRDT} synchronisés par opérations, les \acp{CRDT} synchronisés par différences d'états peuvent aussi faire le choix inverse : s'affranchir du modèle de cohérence causale pour accélerer la diffusion des modifications et minimiser le surcoût du type répliqué.
+S'ils souhaitent assurer une intégration causale des modifications, les \acp{CRDT} synchronisés par différences d'états doivent donc définir et ajouter à leur spécification un mécanisme similaire à la couche de livraison des \acp{CRDT} synchronisés par opérations.
+En revanche et à l'instar des \acp{CRDT} synchronisés par opérations, les \acp{CRDT} synchronisés par différences d'états peuvent aussi faire le choix inverse : s'affranchir du modèle de cohérence causale pour accélerer la diffusion des modifications.
 
 Ainsi, les \acp{CRDT} synchronisés par différences d'états sont une évolution prometteuse des \acp{CRDT} synchronisés par états.
 Ce modèle de synchronisation rend ces \acp{CRDT} utilisables dans les systèmes temps réels sans introduire de contraintes sur la fiabilité du réseau.
-Mais pour cela, il ajoute une couche supplémentaire de complexité à la spécification des \acp{CRDT} synchronisés par états, \ie le mécanisme dédié à la livraison des deltas, qui peut s'avérer source d'erreurs et de coûts supplémentaires.
+Mais pour cela, il ajoute une couche supplémentaire de complexité à la spécification des \acp{CRDT} synchronisés par états, \ie le mécanisme dédié à la livraison des deltas.

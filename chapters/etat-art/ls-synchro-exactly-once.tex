@@ -88,8 +88,8 @@ B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{2}\betterid{m}{A2}{1})$ puis
 Le noeud A intègre l'opération $\trm{rmv}$, ce qui a pour effet de supprimer l'élément "X" associé à l'identifiant $\betterid{p}{A1}{2}\betterid{m}{A2}{1}$.
 Il obtient alors un état équivalent à celui du noeud B.
 
-Cependant, l'opération $\trm{ins}$ insérant l'élément "X" à la position $\betterid{p}{A1}{2}\betterid{m}{A2}{1}$ est de nouveau délivrée au noeud B.
-De multiples raisons peuvent être à l'origine de cette nouvelle livraison : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
+Cependant, l'opération $\trm{ins}$ insérant l'élément "X" à la position $\betterid{p}{A1}{2}\betterid{m}{A2}{1}$ est de nouveau envoyée au noeud B.
+De multiples raisons peuvent être à l'origine de ce nouvel envoi : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
 Le noeud B ré-intègre alors l'opération $\trm{ins}$, ce qui fait revenir l'élément "X" et l'identifiant associé.
 L'état du noeud B diverge désormais de celui-ci du noeud A.
 

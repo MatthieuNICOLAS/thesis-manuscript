@@ -170,8 +170,8 @@ WOOT met en place un modèle de livraison sur-mesure basé sur les pré-conditio
     \item Une opération doit être livrée exactement une fois à chaque noeud\footnotemark.
       \footnotetext{Néanmoins, les algorithmes d'intégration des opérations, notamment celui pour l'opération $\trm{ins}$, pourraient être aisément modifiés pour être idempotents.
       Ainsi, la livraison répétée d'une même opération deviendrait possible, ce qui permettrait de relaxer cette contrainte en \emph{une livraison au moins une fois}.}
-    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle \prec \trm{succId})$ ne peut être délivrée à un noeud qu'après la livraison des opérations d'insertion des éléments associés à $\trm{predId}$ et $\trm{succId}$.
-    \item L'opération $\trm{rmv}(id)$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
+    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle \prec \trm{succId})$ ne peut être livrée à un noeud qu'après la livraison des opérations d'insertion des éléments associés à $\trm{predId}$ et $\trm{succId}$.
+    \item L'opération $\trm{rmv}(id)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
   \end{enumerate}
 \end{definition}
 Ce modèle de livraison ne requiert qu'une quantité fixe de métadonnées associées à chaque opération pour être respecté.

@@ -19,7 +19,7 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
 \begin{definition}[Identifiants contigus]
   Deux identifiants sont contigus si et seulement si les deux identifiants sont identiques à l'exception de leur dernier offset et que leur derniers offsets sont consécutifs.
 
-  De manière plus formelle, étant donné deux identifiants $\trm{id} = t_1 \oplus t_2 \oplus ... \oplus t_{n-1} \oplus \langle \trm{pos},\trm{nodeId},\trm{seq},\trm{offset} \rangle$ et $\trm{id'} = t^\prime_1 \oplus t^\prime_2 \oplus ... \oplus t^\prime_{n-1} \oplus \langle \trm{pos}',\trm{nodeId}',\trm{seq}',\trm{offset}' \rangle$, on a :
+  De manière plus formelle, étant donné deux identifiants $\trm{id} = t_1 \oplus t_2 \oplus ... \oplus t_{n-1} \oplus \langle \trm{pos},\trm{nodeId},\trm{seq},\trm{offset} \rangle$ et $\trm{id'} = t^\prime_1 \oplus t^\prime_2 \oplus ... \oplus t^\prime_{n-1} \oplus \langle \trm{pos}',\trm{nodeId}',\trm{seq}',\trm{offset}' \rangle$, nous avons :
   \begin{equation*}
     \begin{split}
       \trm{contigus}(id,id') \quad \trm{iff} \quad     & (\forall i \in [1,n[ \cdot t_i = t'_i) \quad \land \\

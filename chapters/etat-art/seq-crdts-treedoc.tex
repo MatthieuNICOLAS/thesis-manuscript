@@ -339,8 +339,8 @@ En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expli
   Le modèle de livraison Treedoc définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Les opérations $\trm{ins}$ peuvent être délivrées dans un ordre quelconque.
-    \item L'opération $\trm{rmv}(\trm{id})$ ne peut délivrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
+    \item L'opération $\trm{rmv}(\trm{id})$ ne peut être livrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
   \end{enumerate}
 \end{definition}
 

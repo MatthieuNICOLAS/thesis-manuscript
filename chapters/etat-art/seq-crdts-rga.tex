@@ -18,7 +18,7 @@ Le second principe sur lequel reposent les RADTs est la \ac{PT}.
       \item $o_1 \parallel o_2$ et $o_2$ a une priorité supérieure à $o_1$.
     \end{enumerate}
   \end{subdefinition}
-  \ac{PT} définit qu'étant donné trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors on a $o_1 \dashrightarrow o_3$.
+  \ac{PT} définit qu'étant donné trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors nous avons $o_1 \dashrightarrow o_3$.
 \end{definition}
 Ce second principe offre une méthode pour concevoir un ensemble d'opérations commutatives.
 Il permet aussi d'exprimer la priorité des opérations par rapport aux opérations dont elles dépendent causalement.
@@ -185,7 +185,7 @@ Ce mécanisme repose sur deux conditions :
 \label{sec:gc-rga}
 \begin{enumerate}
   \item \label{item:gc-rga-1}
-    La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a observé la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
+    La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a intégré la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
   \item \label{item:gc-rga-2}
     L'impossibilité pour l'ensemble des noeuds de générer un identifiant inférieur à celui de l'élément suivant la pierre tombale d'après $\lid$.
 \end{enumerate}
@@ -202,8 +202,8 @@ Ce modèle consisterait :
   Le modèle de livraison \ac{RGA} définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
-    \item Une opération $\trm{rmv}(\trm{id})$ ne peut être délivrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
+    \item Une opération $\trm{rmv}(\trm{id})$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
   \end{enumerate}
 \end{definition}
 Nous secondons cette observation.
