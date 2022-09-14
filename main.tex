@@ -663,18 +663,7 @@ WIP
 \input{chapters/etat-art/mitig-surcout-seq-crdts}
 
 \section{Synthèse}
-
-\begin{itemize}
-  \item Systèmes distribués adoptent le modèle de la réplication optimiste pour offrir de meilleures performances, \ie disponibilité et latence, et assurer la résilience du système, \ie accroître la capacité de tolérance aux pannes.
-  \item Ce modèle autorise les noeuds à modifier leur copie sans coordination, provoquant ainsi des divergences temporaires.
-    Pour résoudre les potentiels conflits et assurer la convergence à terme des copies, systèmes utilisent les \acp{CRDT} en place et lieu des types de données séquentiels.
-  \item \acp{CRDT} pour Séquence ont été proposés pour conception d'éditeurs collaboratifs pair-à-pair.
-    Deux approches sont utilisées pour concevoir leur mécanismes de résolution de conflits : l'approche basée sur les pierres tombales et l'approche basée sur les identifiants densément ordonnés.
-  \item Chacune de ces approches introduit un surcoût croissant, pénalisant leurs performances à terme.
-    Plusieurs travaux ont été proposés pour limiter ce surcoût, notamment \cite{letia:hal-01248270, zawirski:hal-01248197} qui présentent un mécanisme de renommage des identifiants pour les \acp{CRDT} pour Séquence basés sur identifiants densément ordonnés.
-  \item Mais cette approche requiert un mécanisme de consensus, des renommages concurrents provoquant un nouveau conflit.
-    Cette contrainte empêche son utilisation dans les systèmes pair-à-pair ne disposant pas de noeuds suffisamment stables et bien connectés pour exécuter le mécanisme de consensus.
-\end{itemize}
+\input{chapters/etat-art/synthese}
 
 \section{Proposition}
 
