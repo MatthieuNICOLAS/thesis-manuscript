@@ -49,14 +49,15 @@ Cette condition est un obstacle pour le déploiement et la pérennité de cette 
 
 L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à réduire la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
 Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
-Dans ces travaux, les auteurs notent que la stratégie d'allocation des identifiants proposée dans Logoot \cite{2009-logoot-weiss} n'est adaptée qu'à un seul comportement d'édition : l'édition séquentielle.
+
+Dans ces travaux, les auteurs notent que les stratégies d'allocation des identifiants proposées pour Logoot dans \cite{2009-logoot-weiss} et \cite{2010-logoot-undo-weiss} ne sont adaptées qu'à un seul comportement d'édition : l'édition séquentielle.
 Si les insertions sont effectuées en suivant d'autres comportements, les identifiants générés saturent rapidement l'espace des identifiants pour une taille donnée.
 Les insertions suivantes déclenchent alors une augmentation de la taille des identifiants.
 En conséquent, la taille des identifiants dans Logoot augmente de façon linéaire au nombre d'insertions, au lieu de suivre la progression logarithmique attendue.
 
 LSEQ définit donc plusieurs stratégies d'allocation d'identifiants adaptées à différents comportements d'édition.
-Les noeuds choisissent aléatoirement une de ces stratégies pour chaque taille d'identifiants.
-De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifiants : l'intervalle des identifiants possibles double à chaque fois que la taille des identifiants augmente.
+Les noeuds choisissent de manière aléatoire mais déterministe une de ces stratégies pour chaque taille d'identifiants.
+De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifiants : l'espace des identifiants possibles double à chaque fois que la taille des identifiants augmente.
 Cela permet à LSEQ de choisir avec soin la taille des identifiants et la stratégie d'allocation en fonction des besoins.
 En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.
 
@@ -65,4 +66,18 @@ Sa complexité ne dépend pas non plus du nombre de noeuds du système.
 Elle nous apparaît donc adaptée aux systèmes \ac{P2P} dynamique à large échelle.
 
 Nous conjecturons cependant que cette approche perd ses bienfaits lorsqu'elle est couplée avec un \ac{CRDT} pour Séquence à granularité variable.
-En effet, comme évoqué précédemment, toute insertion au sein d'un bloc conduit à une croissance de l'identifiant résultant \cf{sec:growth-ids-split}.
+En effet, comme évoqué précédemment, toute insertion au sein d'un bloc provoque une augmentation de la taille de l'identifiant résultant \cf{sec:growth-ids-split}.
+
+\subsection{Synthèse}
+
+Ainsi, plusieurs approches ont été proposées dans la littérature pour réduire le surcoût des \acp{CRDT} pour Séquence.
+Cependant, aucune de ces approches ne nous apparaît adaptée pour les \acp{CRDT} pour Séquence à granularité variable dans le contexte de systèmes \ac{P2P} dynamiques :
+
+\begin{enumerate}
+    \item Les approches présentées dans \cite{ROH2011354,letia:hal-01248270,zawirski:hal-01248197} reposent chacune sur des contraintes fortes dans les systèmes \ac{P2P} dynamiques, \ie respectivement la stabilité causale des opérations et l'utilisation d'un protocole de consensus.
+        Dans un système dans lequel nous n'avons aucun contrôle sur les noeuds et notamment leur disponibilité, ces contraintes nous apparaissent rédhibitoires.
+    \item L'approche présentée dans \cite{lseq2013,lseq2017} est conçue pour les \acp{CRDT} pour Séquence à identifiants densément ordonnés à granularité fixe.
+        L'introduction de mécanismes d'aggrégation dynamique des éléments en blocs comme ceux présentés dans \cite{2013-logootsplit,briot:hal-01343941}, avec les contraintes qu'ils introduisent, nous semble contrarier les efforts effectués pour réduire la croissance des identifiants de position.
+\end{enumerate}
+
+Nous considérons donc la problématique du surcoût des \acp{CRDT} pour Séquence à granularité variable toujours ouverte.
