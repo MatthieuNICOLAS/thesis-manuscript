@@ -1,6 +1,6 @@
 L'approche de la synchronisation par états propose que les noeuds diffusent leurs modifications en transmettant leur état.
 Les \acp{CRDT} adoptant cette approche doivent définir une fonction \texttt{merge}.
-Cette fonction correspond à la fonction de fusion mentionnée précédemment \cf{def:spec-crdts} : elle prend en paramètres une paire d'états et génère en retour l'état correspondant à leur \ac{LUB}.
+Cette fonction correspond à la fonction de fusion mentionnée précédemment \cf{def:spec-crdts} : elle prend en paramètres une paire d'états et génère en retour leur \ac{LUB}, \ie l'état correspondant à la borne supérieure des deux états en paramètres.
 Cette fonction doit être associative, commutative et idempotente.
 
 Ainsi, lorsqu'un noeud reçoit l'état d'un autre noeud, il fusionne ce dernier avec son état courant à l'aide de la fonction \texttt{merge}.
@@ -18,13 +18,14 @@ Ainsi, les \acp{CRDT} synchronisés par états utilisent régulièrement des pie
   Une pierre tombale est un marqueur de la présence passée d'un élément.
 
   Dans le contexte des \acp{CRDT}, un identifiant est généralement associé à chaque élément.
-  Lors de la suppression de l'élément, l'élément peut être supprimé de manière effective, mais son identifiant est conservé dans la structure de données.
+  Dans ce contexte, l'utilisation de pierres tombales correspond au comportement suivant : la suppression d'un élément peut supprimer de manière effective ce dernier, mais doit cependant conserver son identifiant dans la structure de données.
 \end{definition}
 
 En plus de l'utilisation de pierres tombales, la taille de l'état peut croître de manière non-bornée dans le cas de certains types de donnés, \eg l'Ensemble ou la Séquence.
 Ainsi, ces structures peuvent atteindre à terme des tailles conséquentes.
 Dans de tels cas, diffuser l'état complet à chaque modification induirait alors un coût rédhibitoire.
-L'approche de la synchronisation par états s'avère donc inadaptée aux systèmes temps réel et repose généralement sur une synchronisation périodique.
+L'approche de la synchronisation par états s'avère donc inadaptée aux systèmes nécessitant une diffusion et intégration instantanée des modifications, \ie les systèmes temps réel.
+Ainsi, les systèmes utilisant des \acp{CRDT} synchronisés par états reposent généralement sur une synchronisation périodique des noeuds, \ie chaque noeud diffuse périodiquement son état.
 
 Nous illustrons le fonctionnement de cette approche avec la \autoref{fig:sync-model-state}.
 Dans cet exemple, après que les noeuds aient effectués leurs modifications respectives, le mécanisme de synchronisation périodique de chaque noeud se déclenche.
@@ -73,6 +74,11 @@ Dans le cadre de l'Ensemble répliqué, cette fonction consiste généralement �
 Ainsi la fusion de leur état respectif, $\set{a,b,c,e} \cup \set{a,d,e}$, permet aux noeuds de converger à l'état souhaité : $\set{a,b,c,d,e}$.
 
 Avant de conclure, il est intéressant de noter que les \acp{CRDT} adoptant ce modèle de synchronisation respectent de manière intrinsèque le modèle de cohérence causale \cite{2011-consistency-availability-convergence-mahajan}.
+
+\begin{definition}[Modèle de cohérence causale]
+  Le modèle de cohérence causale définit que, pour toute paire de modifications $m_1$ et $m_2$ d'une exécution, si $m_1 \to m_2$, alors l'ensemble des noeuds doit intégrer la modification $m_1$ avant d'intégrer la modification $m_2$.
+\end{definition}
+
 En effet, ce modèle de synchronisation assure l'intégration soit de toutes les modifications connues d'un noeud, soit d'aucune.
 Par exemple, dans la \autoref{fig:sync-model-state}, le noeud B ne peut pas recevoir et intégrer l'élément $c$ sans l'élement $b$.
 Ainsi, ce modèle permet naturellement d'éviter ce qui pourrait être interprétées comme des anomalies par les utilisateur-rices.
