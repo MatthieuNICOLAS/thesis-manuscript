@@ -1,23 +1,23 @@
-Pour limiter la coordination entre les noeuds, les systèmes distribués adoptent le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito}.
-Ce paradigme consiste à ce que chaque noeud possède une copie de la donnée.
-Chaque noeud possède le droit de la modifier sans se coordonner avec les autres noeuds.
+Afin d'offrir une haute disponibilité à leurs clients et afin d'accroître leur tolérance aux pannes \cite{2016-trade-offs-replicated-systems-guerraoui}, les systèmes distribués peuvent adopter le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito}.
+Ce paradigme consiste à ce que chaque noeud composant le système possède une copie de la donnée répliquée.
+Chaque noeud possède le droit de la consulter et de la modifier, sans coordination préalable avec les autres noeuds.
 Les noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
-Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et de nouveau converger.
-Ce paradigme offre ainsi aux noeuds une haute disponibilité \cite{2016-trade-offs-replicated-systems-guerraoui} ainsi qu'une faible latence.
+Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et d'obtenir de nouveau des états équivalent, \ie de converger à terme \cite{10.1145/224057.224070}.
 
-Afin d'ordonner les évènements se produisant dans un système, la littérature repose généralement sur la relation \hb \cite{1978-happen-before-lamport}.
-Nous l'adaptons ci-dessous à notre contexte :
+Pour permettre aux noeuds de converger, les protocoles de réplication optimiste ordonnent généralement les évènements se produisant dans le système distribué.
+Pour les ordonner, la littérature repose généralement sur la relation de causalité entre les évènements, qui est définie par la relation \hb \cite{1978-happen-before-lamport}.
+Nous l'adaptons ci-dessous à notre contexte, en ne considérant que les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.} effectuées et celles intégrées :
 
 \begin{definition}[Relation \hb]
   La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est satisfaite :
   \begin{enumerate}
-    \item $m_1$ a eu lieu avant $m_2$ sur le même noeud.
-    \item $m_1$ a été livrée au noeud auteur de $m_2$ avant la génération de $m_2$.
+    \item $m_1$ a été effectuée avant $m_2$ sur le même noeud.
+    \item $m_1$ a été intégrée par le noeud auteur de $m_2$ avant qu'il n'effectue $m_2$.
     \item Il existe une modification $m$ telle que $m_1 \rightarrow m \land m \rightarrow m_2$.
   \end{enumerate}
 \end{definition}
 
-Dans le cadre d'un système distribué, nous notons que la relation \hb ne permet pas d'établir un ordre total entre les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.}.
+Dans le cadre d'un système distribué, nous notons que la relation \hb ne permet pas d'établir un ordre total entre les modifications.
 En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parallèle par deux noeuds différents, sans avoir connaissance de la modification de leur pair respectif.
 De telles modifications sont alors dites \emph{concurrentes} :
 
@@ -56,7 +56,7 @@ Avant d'illustrer notre propos avec un exemple, nous introduisons la spécificat
   \label{fig:spec-set}
 \end{figure}
 
-Un Ensemble est une collection dynamique non-ordonnés d'éléments de type $E$.
+Un Ensemble est une collection dynamique non-ordonnée d'éléments de type $E$.
 Cette spécification définit que ce type dispose d'un constructeur, $\trm{emp}$, permettant de générer un ensemble vide.
 
 La spécification définit deux modifications sur l'ensemble :
@@ -80,6 +80,8 @@ Elle définit aussi deux observateurs :
     Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{rd}$ après chaque modification.
 \end{enumerate}
 
+Dans le cadre de ce manuscrit, nous travaillons sur des ensembles de caractères.
+Cette restriction du domaine se fait sans perte en généralité.
 En se basant sur cette spécification, nous présentons dans la \autoref{fig:set-conflict} un scénario où des noeuds effectuent en concurrence des modifications provoquant un conflit.
 
 \begin{figure}[!ht]
@@ -162,7 +164,7 @@ Pour offrir la propriété de \emph{convergence forte}, la spécification des \a
 
 
 Malgré leur spécification différente, les \acp{CRDT} partagent la même sémantique, \ie le même comportement, et la même interface que les types séquentiels\footnotemark \  correspondants du point de vue des utilisateur-rices.
-\footnotetext{Nous dénotons comme \emph{types séquentiels} les spécifications précédentes des types de données supposant une exécution séquentielle de leurs modifications.}
+\footnotetext{Nous dénotons comme \emph{types séquentiels} les spécifications usuelles des types de données supposant une exécution séquentielle de leurs modifications.}
 Ainsi, les \acp{CRDT} partagent le comportement des types séquentiels dans le cadre d'exécutions séquentielles.
 Cependant, ils définissent aussi une sémantique additionnelle pour chaque type de conflit ne pouvant se produire que dans le cadre d'une exécution distribuée.
 

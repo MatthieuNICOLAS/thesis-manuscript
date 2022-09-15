@@ -4,7 +4,7 @@
 %----------------------------------------------------------------------
 \usepackage[french]{babel}
 \usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
-\usepackage[sorting=none]{biblatex}
+\usepackage[maxbibnames=99,maxcitenames=1,sorting=none]{biblatex}
 \bibliography{biblio.bib}
 \usepackage{booktabs} % \toprule, \midrule, \cmidrule, \bottomrule
 \usepackage{cancel} % \cancel
@@ -173,7 +173,7 @@
 \algdef{C}[IF]{IF}{ElsIf}[1]%
   {\algorithmicelse\ \algorithmicif\ \CONDITION{#1}{\ \algorithmicthen}}
 
-\usepackage[draft,inline,nomargin,index]{fixme}
+\usepackage[inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
 \FXRegisterAuthor{mn}{amn}{Matthieu}
 
@@ -672,8 +672,8 @@ WIP
 \input{chapters/etat-art/proposition}
 
 
-% \import{chapters/}{rls}
-% \import{chapters/}{mute}
+\import{chapters/}{rls}
+\import{chapters/}{mute}
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
