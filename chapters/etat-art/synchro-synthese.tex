@@ -1,4 +1,52 @@
-Nous récapitulons les principales propriétés et différences des modèles de synchronisations pour \acp{CRDT} dans \autoref{tab:synchronisation-models}.
+Ainsi, plusieurs modèles de synchronisation ont été proposées pour permettre aux noeuds utilisant un \ac{CRDT} pour répliquer une donnée de diffuser leurs modifications et d'intégrer celles des autres.
+Nous récapitulons dans cette section les principales propriétés et différences entre ces modèles.
+
+Tout d'abord, rappelons que chaque approche repose sur l'utilisation d'un sup-demi-treillis pour assurer la convergence forte.
+Dans le cadre des \acp{CRDT} synchronisés par états et des \acp{CRDT} synchronisés par différences d'états, ce sont les états du \acp{CRDT} même qui forment un sup-demi-treillis.
+
+Ce n'est pas exactement le cas dans le cadre des \acp{CRDT} synchronisés par opérations.
+Comme indiqué précédemment, les \acp{CRDT} synchronisés par opérations demandent à la couche de livraison des messages qui leur est associée qu'elle satisfasse un ensemble de contraintes.
+Si la couche de livraison ne garantit pas ces contraintes, \eg les opérations sont livrées dans le désordre, l'état des noeuds peut diverger définitivement.
+Ainsi, pour être précis, c'est le couple $\langle \trm{etats~du~CRDT},\trm{couche~livraison} \rangle$ qui forme un sup-demi-treillis dans le cadre de ce modèle de synchronisation.
+
+La principale différence entre les modèles de synchronisation proposés réside dans l'unité utilisée lors d'une synchronisation.
+Le modèle de synchronisation par états, de manière équivoque, utilise les états complets.
+L'intégration des modifications effectuées par un noeud dans la copie locale d'un second se fait alors en diffusant l'état du premier au second et en fusionnant cet état avec l'état du second.
+
+Le modèle de synchronisation par opérations repose sur des opérations pour diffuser les modifications.
+Les opérations encodent les modifications sous la forme  d'un ou plusieurs états spécifiques du sup-demi-trellis : les éléments irréductibles \cf{def:irreducible-element}.
+L'intégration des modifications d'un noeud par un second se fait alors en diffusant les opérations correspondant aux modifications et en intégrant chacune d'entre elle à la copie locale du second.
+
+Le modèle de synchronisation par différences d'états permet quant à lui d'intégrer les modifications soit par le biais d'éléments irréductibles, soit par le biais d'états complets.
+Dans les deux cas, les \acp{CRDT} synchronisés par différences d'états reposent sur la fonction de fusion du sup-demi-treillis pour intégrer les modifications.
+
+De cette différence d'unité de synchronisation découle l'ensemble des différences entre ces modèles.
+La capacité d'intégrer les modifications par le biais d'une fusion d'états permet aux \acp{CRDT} synchronisé par états et différences d'états de résister aux défaillances du réseau.
+En effet, la perte, le ré-ordonnement ou la duplication de messages, \ie d'états ou de différences d'états, n'empêche pas la convergence des noeuds.
+Tant que deux noeuds peuvent à terme échanger leur états respectifs et les fusionner, la fonction de fusion garantit qu'ils obtiendront à terme des états équivalents.
+
+À l'inverse, la perte, le ré-ordonnement ou la duplication de messages, \ie d'opérations, peut entraîner une divergence des noeuds dans le cadre du modèle de synchronisation par opérations.
+Pour éviter ce problème, la couche de livraison de messages associée au \ac{CRDT} doit satisfaire le modèle de livraison requis par ce dernier.
+
+Un autre aspect impacté par l'unité de synchronisation est la fréquence de synchronisation.
+La synchronisation par états nécessite de diffuser son état complet pour diffuser ses modifications.
+En fonction du type de données, le coût réseau pour diffuser chaque modification dès qu'elle est effectuée peut s'avérer prohibitif.
+Ce modèle de synchronisation repose donc généralement sur une synchronisation périodique, \ie chaque noeud diffuse son état périodiquement.
+
+À l'inverse, la synchronisation par éléments irréductibles, que ça soit sous la forme d'opérations ou leur forme primaire, induit un coût réseau raisonnable : les éléments sont généralement petits et de taille fixe.
+Les modèles de synchronisation par opérations et par différences d'états permettent donc de diffuser des modifications dès leur génération.
+Ceci permet aux noeuds du système d'intégrer les modifications effectuées par les autres noeuds de manière plus fréquente, voire en temps réel.
+
+Finalement, la dernière différence entre ces modèles concerne le modèle de cohérence causale \cf{def:causal-consistency}.
+Par nature, le modèle de synchronisation par états garantit le respect du modèle de cohérence causale.
+En effet, un état correspond à l'intégration d'un ensemble de modifications.
+De manière similaire, le résultat de la fusion de deux états correspond à l'intégration de l'union de leur ensemble respectif de modifications.
+Ce modèle de synchronisation empêche donc l'intégration d'une modification sans avoir intégré aussi les modifications l'ayant précédé d'après la relation \hb.
+
+À l'inverse, par défaut, les modèles de synchronisation par opérations ou différences d'états permettent l'intégration d'un élément irréductible sans avoir intégré au préalable les éléments irréductibles l'ayant précédé d'après la relation \hb.
+Pour satisfaire le modèle de cohérence causale, les \acp{CRDT} adoptant ces modèles de synchronisation doivent être associés à une couche de livraison de messages garantissant leur livraison causale \cf{def:causal-delivery}.
+
+Nous récapitulons le contenu de cette discussion sous la forme du \autoref{tab:synchronisation-models}.
 
 \begin{table}[!ht]
   \centering
@@ -9,12 +57,12 @@ Nous récapitulons les principales propriétés et différences des modèles de 
       \toprule
                                                 & Sync. par états & Sync. par opérations    & Sync. par diff. d'états \\
       \midrule
-      Est un sup-demi-treillis                  & \checkmark  & \checkmark  & \checkmark  \\
+      Forme un sup-demi-treillis                  & \checkmark  & \checkmark  & \checkmark  \\
       Intègre modifications par fusion d'états  & \checkmark  & \ballotx    & \checkmark  \\
       Intègre modifications par élts irréductibles & \ballotx    & \checkmark  & \checkmark  \\
-      Résiste aux défaillances réseau           & \checkmark  & \ballotx    & \checkmark  \\
-      Offre modèle de cohérence causale             & \checkmark  & \ballotx    & \ballotx  \\
+      Résiste nativ. aux défaillances réseau           & \checkmark  & \ballotx    & \checkmark  \\
       Adapté pour systèmes temps réel           & \ballotx    & \checkmark  & \checkmark  \\
+      Offre nativ. modèle de cohérence causale             & \checkmark  & \ballotx    & \ballotx  \\
       \bottomrule
     \end{tabular}
   }

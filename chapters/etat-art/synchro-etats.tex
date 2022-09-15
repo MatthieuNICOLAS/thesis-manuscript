@@ -76,6 +76,7 @@ Ainsi la fusion de leur état respectif, $\set{a,b,c,e} \cup \set{a,d,e}$, perme
 Avant de conclure, il est intéressant de noter que les \acp{CRDT} adoptant ce modèle de synchronisation respectent de manière intrinsèque le modèle de cohérence causale \cite{2011-consistency-availability-convergence-mahajan}.
 
 \begin{definition}[Modèle de cohérence causale]
+  \label{def:causal-consistency}
   Le modèle de cohérence causale définit que, pour toute paire de modifications $m_1$ et $m_2$ d'une exécution, si $m_1 \to m_2$, alors l'ensemble des noeuds doit intégrer la modification $m_1$ avant d'intégrer la modification $m_2$.
 \end{definition}
 

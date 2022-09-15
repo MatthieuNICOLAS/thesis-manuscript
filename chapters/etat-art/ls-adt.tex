@@ -11,16 +11,16 @@ En nous basant sur \textcite{2013-logootsplit}, nous proposons une définition d
       $\trm{emp}$ & : &                                                 & $\longrightarrow S$   \\
       \\
       \textbf{prepare} \\
-      $\trm{ins}$ & : & $S \times N \times \trm{Arr}\langle E \rangle \times \mathbb{I} \times N^*$   & $\longrightarrow \trm{Id} \times \trm{Arr}\langle E \rangle$   \\
-      $\trm{rmv}$ & : & $S \times N \times N$                           & $\longrightarrow \trm{Arr}\langle \trm{IdInterval} \rangle$ \\
+      $\trm{ins}$ & : & $S \times \nat \times \trm{Arr}\langle \elt \rangle \times \mathbb{I} \times \nat^*$   & $\longrightarrow \trm{Id} \times \trm{Arr}\langle \elt \rangle$   \\
+      $\trm{rmv}$ & : & $S \times \nat \times \nat$                           & $\longrightarrow \trm{Arr}\langle \trm{IdInterval} \rangle$ \\
       \\
       \textbf{effect} \\
-      $\trm{ins}$ & : & $S \times \trm{Id} \times \trm{Arr}\langle E \rangle$ & $\longrightarrow S$ \\
+      $\trm{ins}$ & : & $S \times \trm{Id} \times \trm{Arr}\langle \elt \rangle$ & $\longrightarrow S$ \\
       $\trm{rmv}$ & : & $S \times \trm{Arr}\langle \trm{IdInterval} \rangle$  & $\longrightarrow S$ \\
       \\
       \textbf{queries} \\
-      $\trm{len}$ & : & $S$                                             & $\longrightarrow N$   \\
-      $\trm{rd}$  & : & $S$                                             & $\longrightarrow \trm{Arr}\langle E \rangle$ \\
+      $\trm{len}$ & : & $S$                                             & $\longrightarrow \nat$   \\
+      $\trm{rd}$  & : & $S$                                             & $\longrightarrow \trm{Arr}\langle \elt \rangle$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait LogootSplit}

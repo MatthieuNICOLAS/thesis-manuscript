@@ -37,6 +37,7 @@ Il s'agit de la couche de livraison de messages que nous avons introduit dans le
 Généralement, les \acp{CRDT} synchronisés par opérations sont présentés dans la littérature comme nécessitant une livraison causale des opérations.
 
 \begin{definition}[Modèle de livraison causale]
+  \label{def:causal-delivery}
   Le modèle de livraison causale définit que, pour toute paire de messages $m_1$ et $m_2$ d'une exécution, si $m_1 \to m_2$, alors la couche de livraison de l'ensemble des noeuds doit livrer le message $m_1$ à l'application avant de livrer le message $m_2$.
 \end{definition}
 
@@ -157,7 +158,7 @@ Ce mécanisme est en effet nécessaire pour permettre un nouveau noeud de rejoin
 
 Pour résumer, cette approche permet de mettre en place un système en composant un \ac{CRDT} synchronisé par opérations avec une couche de livraison des messages.
 Mais comme illustré ci-dessus, chaque \ac{CRDT} synchronisé par opérations établit les propriétés de ses différentes opérations et délègue potentiellement des responsabilités à la couche de livraison.
-Une partie de la complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{couche livraison} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
+Une partie de la complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{couche~livraison} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
 Des travaux \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} ont proposé un patron de conception pour modéliser ces deux composants et leurs interactions.
 Cependant, ce patron repose sur l'hypothèse d'une livraison causale des opérations et n'est donc pas optimal.
 \mnnote{TODO: Vérifier que c'est bien le cas dans \cite{2021-improving-reactivity-pure-op-based-crdts-bauwens}}

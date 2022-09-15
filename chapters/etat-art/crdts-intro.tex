@@ -26,7 +26,7 @@ De telles modifications sont alors dites \emph{concurrentes} :
 \end{definition}
 
 Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.
-Cependant, les modifications permises par un type de données ne sont généralement pas commutatives car de sémantiques contraires.
+Cependant, les modifications permises par un type de données ne sont généralement pas commutatives car de sémantiques contraires, \eg l'ajout et la suppression d'un élément dans une Collection.
 Ainsi, une exécution distribuée peut mener à la génération de modifications concurrentes non commutatives.
 Nous parlons alors de conflits.
 La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques contraires sont générées en concurrence.
@@ -122,7 +122,7 @@ L'autre aspect définissant un \ac{CRDT} donné est le modèle qu'il adopte pour
 Au fil des années, la littérature a établi et défini plusieurs modèles dit de synchronisation, chacun ayant ses propres besoins et avantages.
 De fait, plusieurs \acp{CRDT} peuvent être proposés pour un même type donné en fonction du modèle de synchronisation choisi.
 
-Ainsi, ce qui définit un \ac{CRDT} est sa sémantique en cas de concurrence et son modèle de synchronisation.
+Ainsi, ce qui définit un \ac{CRDT} est sa ou ses sémantiques en cas de conflits et son modèle de synchronisation.
 Dans les prochaines sections, nous présentons les différentes sémantiques possibles pour un type donné, l'Ensemble, en guise d'exemple.
 Nous présentons ensuite les différents modèles de synchronisation proposés dans la littérature, et détaillons leurs contraintes et impact sur les \ac{CRDT} les adoptant, toujours en utilisant le même exemple.
 

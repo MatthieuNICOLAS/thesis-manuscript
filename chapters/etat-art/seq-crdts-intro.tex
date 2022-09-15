@@ -1,4 +1,6 @@
-La \emph{Séquence}, aussi appelée \emph{Liste}, est un type abstrait de données représentant une collection ordonnée et de taille dynamique d'éléments.
+Dans le cadre des travaux de cette thèse, nous nous sommes focalisés sur les \acp{CRDT} pour un type de donnée précis : la \emph{Séquence}.
+
+La Séquence, aussi appelée \emph{Liste}, est un type abstrait de données représentant une collection ordonnée et de taille dynamique d'éléments.
 Dans une séquence, un même élément peut apparaître à de multiples reprises.
 Chacune des occurrences de cet élément est alors considérée comme distincte.
 
@@ -30,15 +32,19 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
   \centering
   % \resizebox{0.35\columnwidth}{!}{
     \begin{tabular}{llll}
-      $S \in \trm{Seq}\langle E \rangle$ & & & \\
+      \textbf{payload} \\
+      $S \in \trm{Seq}\langle \elt \rangle$ & & & \\
       \\
+      \textbf{constructor} \\
       $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
       \\
-      $\trm{ins}$ & : & $S \times N \times E$ & $\longrightarrow S$   \\
-      $\trm{rmv}$ & : & $S \times N$          & $\longrightarrow S$   \\
+      \textbf{mutators} \\
+      $\trm{ins}$ & : & $S \times \nat \times \elt$ & $\longrightarrow S$   \\
+      $\trm{rmv}$ & : & $S \times \nat$          & $\longrightarrow S$   \\
       \\
-      $\trm{len}$ & : & $S$                   & $\longrightarrow N$   \\
-      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle E \rangle$ \\
+      \textbf{queries} \\
+      $\trm{len}$ & : & $S$                   & $\longrightarrow \nat$   \\
+      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle \elt \rangle$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait usuel Séquence}
@@ -47,19 +53,19 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 
 Celle-ci définit deux modifications :
 \begin{enumerate}
-  \item $\trm{ins}$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{ins}(s,i,elt)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, e \in E, i \in [0,m]~|~m = \trm{len}(s) - 1,
-      s = \langle e_0, ..., e_{i-1}, e_{i}, ..., e_m \rangle~\cdot \\
-      \trm{ins}(s,i,v) = \langle e_0, ..., e_{i-1}, e, e_{i}, ..., e_m  \rangle
+      \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{len}(s),
+      s = \langle e_0, ..., e_{i-1}, e_{i}, ..., e_{m-1} \rangle~\cdot \\
+      \trm{ins}(s,i,e) = \langle e_0, ..., e_{i-1}, e, e_{i}, ..., e_{m-1}  \rangle
     \end{multline*}
-  \item $\trm{rmv}$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{rmv}(s,i)$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, e \in E, i \in [0,m]~|~m = \trm{len}(s) - 1,
-      s = \langle e_0, ..., e_{i-1}, e_{i}, e{i+1}, ..., e_m \rangle~\cdot \\
-      \trm{rmv}(s,i) = \langle e_0, ..., e_{i-1}, e_{i+1}, ..., e_m  \rangle
+      \forall s \in S, e \in E, i \in [0,m[~|~m = \trm{len}(s),
+      s = \langle e_0, ..., e_{i-1}, e_{i}, e{i+1}, ..., e_{m-1} \rangle~\cdot \\
+      \trm{rmv}(s,i) = \langle e_0, ..., e_{i-1}, e_{i+1}, ..., e_{m-1}  \rangle
     \end{multline*}
 \end{enumerate}
 Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
@@ -177,7 +183,7 @@ En concurrence, le noeud B insère lui le caractère "L" à l'index 2 pour obten
 
 Les deux noeuds diffusent ensuite leur opération respective puis intègre celle de leur pair.
 Nous constatons alors une divergence.
-En effet, l'intégration de la modification $\trm{ins}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD.
+En effet, l'intégration de la modification $\trm{ins}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD".
 
 Cette divergence est dûe à la non-commutativité de la modification $\trm{ins}$ avec elle-même.
 En effet, celle-ci se base sur un index pour déterminer où placer le nouvel élément.
@@ -194,8 +200,7 @@ Elle se décompose en deux parties :
   \item Des fonctions de transformations \mnnote{TODO: Ajouter refs}, qui définissent comment une modification doit être transformée par rapport à une autre modification pour tenir compte de son effet.
 \end{enumerate}
 
-Cependant, bien que de nombreuses fonctions de transformations pour le type Séquence ont été proposées, seule la correction des \acfp{TTF} \cite{2006-tombstone-transformation-functions-oster} a été éprouvée à notre connaissance.
-\mnnote{TODO: Vérifier que c'est pas plutôt les seules fonctions de transformations qui sont correctes et compatibles avec un système P2P.}
+Cependant, bien que de nombreuses fonctions de transformations pour le type Séquence ont été proposées, seule la correction des \acfp{TTF} \cite{2006-tombstone-transformation-functions-oster} a été éprouvée pour les systèmes \ac{P2P} à notre connaissance.
 De plus, les algorithmes de contrôle compatibles reposent sur une livraison causale des modifications, et donc l'utilisation de vecteurs d'horloges.
 Cette approche est donc inadaptée aux systèmes \ac{P2P} dynamiques.
 
@@ -206,20 +211,20 @@ Néanmoins, une contribution importante de l'approche \ac{OT} fut la définition
   \begin{subdefinition}[Convergence]
     Le critère de \emph{Convergence} indique que des noeuds ayant intégrés le même ensemble de modifications convergent à un état équivalent.
   \end{subdefinition}
-  \begin{subdefinition}[Causality preservation]
+  \begin{subdefinition}[Préservation de la causalité]
     \label{def:causality}
-    Le critère de \emph{Causality preservation} indique que si une modification $m_1$ précède une autre modification $m_2$ d'après la relation \emph{happens-before}, \ie $m_1 \rightarrow m_2$, $m_1$ doit être intégrée avant $m_2$ par les noeuds du système.
+    Le critère de \emph{Préservation de la causalité} indique que si une modification $m_1$ précède une autre modification $m_2$ d'après la relation \emph{happens-before}, \ie $m_1 \rightarrow m_2$, $m_1$ doit être intégrée avant $m_2$ par les noeuds du système.
   \end{subdefinition}
-  \begin{subdefinition}[Intention preservation]
-    Le critère de \emph{Intention preservation} indique que l'intégration d'une modification par un noeud distant doit reproduire l'effet de la modification sur la copie du noeud d'origine, indépendamment des modifications concurrentes intégrées.
+  \begin{subdefinition}[Préservation de l'intention]
+    Le critère de \emph{Préservation de l'intention} indique que l'intégration d'une modification par un noeud distant doit reproduire l'effet de la modification sur la copie du noeud d'origine, indépendamment des modifications concurrentes intégrées.
   \end{subdefinition}
 \end{definition}
 
-De manière similaire à \cite{2009-logoot-weiss}, nous ajoutons le critère de \emph{Scalability} à ces critères :
+De manière similaire à \cite{2009-logoot-weiss}, nous ajoutons le critère de \emph{Passage à l'échelle} à ces critères :
 
-\begin{definition}[Scalability]
+\begin{definition}[Passage à l'échelle]
   \label{def:scalability}
-  Le critère de \emph{Scalability} indique que le nombre de noeuds du système ne doit avoir qu'un impact sous-linéaire sur les complexités en temps, en espace et sur le nombre et la taille des messages.
+  Le critère de \emph{Passage à l'échelle} indique que le nombre de noeuds du système ne doit avoir qu'un impact sous-linéaire sur les complexités en temps, en espace et sur le nombre et la taille des messages.
 \end{definition}
 
 Nous constatons cependant que les critères \ref{def:causality} et \ref{def:scalability} peuvent être contraires.
@@ -227,7 +232,7 @@ En effet, pour respecter le modèle de cohérence causale, un système peut néc
 La livraison causale implique un surcoût computationnel, en métadonnées et en taille des messages qui est fonction du nombre de participants du système \cite{1991-concerning-size-logical-clocks-charron-bost}.
 Ainsi, dans le cadre de nos travaux, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
 
-C'est dans une optique similaire que fut proposé \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
+C'est dans une optique similaire que fut proposé WOOT \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
 Depuis, plusieurs \acp{CRDT} pour Séquence furent définies \cite{ROH2011354, 2009-treedoc-preguica, 2009-logoot-weiss}.
 Ces \acp{CRDT} peuvent être répartis en deux approches : l'approche à pierres tombales \cite{2006-woot-oster,ROH2011354} et l'approche à identifiants densément ordonnés \cite{2009-treedoc-preguica,2009-logoot-weiss}.
 L'état d'une séquence pouvant croître de manière infinie, ces \acp{CRDT} sont synchronisés par opérations pour limiter la taille des messages diffusés.

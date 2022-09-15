@@ -23,7 +23,8 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
   \begin{equation*}
     \begin{split}
       \trm{contigus}(id,id') \quad \trm{iff} \quad     & (\forall i \in [1,n[ \cdot t_i = t'_i) \quad \land \\
-                                            & (\trm{pos} = \trm{pos}' \land \trm{nodeId} = \trm{nodeId}' \land \trm{seq} = \trm{seq}' \land \trm{offset} + 1 = \trm{offset}') \\
+                                            & (\trm{pos} = \trm{pos}' \land \trm{nodeId} = \trm{nodeId}' \land \trm{seq} = \trm{seq}') \quad \land \\
+                                            & (\trm{offset} + 1 = \trm{offset}' \lor \trm{offset} - 1 = \trm{offset}') \\
     \end{split}
   \end{equation*}
 
