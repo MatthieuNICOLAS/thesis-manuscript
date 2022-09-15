@@ -29,7 +29,58 @@ Lorsque les modifications possibles sur un type de données sont commutatives, l
 Cependant, les modifications permises par un type de données ne sont généralement pas commutatives car de sémantiques contraires, \eg l'ajout et la suppression d'un élément dans une Collection.
 Ainsi, une exécution distribuée peut mener à la génération de modifications concurrentes non commutatives.
 Nous parlons alors de conflits.
-La figure \autoref{fig:set-conflict} présente un scénario où des modifications de sémantiques contraires sont générées en concurrence.
+
+Avant d'illustrer notre propos avec un exemple, nous introduisons la spécification algébrique du type Ensemble dans la \autoref{fig:spec-set} sur laquelle nous nous basons.
+
+\begin{figure}[!ht]
+
+  \centering
+  % \resizebox{0.35\columnwidth}{!}{
+    \begin{tabular}{llll}
+      \textbf{payload} \\
+      $S \in \trm{Set}\langle \elt \rangle$ & & & \\
+      \\
+      \textbf{constructor} \\
+      $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
+      \\
+      \textbf{mutators} \\
+      $\trm{add}$ & : & $S \times \elt$ & $\longrightarrow S$   \\
+      $\trm{rmv}$ & : & $S \times \elt$          & $\longrightarrow S$   \\
+      \\
+      \textbf{queries} \\
+      $\trm{len}$ & : & $S$                   & $\longrightarrow \nat$   \\
+      $\trm{rd}$  & : & $S$                   & $\longrightarrow S$ \\
+    \end{tabular}
+  % }
+  \caption{Spécification algébrique du type abstrait usuel Ensemble}
+  \label{fig:spec-set}
+\end{figure}
+
+Un Ensemble est une collection dynamique non-ordonnés d'éléments de type $E$.
+Cette spécification définit que ce type dispose d'un constructeur, $\trm{emp}$, permettant de générer un ensemble vide.
+
+La spécification définit deux modifications sur l'ensemble :
+\begin{enumerate}
+  \item $\trm{add}(s,e)$, qui permet d'ajouter un élément donné $e$ à un ensemble $s$.
+    Cette modification renvoie un nouvel ensemble construit de la manière suivante :
+    \begin{equation*}
+      \trm{add}(s,e) = s \cup \set{e}
+    \end{equation*}
+  \item $\trm{rmv}(s,e)$, qui permet de retirer un élément donné $e$ d'un ensemble $s$.
+    Cette modification renvoie un nouvel ensemble construit de la manière suivante :
+    \begin{equation*}
+      \trm{rmv}(s,e) = s~\backslash \set{e}
+    \end{equation*}
+\end{enumerate}
+
+Elle définit aussi deux observateurs :
+\begin{enumerate}
+  \item $\trm{len}(s)$, qui permet de récupérer le nombre d'éléments présents dans un ensemble $s$.
+  \item $\trm{rd}(s)$, qui permet de consulter l'état d'ensemble $s$.
+    Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{rd}$ après chaque modification.
+\end{enumerate}
+
+En se basant sur cette spécification, nous présentons dans la \autoref{fig:set-conflict} un scénario où des noeuds effectuent en concurrence des modifications provoquant un conflit.
 
 \begin{figure}[!ht]
 

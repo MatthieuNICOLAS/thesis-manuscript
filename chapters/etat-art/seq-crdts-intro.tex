@@ -53,7 +53,7 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 
 Celle-ci définit deux modifications :
 \begin{enumerate}
-  \item $\trm{ins}(s,i,elt)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{ins}(s,i,e)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
       \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{len}(s),
@@ -70,6 +70,14 @@ Celle-ci définit deux modifications :
 \end{enumerate}
 Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
 Cette simplification du type se fait cependant sans perte de généralité, la spécification pouvant être étendue pour insérer successivement plusieurs éléments à partir d'un index donné ou retirer plusieurs éléments consécutifs.
+
+La spécification définit aussi deux observateurs :
+\begin{enumerate}
+  \item $\trm{len}(s)$, qui permet de récupérer le nombre d'éléments présents dans une séquence $s$.
+  \item $\trm{rd}(s)$, qui permet de consulter l'état d'une séquence $s$.
+    L'état de la séquence est retournée sous la forme d'un Tableau, \ie une collection ordonnée de taille fixe d'éléments.
+    Comme pour le type Ensemble, nous considérons que $\trm{rd}$ est utilisé de manière implicite après chaque modification dans nos exemples.
+\end{enumerate}
 
 Cette spécification du type Séquence est une spécification séquentielle.
 Les modifications sont définies pour être effectuées l'une après l'autre.
