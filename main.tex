@@ -173,7 +173,7 @@
 \algdef{C}[IF]{IF}{ElsIf}[1]%
   {\algorithmicelse\ \algorithmicif\ \CONDITION{#1}{\ \algorithmicthen}}
 
-\usepackage[inline,nomargin,index]{fixme}
+\usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
 \FXRegisterAuthor{mn}{amn}{Matthieu}
 
@@ -559,285 +559,170 @@ WIP
 \section{Plan du manuscrit}
 \section{Publications}
 
-\NumberThisInToc
-\chapter{État de l'art}
-\minitoc
+% \NumberThisInToc
+% \chapter{État de l'art}
+% \minitoc
 
-\section{Modèle du système}
-\input{chapters/etat-art/system-model}
+% \section{Modèle du système}
+% \input{chapters/etat-art/system-model}
 
-% \section{Systèmes distribués}
-% \input{chapters/etat-art/dist-sys}
+% % \section{Systèmes distribués}
+% % \input{chapters/etat-art/dist-sys}
 
-% \section{Transformées opérationnelles}
-% \input{chapters/etat-art/ot}
+% % \section{Transformées opérationnelles}
+% % \input{chapters/etat-art/ot}
 
-\section{Types de données répliquées sans conflits}
-\input{chapters/etat-art/crdts-intro}
+% \section{Types de données répliquées sans conflits}
+% \input{chapters/etat-art/crdts-intro}
 
-\subsection{Sémantiques en cas de concurrence}
-\input{chapters/etat-art/semantique-intro}
+% \subsection{Sémantiques en cas de concurrence}
+% \input{chapters/etat-art/semantique-intro}
 
-\subsubsection{Sémantique \acl{LWW}}
-\input{chapters/etat-art/semantique-lww}
+% \subsubsection{Sémantique \acl{LWW}}
+% \input{chapters/etat-art/semantique-lww}
 
-\subsubsection{Sémantique \acl{MV}}
-\input{chapters/etat-art/semantique-mv}
+% \subsubsection{Sémantique \acl{MV}}
+% \input{chapters/etat-art/semantique-mv}
 
-\subsubsection{Sémantiques \acl{AW} et \acl{RW}}
-\input{chapters/etat-art/semantique-aw-rw}
+% \subsubsection{Sémantiques \acl{AW} et \acl{RW}}
+% \input{chapters/etat-art/semantique-aw-rw}
 
-\subsubsection{Sémantique \acl{CL}}
-\input{chapters/etat-art/semantique-cl}
+% \subsubsection{Sémantique \acl{CL}}
+% \input{chapters/etat-art/semantique-cl}
 
-\subsubsection{Synthèse}
-\input{chapters/etat-art/semantique-synthese}
+% \subsubsection{Synthèse}
+% \input{chapters/etat-art/semantique-synthese}
 
-\subsection{Modèles de synchronisation}
-\input{chapters/etat-art/synchro-intro}
+% \subsection{Modèles de synchronisation}
+% \input{chapters/etat-art/synchro-intro}
 
-\subsubsection{Synchronisation par états}
-\input{chapters/etat-art/synchro-etats}
+% \subsubsection{Synchronisation par états}
+% \input{chapters/etat-art/synchro-etats}
 
-\subsubsection{Synchronisation par opérations}
-\input{chapters/etat-art/synchro-operations}
+% \subsubsection{Synchronisation par opérations}
+% \input{chapters/etat-art/synchro-operations}
 
-\subsubsection{Synchronisation par différences d'états}
-\input{chapters/etat-art/synchro-diff-etats}
+% \subsubsection{Synchronisation par différences d'états}
+% \input{chapters/etat-art/synchro-diff-etats}
 
-\subsubsection{Synthèse}
-\input{chapters/etat-art/synchro-synthese}
+% \subsubsection{Synthèse}
+% \input{chapters/etat-art/synchro-synthese}
 
-% \subsection{Adoption dans la littérature et l'industrie}
-% \input{chapters/etat-art/crdts-adoption}
+% % \subsection{Adoption dans la littérature et l'industrie}
+% % \input{chapters/etat-art/crdts-adoption}
 
-\section{Séquences répliquées sans conflits}
-\input{chapters/etat-art/seq-crdts-intro}
+% \section{Séquences répliquées sans conflits}
+% \input{chapters/etat-art/seq-crdts-intro}
 
-\subsection{Approche à pierres tombales}
+% \subsection{Approche à pierres tombales}
 
-\subsubsection{WOOT}
-\input{chapters/etat-art/seq-crdts-woot}
+% \subsubsection{WOOT}
+% \input{chapters/etat-art/seq-crdts-woot}
 
-\subsubsection{\acl{RGA}}
-\input{chapters/etat-art/seq-crdts-rga}
+% \subsubsection{\acl{RGA}}
+% \input{chapters/etat-art/seq-crdts-rga}
 
-\subsection{Approche à identifiants densément ordonnés}
+% \subsection{Approche à identifiants densément ordonnés}
 
-\subsubsection{Treedoc}
-\input{chapters/etat-art/seq-crdts-treedoc}
+% \subsubsection{Treedoc}
+% \input{chapters/etat-art/seq-crdts-treedoc}
 
-\subsubsection{Logoot}
-\input{chapters/etat-art/seq-crdts-logoot}
+% \subsubsection{Logoot}
+% \input{chapters/etat-art/seq-crdts-logoot}
 
-\mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
+% \mnnote{TODO: Autres Sequence CRDTs à considérer : String-wise CRDT \cite{2012-string-wise}, Chronofold \cite{2020-chronofold}}
 
-\subsection{Synthèse}
-\input{chapters/etat-art/seq-crdts-synthese.tex}
+% \subsection{Synthèse}
+% \input{chapters/etat-art/seq-crdts-synthese.tex}
 
-\section{LogootSplit}
-\input{chapters/etat-art/ls-intro}
+% \section{LogootSplit}
+% \input{chapters/etat-art/ls-intro}
 
-\subsection{Identifiants}
-\input{chapters/etat-art/ls-ids}
+% \subsection{Identifiants}
+% \input{chapters/etat-art/ls-ids}
 
-\subsection{Aggrégation dynamique d'élements en blocs}
-\input{chapters/etat-art/ls-blocs}
+% \subsection{Aggrégation dynamique d'élements en blocs}
+% \input{chapters/etat-art/ls-blocs}
 
-\subsection{Modèle de données}
-\input{chapters/etat-art/ls-adt}
+% \subsection{Modèle de données}
+% \input{chapters/etat-art/ls-adt}
 
-\subsection{Modèle de livraison}
-\input{chapters/etat-art/ls-synchro-intro}
+% \subsection{Modèle de livraison}
+% \input{chapters/etat-art/ls-synchro-intro}
 
-\subsubsection{Livraison des opérations en exactement un exemplaire}
-\input{chapters/etat-art/ls-synchro-exactly-once}
+% \subsubsection{Livraison des opérations en exactement un exemplaire}
+% \input{chapters/etat-art/ls-synchro-exactly-once}
 
-\subsubsection{Livraison de l'opération $\trm{rmv}$ après les opérations $\trm{ins}$ correspondantes}
-\input{chapters/etat-art/ls-synchro-causal-remove}
+% \subsubsection{Livraison de l'opération $\trm{rmv}$ après les opérations $\trm{ins}$ correspondantes}
+% \input{chapters/etat-art/ls-synchro-causal-remove}
 
-\subsubsection{Définition du modèle de livraison}
-\input{chapters/etat-art/ls-synchro-synthese}
+% \subsubsection{Définition du modèle de livraison}
+% \input{chapters/etat-art/ls-synchro-synthese}
 
-\subsection{Limites}
-\input{chapters/etat-art/ls-limites}
+% \subsection{Limites}
+% \input{chapters/etat-art/ls-limites}
 
-\section{Mitigation du surcoût des séquences répliquées sans conflits}
-\input{chapters/etat-art/mitig-surcout-seq-crdts}
+% \section{Mitigation du surcoût des séquences répliquées sans conflits}
+% \input{chapters/etat-art/mitig-surcout-seq-crdts}
 
-\section{Synthèse}
-\input{chapters/etat-art/synthese}
+% \section{Synthèse}
+% \input{chapters/etat-art/synthese}
 
-\section{Proposition}
-\input{chapters/etat-art/proposition}
+% \section{Proposition}
+% \input{chapters/etat-art/proposition}
 
 
-\import{chapters/}{rls}
-\import{chapters/}{mute}
+% \import{chapters/}{rls}
+% \import{chapters/}{mute}
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
 \minitoc
 \section{Résumé des contributions}
+
+\subsection{Ré-identification sans coordination pour les \acp{CRDT} pour Séquence}
+
+\begin{itemize}
+  \item
+\end{itemize}
+
+\subsection{Éditeur de texte collaboratif \ac{P2P} chiffré de bout en bout}
+
+\begin{itemize}
+  \item
+\end{itemize}
+
 \section{Perspectives}
 
-% \begin{itemize}
-%   \item Définir stratégie pour déclenchement de l'opération \emph{rename}
-%   \item Proposer nouvelles relations \emph{priority} \lepoch
-%   \item Utiliser combinaison de CRDT et OT pour concevoir structures de données répliquées complexes (move dans Sequence, DFS...)
-% \end{itemize}
-
 \subsection{Définition de relations de priorité pour minimiser les traitements}
-\subsection{Redéfinition de la sémantique du renommage en déplacement d'éléments}
-\subsection{Définition de types de données répliquées sans conflits plus complexes}
+\input{chapters/conclusion/priorite-alternatives}
 
-\subsection{Étude comparative des différentes familles de CRDTs}
+\subsection{Détection et fusion manuelle de versions distantes}
+\input{chapters/conclusion/fusion-manuelle-versions-distantes}
 
-\begin{itemize}
-  \item La spécification récente des Delta-based CRDTs .
-    Ce nouveau type de CRDTs se base sur celui des State-based CRDTs.
-    Partage donc les mêmes pré-requis :
-    \begin{itemize}
-      \item États du type de données répliqué forment un sup-demi-treillis
-      \item Modifications locales entraînent une inflation de l'état
-      \item Possède une fonction de \texttt{merge}, permettant de fusionner deux états S et S', et qui
-      \begin{itemize}
-        \item Est associative, commutative et idempotente
-        \item Retourne S", la \ac{LUB} de S et S' (\ie $\nexists S''' \cdot merge(S, S') < S''' < S''$)
-      \end{itemize}
-    \end{itemize}
-    Et bénéficie de son principal avantage : synchronisation possible entre deux pairs en fusionnant leur états, peu importe le nombre de modifications les séparant.
-  \item Spécificité des Delta-based CRDTs est de proposer une synchronisation par différence d'états.
-    Plutôt que de diffuser l'entièreté de l'état pour permettre aux autres pairs de se mettre à jour, idée est de seulement transmettre la partie de l'état ayant été mise à jour.
-    Correspond à un élément irréductible du sup-demi-treillis.
-    Permet ainsi de mettre en place une synchronisation en temps réel de manière efficace.
-    Et d'utiliser la synchronisation par fusion d'états complets pour compenser les défaillances du réseau
-  \item Ainsi, ce nouveau type de CRDTs semble allier le meilleur des deux mondes :
-    \begin{itemize}
-      \item Absence de contrainte sur le réseau autre que la livraison à terme
-      \item Propagation possible en temps réel des modifications
-    \end{itemize}
-    Semble donc être une solution universelle :
-    \begin{itemize}
-      \item Utilisable peu importe la fiabilité réseau à disposition
-      \item Empreinte réseau du même ordre de grandeur qu'un Op-based CRDT
-      \item Utilisable peu importe la fréquence de synchronisation désirée
-    \end{itemize}
-    Pose la question de l'intérêt des autres types de CRDTs.
-  \item Delta-based CRDT est un State-based CRDT dont on a identifié les éléments irréductibles et qui utilise ces derniers pour la propagation des modifications plutôt que l'état complet.
-    Famille des State-based CRDTs semble donc rendue obsolète par celle des Delta-based CRDTs.
-    À confirmer.
-  \item Les Op-based CRDTs proposent une spécification différente du type répliqué de leur équivalent Delta-based, généralement plus simple.
-    À première vue, famille des Op-based CRDTs semble donc avoir la simplicité comme avantage par rapport à celle des Delta-based CRDTs.
-    S'agit d'un paramètre difficilement mesurable et auquel on peut objecter si on considère qu'un Op-based CRDT s'accompagne d'une couche livraison de messages, qui cache sa part de complexité.
-    Intéressant d'étudier si la spécification différente des Op-based CRDTs présente d'autres avantages par rapport aux Delta-based CRDTs : performances (temps d'intégration des modifications, délai de convergence...), fonctionnalités spécifiques (composition, undo...)
-  \item But serait de fournir des guidelines sur la famille de CRDT à adopter en fonction du cas d'utilisation.
-\end{itemize}
+\subsection{Étude comparative des différents modèles de synchronisation pour \acp{CRDT}}
+\input{chapters/conclusion/approfondissement-pure-op-based-crdts}
 
-\subsection{Définition d'opérations supplémentaires pour fonctionnalités liées à l'édition collaborative}
+\subsection{Approfondissement du patron de conception de Pure Op-based \acp{CRDT}}
+\input{chapters/conclusion/approfondissement-pure-op-based-crdts}
 
-\begin{itemize}
-  \item Commentaires
-  \item Suggestions
-\end{itemize}
+% \subsection{Conduction d'expériences utilisateurs d'édition collaborative}
+% \input{chapters/conclusion/user-experiences}
 
-\subsection{Conduction d'expériences utilisateurs d'édition collaborative}
+% \subsection{Comparaison des mécanismes de synchronisation}
+% \input{chapters/conclusion/comparaison-anti-entropy.tex}
 
-\begin{itemize}
-  \item Absence d'un dataset réel et réutilisable sur les sessions d'édition collaborative
-  \item Généralement, expériences utilisent données d'articles de Wikipédia \mnnote{TODO: Revoir références, mais me semble que c'est celui utilisé pour Logoot, LogootSplit et RGASplit entre autres}.
-    Mais ces données correspondent à une exécution séquentielle, \ie aucune édition concurrente ne peut être réalisée avec le système de résolution de conflits de Wikipédia.
-    \mnnote{TODO:
-      Me semble que Kleppmann a aussi utilisé et mis à disposition ses traces correspondant à la rédaction d'un de ses articles.
-      Mais que cet article n'était rédigé que par lui.
-      Peu de chances de présence d'éditions concurrentes.
-      À retrouver et vérifier.
-    }
-  \item Inspiré par expériences de Claudia, pourrait mener des sessions d'édition collaborative sur des outils orchestrés pour produire ce dataset
-  \item Devrait rendre ce dataset agnostique de l'approche choisie pour la résolution automatique de conflits
-  \item Absence de retours sur les collaborations à grande échelle
-  \item Comment on collabore lorsque plusieurs centaines d'utilisateur-rices ?
-\end{itemize}
+% \subsection{Contrôle d'accès}
+% \input{chapters/conclusion/access-control}
 
-\subsection{Comparaison des mécanismes de synchronisation}
+% \subsection{Détection et éviction de pairs malhonnêtes}
+% \input{chapters/conclusion/malicious-peers-management}
 
-Serait intéressant de comparer à d'autres méthodes de synchronisation : mécanisme d'anti-entropie basé sur un Merkle Tree\cite{2007-dynamo, 2015-approximate-hash-based-set-reconciliation, 2017-anti-entropy-without-merkle-trees}, synchronisation par états (state/delta-based \acp{CRDT}).
-Dans le cadre des Delta-based \acp{CRDT}, pourrait évaluer un protocole de diffusion épidémique des deltas comme celui proposé par SWIM\cite{swim2002}.
+% \subsection{Vecteur de version \emph{epoch-based}}
+% \input{chapters/conclusion/epoch-based-version-vector}
 
-\subsection{Distance entre versions d'un document}
-
-\begin{itemize}
-  \item Est-ce que ça a vraiment du sens d'intégrer automatiquement des modifications ayant été généré sur une version du document distante de l'état actuel du document (voir distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al))
-  \item Jusqu'à quelle distance est-ce que la fusion automatique a encore du sens ?
-  \mnnote{NOTE: Peut connecter ça à la nécessité de conserver un chemin d'une époque à l'autre : si les opérations émises depuis cette époque ont probablement plus d'intérêt pour l'état actuel, couper l'arbre ?}
-\end{itemize}
-
-\subsection{Contrôle d'accès}
-
-\begin{itemize}
-  \item Pour le moment, n'importe quel utilisateur ayant l'URL du document peut y accéder dans MUTE
-  \item Pour des raisons de confidentialité, peut vouloir contrôler quels utilisateurs ont accès à un document
-  \item Nécessite l'implémentation de liste de contrôle d'accès
-  \item Mais s'agit d'une tâche complexe dans le cadre d'un système distribué
-  \item Peut s'inspirer des travaux réalisés au sein de la communautée \acp{CRDT} \cite{2021-access-control-crdts, 2022-dist-access-control-pa} pour cela
-\end{itemize}
-
-\subsection{Détection et éviction de pairs malhonnêtes}
-
-\begin{itemize}
-  \item À l'heure actuelle, MUTE suppose qu'ensemble des collaborateurs honnêtes
-  \item Vulnérable à plusieurs types d'attaques par des adversaires byzantins, tel que l'équivoque
-  \item Ce type d'attaque peut provoquer des divergences durables et faire échouer des collaborations
-  \item \textcite{2021-these-vic} propose un mécanisme permettant de maintenir des logs authentifiés dans un système distribué
-  \item Les logs authentifiés permettent de mettre en lumière les comportements malveillants des adversaires et de borner le nombre d'actions malveillantes qu'ils peuvent effectuer avant d'être évincé
-  \item Implémenter ce mécanisme permettrait de rendre compatible MUTE avec des environnements avec adversaires byzantins
-  \item Nécessiterait tout de même de faire évoluer le \ac{CRDT} pour résoudre les équivoques détectés
-\end{itemize}
-
-\subsection{Vecteur de version \emph{epoch-based}}
-
-\begin{itemize}
-  \item S'agit d'une structure primordiale dans les systèmes distribués, dont pouvons difficilement nous passer.
-    Utilisé notamment pour représenter le contexte causal de l'état d'un noeud, nécessaire pour :
-    \begin{enumerate}
-      \item Déterminer quelles opérations ont été observées (anti-entropie et couche de livraison)
-      \item Déterminer quelles opérations ont observé les autres noeuds (stabilité causale)
-      \item Préciser les dépendances causales d'un message
-    \end{enumerate}
-  \item Comme présenté précédemment, nous utilisons plusieurs vecteurs pour représenter des données dans l'application MUTE
-  \item Notamment pour le vecteur de version, utilisé pour respecter le modèle de livraison requis par le \ac{CRDT}
-  \item Et pour la liste des collaborateurs, utilisé pour offrir des informations nécessaires à la conscience de groupe aux utilisateurs
-  \item Ces vecteurs sont maintenus localement par chacun des noeuds et sont échangés de manière périodique
-  \item Cependant, la taille de ces vecteurs croit de manière linéaire au nombre de noeuds impliqués dans la collaboration
-  \item Les systèmes \ac{P2P} à large échelle sont sujets au \emph{churn}
-  \item Dans le cadre d'un tel système, ces structures croissent de manière non-bornée
-  \item Ceci pose un problème de performances, notamment d'un point de vue consommation en bande-passante
-  \item Cependant, même si on observe un grand nombre de pairs différents dans le cadre d'une collaboration à large échelle
-  \item Intuition est qu'une collaboration repose en fait sur un petit noyau de collaborateurs principaux
-  \item Et que majorité des collaborateurs se connectent de manière éphèmère
-  \item Serait intéressant de pouvoir réduire la taille des vecteurs en oubliant les collaborateurs éphèmères
-  \item Dynamo\cite{2007-dynamo} tronque le vecteur de version lorsqu'il dépasse une taille seuil
-  \item Conduit alors à une perte d'informations
-  \item Pour la liste des collaborateurs, approche peut être adoptée (pas forcément gênant de limiter à 100 la taille de la liste)
-  \item Mais pour vecteur de version, conduirait à une relivraison d'opérations déjà observées
-  \item Approche donc pas applicable pour cette partie
-  \item Autre approche possible est de réutiliser le système d'époque
-  \item Idée serait de ACK un vecteur avec un changement d'époque
-  \item Et de ne diffuser à partir de là que les différences
-  \item Un mécanisme de transformation (une simple soustraction) permettrait d'obtenir le dot dans la nouvelle époque d'une opération concurrente au renommage
-  \item Peut facilement mettre en place un mécanisme d'inversion du renommage (une simple addition) pour revenir à une époque précédente
-  \item Et ainsi pouvoir circuler librement dans l'arbre des époques et gérer les opérations \emph{rename} concurrentes
-  \item Serait intéressant d'étudier si on peut aller plus loin dans le cadre de cette structure de données et notamment rendre commutatives les opérations de renommage concurrentes
-\end{itemize}
-
-\subsection{Fusion de versions distantes d'un document collaboratif}
-
-\subsection{Rôles et places des bots dans systèmes collaboratifs}
-\begin{itemize}
-  \item Stockage du document pour améliorer sa disponibilité
-  \item Overleaf en P2P ?
-  \item Comment réinsérer des bots dans la collaboration sans en faire des éléments centraux, sans créer des failles de confidentialité, et tout en rendant ces fonctionnalités accessibles ?
-\end{itemize}
+% \subsection{Rôles et places des bots dans systèmes collaboratifs}
+% \input{chapters/conclusion/bots-role-p2p-collaborative-systems}
 
 \Annex{Entrelacement d'insertions concurrentes dans Treedoc}
 

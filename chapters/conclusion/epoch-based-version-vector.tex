@@ -1,0 +1,33 @@
+\begin{itemize}
+    \item S'agit d'une structure primordiale dans les systèmes distribués, dont pouvons difficilement nous passer.
+      Utilisé notamment pour représenter le contexte causal de l'état d'un noeud, nécessaire pour :
+      \begin{enumerate}
+        \item Déterminer quelles opérations ont été observées (anti-entropie et couche de livraison)
+        \item Déterminer quelles opérations ont observé les autres noeuds (stabilité causale)
+        \item Préciser les dépendances causales d'un message
+      \end{enumerate}
+    \item Comme présenté précédemment, nous utilisons plusieurs vecteurs pour représenter des données dans l'application MUTE
+    \item Notamment pour le vecteur de version, utilisé pour respecter le modèle de livraison requis par le \ac{CRDT}
+    \item Et pour la liste des collaborateurs, utilisé pour offrir des informations nécessaires à la conscience de groupe aux utilisateurs
+    \item Ces vecteurs sont maintenus localement par chacun des noeuds et sont échangés de manière périodique
+    \item Cependant, la taille de ces vecteurs croit de manière linéaire au nombre de noeuds impliqués dans la collaboration
+    \item Les systèmes \ac{P2P} à large échelle sont sujets au \emph{churn}
+    \item Dans le cadre d'un tel système, ces structures croissent de manière non-bornée
+    \item Ceci pose un problème de performances, notamment d'un point de vue consommation en bande-passante
+    \item Cependant, même si on observe un grand nombre de pairs différents dans le cadre d'une collaboration à large échelle
+    \item Intuition est qu'une collaboration repose en fait sur un petit noyau de collaborateurs principaux
+    \item Et que majorité des collaborateurs se connectent de manière éphèmère
+    \item Serait intéressant de pouvoir réduire la taille des vecteurs en oubliant les collaborateurs éphèmères
+    \item Dynamo\cite{2007-dynamo} tronque le vecteur de version lorsqu'il dépasse une taille seuil
+    \item Conduit alors à une perte d'informations
+    \item Pour la liste des collaborateurs, approche peut être adoptée (pas forcément gênant de limiter à 100 la taille de la liste)
+    \item Mais pour vecteur de version, conduirait à une relivraison d'opérations déjà observées
+    \item Approche donc pas applicable pour cette partie
+    \item Autre approche possible est de réutiliser le système d'époque
+    \item Idée serait de ACK un vecteur avec un changement d'époque
+    \item Et de ne diffuser à partir de là que les différences
+    \item Un mécanisme de transformation (une simple soustraction) permettrait d'obtenir le dot dans la nouvelle époque d'une opération concurrente au renommage
+    \item Peut facilement mettre en place un mécanisme d'inversion du renommage (une simple addition) pour revenir à une époque précédente
+    \item Et ainsi pouvoir circuler librement dans l'arbre des époques et gérer les opérations \emph{rename} concurrentes
+    \item Serait intéressant d'étudier si on peut aller plus loin dans le cadre de cette structure de données et notamment rendre commutatives les opérations de renommage concurrentes
+  \end{itemize}

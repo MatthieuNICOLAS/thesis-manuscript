@@ -650,6 +650,7 @@ Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif 
 Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation \emph{priority}.
 
 \begin{definition}[Relation \emph{priority} \lepoch]
+  \label{def:priority-relation}
   La relation \emph{priority} \lepoch est un ordre strict total sur l'ensemble des époques.
   Elle permet aux noeuds de comparer n'importe quelle paire d'époques.
 \end{definition}
@@ -2461,7 +2462,9 @@ Nous présentons les avantages et inconvénients de cette approche dans la sous-
 
 % \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}
 
-\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le log d'opérations}
+\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le journal d'opérations}
+
+\label{sec:log-based-rename-mechanism}
 
 Nous avons décrit précédemment dans la \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
