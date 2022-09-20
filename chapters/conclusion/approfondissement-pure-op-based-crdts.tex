@@ -1,0 +1,53 @@
+\begin{itemize}
+    \item \textcite{baquero2017pure} proposent un framework pour concevoir des \acp{CRDT} synchronisés par opérations : Pure Op-based \acp{CRDT}.
+        Ce framework a plusieurs objectifs :
+        \begin{enumerate}
+            \item Proposer une approche partiellement générique pour définir un \ac{CRDT} synchronisé par opérations.
+            \item Factoriser les métadonnées utilisées par le \ac{CRDT} pour le mécanisme de résolution de conflits, notamment pour identifier les éléments, et celles utilisées par la couche livraison, notamment pour identifier les opérations.
+            \item Inclure des mécanismes de \ac{GC} de ces métadonnées pour réduire la taille de l'état.
+        \end{enumerate}
+    \item Pour cela, les auteurs se limitent aux \acp{CRDT} purs synchronisés par opérations, \ie les \acp{CRDT} dont les modifications enrichies de leurs arguments et d'une estampille fournie par la couche de livraison des messages sont commutatives.
+        Pour ces \acp{CRDT}, les auteurs proposent un framework générique permettant leur spécification sous la forme d'un PO-Log associé à une couche de livraison \ac{RCB}.
+    \item Les auteurs définissent ensuite le concept de stabilité causale.
+        Ce concept leur permet de retirer les métadonnées de causalité des opérations du PO-Log lorsque celles-ci sont déterminées comme étant causalement stables.
+    \item Finalement, les auteurs définissent un ensemble de relations, spécifiques à chaque \ac{CRDT}, qui permettent d'exprimer la \emph{redondance causale}.
+        La redondance causale permet de spécifier quand retirer une opération du PO-Log, car rendue obsolète par une autre opération.
+    \item Cette approche souffre toutefois de plusieurs limites.
+        Tout d'abord, elle repose sur l'utilisation d'une couche de livraison \ac{RCB}.
+        Cette couche satisfait le modèle de livraison causale.
+        Mais pour rappel, ce modèle induit l'ajout de données de causalité précises à chaque opération, sous la forme d'un vecteur de version ou d'une barrière causale.
+        Nous jugeons ce modèle trop coûteux pour un système \ac{P2P} dynamique à large échelle.
+    \item En plus du coût induit en termes de métadonnées et de bande-passante, le modèle de livraison causale peut aussi introduire un délai superflu dans la livraison des opérations.
+        En effet, ce modèle impose que tous les messages précédant un nouveau message d'après la relation \hb soient eux-mêmes livrés avant de livrer ce dernier.
+        Il en résulte que des opérations peuvent être mises en attente par la couche livraison, \eg suite à la perte d'une de leurs dépendances d'après la relation \hb, alors que leurs dépendances réelles ont déjà été livrées et que les opérations sont de fait intégrables en l'état.
+        Plusieurs travaux \cite{2020-flec-bauwens,2021-improving-reactivity-pure-op-based-crdts-bauwens} ont noté ce problème.
+        Pour y répondre et ainsi améliorer la réactivité du framework Pure Op-based, ils proposent d'exposer les opérations mises en attente par la couche livraison au \ac{CRDT}.
+        Bien que fonctionnelle, cette approche induit toujours le coût d'une couche de livraison respectant le modèle de livraison causale et nous fait considérer la raison de ce coût, le modèle de livraison n'étant alors plus respecté.
+    \item Ensuite, ce framework impose que la modification \textbf{prepare} ne puisse pas inspecter l'état courant du noeud.
+        Cette contrainte est compatible avec les \acp{CRDT} pour les types de données simples qui sont considérés dans \cite{baquero2017pure}, \eg le Compteur ou l'Ensemble.
+        Elle empêche cependant l'expression de \acp{CRDT} pour des types de données plus complexes, \eg la Séquence ou le Graphe.
+        \mnnote{TODO: À confirmer pour le graphe}
+        Nous jugeons dommageable qu'un framework pour la conception de \acp{CRDT} limite de la sorte son champ d'application.
+    \item Finalement, les auteurs ne considèrent que des types de données avec des modifications à granularité fixe.
+        Ainsi, ils définissent la notion de redondance causale en se limitant à ce type de modifications.
+        Par exemple, ils définissent que la suppression d'un élément d'un ensemble rend obsolète les ajouts précédents de cet élément.
+        Cependant, dans le cadre d'autres types de données, \eg la Séquence, une modification peut concerner un ensemble d'éléments de taille variable.
+        Une opération peut donc être rendue obsolète non pas par une opération, mais par un exemple d'opérations.
+        Par exemple, les suppressions d'éléments formant une sous-chaîne rendent obsolète l'insertion de cette sous-chaîne.
+        Ainsi, la notion de redondance causale est incomplète et souffre de l'absence d'une notion d'obsolescence partielle d'une opération.
+    \item Pour répondre aux différents problèmes soulevés, nous souhaitons proposer une extension du framework Pure Op-based \acp{CRDT}.
+        Nos objectifs sont les suivants :
+        \begin{enumerate}
+            \item Proposer un framework mettant en lumière la présence et le rôle de deux modèles de livraison :
+                \begin{enumerate}
+                    \item Le modèle de livraison minimale requis par le \ac{CRDT} pour assurer la convergence forte à terme.
+                    \item Le modèle de livraison utilisé par le système, qui doit être égal ou plus contraint que modèle de livraison minimal du \ac{CRDT}.
+                        Ce second modèle de livraison est une stratégie permettant au système de respecter un modèle de cohérence donné et régissant les règles de compaction de l'état.
+                        Il peut être amené à évoluer en fonction de l'état du système et de ses besoins.
+                        Par exemple, un système peut par défaut utiliser le modèle de livraison causale pour assurer le modèle de cohérence causal.
+                        Puis, lorsque le nombre de noeuds atteint un seuil donné, le système peut passer au modèle de livraison FIFO pour assurer le modèle de cohérence PRAM afin de réduire les coûts en bande-passante.
+                \end{enumerate}
+            \item Rendre accessible la notion de redondance causale à la couche de livraison, pour détecter au plus tôt les opérations désormais obsolètes et prévenir leur diffusion.
+            \item Identifier et classifier les mécanismes de résolution de conflits, pour déterminer lesquels sont indépendants de l'état courant pour la génération des opérations et lesquels nécessitent d'inspecter l'état courant dans \textbf{prepare}.
+        \end{enumerate}
+\end{itemize}
