@@ -32,7 +32,7 @@
         Ainsi, ils définissent la notion de redondance causale en se limitant à ce type de modifications.
         Par exemple, ils définissent que la suppression d'un élément d'un ensemble rend obsolète les ajouts précédents de cet élément.
         Cependant, dans le cadre d'autres types de données, \eg la Séquence, une modification peut concerner un ensemble d'éléments de taille variable.
-        Une opération peut donc être rendue obsolète non pas par une opération, mais par un exemple d'opérations.
+        Une opération peut donc être rendue obsolète non pas par une opération, mais par un ensemble d'opérations.
         Par exemple, les suppressions d'éléments formant une sous-chaîne rendent obsolète l'insertion de cette sous-chaîne.
         Ainsi, la notion de redondance causale est incomplète et souffre de l'absence d'une notion d'obsolescence partielle d'une opération.
     \item Pour répondre aux différents problèmes soulevés, nous souhaitons proposer une extension du framework Pure Op-based \acp{CRDT}.
@@ -40,7 +40,7 @@
         \begin{enumerate}
             \item Proposer un framework mettant en lumière la présence et le rôle de deux modèles de livraison :
                 \begin{enumerate}
-                    \item Le modèle de livraison minimale requis par le \ac{CRDT} pour assurer la convergence forte à terme.
+                    \item Le modèle de livraison minimal requis par le \ac{CRDT} pour assurer la convergence forte à terme.
                     \item Le modèle de livraison utilisé par le système, qui doit être égal ou plus contraint que modèle de livraison minimal du \ac{CRDT}.
                         Ce second modèle de livraison est une stratégie permettant au système de respecter un modèle de cohérence donné et régissant les règles de compaction de l'état.
                         Il peut être amené à évoluer en fonction de l'état du système et de ses besoins.

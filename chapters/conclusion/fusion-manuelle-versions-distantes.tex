@@ -1,5 +1,61 @@
 \begin{itemize}
-    \item Est-ce que ça a vraiment du sens d'intégrer automatiquement des modifications ayant été généré sur une version du document distante de l'état actuel du document (voir distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al))
-    \item Jusqu'à quelle distance est-ce que la fusion automatique a encore du sens ?
-    \mnnote{NOTE: Peut connecter ça à la nécessité de conserver un chemin d'une époque à l'autre : si les opérations émises depuis cette époque ont probablement plus d'intérêt pour l'état actuel, couper l'arbre ?}
-  \end{itemize}
+    \item À l'issue de cette thèse, nous constatons plusieurs limites des mécanismes de résolution de conflits automatiques dans les systèmes \ac{P2P} à large échelle.
+        La première d'entre elles est l'utilisation d'un contexte causal.
+        Le contexte causal est utilisé par les mécanismes de résolution de conflits pour :
+        \begin{enumerate}
+            \item Satisfaire le modèle de cohérence causale, \ie assurer que si nous avons deux modifications $m_1$ et $m_2$ telles que $m1 \to m_2$, alors l'effet de $m_2$ supplantera celui de $m_1$.
+                Ceci permet d'éviter des anomalies de comportement de la part de la structure de données du point de vue des utilisateur-rices, par exemple la résurgence d'un élément supprimé au préalable.
+            \item Permettre de préserver l'intention d'une modification malgré l'intégration préalable de modifications concurrentes.
+        \end{enumerate}
+    \item Le contexte causal est utilisé de manière différente en fonction du mécanisme de résolution de conflit.
+        Dans l'approche \ac{OT}, le contexte causal est utilisé par l'algorithme de contrôle pour déterminer les modifications concurrentes à une modification lors de son intégration, afin de prendre en compte leurs effets.
+        Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification indépendante de l'état, \ie un élément du sup-demi-treillis représentant la structure de données répliquée.
+    \item Le contexte causal peut être représenté de différentes manières.
+        Par exemple, le contexte causal peut prendre la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'un \ac{DAG} des modifications \cite{1997-causal-barrier}.
+        Cependant, de manière intrinsèque, le contexte causal ne fait que de croître au fur et à mesure que des modifications sont effectuées ou que des noeuds rejoignent le système, incrémentant son surcoût en métadonnées, calculs et bande-passante.
+    \item La stabilité causale permet cependant de réduire le surcoût lié au contexte causal.
+        En effet, la stabilité causale permet d'établir le contexte commun à l'ensemble des noeuds, \ie l'ensemble des modifications que l'ensemble des noeuds ont intégré.
+        Ces modifications font alors partie de l'histoire commune et n'ont plus besoin d'être considérées par les mécanismes de résolution de conflits.
+        La stabilité causale permet donc de déterminer et de tronquer la partie commune du contexte causal pour éviter que ce dernier ne pénalise les performances du système à terme.
+    \item La stabilité causale est cependant une contrainte forte dans les systèmes \ac{P2P} dynamiques à large échelle dans lesquels nous n'avons aucun contrôle sur les noeuds.
+        Il ne suffit en effet que d'un noeud déconnecté pour empêcher la stabilité causale de progresser.
+        Pour répondre à ce problème, nous nous trouvons dès lors devant un spectre d'approches possibles dont les extrémités sont les suivantes :
+        \begin{enumerate}
+            \item Considérer tout noeud déconnecté comme déconnecté de manière définitive, et donc les exclure du système.
+                Cette première approche permet à la stabilité causale de progresser, et ainsi aux noeuds connectés de travailler dans des conditions optimales.
+                Mais elle implique cependant que les modifications potentielles du noeud déconnecté soient perdues, \ie de ne plus pouvoir les intégrer en l'absence d'un lien entre leur contexte causal de génération et le contexte causal actuel de chaque autre noeud.
+            \item Assurer en toutes circonstances la capacité d'intégration des modifications des noeuds, même ceux déconnectés.
+                Cette seconde approche permet de garantir que les modifications potentielles d'un noeud déconnecté pourront être intégrées automatiquement, dans l'éventualité où ce dernier se reconnecte à terme.
+                Mais elle implique de bloquer potentiellement de manière définitive la stabilité causale et donc le mécanisme de \ac{GC} du contexte causal.
+        \end{enumerate}
+    \item La seconde limite que nous constatons est la limite des mécanismes actuels de résolution de conflits automatiques pour préserver l'intention des utilisateur-rices.
+        Par exemple, les mécanismes de résolution de conflits automatiques pour le type Séquence présentés dans ce manuscrit \cf{sec:seq-crdts} définissent l'intention de la manière suivante : \emph{l'intégration de la modification par les noeuds distants doit reproduire l'effet de la modification sur la copie d'origine}.
+        Cette définition assure que chaque modification est porteuse d'une intention, mais limite voire ignore toute la dimension sémantique de la dite intention.
+        Nous conjecturons que l'absence de dimension sémantique réduit les cas d'utilisation de ces mécanismes.
+    \item Considérons par exemple une édition collaborative d'un même texte par un ensemble de noeuds.
+        Lors de la présence d'une faute de frappe dans le texte, \eg le mot "HLLO", plusieurs utilisateur-rices peuvent la corriger en concurrence, \ie insérer l'élément "E" entre "H" et "L".
+        Les mécanismes de résolution de conflits automatiques permettent aux noeuds d'obtenir des résultats qui convergent mais à notre sens insatisfaisant, \eg "HEEEEEELLO".
+        Nous considérons ce type de résultats comme des anomalies, au même titre que l'entrelacement \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+        Dans le cadre de collaborations temps réel à échelle limitée, nous conjecturons cependant qu'une granularité fine des modifications permet de pallier ce problème.
+        En effet, les utilisateur-rices peuvent observer une anomalie produite par le mécanisme de résolution de conflits, et la résoudre par le biais d'actions supplémentaires de compensation.
+    \item Cependant, dans le cadre de collaborations asynchrones ou à large échelle, nous conjecturons que ces anomalies de résolution de conflits s'accumulent au point d'entraver la collaboration.
+        Pour reprendre l'exemple de l'édition collaborative de texte, nous pouvons constater dans de tels cas de la duplication de contenu et/ou l'entrelacement de mots, phrases voire paragraphes nuisant à la clarté et correction du texte.
+    \item Il convient alors de s'interroger sur le bien-fondé de l'utilisation de mécanismes de résolutions de conflits automatiques pour intégrer un ensemble de modifications provenant d'une version distante de la donnée répliquée par rapport à la version courante.
+    \item Pour répondre à ces deux limites, nous souhaitons proposer une approche combinant un ou des mécanismes de résolution de conflits automatiques avec un ou des mécanismes de résolution de conflits manuels.
+        L'idée derrière cette approche est de faire varier le mécanisme de résolution de conflits utilisé pour intégrer des modifications en fonction de la distance entre la version courante de la donnée répliquée et celle de leur génération :
+        \begin{enumerate}
+            \item Si cette distance est faible, utiliser un mécanisme de résolution de conflits automatique.
+            \item Si cette distance dépasse une distance seuil, faire intervenir les utilisateur-rices par le biais d'un mécanisme de résolution de conflits manuel.
+                L'utilisation d'un mécanisme manuel n'exclut cependant pas tout pré-travail de notre part pour réduire la charge de travail des utilisateur-rices dans le processus de fusion.
+        \end{enumerate}
+        Dans un premier temps, cette approche pourra se focaliser sur un type d'application spécifique, \eg l'édition collaborative de texte.
+    \item Pour mener à bien ce travail, il conviendra tout d'abord de définir la notion de distance entre versions de la donnée répliquée.
+        Dans le cadre de l'édition collaborative, nous pourrons pour cela nous baser sur les travaux existants pour évaluer la distance entre deux textes.
+        \mnnote{TODO: Insérer refs distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al)}
+    \item Il conviendra ensuite de déterminer comment établir la valeur seuil à partir de laquelle la distance entre textes est jugée trop importante.
+        Les approches d'évaluation de la qualité du résultat pourront être utilisées pour déterminer un couple $\langle \text{méthode de calcul de la distance}, \text{valeur de distance} \rangle$ spécifiant les cas pour lesquels les méthodes de résolution de conflits automatiques ne produisent plus un résultat satisfaisant.
+        \mnnote{TODO: Insérer refs travaux Claudia et Vinh}
+        Le couple obtenu pourra ensuite être confirmé par le biais d'expériences utilisateurs inspirées de \cite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
+    \item Finalement, il conviendra de proposer un mécanisme de résolution de conflits adapté pour gérer les éventuelles fusions manuelles concurrentes, ou à défaut un mécanisme de conscience de groupe invitant les utilisateur-rices à effectuer des actions de compensation.
+    \item Le gain attendu de cette approche est la progression de la stabilité causale et la troncature d'une partie du contexte causal déterminée comme étant au-delà de la valeur seuil de distance, \eg en retirant des entrées du vecteur de version correspondant à des noeuds inactifs ou les premières modifications du \ac{DAG}.
+\end{itemize}
