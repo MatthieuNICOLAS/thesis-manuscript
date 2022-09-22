@@ -9,7 +9,7 @@
         \end{enumerate}
     \item Le contexte causal est utilisé de manière différente en fonction du mécanisme de résolution de conflit.
         Dans l'approche \ac{OT}, le contexte causal est utilisé par l'algorithme de contrôle pour déterminer les modifications concurrentes à une modification lors de son intégration, afin de prendre en compte leurs effets.
-        Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification indépendante de l'état, \ie un élément du sup-demi-treillis représentant la structure de données répliquée.
+        Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification nativement commutative avec les modifications concurrentes, \ie pour en faire un élément du sup-demi-treillis représentant la structure de données répliquée.
     \item Le contexte causal peut être représenté de différentes manières.
         Par exemple, le contexte causal peut prendre la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'un \ac{DAG} des modifications \cite{1997-causal-barrier}.
         Cependant, de manière intrinsèque, le contexte causal ne fait que de croître au fur et à mesure que des modifications sont effectuées ou que des noeuds rejoignent le système, incrémentant son surcoût en métadonnées, calculs et bande-passante.
@@ -19,14 +19,17 @@
         La stabilité causale permet donc de déterminer et de tronquer la partie commune du contexte causal pour éviter que ce dernier ne pénalise les performances du système à terme.
     \item La stabilité causale est cependant une contrainte forte dans les systèmes \ac{P2P} dynamiques à large échelle dans lesquels nous n'avons aucun contrôle sur les noeuds.
         Il ne suffit en effet que d'un noeud déconnecté pour empêcher la stabilité causale de progresser.
-        Pour répondre à ce problème, nous nous trouvons dès lors devant un spectre d'approches possibles dont les extrémités sont les suivantes :
+        Pour répondre à ce problème, nous avons dès lors tout un spectre d'approches possibles, proposant chacune un compromis entre le surcoût du contexte causal et la probabilité de rejeter des modifications.
+        Les extremités de ce spectre d'approches sont les suivantes :
         \begin{enumerate}
-            \item Considérer tout noeud déconnecté comme déconnecté de manière définitive, et donc les exclure du système.
+            \item Considérer tout noeud déconnecté comme déconnecté de manière définitive, et donc les ignorer dans le calcul de la stabilité causale.
                 Cette première approche permet à la stabilité causale de progresser, et ainsi aux noeuds connectés de travailler dans des conditions optimales.
-                Mais elle implique cependant que les modifications potentielles du noeud déconnecté soient perdues, \ie de ne plus pouvoir les intégrer en l'absence d'un lien entre leur contexte causal de génération et le contexte causal actuel de chaque autre noeud.
+                Mais elle implique cependant que les modifications potentielles des noeuds déconnectés soient perdues, \ie de ne plus pouvoir les intégrer en l'absence d'un lien entre leur contexte causal de génération et le contexte causal actuel de chaque autre noeud.
+                Il s'agit là de la stratégie la plus aggressive en terme de \ac{GC} du contexte causal.
             \item Assurer en toutes circonstances la capacité d'intégration des modifications des noeuds, même ceux déconnectés.
-                Cette seconde approche permet de garantir que les modifications potentielles d'un noeud déconnecté pourront être intégrées automatiquement, dans l'éventualité où ce dernier se reconnecte à terme.
+                Cette seconde approche permet de garantir que les modifications potentielles des noeuds déconnectés pourront être intégrées automatiquement, dans l'éventualité où ces derniers se reconnectent à terme.
                 Mais elle implique de bloquer potentiellement de manière définitive la stabilité causale et donc le mécanisme de \ac{GC} du contexte causal.
+                Il s'agit là de la stratégie la plus timide en terme de \ac{GC} du contexte causal.
         \end{enumerate}
     \item La seconde limite que nous constatons est la limite des mécanismes actuels de résolution de conflits automatiques pour préserver l'intention des utilisateur-rices.
         Par exemple, les mécanismes de résolution de conflits automatiques pour le type Séquence présentés dans ce manuscrit \cf{sec:seq-crdts} définissent l'intention de la manière suivante : \emph{l'intégration de la modification par les noeuds distants doit reproduire l'effet de la modification sur la copie d'origine}.
@@ -37,25 +40,35 @@
         Les mécanismes de résolution de conflits automatiques permettent aux noeuds d'obtenir des résultats qui convergent mais à notre sens insatisfaisant, \eg "HEEEEEELLO".
         Nous considérons ce type de résultats comme des anomalies, au même titre que l'entrelacement \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
         Dans le cadre de collaborations temps réel à échelle limitée, nous conjecturons cependant qu'une granularité fine des modifications permet de pallier ce problème.
-        En effet, les utilisateur-rices peuvent observer une anomalie produite par le mécanisme de résolution de conflits, et la résoudre par le biais d'actions supplémentaires de compensation.
-    \item Cependant, dans le cadre de collaborations asynchrones ou à large échelle, nous conjecturons que ces anomalies de résolution de conflits s'accumulent au point d'entraver la collaboration.
-        Pour reprendre l'exemple de l'édition collaborative de texte, nous pouvons constater dans de tels cas de la duplication de contenu et/ou l'entrelacement de mots, phrases voire paragraphes nuisant à la clarté et correction du texte.
-    \item Il convient alors de s'interroger sur le bien-fondé de l'utilisation de mécanismes de résolutions de conflits automatiques pour intégrer un ensemble de modifications provenant d'une version distante de la donnée répliquée par rapport à la version courante.
-    \item Pour répondre à ces deux limites, nous souhaitons proposer une approche combinant un ou des mécanismes de résolution de conflits automatiques avec un ou des mécanismes de résolution de conflits manuels.
-        L'idée derrière cette approche est de faire varier le mécanisme de résolution de conflits utilisé pour intégrer des modifications en fonction de la distance entre la version courante de la donnée répliquée et celle de leur génération :
+        En effet, les utilisateur-rices peuvent observer une anomalie produite par le mécanisme de résolution de conflits automatique, déduire l'intention initiale des modifications concernées et la restaurer par le biais d'actions supplémentaires de compensation.
+    \item Cependant, dans le cadre de collaborations asynchrones ou à large échelle, nous conjecturons que ces anomalies de résolution de conflits s'accumulent.
+        Cette accumulation peut atteindre un seuil rendant laborieuse la déduction et le rétablissement de l'intention initiale des modifications.
+        Le travail imposé aux utilisateur-rices pour résoudre ces anomalies par le biais d'actions de compensation peut alors entraver la collaboration.
+        Pour reprendre l'exemple de l'édition collaborative de texte, nous pouvons constater de tels cas suite à de la duplication de contenu et/ou l'entrelacement de mots, phrases voire paragraphes nuisant à la clarté et correction du texte.
+        Il convient alors de s'interroger sur le bien-fondé de l'utilisation de mécanismes de résolutions de conflits automatiques pour intégrer un ensemble de modifications dans l'ensemble des situations.
+    \item Ainsi, pour répondre aux limites des mécanismes de résolution conflits automatiques dans les systèmes \ac{P2P} à large échelle, \ie l'augmentation de leur surcoût et la pertinence de leur résultat, nous souhaitons proposer une approche combinant un ou des mécanismes de résolution de conflits automatiques avec un ou des mécanismes de résolution de conflits manuels.
+        L'idée derrière cette approche est de faire varier le mécanisme de résolution de conflits utilisé pour intégrer des modifications.
+        Le choix du mécanisme de résolution de conflits utilisé peut se faire à partir de la valeur d'une distance calculée entre la version courante de la donnée répliquée et celle de la génération de la modification à intégrer, ou d'une évaluation de la qualité du résultat de l'intégration de la modification.
+        Par exemple :
         \begin{enumerate}
-            \item Si cette distance est faible, utiliser un mécanisme de résolution de conflits automatique.
-            \item Si cette distance dépasse une distance seuil, faire intervenir les utilisateur-rices par le biais d'un mécanisme de résolution de conflits manuel.
+            \item Si la distance calculée se trouve dans un intervalle de valeurs pour lequel nous disposons d'un mécanisme de résolution de conflits automatique satisfaisant, utiliser ce dernier.
+                Ainsi, nous pouvons envisager de reposer sur plusieurs mécanismes de résolution de conflits automatiques, de plus en plus complexes et pertinents mais coûteux, sans dégrader les performances du système dans le cas de base.
+            \item Si la distance calculée dépasse la distance seuil, \ie que nous ne disposons plus à ce stade de mécanismes de résolution de conflits automatiques satisfaisants, faire intervenir les utilisateur-rices par le biais d'un mécanisme de résolution de conflits manuel.
                 L'utilisation d'un mécanisme manuel n'exclut cependant pas tout pré-travail de notre part pour réduire la charge de travail des utilisateur-rices dans le processus de fusion.
         \end{enumerate}
         Dans un premier temps, cette approche pourra se focaliser sur un type d'application spécifique, \eg l'édition collaborative de texte.
+    \item Cette approche nous permettrait de répondre aux limites soulevées précédemment.
+        En effet, elle permettrait de limiter la génération d'anomalies par le mécanisme de résolution de conflits automatique en faisant intervenir les utilisateur-rices.
+        Puis, puisque nous déléguons aux utilisateur-rices l'intégration des modifications à partir d'une distance seuil, nous pouvons dès lors reconsidérer les métadonnées conservées par les noeuds pour les mécanismes de résolution de conflits automatiques.
+        Notamment, nous pouvons identifier les noeuds se trouvant au-delà de cette distance seuil d'après leur dernier contexte causal connu et ne plus les prendre en compte pour le calcul de la stabilité causal.
+        Cette approche permettrait donc de réduire le surcoût lié au contexte causal et limiter la perte de modifications, tout en prenant en considération l'ajout de travail aux utilisateur-rices.
     \item Pour mener à bien ce travail, il conviendra tout d'abord de définir la notion de distance entre versions de la donnée répliquée.
+        Nous envisageons de baser cette dernière sur les deux aspects temporel et spatial, \ie en utilisant la distance entre contextes causaux et la distance entre contenus.
         Dans le cadre de l'édition collaborative, nous pourrons pour cela nous baser sur les travaux existants pour évaluer la distance entre deux textes.
         \mnnote{TODO: Insérer refs distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al)}
     \item Il conviendra ensuite de déterminer comment établir la valeur seuil à partir de laquelle la distance entre textes est jugée trop importante.
         Les approches d'évaluation de la qualité du résultat pourront être utilisées pour déterminer un couple $\langle \text{méthode de calcul de la distance}, \text{valeur de distance} \rangle$ spécifiant les cas pour lesquels les méthodes de résolution de conflits automatiques ne produisent plus un résultat satisfaisant.
         \mnnote{TODO: Insérer refs travaux Claudia et Vinh}
         Le couple obtenu pourra ensuite être confirmé par le biais d'expériences utilisateurs inspirées de \cite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
-    \item Finalement, il conviendra de proposer un mécanisme de résolution de conflits adapté pour gérer les éventuelles fusions manuelles concurrentes, ou à défaut un mécanisme de conscience de groupe invitant les utilisateur-rices à effectuer des actions de compensation.
-    \item Le gain attendu de cette approche est la progression de la stabilité causale et la troncature d'une partie du contexte causal déterminée comme étant au-delà de la valeur seuil de distance, \eg en retirant des entrées du vecteur de version correspondant à des noeuds inactifs ou les premières modifications du \ac{DAG} des modifications.
+    \item Finalement, il conviendra de proposer un mécanisme de résolution de conflits adapté pour gérer les éventuelles fusions d'une même modification de façon concurrente par un mécanisme automatique et par un mécanisme manuel, ou à défaut un mécanisme de conscience de groupe invitant les utilisateur-rices à effectuer des actions de compensation.
 \end{itemize}

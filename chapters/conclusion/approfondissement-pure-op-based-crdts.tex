@@ -22,7 +22,7 @@
         Il en résulte que des opérations peuvent être mises en attente par la couche livraison, \eg suite à la perte d'une de leurs dépendances d'après la relation \hb, alors que leurs dépendances réelles ont déjà été livrées et que les opérations sont de fait intégrables en l'état.
         Plusieurs travaux \cite{2020-flec-bauwens,2021-improving-reactivity-pure-op-based-crdts-bauwens} ont noté ce problème.
         Pour y répondre et ainsi améliorer la réactivité du framework Pure Op-based, ils proposent d'exposer les opérations mises en attente par la couche livraison au \ac{CRDT}.
-        Bien que fonctionnelle, cette approche induit toujours le coût d'une couche de livraison respectant le modèle de livraison causale et nous fait considérer la raison de ce coût, le modèle de livraison n'étant alors plus respecté.
+        Bien que fonctionnelle, cette approche induit toujours le coût d'une couche de livraison respectant le modèle de livraison causale et nous fait considérer la raison de ce coût, le modèle de livraison n'étant dès lors plus respecté.
     \item Ensuite, ce framework impose que la modification \textbf{prepare} ne puisse pas inspecter l'état courant du noeud.
         Cette contrainte est compatible avec les \acp{CRDT} pour les types de données simples qui sont considérés dans \cite{baquero2017pure}, \eg le Compteur ou l'Ensemble.
         Elle empêche cependant l'expression de \acp{CRDT} pour des types de données plus complexes, \eg la Séquence ou le Graphe.
