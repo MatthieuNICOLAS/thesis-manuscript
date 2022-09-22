@@ -1,40 +1,37 @@
 \begin{itemize}
-    \item La spécification récente des Delta-based CRDTs .
-      Ce nouveau type de CRDTs se base sur celui des State-based CRDTs.
-      Partage donc les mêmes pré-requis :
-      \begin{itemize}
-        \item États du type de données répliqué forment un sup-demi-treillis
-        \item Modifications locales entraînent une inflation de l'état
-        \item Possède une fonction de \texttt{merge}, permettant de fusionner deux états S et S', et qui
-        \begin{itemize}
-          \item Est associative, commutative et idempotente
-          \item Retourne S", la \ac{LUB} de S et S' (\ie $\nexists S''' \cdot merge(S, S') < S''' < S''$)
-        \end{itemize}
-      \end{itemize}
-      Et bénéficie de son principal avantage : synchronisation possible entre deux pairs en fusionnant leur états, peu importe le nombre de modifications les séparant.
-    \item Spécificité des Delta-based CRDTs est de proposer une synchronisation par différence d'états.
-      Plutôt que de diffuser l'entièreté de l'état pour permettre aux autres pairs de se mettre à jour, idée est de seulement transmettre la partie de l'état ayant été mise à jour.
-      Correspond à un élément irréductible du sup-demi-treillis.
-      Permet ainsi de mettre en place une synchronisation en temps réel de manière efficace.
-      Et d'utiliser la synchronisation par fusion d'états complets pour compenser les défaillances du réseau
-    \item Ainsi, ce nouveau type de CRDTs semble allier le meilleur des deux mondes :
-      \begin{itemize}
-        \item Absence de contrainte sur le réseau autre que la livraison à terme
-        \item Propagation possible en temps réel des modifications
-      \end{itemize}
-      Semble donc être une solution universelle :
-      \begin{itemize}
-        \item Utilisable peu importe la fiabilité réseau à disposition
-        \item Empreinte réseau du même ordre de grandeur qu'un Op-based CRDT
-        \item Utilisable peu importe la fréquence de synchronisation désirée
-      \end{itemize}
-      Pose la question de l'intérêt des autres types de CRDTs.
-    \item Delta-based CRDT est un State-based CRDT dont on a identifié les éléments irréductibles et qui utilise ces derniers pour la propagation des modifications plutôt que l'état complet.
-      Famille des State-based CRDTs semble donc rendue obsolète par celle des Delta-based CRDTs.
-      À confirmer.
-    \item Les Op-based CRDTs proposent une spécification différente du type répliqué de leur équivalent Delta-based, généralement plus simple.
-      À première vue, famille des Op-based CRDTs semble donc avoir la simplicité comme avantage par rapport à celle des Delta-based CRDTs.
-      S'agit d'un paramètre difficilement mesurable et auquel on peut objecter si on considère qu'un Op-based CRDT s'accompagne d'une couche livraison de messages, qui cache sa part de complexité.
-      Intéressant d'étudier si la spécification différente des Op-based CRDTs présente d'autres avantages par rapport aux Delta-based CRDTs : performances (temps d'intégration des modifications, délai de convergence...), fonctionnalités spécifiques (composition, undo...)
-    \item But serait de fournir des guidelines sur la famille de CRDT à adopter en fonction du cas d'utilisation.
-  \end{itemize}
+  \item Comme évoqué dans l'état de l'art \cf{sec:delta-crdts}, un nouveau modèle de synchronisation pour \ac{CRDT} fut proposé récemment \cite{almeida2015delta}.
+    Ce dernier propose une synchronisation des noeuds par le biais de différences d'états.
+  \item Pour rappel, ce nouveau modèle de synchronisation se base sur le modèle de synchronisation par états.
+    Il partage les mêmes pré-requis, à savoir la nécessité d'une fonction \texttt{merge} associative, commutative et idempotente.
+    Cette dernière doit permettre de la fusion toute paire d'états possible en calculant leur borne supérieure, \ie leur \ac{LUB}.
+  \item La spécificité de ce nouveau modèle de synchronisation est de calculer pour chaque modification la différence d'état correspondante.
+    Cette différence correspond à un élément irréductible du sup-demi-treillis du \ac{CRDT} \cite{enes2019}, \ie un état particulier de ce ddernier.
+    Cet élément irréductible peut donc être diffusé et intégré par les autres noeuds, toujours à l'aide de la fonction \texttt{merge}.
+  \item Ce modèle de synchronisation permet alors d'adopter une variété de stratégies de synchronisation, \eg diffusion des différences de manière atomique, fusion de plusieurs différences puis diffusion du résultat..., et donc de répondre à une grande variété de cas d'utilisation.
+  \item Dans notre comparaison des modèles de synchronisation \cf{def:synchro-synthese}, nous avons justifié que les \acp{CRDT} synchronisés par différences d'états peuvent être utilisés dans les mêmes contextes que les \acp{CRDT} synchronisés par états et que les \acp{CRDT} synchronisés par opérations.
+    Cette conclusion nous mène à reconsidérer l'intérêt des autres modèles de synchronisation de nos jours.
+  \item Par exemple, un \ac{CRDT} synchronisé par différences d'états correspond à un \ac{CRDT} synchronisé par états dont nous avons identifié les éléments irréductibles.
+    La différence entre ces deux modèles de synchronisation semble reposer seulement sur la possibilité d'utiliser ces éléments irréductibles pour propager les modifications, en place et lieu des états complets.
+    Nous conjecturons donc que le modèle de synchronisation par états est rendu obsolète par celui par différences d'états.
+    Il serait intéressant de confirmer cette supposition.
+  \item En revanche, l'utilisation du modèle de synchronisation par opérations conduit généralement à une spécification différente du \ac{CRDT}, les opérations permettant d'encoder plus librement les modifications.
+    Notamment, l'utilisation d'opérations peut mener à des algorithmes d'intégration des modifications différents que ceux de la fonction \texttt{merge}.
+    Il convient de comparer ces algorithmes pour déterminer si le modèle de synchronisation par opérations peut présenter un intérêt d'un point de vue surcoût.
+  \item Au-delà de ce premier aspect, il convient d'explorer d'autres pistes pouvant induire des avantages et inconvénients pour chacun de ces modèles de synchronisation.
+    À l'issue de cette thèse, nous identifions les pistes suivantes :
+    \begin{enumerate}
+      \item La composition de \acp{CRDT}, \ie la capacité de combiner et de mettre en relation plusieurs \acp{CRDT} au sein d'un même système, afin d'offrir des fonctionnalités plus complexes.
+        Par exemple, une composition de \acp{CRDT} peut se traduire par l'ajout de dépendances entre les modifications des différents \acp{CRDT} composés.
+        Le modèle de synchronisation par opérations nous apparaît plus adapté pour cette utilisation, de par le découplage qu'il induit entre les \acp{CRDT} et la couche de livraison de messages.
+      \item L'utilisation de \acp{CRDT} au sein de systèmes non-sûrs, \ie pouvant compter un ou plusieurs adversaires byzantins \cite{2019-byzantine-generals-problem-lamport}.
+        Dans de tels systèmes, les adversaires byzantins peuvent générer des modifications différentes mais qui sont perçues comme identiques par les mécanismes de résolution de conflits.
+        Cette attaque, nommée \emph{équivoque}, peut provoquer la divergence définitive des copies.
+        \cite{2018-prunable-authenticated-log-vic} propose une solution adaptée aux systèmes \ac{P2P} à large échelle.
+        Celle-ci se base notamment sur l'utilisation de journaux infalsifiables.
+        \mnnote{TODO: Ajouter refs}
+        Il convient alors d'étudier si l'utilisation de ces structures ne limite pas le potentiel du modèle de synchronisation par différences d'états, \eg en interdisant la diffusion des modifications par états complets.
+    \end{enumerate}
+  \item Un premier objectif de notre travail serait de proposer des directives sur le modèle de synchronisation à privilégier en fonction du contexte d'utilisation du \ac{CRDT}.
+  \item Ce travail permettrait aussi d'étudier la combinaison des modèles de synchronisation par opérations et par différences d'états au sein d'un même \ac{CRDT}.
+    Le but serait notamment d'identifier les paramètres conduisant à privilégier un modèle de synchronisation par rapport à l'autre, de façon à permettre aux noeuds de basculer dynamiquement entre les deux.
+\end{itemize}

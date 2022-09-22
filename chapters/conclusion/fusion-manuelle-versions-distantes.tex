@@ -56,17 +56,17 @@
             \item Si la distance calculée dépasse la distance seuil, \ie que nous ne disposons plus à ce stade de mécanismes de résolution de conflits automatiques satisfaisants, faire intervenir les utilisateur-rices par le biais d'un mécanisme de résolution de conflits manuel.
                 L'utilisation d'un mécanisme manuel n'exclut cependant pas tout pré-travail de notre part pour réduire la charge de travail des utilisateur-rices dans le processus de fusion.
         \end{enumerate}
-        Dans un premier temps, cette approche pourra se focaliser sur un type d'application spécifique, \eg l'édition collaborative de texte.
+        Dans un premier temps, cette approche pourrait se focaliser sur un type d'application spécifique, \eg l'édition collaborative de texte.
     \item Cette approche nous permettrait de répondre aux limites soulevées précédemment.
         En effet, elle permettrait de limiter la génération d'anomalies par le mécanisme de résolution de conflits automatique en faisant intervenir les utilisateur-rices.
         Puis, puisque nous déléguons aux utilisateur-rices l'intégration des modifications à partir d'une distance seuil, nous pouvons dès lors reconsidérer les métadonnées conservées par les noeuds pour les mécanismes de résolution de conflits automatiques.
-        Notamment, nous pouvons identifier les noeuds se trouvant au-delà de cette distance seuil d'après leur dernier contexte causal connu et ne plus les prendre en compte pour le calcul de la stabilité causal.
+        Notamment, nous pouvons identifier les noeuds se trouvant au-delà de cette distance seuil d'après leur dernier contexte causal connu et ne plus les prendre en compte pour le calcul de la stabilité causale.
         Cette approche permettrait donc de réduire le surcoût lié au contexte causal et limiter la perte de modifications, tout en prenant en considération l'ajout de travail aux utilisateur-rices.
     \item Pour mener à bien ce travail, il conviendra tout d'abord de définir la notion de distance entre versions de la donnée répliquée.
         Nous envisageons de baser cette dernière sur les deux aspects temporel et spatial, \ie en utilisant la distance entre contextes causaux et la distance entre contenus.
         Dans le cadre de l'édition collaborative, nous pourrons pour cela nous baser sur les travaux existants pour évaluer la distance entre deux textes.
         \mnnote{TODO: Insérer refs distance de Hamming, Levenstein, String-to-string correction problem (Tichy et al)}
-    \item Il conviendra ensuite de déterminer comment établir la valeur seuil à partir de laquelle la distance entre textes est jugée trop importante.
+    \item Il conviendra ensuite de déterminer comment établir la valeur seuil à partir de laquelle la distance entre versions est jugée trop importante.
         Les approches d'évaluation de la qualité du résultat pourront être utilisées pour déterminer un couple $\langle \text{méthode de calcul de la distance}, \text{valeur de distance} \rangle$ spécifiant les cas pour lesquels les méthodes de résolution de conflits automatiques ne produisent plus un résultat satisfaisant.
         \mnnote{TODO: Insérer refs travaux Claudia et Vinh}
         Le couple obtenu pourra ensuite être confirmé par le biais d'expériences utilisateurs inspirées de \cite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
