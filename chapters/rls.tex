@@ -1963,6 +1963,8 @@ Des travaux supplémentaires pour prouver formellement sa correction doivent êt
 
 \subsubsection{Consommation mémoire}
 
+\label{sec:evaluation-metadata}
+
 Nous avons ensuite procédé à l'évaluation de l'évolution de la consommation mémoire du document au cours des simulations, en fonction du \ac{CRDT} utilisé et du nombre de \emph{renaming bots}.
 Nous présentons les résultats obtenus dans la \autoref{fig:evolution-document-size}.
 
@@ -2040,6 +2042,8 @@ Il ne concerne pas la majorité des opérations, \ie les opérations générées
 Ces opérations, elles, ne souffrent d'aucun surcoût tout en bénéficiant des réductions de taille de l'état.
 
 \subsubsection{Temps d'intégration de l'opération de renommage}
+
+\label{sec:integration-time-rename}
 
 Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations émises précédemment, \ie en fonction de la taille de l'état.
 Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.

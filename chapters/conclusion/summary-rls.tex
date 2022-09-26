@@ -1,0 +1,51 @@
+\begin{itemize}
+    \item Pour améliorer leur disponibilité, latence et tolérance aux pannes, les systèmes distribués adoptent de plus en plus le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito}.
+        Ce paradigme consiste à relaxer la cohérence de données entre les noeuds du système pour leur permettre de consulter et modifier leur copie locale sans se coordonner.
+        Leur copies peuvent alors temporairement diverger avant de converger de nouveau une fois les modifications de chacun propagées.
+        Cependant, cette approche nécessite l'emploi d'un mécanisme de résolution pour assurer la convergence même en cas de modifications concurrentes.
+        Pour cela, l'approche des \acp{CRDT} \cite{2007-crdt-shapiro,shapiro_2011_crdt} propose d'utiliser des types de données dont les modifications sont nativement commutatives.
+    \item Depuis la spécification des \acp{CRDT}, la littérature a proposé plusieurs de ces mécanismes résolution de conflits automatiques pour le type de données Séquence \cite{2006-woot-oster,ROH2011354,2009-treedoc-preguica,2009-logoot-weiss}.
+        Cependant, ces approches souffrent toutes d'un surcoût croissant de manière monotone.
+        Ce problème a été identifié par la communauté, et celle-ci a proposé pour y répondre des mécanismes permettant soit de réduire la croissance du surcoût \cite{lseq2013,lseq2017}, soit d'effectuer une \ac{GC} du surcoût \cite{ROH2011354,letia:hal-01248270,zawirski:hal-01248197}.
+        Nous avons cependant déterminé que ces mécanismes ne sont pas adaptés aux systèmes \ac{P2P} à large échelle souffrant de churn et utilisant des \acp{CRDT} pour Séquence à granularité variable.
+    \item Dans le cadre de cette thèse, nous avons donc souhaité proposer un nouveau mécanisme adapté à ce type de systèmes.
+        Pour cela, nous avons suivi l'approche proposée par \cite{letia:hal-01248270,zawirski:hal-01248197} : l'utilisation d'un mécanisme pour ré-assigner de nouveaux identifiants aux élements stockées dans la séquence.
+        Nous avons donc proposé un nouveau mécanisme appartenant à cette approche pour le \ac{CRDT} LogootSplit.
+    \item Notre proposition prend la forme d'un nouvel \ac{CRDT} pour Séquence à granularité variable : RenamableLogootSplit.
+        Ce nouveau \ac{CRDT} associe à LogootSplit un nouveau type de modification, $\trm{ren}$, permettant de produire une nouvelle séquence équivalente à son état précédent.
+        Cette nouvelle modification tire profit de la granularité variable de la séquence pour produire un état de taille minimale : elle assigne à tous les éléments des identifiants de position issus d'un même intervalle.
+        Ceci nous permet de minimiser les métadonnées que la séquence doit stocker de manière effective.
+        De plus, le passage à une représentation interne minimale de la séquence nous permet d'améliorer en terme de calculs le coûts des modifications suivantes.
+    \item Afin de gérer les opérations concurrentes aux opérations $\trm{ren}$, nous définissons pour ces dernières un algorithme de transformation.
+        Pour cela, nous définissons un mécanisme d'époques nous permettant d'identifier la concurrence entre opérations.
+        De plus, nous introduisons une relation d'ordre strict total, \emph{priority}, pour résoudre de manière déterministe le conflit provoqué par deux opérations $\trm{ren}$, \ie pour déterminer quelle opération $\trm{ren}$ privilégier.
+        Finalement, nous définissons deux algorithmes, \texttt{renameId} et \texttt{revertRenameId}, qui permettent de transformer les opérations concurrentes à une opération $\trm{ren}$ pour prendre en compte l'effet de cette dernière.
+        Ainsi, notre algorithme permet de détecter et de transformer les opérations concurrentes aux opérations $\trm{ren}$, sans nécessiter une coordination synchrone entre les noeuds.
+        Le surcoût induit par ce mécanisme, notamment en termes de calculs, est toutefois contrebalancé par l'amélioration précisée précédemment, \ie la réduction de la taille de la séquence.
+    \item Finalement, le mécanisme que nous proposons est partiellement générique : il peut être adapté à d'autres \acp{CRDT} pour Séquence à granularité variable, \eg un \ac{CRDT} pour Séquence appartenant à l'approche à pierres tombales.
+        Dans le cadre d'une telle démarche, nous pourrions réutiliser le système d'époques, la relation \emph{priority} et l'algorithme de contrôle qui identifie les transformations à effectuer.
+        Pour compléter une telle adaptation, nous devrions cependant concevoir de nouveaux algorithmes \texttt{renameId} et \texttt{revertRenameId} spécifiques et adaptés au \ac{CRDT} choisi.
+    \item Le mécanisme de renommage que nous présentons souffre néanmoins de plusieurs limites.
+        La première d'entre elles concerne ses performances.
+        En effet, notre évaluation expérimentale a mis en lumière le coût important en l'état de la modification $\trm{ren}$ par rapport aux autres modifications en termes de calculs \cf{sec:integration-time-rename}.
+        De plus, chaque opération $\trm{ren}$ comporte une représentation de l'ancien état qui doit être maintenue par les noeuds jusqu'à leur stabilité causale.
+        Le surcoût en métadonnées introduit par un ensemble d'opérations $\trm{ren}$ concurrentes peut donc s'avérer important, voire pénalisant \cf{sec:evaluation-metadata}.
+        Pour répondre à ces problèmes, nous identifions trois axes d'amélioration :
+        \begin{enumerate}
+            \item La définition de stratégies de déclenchement du renommage efficaces.
+                Le but de ces stratégies serait de déclencher le mécanisme de renommage de manière fréquente, de façon à garder son temps d'exécution acceptable, mais tout visant à minimiser la probabilité que les noeuds produisent des opérations $\trm{ren}$ concurrentes, de façon à minimiser le surcoût en métadonnées.
+            \item La définition de relations \emph{priority} efficaces.
+                Nous développons ce point dans la \autoref{sec:alternative-priority}.
+            \item La proposition d'algorithmes de renommage efficaces.
+                Cette amélioration peut prendre la forme de nouveaux algorithmes pour \texttt{renameId} et \texttt{revertRenameId} offrant une meilleure complexité en temps.
+                Il peut aussi s'agir de la conception d'une nouvelle approche pour renommer l'état et gérer les modifications concurrentes, \eg un mécanisme de renommage basé sur le journal des opérations \cf{sec:log-based-rename-mechanism}.
+        \end{enumerate}
+    \item Une seconde limite de RenamableLogootSplit que nous identifions concerne son mécanisme de \ac{GC} des métadonnées introduites par le mécanisme de renommage.
+        En effet, pour fonctionner, ce dernier repose sur la stabilité causale des opérations $\trm{ren}$.
+        Pour rappel, la stabilité causale représente le contexte causal commun à l'ensemble des noeuds du système.
+        Pour le déterminer, chaque noeud doit récupérer le contexte causal de l'ensemble des noeuds du système.
+        Ainsi, l'utilisation de la stabilité causale comme pré-requis pour la \ac{GC} de métadonnées constitue une contrainte forte, voire prohibitive, dans les systèmes \ac{P2P} à large échelle sujet au churn.
+        En effet, un noeud du système déconnecté de manière définitive suffit pour empêcher la stabilité causale de progresser, son contexte causal étant alors indéterminé du point de vue des autres noeuds.
+        Il s'agit toutefois d'une limite récurrente des mécanismes de \ac{GC} distribués et asynchrones \cite{ROH2011354,baquero2017pure,2018-prunable-authenticated-log-vic}.
+        Nous présentons une piste de travail possible pour pallier ce problème dans la \autoref{sec:manual-merge}.
+\end{itemize}
