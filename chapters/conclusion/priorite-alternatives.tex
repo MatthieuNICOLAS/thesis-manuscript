@@ -1,41 +1,46 @@
 \label{sec:alternative-priority}
 
-\begin{itemize}
-    \item Dans \autoref{sec:priority}, nous avons spécifié la relation \emph{priority} \cf{def:priority-relation}.
-        Pour rappel, cette relation doit établir un ordre strict total sur les époques de RenamableLogootSplit.
-    \item Cette relation nous permet ainsi de comparer les époques introduites par des modifications $\trm{ren}$ concurrentes.
-        En l'utilisant, les noeuds peuvent ainsi déterminer vers quelle époque de l'ensemble des époques connues progresser.
-        Cette relation permet ainsi aux noeuds de converger à une époque commune à terme.
-    \item La convergence à terme à une époque commune présente plusieurs avantages :
-        \begin{enumerate}
-            \item Réduire la distance entre les époques courantes des noeuds, et ainsi minimiser le surcoût en calculs par opération du mécanisme de renommage.
-                En effet, il n'est pas nécessaire de transformer une opérations livrée avant de l'intégrer si celle-ci provient de la même époque que le noeud courant.
-            \item Définir un nouveau \ac{LCA}, permettant d'appliquer le mécanisme de \ac{GC} des anciens états pour minimiser le surcoût en métadonnées du mécanisme de renommage.
-        \end{enumerate}
-    \item Il existe plusieurs manières pour définir la relation \emph{priority} tout en satisfaisant les propriétés indiquées.
-        Dans le cadre de ce manuscrit, nous avons utilisé l'ordre lexicographique sur les chemins des époques dans l'\emph{arbre des époques} pour définir \emph{priority}.
-        Cette approche se démarque par :
-        \begin{enumerate}
-            \item Sa simplicité.
-            \item Son surcoût limité, \ie pas de métadonnées supplémentaires à stocker et diffuser, algorithme de comparaison simple.
-            \item Sa propriété arrangeante sur les déplacements des noeuds dans l'arbre des époques.
-                De manière plus précise, cette définition de \emph{priority} impose aux noeuds de se déplacer que vers l'enfant le plus à droite de l'arbre des époques.
-                Ceci empêche les noeuds de faire un aller-retour entre deux époques données.
-                Cette propriété permet de passer outre une contrainte concernant le couple de fonctions \texttt{renameId} et \texttt{revertRenameId} : leur reciprocité.
-        \end{enumerate}
-    \item Cette définition présente cependant plusieurs limites.
-        La limite que nous identifions est sa décorrélation avec le rapport coût vs. bénéfice de progresser vers l'époque cible désignée.
-        En effet, l'époque cible est désignée de manière arbitraire par rapport à sa position dans l'arbre des époques.
-        Il est possible que progresser vers cette époque détériore l'état de la séquence, \ie augmente la taille des identifiants et augmente le nombre de blocs.
-        En outre, c'est sans compter le coût en calculs induits par la transition de l'ensemble des noeuds de leur époque courante respective à cette nouvelle époque cible.
-    \item Exemple
-    \item Pour pallier ce problème, il est nécessaire de proposer une définition de \emph{priority} prenant l'aspect efficacité en compte.
-        L'approche considérée consisterait à inclure dans les opérations $\trm{ren}$ une ou plusieurs métriques qui représente le travail accumulé sur la branche courante de l'arbre des époques, \eg le nombre d'opérations intégrées, les noeuds actuellement sur cette branche...
-        L'ordre strict total entre les époques serait ainsi construit à partir de la comparaison entre les valeurs de ces métriques de leur opération $\trm{ren}$ respective.
-    \item Il conviendra d'adjoindre à cette nouvelle définition de \emph{priority} un nouveau couple de fonctions \texttt{renameId} et \texttt{revertRenameId} respectant la contrainte de réciprocité de ces fonctions.
-        Ou de mettre en place une autre implémentation du mécanisme de renommage ne nécessitant pas cette contrainte, tel que l'implémentation basée sur le journal des opérations \cf{sec:log-based-rename-mechanism}.
-    \item Il conviendra aussi d'étudier la possibilité de combiner l'utilisation de plusieurs relations \emph{priority} pour minimiser le surcoût global du mécanisme de renommage, \eg en fonction de la distance entre deux époques.
-    \item Il sera nécessaire de valider l'approche proposée par une évaluation comparative par rapport à l'approche actuelle.
-        Elle consistera à monitorer le coût du système pour observer si l'approche proposée permet de réduire les calculs de manière globale.
-        Plusieurs configurations de paramètres pourront aussi être utilisées pour déterminer l'impact respectif de chaque paramètre sur les résultats.
-\end{itemize}
+Dans la \autoref{sec:priority}, nous avons spécifié la relation \emph{priority} \cf{def:priority-relation}.
+Pour rappel, cette relation doit établir un ordre strict total sur les époques de notre mécanisme de renommage.
+
+Cette relation nous permet ainsi de résoudre le conflit provoqué par la génération de modifications $\trm{ren}$ concurrentes en les ordonnant.
+Grâce à cette relation relation d'ordre, les noeuds peuvent déterminer vers quelle époque de l'ensemble des époques connues progresser.
+Cette relation permet ainsi aux noeuds de converger à une époque commune à terme.
+
+La convergence à terme à une époque commune présente plusieurs avantages :
+\begin{enumerate}
+    \item Réduire la distance entre les époques courantes des noeuds, et ainsi minimiser le surcoût en calculs par opération du mécanisme de renommage.
+        En effet, il n'est pas nécessaire de transformer une opérations livrée avant de l'intégrer si celle-ci provient de la même époque que le noeud courant.
+    \item Définir un nouveau \ac{LCA} entre les époques courantes des noeuds.
+        Cela permet aux noeuds d'appliquer le mécanisme de \ac{GC} pour supprimer les époques devenues obsolètes et leur anciens états associés, pour ainsi minimiser le surcoût en métadonnées du mécanisme de renommage.
+\end{enumerate}
+
+Il existe plusieurs manières pour définir la relation \emph{priority} tout en satisfaisant les propriétés indiquées.
+Dans le cadre de ce manuscrit, nous avons utilisé l'ordre lexicographique sur les chemins des époques dans l'\emph{arbre des époques} pour définir \emph{priority}.
+Cette approche se démarque par :
+\begin{enumerate}
+    \item Sa simplicité.
+    \item Son surcoût limité, \ie cette approche n'introduit pas de métadonnées supplémentaires à stocker et diffuser, et l'algorithme de comparaison utilisé est simple.
+    \item Sa propriété arrangeante sur les déplacements des noeuds dans l'arbre des époques.
+        De manière plus précise, cette définition de \emph{priority} impose aux noeuds de se déplacer que vers l'enfant le plus à droite de l'arbre des époques.
+        Ceci empêche les noeuds de faire un aller-retour entre deux époques données.
+        Cette propriété permet de passer outre une contrainte concernant le couple de fonctions \texttt{renameId} et \texttt{revertRenameId} : leur reciprocité.
+\end{enumerate}
+
+Cette définition présente cependant plusieurs limites.
+La limite que nous identifions est sa décorrélation avec le coût et le bénéfice de progresser vers l'époque cible désignée.
+En effet, l'époque cible est désignée de manière arbitraire par rapport à sa position dans l'arbre des époques.
+Il est ainsi possible que progresser vers cette époque détériore l'état de la séquence, \ie augmente la taille des identifiants et augmente le nombre de blocs.
+De plus, la transition de l'ensemble des noeuds depuis leur époque courante respective vers cette nouvelle époque cible induit un coût en calculs, potentiellement important \cf{fig:worst-case-priority}.
+
+Pour pallier ce problème, il est nécessaire de proposer une définition de \emph{priority} prenant l'aspect efficacité en compte.
+L'approche considérée consisterait à inclure dans les opérations $\trm{ren}$ une ou plusieurs métriques qui représente le travail accumulé sur la branche courante de l'arbre des époques, \eg le nombre d'opérations intégrées, les noeuds actuellement sur cette branche...
+L'ordre strict total entre les époques serait ainsi construit à partir de la comparaison entre les valeurs de ces métriques de leur opération $\trm{ren}$ respective.
+
+Il conviendra d'adjoindre à cette nouvelle définition de \emph{priority} un nouveau couple de fonctions \texttt{renameId} et \texttt{revertRenameId} respectant la contrainte de réciprocité de ces fonctions, ou de mettre en place une autre implémentation du mécanisme de renommage ne nécessitant pas cette contrainte, telle qu'une implémentation basée sur le journal des opérations \cf{sec:log-based-rename-mechanism}.
+
+Il conviendra aussi d'étudier la possibilité de combiner l'utilisation de plusieurs relations \emph{priority} pour minimiser le surcoût global du mécanisme de renommage, \eg en fonction de la distance entre deux époques.
+
+Finalement, il sera nécessaire de valider l'approche proposée par une évaluation comparative par rapport à l'approche actuelle.
+Cette évaluation pourrait consister à monitorer le coût du système pour observer si l'approche proposée permet de réduire les calculs de manière globale.
+Plusieurs configurations de paramètres pourraient aussi être utilisées pour déterminer l'impact respectif de chaque paramètre sur les résultats.
