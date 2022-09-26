@@ -5,21 +5,21 @@
 Les systèmes collaboratifs temps réels permettent à plusieurs utilisateurs de réaliser une tâche de manière coopérative.
 Ils permettent aux utilisateurs de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateurs.
 L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
-L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit\cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
+L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
 
-Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT ont permis de populariser l'édition collaborative temps réel de texte\cite{gdocs, etherpad}.
+Plusieurs outils d'édition collaborative centralisés basés sur l'approche OT ont permis de populariser l'édition collaborative temps réel de texte \cite{gdocs, etherpad}.
 Ces approchent souffrent néanmoins de leur architecture centralisée.
-Notamment, ces solutions rencontrent des difficultés à passer à l'échelle\cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité\cite{prism-washington-post, prism-guardian}.
+Notamment, ces solutions rencontrent des difficultés à passer à l'échelle \cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité \cite{prism-washington-post, prism-guardian}.
 
-L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P}\cite{2011-evaluation-crdts-ahmed-nacer}.
-Ainsi, de nombreux travaux\cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
-De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares}\cite{localfirstsoftware2019, pushpin2020}.
+L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P} \cite{2011-evaluation-crdts-ahmed-nacer}.
+Ainsi, de nombreux travaux \cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
+De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
 Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
 
 \mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
 
 De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
-Elle développe \acf{MUTE}\cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+Elle développe \acf{MUTE} \cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
 \ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
 Nous avons donc intégré dans \ac{MUTE} les travaux de cette thèse.
 
@@ -90,7 +90,7 @@ Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à 
 
 En plus du texte, MUTE maintient un ensemble de métadonnées par document.
 Par exemple, les utilisateurs peuvent donner un titre au document.
-Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Wins Register \ac{CRDT} synchronisé par opérations\cite{shapiro_2011_crdt} au document.
+Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Wins Register \ac{CRDT} synchronisé par opérations \cite{shapiro_2011_crdt} au document.
 De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par opérations pour représenter la date de création du document.
 
 \subsection{Module de livraison des opérations}
@@ -104,7 +104,7 @@ Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentée
 \label{sec:mute-exactly-once-delivery}
 
 Afin de respecter la contrainte de \emph{exactly-once delivery}, il est nécessaire d'identifier de manière unique chaque opération.
-Pour cela, le module \texttt{Sync} ajoute un \emph{Dot}\cite{2014-scalable-accurate-causality-tracking} à chaque opération :
+Pour cela, le module \texttt{Sync} ajoute un \emph{Dot} \cite{2014-scalable-accurate-causality-tracking} à chaque opération :
 
 \begin{definition}[Dot]
   Un \emph{Dot} est une paire $\langle$nodeId, nodeSyncSeq$\rangle$ où
@@ -114,7 +114,7 @@ Pour cela, le module \texttt{Sync} ajoute un \emph{Dot}\cite{2014-scalable-accur
   \end{itemize}
 \end{definition}
 
-Il est à noter que \emph{nodeSyncSeq} est différent du \emph{nodeSeq} utilisé dans LogootSplit et RenamableLogootSplit (cf. \autoref{def:logootsplit}).
+Il est à noter que \emph{nodeSyncSeq} est différent du \emph{nodeSeq} utilisé dans LogootSplit et RenamableLogootSplit \cf{def:logootsplit}.
 En effet, \emph{nodeSyncSeq} se doit d'augmenter à chaque opération tandis que \emph{nodeSeq} n'augmente qu'à la création d'un nouveau bloc.
 Les contraintes étant différentes, il est nécessaire de distinguer ces deux données.
 
@@ -720,7 +720,7 @@ MUTE présente cependant plusieurs contraintes liées à notre modèle du systè
 Tout d'abord, le protocole doit être compatible avec un environnement \ac{P2P}, où les noeuds partagent les mêmes droits et responsabilités.
 De plus, le protocole doit présenter une capacité de passage à l'échelle pour être adapté aux collaborations à large échelle.
 
-En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM\cite{swim2002}.
+En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM \cite{swim2002}.
 Proposé par \citeauthor{swim2002}, ce protocole d'appartenance au réseau offre les propriétés intéressantes suivantes.
 Tout d'abord, le nombre de messages diffusés sur le réseau est proportionnel de façon linéaire au nombre de pairs.
 Pour être plus précis, le nombre de messages envoyés par un pair par période du protocole est constant.
@@ -903,7 +903,7 @@ Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par diff
 
 \subsubsection{Synthèse}
 
-Pour générer et maintenir la liste des collaborateurs, nous avons implémenté le protocole distribué d'appartenance au réseau SWIM\cite{swim2002}.
+Pour générer et maintenir la liste des collaborateurs, nous avons implémenté le protocole distribué d'appartenance au réseau SWIM \cite{swim2002}.
 Par rapport à la version originale, nous avons procédé à plusieurs modifications, notamment pour gérer plus efficacement les reconnexions successives d'un même noeud.
 
 Ainsi, nous avons implémenté un mécanisme dont la complexité spatiale dépend linéairement du nombre de noeuds.
@@ -1039,11 +1039,11 @@ La couche sécurité a pour but de garantir l'authenticité et la confidentialit
 Pour cela, elle implémente un mécanisme de chiffrement de bout en bout.
 
 Pour chiffrer les messages, MUTE utilise un mécanisme de chiffrement à base de clé de groupe.
-Le protocole choisi est le protocole Burmester-Desmedt\cite{1995-burmester-desmedt}.
+Le protocole choisi est le protocole Burmester-Desmedt \cite{1995-burmester-desmedt}.
 Il nécessite que chaque noeud possède une paire de clés de chiffrement et enregistre sa clé publique auprès d'un PKI\footnote{\acf{PKI} : Infrastructure de gestion de clés}.
 
 Afin d'éviter qu'un \ac{PKI} malicieux n'effectue une attaque de l'homme au milieu sur la collaboration, les noeuds doivent vérifier le bon comportement des PKI de manière non-coordonnée.
-À cet effet, MUTE implémente le mécanisme d'audit de PKI Trusternity\cite{2018-trusternity-short, 2018-trusternity-long}.
+À cet effet, MUTE implémente le mécanisme d'audit de PKI Trusternity \cite{2018-trusternity-short, 2018-trusternity-long}.
 Son fonctionnement nécessite l'utilisation d'un registre publique sécurisé \emph{append-only}, \ie une blockchain.
 
 L'architecture système nécessaire pour la couche sécurité est présentée dans la \autoref{fig:architecture-systeme-trusternity}.
