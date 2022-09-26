@@ -1,42 +1,46 @@
-\begin{itemize}
-    \item Les applications collaboratives permettent à des utilisateur-rices de réaliser collaborativement une tâche.
-        Elles permettent à plusieurs utilisateur-rices de consulter la version actuelle du document, de la modifier et de partager leurs modifications avec les autres.
-        Ceci permet de mettre en place une réflexion de groupe, ce qui améliore la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing,2005-internet-encyclopaedias-head-to-head}.
-    \item Cependant, les applications collaboratives sont historiquement des applications centralisées, \eg Google Docs \cite{gdocs}.
-        Ce type d'architecture induit des défauts d'un point de vue technique, \eg faible capacité de passage à l'échelle et faible tolérance aux pannes, mais aussi d'un point de vue utilisateur, \eg perte de la souveraineté des données et absence de garantie de pérennité.
-    \item Les travaux de l'équipe Coast s'inscrivent dans une mouvance souhaitant résoudre ces problèmes et qui a conduit à la définition d'un nouveau paradigme d'applications : les \acp{LFS} \cite{localfirstsoftware2019}.
-        Le but de ce paradigme est la conception d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateur-rices.
-    \item Dans le cadre de cette démarche, l'équipe Coast développe depuis plusieurs années l'application \acf{MUTE}, un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-        Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \ac{POC} pour les \acp{LFS}.
-    \item Dans le cadre de cette thèse, nous avons implémenté dans \ac{MUTE} nos travaux de recherche portant sur le nouvel \ac{CRDT} pour le type Séquence : RenamableLogootSplit.
-        \ac{MUTE} a aussi servi à l'équipe pour présenter ses travaux concernant l'authentification des utilisateur-rices dans un système \ac{P2P} \cite{2018-trusternity-long}.
-        Finalement, \ac{MUTE} nous a permis de nous d'étudier et/ou de présenter les travaux de recherche existants concernant :
-        \begin{enumerate}
-            \item Les protocoles distribués d'appartenance au groupe \cite{swim2002}.
-            \item Les mécanismes d'anti-entropie \cite{1983-anti-entropy-vv}.
-            \item Les protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
-            \item Les protocoles d'établissement de topologies réseaux efficientes \cite{2018-spray-nedelec}.
-            \item Les mécanismes de conscience de groupe.
-        \end{enumerate}
-    \item \ac{MUTE} offre donc, à notre connaissance, le tour d'horizon le plus complet des travaux de recherche permettant la conception d'applications \acp{LFS}.
-        Cependant, cela ne dispense pas \ac{MUTE} de souffrir de plusieurs limites.
-    \item Tout d'abord, l'environnement web implique un certain nombre de contraintes, notamment au niveau des technologies et protocoles disponibles.
-        Notamment, le protocole WebRTC repose sur l'utilisation de serveurs de signalisation, \ie de points de rendez-vous des pairs, et de serveurs de relai, \ie d'intermédiaires pour communiquer entre pairs lorsque les configurations de leur réseaux respectifs interdisent l'établissement d'une connection directe.
-        Ainsi, les applications \ac{P2P} web doivent soit déployer et maintenir leur propre infrastructure de serveurs, soit reposer sur une infrastructure existante, \eg celle proposée par OpenRelay.
-        \mnnote{TODO: Ajouter ref https://openrelay.xyz}
-        Afin de minimiser l'effort requis aux applications \ac{P2P} et la confiance exigée à leurs utilisateur-rices, nous devons supporter la mise en place d'une telle infrastructure transparente et pérenne.
-    \item Une autre limite de ce système que nous identifions concerne l'utilisabilité des systèmes \ac{P2P} de manière générale.
-        L'expérience vécue suivante constitue à notre avis un exemple éloquent des limites actuelles de l'application \ac{MUTE} dans ce domaine.
-        Après avoir rédigé une version initiale d'un document, nous avons envoyé le lien du document à notre collaborateur pour relecture et validation.
-        Lorsque notre collaborateur a souhaité accéder au document, celui-ci s'est retrouvé devant une page blanche : comme nous nous étions déconnecté du système entretemps, \ie plus aucun pair n'était disponible pour effectuer une synchronisation.
-        Notre collaborateur était donc dans l'incapacité de récupérer l'état et d'effectuer sa tâche.
-        Afin de pallier ce problème, une solution possible est de faire reposer \ac{MUTE} sur un réseau \ac{P2P} global, \eg \ac{IPFS} , et d'utiliser les pairs de ce dernier, potentiellement des pairs étrangers à l'application, comme pairs de stockage pour permettre une synchronisation future.
-        Cette solution limite ainsi le risque qu'un pair ne puisse récupérer l'état du document faute de pairs disponibles.
-        Cependant, elle nécessite de mettre en place un mécanisme de réplication de données additionnel.
-        Ce mécanisme de réplication sur des pairs additionnels doit cependant garantir qu'il n'introduit pas de vulnérabilités, \eg la possibilité pour les pairs de stockage selectionnés de reconstruire et consulter le document.
-    % \item Finalement, une dernière limite que nous identifions est la pérennité économique de ce type d'applications.
-    %     Selon nous, les systèmes \ac{P2P} chiffrés de bout en bout s'interdisent les modèles économiques dominants et acceptés par les organisations et utilisateur-rices, \ie la collecte et revente de données.
-    %     En effet,
-    %     , de par les propriétés qu'ils assurent, notamment la confidentialité des données .
-    %     \mnnote{TODO: Voir si on a des données sur les entreprises/organisations encourageant le chiffrement de bout-en-bout dans leurs outils internes, }
-\end{itemize}
+Les applications collaboratives permettent à des utilisateur-rices de réaliser collaborativement une tâche.
+Elles permettent à plusieurs utilisateur-rices de consulter la version actuelle du document, de la modifier et de partager leurs modifications avec les autres.
+Ceci permet de mettre en place une réflexion de groupe, ce qui améliore la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing,2005-internet-encyclopaedias-head-to-head}.
+
+Cependant, les applications collaboratives sont historiquement des applications centralisées, \eg Google Docs \cite{gdocs}.
+Ce type d'architecture induit des défauts d'un point de vue technique, \eg faible capacité de passage à l'échelle et faible tolérance aux pannes, mais aussi d'un point de vue utilisateur, \eg perte de la souveraineté des données et absence de garantie de pérennité.
+
+Les travaux de l'équipe Coast s'inscrivent dans une mouvance souhaitant résoudre ces problèmes et qui a conduit à la définition d'un nouveau paradigme d'applications : les \acp{LFS} \cite{localfirstsoftware2019}.
+Le but de ce paradigme est la conception d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateur-rices.
+
+Dans le cadre de cette démarche, l'équipe Coast développe depuis plusieurs années l'application \acf{MUTE}, un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \ac{PoC} pour les \acp{LFS}.
+
+Dans le cadre de cette thèse, nous avons implémenté dans \ac{MUTE} nos travaux de recherche portant sur le nouvel \ac{CRDT} pour le type Séquence : RenamableLogootSplit.
+\ac{MUTE} a aussi servi à l'équipe pour présenter ses travaux concernant l'authentification des utilisateur-rices dans un système \ac{P2P} \cite{2018-trusternity-long}.
+Finalement, \ac{MUTE} nous a permis de nous d'étudier et/ou de présenter les travaux de recherche existants concernant :
+\begin{enumerate}
+    \item Les protocoles distribués d'appartenance au groupe \cite{swim2002}.
+    \item Les mécanismes d'anti-entropie \cite{1983-anti-entropy-vv}.
+    \item Les protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
+    \item Les protocoles d'établissement de topologies réseaux efficientes \cite{2018-spray-nedelec}.
+    \item Les mécanismes de conscience de groupe.
+\end{enumerate}
+
+\ac{MUTE} offre donc, à notre connaissance, le tour d'horizon le plus complet des travaux de recherche permettant la conception d'applications \acp{LFS}.
+Cependant, cela ne dispense pas \ac{MUTE} de souffrir de plusieurs limites.
+
+Tout d'abord, l'environnement web implique un certain nombre de contraintes, notamment au niveau des technologies et protocoles disponibles.
+Notamment, le protocole WebRTC repose sur l'utilisation de serveurs de signalisation, \ie de points de rendez-vous des pairs, et de serveurs de relai, \ie d'intermédiaires pour communiquer entre pairs lorsque les configurations de leur réseaux respectifs interdisent l'établissement d'une connection directe.
+Ainsi, les applications \ac{P2P} web doivent soit déployer et maintenir leur propre infrastructure de serveurs, soit reposer sur une infrastructure existante, \eg celle proposée par OpenRelay \cite{openrelay}.
+Afin de minimiser l'effort requis aux applications \ac{P2P} et la confiance exigée à leurs utilisateur-rices, nous devons supporter la mise en place d'une telle infrastructure transparente et pérenne.
+
+Une autre limite de ce système que nous identifions concerne l'utilisabilité des systèmes \ac{P2P} de manière générale.
+L'expérience vécue suivante constitue à notre avis un exemple éloquent des limites actuelles de l'application \ac{MUTE} dans ce domaine.
+Après avoir rédigé une version initiale d'un document, nous avons envoyé le lien du document à notre collaborateur pour relecture et validation.
+Lorsque notre collaborateur a souhaité accéder au document, celui-ci s'est retrouvé devant une page blanche : comme nous nous étions déconnecté du système entretemps, \ie plus aucun pair n'était disponible pour effectuer une synchronisation.
+Notre collaborateur était donc dans l'incapacité de récupérer l'état et d'effectuer sa tâche.
+Afin de pallier ce problème, une solution possible est de faire reposer \ac{MUTE} sur un réseau \ac{P2P} global, \eg le réseau de \ac{IPFS} \cite{ipfs}, et d'utiliser les pairs de ce dernier, potentiellement des pairs étrangers à l'application, comme pairs de stockage pour permettre une synchronisation future.
+Cette solution limite ainsi le risque qu'un pair ne puisse récupérer l'état du document faute de pairs disponibles.
+Cependant, elle nécessite de mettre en place un mécanisme de réplication de données additionnel.
+Ce mécanisme de réplication sur des pairs additionnels doit cependant garantir qu'il n'introduit pas de vulnérabilités, \eg la possibilité pour les pairs de stockage selectionnés de reconstruire et consulter le document.
+% \item Finalement, une dernière limite que nous identifions est la pérennité économique de ce type d'applications.
+%     Selon nous, les systèmes \ac{P2P} chiffrés de bout en bout s'interdisent les modèles économiques dominants et acceptés par les organisations et utilisateur-rices, \ie la collecte et revente de données.
+%     En effet,
+%     , de par les propriétés qu'ils assurent, notamment la confidentialité des données .
+%     \mnnote{TODO: Voir si on a des données sur les entreprises/organisations encourageant le chiffrement de bout-en-bout dans leurs outils internes, }
