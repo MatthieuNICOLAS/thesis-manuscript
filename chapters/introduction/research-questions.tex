@@ -1,49 +1,69 @@
-\subsection{Ré-identification sans coordination pour \acp{CRDT} pour Séquence}
+\subsection{Ré-identification sans coordination synchrone pour \acp{CRDT} pour le type Séquence}
 
 \begin{itemize}
-  \item Systèmes collaboratifs permettent aux utilisateur-rices de manipuler et éditer un contenu partagé.
-    Pour des raisons de performance, ces systèmes autorisent généralement les utilisateur-rices à effectuer des modifications sans coordination.
-    Leur copies divergent alors momentanément.
-    Un mécanisme de synchronisation leur permet ensuite de récupérer l'ensemble des modifications et de les intégrer, de façon à converger.
-    Cependant, des modifications peuvent être incompatibles entre elles, car de sémantiques contraires.
-    Un mécanisme de résolution de conflits est alors nécessaire.
-  \item Les \acp{CRDT} sont des types de données répliquées.
-    Ils sont conçus pour être répliqués par les noeuds d'un système et pour permettre à ces derniers de modifier les données partagées sans aucune coordination.
-    Dans ce but, ils incluent des mécanismes de résolution de conflits directement au sein leur spécification.
-    Ces mécanismes leur permettent de résoudre le problème évoqué précédemment.
-    Cependant, ces mécanimes induisent un surcoût, aussi bien d'un point de vue consommation mémoire et réseau que computationnel.
-    Notamment, certains \acp{CRDT} comme ceux pour la Séquence souffrent d'une croissance monotone de leur surcoût.
-    Ce surcoût s'avère handicapant dans le contexte des collaborations à large échelle.
-  \item Pouvons-nous proposer un mécanisme sans coordination de réduction du surcoût des \acp{CRDT} pour Séquence, \ie compatible avec les systèmes pair-à-pair ?
-  \item Dans le cadre des \acp{CRDT} pour Séquence, le surcoût du type de données répliquées provient de la croissance de leurs métadonnées.
-    Métadonnées proviennent des identifiants associés aux éléments de la Séquence par les \acp{CRDT}.
-    Ces identifiants sont nécessaires pour le bon fonctionnement de leur mécanisme de résolution de conflits.
-  \item Plusieurs approches ont été proposées pour réduire le coût de ces identifiants.
-    Notamment, \cite{letia:hal-01248270,zawirski:hal-01248197} proposent un mécanisme de ré-assignation d'identifiants de façon à réduire leur taille.
-    Mécanisme non commutatif avec les modifications concurrentes de la Séquence, \ie l'insertion ou la suppression.
-    Propose ainsi un mécanisme de transformation des modifications concurrentes pour gérer ces conflits.
-    Mais mécanisme de ré-assignation n'est pas non plus commutatif avec lui-même.
-    De fait, utilisent un algorithme de consensus pour empêcher l'exécution du mécanisme en concurrence.
-  \item Proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour Séquence.
-    Intègre un mécanisme de renommage directement au sein de sa spécification.
-    Intègre un mécanisme de résolution de conflits pour les renommages concurrents.
-    Permet ainsi l'utilisation du mécanisme de renommage par les noeuds sans coordination.
+    \item Les systèmes collaboratifs permettent à des utilisateur-rices de manipuler et d'éditer un contenu partagé.
+        Ces systèmes peuvent adopter le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito} pour favoriser leur disponibilité, latence et tolérance aux pannes.
+        Ce paradigme autorise les noeuds possédant une copie de la donnée partagée de la consulter et de la modifier sans se coordonner préalablement avec les autres noeuds.
+        Leur copies peuvent alors diverger momentanément.
+        Un mécanisme de synchronisation permet ensuite à chaque noeud de récupérer l'ensemble des modifications et de les intégrer de façon à converger, \ie obtenir de nouveau des états équivalents.
+        Cependant, le paradigme de la réplication optimiste permet la génération en concurrence de modifications provoquant un conflit, \eg l'ajout et la suppression d'un même élément dans un Ensemble.
+        Un mécanisme de résolution de conflits est alors nécessaire pour assurer la convergence à terme des noeuds \cite{10.1145/224057.224070}.
+    \item Les \acp{CRDT} \cite{2007-crdt-shapiro,shapiro_2011_crdt} sont des types de données répliqués.
+        Ils sont conçus pour être répliqués par les noeuds d'un système et pour permettre à ces derniers de modifier les données partagées sans aucune coordination.
+        Dans ce but, ils incluent des mécanismes de résolution de conflits automatiques directement au sein leur spécification.
+        Ces mécanismes leur permettent de résoudre le problème évoqué précédemment.
+        Cependant, ces mécanimes induisent un surcoût, aussi bien en termes de métadonnées, calculs et bande-passante.
+        Notamment, certains \acp{CRDT} comme ceux pour le type Séquence souffrent d'une croissance monotone de leur surcoût.
+        Ce surcoût s'avère handicapant dans le contexte des collaborations à large échelle.
+    \item Dans le contexte des \acp{CRDT} pour le type Séquence, le surcoût du type de données répliquées provient de la croissance des métadonnées.
+        Notamment, ces métadonnées correspondent à des identifiants associés aux éléments de la Séquence par les \acp{CRDT}.
+        Ces identifiants sont ensuite utilisées par leur mécanisme de résolution de conflits automatique pour .
+    \item Plusieurs approches ont été proposées pour réduire le coût induit par ces identifiants.
+        Notamment, \cite{letia:hal-01248270,zawirski:hal-01248197} proposent un mécanisme de ré-assignation des identifiants pour réduire leur taille.
+        Ce mécanisme provoque cependant des conflits avec les modifications concurrentes de la Séquence, \ie l'insertion ou la suppression.
+        Pour résoudre ces nouveaux conflits, les auteurs proposent un mécanisme de transformation des modifications concurrentes par rapport au mécanisme de ré-assignation.
+    \item Cependant, des exécutions concurrentes du mécanisme de ré-assignation des identifiants provoquent elles aussi des conflits.
+        Pour éviter ces dernier, les auteurs choisissent de subordonner l'exécution du mécanisme de ré-assignation à un protocole de consensus.
+        Ainsi, le mécanisme de ré-assignation ne peut être déclenché en concurrence par les noeuds du systèmes.
+    \item Cependant, reposer sur un protocole de consensus est une contrainte forte dans un système distribué.
+        Nous la jugeons même prohibitive pour les systèmes \ac{P2P} à large échelle sujets au churn.
+        Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie compatible avec les systèmes \ac{P2P} à large échelle sujets au churn ?}
+    \item Nous répondons à cette problématique en proposant RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
+        Ce \ac{CRDT} intègre un mécanisme de renommage directement au sein de sa spécification, ainsi qu'un mécanisme de résolution de conflits automatique pour résoudre le conflit provoqué par des déclenchements concurrents de ce dernier.
+        Ainsi, nous proposons un mécanisme de renommage permettant de réduire le surcoût du \ac{CRDT} pour Séquence et qui est utilisable par les noeuds sans aucune coordination synchrone entre eux.
 \end{itemize}
 
-\subsection{Éditeur de texte collaboratif pair-à-pair}
+\subsection{Éditeur de texte collaboratif \ac{P2P} temps réel chiffré de bout en bout}
 
 \begin{itemize}
-  \item Systèmes collaboratifs adoptent généralement architecture décentralisée.
-    Disposent d'autorités centrales qui facilitent la collaboration, l'authentification des utilisateur-rices, la communication et le stockage des données.
-  \item Mais ces systèmes introduisent une dépendance des utilisateur-rices envers ces mêmes autorités centrales, une perte de confidentialité et de souveraineté.
-  \item Pouvons-nous concevoir un éditeur de texte collaboratif sans autorités centrales, \ie un éditeur de texte collaboratif à large échelle pair-à-pair ?
-  \item Ce changement de modèle, d'une architecture décentralisée à une architecture pair-à-pair, introduit un ensemble de problématiques de domaines variés, \eg
-    \begin{enumerate}
-      \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
-      \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
-      \item Comment structurer le réseau de manière efficace, \ie en limitant le nombre de connexion par pair ?
-    \end{enumerate}
-  \item Présentons \ac{MUTE} \cite{MUTE2017}.
-    S'agit, à notre connaissance, du seul prototype complet d'éditeur de texte collaboratif temps réel pair-à-pair chiffré de bout en bout.
-    Allie ainsi les résultats issus des travaux de l'équipe sur les \acp{CRDT} pour Séquence \cite{2013-logootsplit,2021-these-vic} et l'authentification des pairs dans systèmes distribués \cite{2018-trusternity-short,2018-trusternity-long} aux résultats de la littérature sur mécanismes de conscience de groupe \mnnote{TODO: Trouver et ajouter références}, les protocoles d'appartenance aux groupe \cite{swim2002, lifeguard2018}, les réseaux pair-à-pair \cite{2018-spray-nedelec} et les protocoles d'établissement de clés de groupe \cite{1995-burmester-desmedt}.
+    \item Les systèmes collaboratifs permettent à plusieurs utilisateur-rices de collaborer pour la réalisation d'une tâche.
+        Les systèmes collaboratifs actuels adoptent principalement une architecture décentralisée, \ie un ensemble de serveurs avec lesquels les utilisateur-rices interagissent pour réaliser leur tâche, \eg Google Docs \cite{gdocs}.
+        Par rapport à une architecture centralisée, cette architecture leur permet d'améliorer leur disponibilité et tolérance aux pannes, notamment grâce aux méthodes de réplication de données.
+        Cette architecture à base de serveurs facilite aussi la collaboration, les serveurs permettant d'intégrer les modifications effectuées par les utilisateur-rices, de stocker les données, d'assurer la communication entre les utilisateur-rices ou encore de les authentifier.
+    \item De part le rôle qui leur incombe, ces serveurs jouent donc un rôle central dans ces systèmes.
+        Il en découle plusieurs problématiques :
+        \begin{enumerate}
+            \item Ces serveurs manipulent et hébergent les données faisant l'objet de collaborations.
+                Ces systèmes ont donc connaissance des données manipulées et de l'identité des auteur-rices de ces modifications.
+                Les systèmes collaboratifs décentralisés demandent donc à leurs utilisateur-rices d'abandonner la souveraineté et la confidentialité de leur travail.
+            \item Ces serveurs sont gérés par des autorités centrales, \eg Google.
+                Les systèmes collaboratifs devenant non-fonctionnels en cas d'arrêt des serveurs, les utilisateur-rices de ces systèmes dépendent alors de ces autorités centrales et de leurs intérêts.
+                Par exemple, les autorités centrales ayant le pouvoir de vie et de mort sur leurs systèmes collaboratifs, elles menacent la pérénnité de ces systèmes.
+        \end{enumerate}
+    \item Pour répondre à ces problématiques, \ie confidentialité et souveraineté des données, dépendance envers des tiers, pérénnité des systèmes, un nouveau paradigme d'applications proposent de concevoir des \acp{LFS}, \ie des applications mettant l'utilisateur-rice et son appareil au coeur du système.
+        Dans ce cadre d'applications, les serveurs sont relégués à un rôle de support à la collaboration.
+    \item Dans le cadre de cette mouvance, notre équipe de recherche étudie notamment la conception de systèmes \ac{P2P} sans autorités centrales.
+        Ce changement de modèle, d'une architecture décentralisée appartenant à des autorités centrales à une architecture \ac{P2P} sans autorités centrales, introduit un ensemble de problématiques de domaines variés, \eg
+        \begin{enumerate}
+            \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
+            \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
+            \item Comment structurer le réseau de manière efficace, \ie en limitant le nombre de connexion par pair ?
+        \end{enumerate}
+    \item Cet ensemble de questions peut être résumé en la problématique suivante : \emph{pouvons-nous concevoir une application collaborative \ac{P2P} à large échelle, sûre et sans autorités centrales ?}
+    \item Pour étudier cette problématique, l'équipe Coast développe \acf{MUTE} \cite{MUTE2017}.
+        Il s'agit d'un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+        Ce projet permet de présenter les travaux de recherche de l'équipe, \ie mécanismes de résolutions de conflits automatiques pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} et mécanisme d'authentification des pairs sans autorités centrales \cite{2018-trusternity-short,2018-trusternity-long}.
+        Il permet aussi d'offrir un tour d'horizon des nombreux travaux de recherche nécessaires à la conception de tels systèmes, \ie mécanismes de conscience de groupe \mnnote{TODO: Trouver et ajouter références}, protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} et protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
+        À notre connaissance, il s'agit du \acf{PoC} le plus complet d'applications \acp{LFS} \ac{P2P} sans autorités centrales.
+        \mnnote{TODO: Vérifier du côté des applis de IPFS}
 \end{itemize}
