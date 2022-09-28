@@ -17,7 +17,7 @@
         Ce surcoût s'avère handicapant dans le contexte des collaborations à large échelle.
     \item Dans le contexte des \acp{CRDT} pour le type Séquence, le surcoût du type de données répliquées provient de la croissance des métadonnées.
         Notamment, ces métadonnées correspondent à des identifiants associés aux éléments de la Séquence par les \acp{CRDT}.
-        Ces identifiants sont ensuite utilisées par leur mécanisme de résolution de conflits automatique pour .
+        Ces identifiants sont ensuite utilisées par leur mécanisme de résolution de conflits automatique, \eg pour référencer les élements ou pour ordonner les éléments les uns relativement aux autres.
     \item Plusieurs approches ont été proposées pour réduire le coût induit par ces identifiants.
         Notamment, \cite{letia:hal-01248270,zawirski:hal-01248197} proposent un mécanisme de ré-assignation des identifiants pour réduire leur taille.
         Ce mécanisme provoque cependant des conflits avec les modifications concurrentes de la Séquence, \ie l'insertion ou la suppression.

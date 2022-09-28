@@ -6,7 +6,7 @@
     \item Mais échoue à adresser problèmes non-techniques : confidentialité, souveraineté, protection contre censure, dépendance et nécessité de confiance envers autorité centrale.
     \item À l'heure où les entreprises derrière ces systèmes font preuve d'ingérence et d'intérêts contraires à ceux de leurs utilisateur-rices (Cambridge Analytica, Prism, non-modération/mise en avant de contenus racistes \footnote{\emph{Algorithms of Oppression}, Safiya Umoja Noble}\footnote{\url{https://www.researchgate.net/publication/342113147_The_YouTube_Algorithm_and_the_Alt-Right_Filter_Bubble}}\footnote{\url{https://www.wsj.com/articles/the-facebook-files-11631713039}}, invisibilisation de contenus féministes, dissolution du comité d'éthique de Google\footnote{\url{https://www.bbc.com/news/technology-56135817}}, inégalité d'accès à la méta-machine affectante\footnote{\emph{Je suis une fille sans histoire}, Alice Zeniter, p. 75}\footnote{Qui cite \emph{Les affects de la politique}, Frédéric Lordon}\footnote{\url{https://www.bbc.com/news/technology-59011271}}), parait fondamental de proposer les moyens technologiques accessibles pour concevoir et déployer des alternatives.
     \item \mnnote{TODO: Voir si angle écologique/réduction consommation d'énergie peut être pertinent.}
-    \item Systèmes pair-à-pair sont une direction intéressante pour répondre à ces problématiques, de part leur absence d'autorité centrale, la distribution des tâches et leur conception mettant le pair au centre.
+    \item Systèmes pair-à-pair sont une direction intéressante pour répondre à ces problématiques, de part leur absence d'autorités centrales, la distribution des tâches et leur conception mettant le pair au centre et les permettant de fonctionner aussi bien en mode connecté ou déconnecté.
       Mais posent de nouvelles problématiques de recherche.
     \item Ces systèmes ne disposent d'aucun contrôle sur les noeuds qui les composent.
       Le nombre de noeuds peut donc croître de manière non-bornée et atteindre des centaines de milliers de noeuds.
@@ -19,5 +19,58 @@
       Les noeuds peuvent se comporter de manière byzantine.
       Pour assurer la confidentialité, l'absence de confiance requise et le bon fonctionnement du système, ce dernier doit être conçu pour résister aux comportements byzantins de ses acteurs.
     \item Ainsi, il est nécessaire de faire progresser les technologies existantes pour les rendre compatible avec ce nouveau modèle de système.
-      Dans le cadre de cette thèse, nous nous intéressons aux mécanismes de réplication de données dans les systèmes collaboratifs pair-à-pair temps réel.
+      Dans le cadre de cette thèse, nous nous intéressons aux mécanismes de réplication de données mutables dans les systèmes collaboratifs \ac{P2P} sans autorités centrales.
 \end{itemize}
+
+\subsection{Réplication de données mutables}
+
+Les techniques de réplication de données mutables introduisent de la redondance de données dans les systèmes.
+Cette redondance a pour but et effet d'améliorer plusieurs propriétés des systèmes :
+
+\begin{definition}[Disponibilité]
+\end{definition}
+
+\begin{definition}[Tolérance aux pannes]
+\end{definition}
+
+\begin{definition}[Capacité de passage à l'échelle]
+\end{definition}
+
+\begin{definition}[Latence]
+\end{definition}
+
+Les techniques de réplication de données peuvent être classées en deux approches : les \emph{techniques de réplication de données pessimistes} et les \emph{techniques de réplication de données optimistes}.
+Ces deux catégories offrent des compromis différents vis-à-vis des propriétés décrites par les théorèmes CAP \cite{brewer_2000_podc} et PACELC \cite{pacelc2012}.
+Notamment, la différence entre ces catégories concerne le cas de la propriété de \emph{cohérence}.
+
+\begin{definition}[Cohérence]
+\end{definition}
+
+\subsection{Réplication de données pessimiste}
+
+Les techniques de réplication de données dites \emph{pessimistes} privilègie la cohérence des données.
+Notamment, ces techniques empêchent les modifications en concurrence d'une même donnée.
+Pour cela, plusieurs approches sont possibles.
+
+\begin{itemize}
+    \item Première approche consiste à utiliser un verrou.
+    \item Seconde approche consiste à utiliser un système de vote pour décider de la prochaine modification.
+        Consensus, élection de leader, SMR.
+    \item Le choix de privilégier la cohérence des données se fait au détriment de la disponibilité, tolérance aux pannes, capacité de passage à l'échelle et latence.
+        Par exemple, un système basé sur un leader deviendra temporairement indisponible lors d'une panne de son leader, le temps que la panne soit détectée et qu'un nouveau leader soit élu.
+\end{itemize}
+
+\subsection{Réplication de données optimiste}
+
+À l'inverse, les techniques de réplication de données dites \emph{optimistes} jugent acceptable de relâcher les contraintes existantes sur la cohérence des données.
+Dans ce paradigme, chaque noeud qui possède une copie de la donnée répliquée peut la consulter et la modifier à tout moment, sans coordination préalable avec les autres noeuds.
+Les copies des noeuds sont donc autorisées à diverger de manière temporaire.
+
+Les modifications effectuées par chacun sont ensuite diffusées pour être intégrées par l'ensemble des noeuds et converger de nouveau, \ie atteindre des états équivalents.
+Cependant, certaines modifications effectuées en concurrence par les noeuds peuvent provoquer des conflits.
+\mnnote{NOTE: Pourrait insérer exemple de conflits de l'édition collaborative ici.}
+Des mécanismes de résolution de conflits, potentiellement automatiques, sont alors requis pour assurer la convergence à terme.
+
+Cette approche permet donc de privilégier la disponibilité, tolérance aux pannes, capacité de passage à l'échelle et latence en échange de la cohérence forte.
+
+Dans le cadre de cette thèse, nous nous intéressons aux techniques de réplication de données optimistes.
