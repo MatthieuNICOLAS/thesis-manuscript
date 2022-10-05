@@ -1,0 +1,12 @@
+Le scénario reproduit la rédaction d'un article par plusieurs pairs de manière collaborative, en temps réel.
+La collaboration ainsi décrite se décompose en 2 phases.
+
+Dans un premier temps, les pairs spécifient principalement le contenu de l'article.
+Quelques opérations \emph{remove} sont tout même générées pour simuler des fautes de frappes.
+Une fois que le document atteint une taille critique (définie de manière arbitraire), les pairs passent à la seconde phase de la collaboration.
+Lors de cette seconde phase, les pairs arrêtent d'ajouter du nouveau contenu mais se concentre à la place sur la reformulation et l'amélioration du contenu existant.
+Ceci est simulé en équilibrant le ratio entre les opérations \emph{insert} et \emph{remove}.
+
+Chaque pair doit émettre un nombre donné d'opérations \emph{insert} et \emph{remove}.
+La simulation prend fin une fois que tous les pairs ont reçu toutes les opérations.
+Pour suivre l'évolution de l'état des pairs, nous prenons des instantanés de leur état à plusieurs points donnés de la simulation.

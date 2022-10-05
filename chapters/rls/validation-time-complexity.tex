@@ -1,0 +1,191 @@
+Afin d'évaluer RenamableLogootSplit, nous analysons tout d'abord la complexité en temps de ses opérations.
+Ces complexités dépendent de plusieurs paramètres : nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants, structures de données utilisées...
+
+\subsubsection{Hypothèses}
+
+Afin d'établir les valeurs de complexité des différentes opérations, nous prenons les hypothèses suivantes vis-à-vis des paramètres.
+Nous supposons que le nombre $n$ d'identifiants présents dans la séquence a tendance à croître, \ie que plus d'insertions sont effectuées que de suppressions.
+Nous considérons que la taille des identifiants, qui elle croît avec le nombre d'insertions mais qui est réinitialisée à chaque renommage, devient négligeable par rapport au nombre d'identifiants.
+Nous ne prenons donc pas en considération ce paramètre dans nos complexités et considérons que les manipulations d'identifiants (comparaison, génération) s'effectuent en temps constant.
+Afin de simplifier les complexités, nous considérons que les \emph{anciens états} associés aux époques contiennent aussi $n$ identifiants.
+Finalement, nous considérons que nous utilisons comme structures de données un arbre AVL pour représenter l'état interne de la séquence, des tableaux pour les \emph{anciens états} et une table de hachage pour l'\emph{arbre des époques}.
+
+\subsubsection{Complexité en temps des opérations \emph{insert} et \emph{remove}}
+
+À partir de ces hypothèses, nous établissons les complexités en temps des opérations.
+Pour chaque opération, nous distinguons deux complexités : une complexité pour l'intégration de l'opération locale, une pour l'intégration de l'opération distante.
+
+La complexité de l'intégration de l'opération \emph{insert} locale est inchangée par rapport à celle obtenue pour LogootSplit.
+Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre souhaité puis à insérer le bloc dans l'arbre AVL.
+D'après \textcite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.
+
+La complexité de l'intégration de l'opération \emph{insert} distante, elle, évolue par rapport à celle définie pour LogootSplit.
+Comme indiqué dans la \autoref{sec:integration-process-insert-remove-op}, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
+
+Tout d'abord, il est nécessaire d'identifier l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante.
+L'algorithme correspondant consiste à déterminer la première intersection entre deux branches de l'\emph{arbre des époques}.
+Cette étape peut être effectuée en \bigO{h}, où $h$ représente la hauteur de l'\emph{arbre des époques}.
+
+L'obtention de l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante permet de déterminer les $k$ renommages dont les effets doivent être retirés de l'opération et les $l$ renommages dont les effets doivent être intégrés à l'opération.
+Le noeud intégrant l'opération procède ainsi aux $k$ inversions de renommages successives puis aux $l$ application de renommages, et ce pour tous les $s$ identifiants insérés par l'opération.
+
+Pour retirer les effets des renommages à inverser, le noeud intégrant l'opération utilise \textsc{revertRenameId}.
+Cet algorithme retourne pour un identifiant donné un nouvel identifiant correspondant à l'époque précédente.
+Pour cela, \textsc{revertRenameId} utilise le prédécesseur et le successeur de l'identifiant donné dans l'\emph{ancien état} renommé.
+Pour retrouver ces deux identifiants au sein de l'\emph{ancien état}, \textsc{revertRenameId} utilise l'offset du premier tuple de l'identifiant donné.
+Par définition, cet élément correspond à l'index du prédecesseur de l'identifiant donné dans l'\emph{ancien état}.
+Aucun parcours de l'\emph{ancien état} n'est nécessaire.
+Le reste de \textsc{revertRenameId} consistant en des comparaisons et manipulations d'identifiants, nous obtenons que \textsc{revertRenameId} s'effectue en \bigO{1}.
+
+Pour inclure les effets des renommages à appliquer, le noeud utilise ensuite \textsc{renameId}.
+De manière similaire à \textsc{revertRenameId}, \textsc{renameId} génère pour un identifiant donné un nouvel identifiant équivalent à l'époque suivante en se basant sur son prédecesseur.
+Cependant, il est nécessaire ici de faire une recherche pour déterminer le prédecesseur de l'identifiant donné dans l'\emph{ancien état}.
+L'\emph{ancien état} étant un tableau trié d'identifiants, il est possible de procéder à une recherche dichotomique.
+Cela permet de trouver le prédecesseur en \bigO{\log{}n}, où $n$ correspond ici au nombre d'identifiants composant l'\emph{ancien état}.
+Comme pour \textsc{revertRenameId}, les instructions restantes consistent en des comparaisons et manipulations d'identifiants.
+La complexité de \textsc{renameId} est donc de \bigO{\log{}n}.
+
+Une fois les identifiants introduits par l'opération \emph{insert} renommés pour l'époque courante, il ne reste plus qu'à les insérer dans la séquence.
+Cette étape se réalise en \bigO{\log{}b} pour chaque identifiant, le temps nécessaire pour trouver son emplacement dans l'arbre AVL.
+
+Ainsi, en reprenant l'ensemble des étapes composant l'intégration de l'opération \emph{insert} distante, nous obtenons la complexité suivante : \bigO{h + s (k + l \cdot \log{}n + \log{}b)}.
+
+Le procédé de l'intégration de l'opération \emph{remove} étant similaire à celui de l'opération \emph{insert}, aussi bien en local qu'en distant, nous obtenons les mêmes complexités en temps.
+
+\subsubsection{Complexité en temps de l'opération \emph{rename}}
+
+Étudions à présent la complexité en temps de l'opération \emph{rename}.
+
+L'opération \emph{rename} locale se décompose en 2 étapes :
+\begin{enumerate*}
+  \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op})
+  \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
+\end{enumerate*}
+La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les intervalles d'identifiants.
+Elle s'effectue donc en \bigO{b}.
+La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
+Cette seconde étape s'effectue en \bigO{1}.
+L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
+
+L'intégration de l'opération \emph{rename} se décompose en les étapes suivantes :
+\begin{enumerate*}
+  \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}
+  \item La récupération des $n$ identifiants formant l'état courant
+  \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible
+  \item L'identification des $k$ opérations \emph{rename} à inverser et des $l$ opérations \emph{rename} à jouer
+  \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}
+  \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence
+\end{enumerate*}
+L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
+La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque intervalle d'identifiants en liste d'identifiants, ce qui nécessite \bigO{n} instructions.
+
+Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations \emph{insert} distantes analysé précédemment.
+Ces étapes s'effectuent donc en \bigO{n(k + l \cdot \log{}n + \log{}b)}.
+
+Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération \emph{rename} distante.
+
+Nous pouvons néanmoins améliorer ce premier résultat.
+Notamment, nous pouvons tirer parti des faits suivants :
+\begin{enumerate*}
+  \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe
+  \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
+\end{enumerate*}
+Ainsi, plutôt que d'effectuer une recherche dichotomique sur l'\emph{ancien état} pour trouver le prédecesseur de l'identifiant à renommer, nous pouvons parcourir les deux listes en parallèle.
+Ceci nous permet de renommer l'intégralité des identifiants en un seul parcours de l'état courant et de l'\emph{ancien état}, \ie en \bigO{n} instructions.
+Ensuite, plutôt que d'insérer les identifiants un à un dans la nouvelle séquence, nous pouvons recomposer au préalable les différents blocs en parcourant la liste des identifiants et en les aggrégeant au fur et à mesure.
+Il ne reste plus qu'à constituer la nouvelle séquence à partir des blocs obtenus.
+Ces actions s'effectuent respectivement en \bigO{n} et \bigO{b} instructions.
+
+Ainsi, ces améliorations nous permettent d'obtenir une complexité en temps en \bigO{h + n (k + l) + b} pour le traitement de l'opération \emph{rename} distante.
+
+\subsubsection{Récapitulatif}
+
+Nous récapitulons les complexités en temps présentées précédemment dans le \autoref{tab:time-complexity-operations}.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Complexité en temps des différentes opérations}
+  \label{tab:time-complexity-operations}
+  %\resizebox{0.5\columnwidth}{!}{
+  \begin{tabular}{lcc}
+      \toprule
+      Type d'opération & \multicolumn{2}{c}{Complexité en temps} \\
+      \cmidrule(lr){2-3}
+        & Locale &   Distante \\
+      \midrule
+      \emph{insert} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
+      \emph{remove} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
+      \emph{naive rename} & $b$ & $h + n (k + l \cdot \log{}n + \log{}b)$ \\
+      \emph{rename} & $b$ & $h + n (k + l) + b$ \\
+      \bottomrule
+  \end{tabular}
+  \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments de l'état courant et des \emph{anciens états}, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $s$ : nombre d'éléments insérés/supprimés par l'opération}
+  %}
+\end{table}
+
+\subsubsection{Complexité en temps du mécanisme de récupération de mémoire des époques}
+
+% \mnnote{
+%   NOTE: Dans \autoref{sec:gc-mechanism}, je présente le principe du mécanisme de GC.
+%   Dans cette partie, je décris l'algo correspondant et l'évalue.
+%   Rédiger l'algo ? Dans quelle partie l'insérer dans ce cas ?
+% }
+
+Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
+
+L'algorithme du mécanisme de récupération de la mémoire se compose des étapes suivantes.
+Tout d'abord, il établit le vecteur de version des opérations causalement stables.
+Pour cela, chaque noeud doit maintenir une matrice des vecteurs de version de tous les noeuds.
+L'algorithme génère le vecteur de version des opérations causalement stable en récupérant pour chaque noeud la valeur minimale qui y est associée dans la matrice des vecteurs de version.
+Cette étape correspond à fusionner $n$ vecteurs de version contenant $n$ entrées, elle s'exécute donc en \bigO{n^2} instructions.
+
+La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre défini par la relation \emph{priority}.
+Ce parcours s'effectue jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération \emph{rename} associée est causalement stable.
+Pour chaque époque parcourue, le mécanisme de récupération de mémoire calcule et stocke son chemin jusqu'à la racine.
+Cette étape s'exécute donc en \bigO{e \cdot h}, avec $e$ le nombre d'époques composant l'arbre des époques et $h$ la hauteur de l'arbre.
+
+À partir de ces chemins, le mécanisme calcule l'époque \ac{LCA}.
+Pour ce faire, l'algorithme calcule de manière successive la dernière intersection entre le chemin de la racine jusqu'à l'époque \ac{LCA} courante et les chemins précédemment calculés.
+L'époque \ac{LCA} est la dernière époque du chemin résultant.
+Cette étape s'exécute aussi en \bigO{e \cdot h}.
+
+L'algorithme peut alors calculer l'ensemble des \emph{époques requises}.
+Pour cela, il parcourt les chemins calculés au cours de la seconde étape.
+Pour chaque chemin, il ajoute les époques se trouvant après l'époque \ac{LCA} à l'ensemble des \emph{époques requises}.
+De nouveau, cette étape s'exécute en \bigO{e \cdot h}.
+
+Après avoir déterminé l'ensemble des \emph{époques requises}, le mécanisme peut supprimer les époques obsolètes.
+Il parcourt l'arbre des époques et supprime toute époque qui n'appartient pas à cet ensemble.
+Cette étape finale s'exécute en \bigO{e}.
+
+Ainsi, nous obtenons que la complexité en temps du mécanisme de récupération de mémoire des époques est en \bigO{n^2 + e \cdot h}.
+Nous récapitulons ce résultat dans \autoref{tab:time-complexity-gc-mechanism-epochs}.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Complexité en temps du mécanisme de récupération de mémoire des époques}
+  \label{tab:time-complexity-gc-mechanism-epochs}
+  \resizebox{.7\columnwidth}{!}{
+      \begin{tabular}{lc}
+          \toprule
+          Étape & Temps \\
+          \midrule
+          \emph{calculer le vecteur de version des opérations causalement stables} & $n^2$ \\
+          \emph{calculer les chemins de la racine aux \emph{potentielles époques courantes}} & $e \cdot h$ \\
+          \emph{identifier le \ac{LCA}} & $e \cdot h$ \\
+          \emph{calculer l'ensembe des \emph{époques requises}} & $e \cdot h$ \\
+          \emph{supprimer les époques obsolètes} & $e$ \\
+          \midrule
+          \emph{total} & $n^2 + e \cdot h$ \\
+          \bottomrule
+      \end{tabular}
+  }
+  \caption*{$n$: nombre de noeuds du système, $e$: nombre d'époques dans l'\emph{arbre des époques}, $h$: hauteur de l'\emph{arbre des époques}}
+\end{table}
+
+Malgré sa complexité en temps, le mécanisme de récupération de mémoire des époques devrait avoir un impact limité sur les performances de l'application.
+En effet, ce mécanisme n'appartient pas au chemin critique de l'application, \ie l'intégration des modifications.
+Il peut être déclenché occasionnellement, en tâche de fond.
+Nous pouvons même viser des fenêtres spécifiques pour le déclencher, \eg pendant les périodes d'inactivité.
+Ainsi, nous avons pas étudié plus en détails cette partie de RenamableLogootSplit dans le cadre de cette thèse.
+Des améliorations de ce mécanisme doivent donc être possibles.

@@ -1,0 +1,391 @@
+\label{sec:reverting-rename-ops}
+
+À présent, nous développons le scénario présenté dans la \autoref{fig:conflicting-rename-operations}.
+Dans la \autoref{fig:revertRenameId}, le noeud A reçoit l'opération \emph{rename} du noeud B.
+Cette opération est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
+D'après la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
+Mais pour pouvoir renommer son état vers l'époque \epoch{B2}, il doit au préalable faire revenir son état courant de l'époque \epoch{A1} à un état équivalent à l'époque \epoch{0}.
+Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'une opération \emph{rename} appliquée précédemment.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            ++(0:0.5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {HELO}
+            ++(0:10 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {HE}
+            ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L}
+            ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] (S2A-right) {LO}
+            ++(0:2 * \widthblock) node[point] (between-S2A-S3A) {}
+            ++(0:3 * \widthletter) node[epoch] (S3A-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S3A-right) {LO}
+            ++ (0:3 * \widthblock) node[epoch] (S4A-left) {\epoch{B2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                    label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+                ] {HELLO};
+
+        \path
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                    label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+                ] (S2B-right) {HELLO};
+
+        \draw[dotted] (S1A-right) -- (S2A-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
+        \draw[dotted] (S2A-right) -- (between-S2A-S3A) (S3A-right) -- (S4A-left);
+        \draw[->, dashed, thick] (S2B-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{B2}}} (between-S2A-S3A);
+        \draw[->, loosely dash dot, thick, shorten >= 1] (between-S2A-S3A) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S3A-left);
+        \draw[->, dashed, thick, shorten >= 3] (between-S2A-S3A) edge[bend right] (S4A-left.west);
+    \end{tikzpicture}
+  }
+  \caption{Annulation d'une opération \emph{rename} intégrée précèdemment en présence d'un identifiant inséré en concurrence}
+  \label{fig:revertRenameId}
+\end{figure}
+
+C'est précisément le but de \textsc{revertRenameId}, qui associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
+Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
+
+\begin{algorithm}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{revertRenameId}{id, renamedIds, nId, nSeq}
+          % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
+          % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
+          % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
+          % \Statex \LeftComment{$nSeq}$ is $node~seq}$ of the node which issued the \emph{rename} op}
+          % \\
+          \State length $\gets$ renamedIds.length
+          \State firstId $\gets$ renamedIds[0]
+          \State lastId $\gets$ renamedIds[length - 1]
+          \State pos $\gets$ position(firstId)
+          \\
+          \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
+          \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
+          \\
+          \If{id < newFirstId}
+              \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
+          \ElsIf{isRenamedId(id, pos, nId, nSeq, length)}
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return renamedIds[index]
+          \ElsIf{newLastId < id}
+              \State \Return revRenIdGreaterThanNewLastId(id, lastId)
+          \Else
+              % Ajouter commentaire sur cas
+              \State index $\gets$ getFirstOffset(id)
+              \State \Return revRenIdfromPredId(id, renamedIds, index)
+          \EndIf
+      \EndFunction
+      \\
+      \Function{revRenIdfromPredId}{id, renamedIds, index}
+          \State predId $\gets$ renamedIds[index]
+          \State succId $\gets$ renamedIds[index + 1]
+          \State tail $\gets$ getTail(id, 1)
+          \\
+          \If{tail < predId}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State \Return concat(predId, MIN\_TUPLE, tail)
+          \ElsIf{succId < tail}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State offset $\gets$ getLastOffset(succId) - 1
+              \State predOfSuccId $\gets$ createIdFromBase(succId, offset)
+              \State \Return concat(predOfSuccId, MAX\_TUPLE, tail)
+          \Else
+              \State \Return tail
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Fonctions principales pour annuler le renommage appliqué précèdemment à un identifiant}
+  \label{alg:revertRenameId}
+\end{algorithm}
+
+Les objectifs de \textsc{revertRenameId} sont les suivants :
+\begin{enumerate*}
+  \item \label{item:revert-rename-1}
+    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée
+  \item \label{item:revert-rename-2}
+    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération \emph{rename} annulée
+  \item \label{item:revert-rename-3}
+    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
+\end{enumerate*}
+
+Le cas \ref{item:revert-rename-1} est le plus trivial.
+Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
+En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
+Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A1}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B0}{0}.
+
+Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
+Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
+Deux invariants sont associés à ce motif.
+D'après la \autoref{prop:order}, nous avons :
+\[\trm{newId} \in ]\trm{newPredId}, \trm{newSuccId}[\]
+et nous devons obtenir :
+\[\trm{id} \in ]\trm{predId}, \trm{succId}[\]
+
+Le premier sous-cas se produit quand nous avons $\trm{tail} \in ]\trm{predId}, \trm{succId}[$.
+Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurrent à l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-2}).
+Nous avons alors :
+\[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
+Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
+Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
+Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans \autoref{fig:revertRenameId}.
+Pour cet identifiant, nous avons :
+\begin{itemize}
+  \item $newPredId = $\id{i}{A1}{1}, donc $predId = $\id{i}{B0}{0}\id{f}{A0}{0} d'après le cas \ref{item:revert-rename-1}
+  \item $newSuccId = $\id{i}{A1}{2}, donc $succId = $\id{i}{B0}{1} d'après le cas \ref{item:revert-rename-1}
+\end{itemize}
+Nous avons donc bien :
+\[i^{A1}_{1}i^{B0}_{0}m^{B1}_{0} \in ]i^{A1}_{1}i^{B0}_{0}f^{A0}_{0}, i^{A1}_{1}i^{B0}_{1}]\]
+et $tail = $\id{i}{B0}{0}\id{m}{B1}{0}.
+Renvoyer cette valeur nous permet ainsi de conserver l'ordre entre les identifiants puisque :
+
+\[i^{B0}_{0}f^{A0}_{0} <_{id} i^{B0}_{0}m^{B1}_{0} <_{id} i^{B0}_{1}\]
+
+Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
+$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-3}).
+Nous avons alors :
+\[\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[\]
+Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
+Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$, notés respectivement $\bot$ et $\top$.
+Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
+En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bot~tail}$).
+Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mintuple}.
+
+\begin{figure}[!ht]
+  \subfloat[Génération d'une opération \emph{insert} dépendante causalement d'une opération \emph{rename}]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{C}}
+                ++(0:0.5 * \widthletter) node[epoch] (S1C-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                ++(0:\widthletter) node[letter,
+                          label={below:{\id{o}{D1}{0}} }
+                              ] (S1C-right) {D}
+                ++(0:3 * \widthblock) node[epoch] (S2C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..2}} }
+                              ] (S2C-right) {WOD}
+                ++(0:4 * \widthblock) node[epoch] (S3C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                ++(0:\widthblock) node[letter, fill=mylightblue,
+                          label={above:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S3C-right) {D}
+                ++(0:3 * \widthblock) node[epoch] (S4C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
+                              ] {R}
+                ++(0:\widthletter) node[letter, fill=mylightblue,
+                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S4C-right) {D};
+
+            \path
+                ++(270:3) node {\textbf{D}}
+
+                ++(0:0.5 * \widthletter) node[epoch] (S1D-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                ++(0:\widthletter) node[letter,
+                          label={below:{\id{o}{D1}{0}} }
+                              ] (S1D-right) {D}
+
+                ++(0:3 * \widthblock) node[epoch] (S2D-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                ++(0:\widthletter) node[letter,
+                          label={above:{\id{n}{C0}{0}} }
+                              ] {O}
+                ++(0:\widthletter) node[letter, fill=mylightorange,
+                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                ++(0:\widthletter) node[letter,
+                          label={above:{\id{o}{D1}{0}} }
+                              ] (S2D-right) {D}
+
+                ++(0:4 * \widthblock) node[epoch] (S3D-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
+                              ] (S3D-right) {WOLD};
+
+
+            \draw[->, thick] (S1C-right) -- node[above, align=center]{\emph{rename to \epoch{C1}}} (S2C-left);
+            \draw[dotted] (S2C-right) -- (S3C-left);
+            \draw[->, thick] (S3C-right) -- node[above, align=center]{\emph{insert "R"}\\ \emph{between}\\ \emph{"O" and "L"}} (S4C-left);
+
+            \draw[->, thick] (S1D-right) -- node[below, align=center]{\emph{insert "L"}\\ \emph{between}\\ \emph{"O" and "D"}} (S2D-left);
+            \draw[->, thick] (S2D-right) -- node[below, align=center]{\emph{rename to \epoch{D3}}} (S3D-left);
+
+
+            \draw[dashed, ->, thick, shorten >= 3] (S2D-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}}} (S3C-left.west);
+        \end{tikzpicture}
+        }
+        \label{fig:revertRenameId-mintuple-setup}
+    \end{minipage}}
+  \hfil
+  \subfloat[Annulation de l'opération \emph{rename} précédente au profit d'une opération \emph{rename} concurrente]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+            \path
+                node {\textbf{C}}
+                ++(0:0.5 * \widthletter) node[epoch] (S4C-left) {\epoch{C1}}
+                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
+                              ] {WO}
+                ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
+                              ] {R}
+                ++(0:\widthletter) node[letter, fill=mylightblue,
+                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                ++(0:\widthletter) node[letter, fill=mydarkblue,
+                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
+                              ] (S4C-right) {D}
+                ++(0:2 * \widthblock) node[point] (between-S4C-S5C) {}
+                ++(0:3 * \widthletter) node[epoch] (S5C-left) {\epoch{0}}
+                ++(0:1.05 * \widthoriginepoch) node[letter,
+                          label={below:{\id{k}{D0}{0}} }
+                              ] {W}
+                ++(0:\widthletter) node[letter,
+                          label={below:{\id{n}{C0}{0}} }
+                              ] {O}
+                ++(0:\widthletter) node[letter, fill=mydarkorange,
+                          label={above:{\color{mydarkorange}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
+                              ] {R}
+                ++(0:\widthletter) node[letter, fill=mylightorange,
+                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
+                              ] {L}
+                ++(0:\widthletter) node[letter,
+                          label={above:{\id{o}{D1}{0}} }
+                              ] (S5C-right) {D}
+                ++(0:2 * \widthblock) node[epoch] (S6C-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..1}} }
+                              ] {WO}
+                ++(0:\widthblock) node[letter,
+                          label={above:{\id{k}{D3}{1}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
+                              ] {R}
+                ++(0:\widthletter) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{2..3}} }
+                              ] {LD};
+
+            \path
+                ++(270:3) node {\textbf{D}}
+
+                ++(0:0.5 * \widthletter) node[epoch] (S3D-left) {\epoch{D3}}
+                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
+                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
+                              ] (S3D-right) {WOLD};
+
+            \draw[dotted] (S4C-right) -- (between-S4C-S5C) (S5C-right) -- (S6C-left);
+            \draw[->, loosely dash dot, thick, shorten >= 1] (between-S4C-S5C) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S5C-left);
+
+            \draw[->, dashed, thick] (S3D-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{D3}}} (between-S4C-S5C);
+            \draw[->, dashed, thick, shorten >= 3] (between-S4C-S5C) edge[bend right] (S6C-left.west);
+        \end{tikzpicture}
+        }
+        \label{fig:revertRenameId-mintuple-revert}
+    \end{minipage}}
+  \caption{Annulation d'une opération \emph{rename} intégrée précèdemment en présence d'un identifiant inséré causalement après}
+  \label{fig:revertRenameId-mintuple}
+\end{figure}
+
+Dans la \autoref{fig:revertRenameId-mintuple}, les noeuds C et D répliquent une même séquence contenant les éléments "WOD".
+Dans la \autoref{fig:revertRenameId-mintuple-setup}, le noeud C commence par renommer son état.
+En concurrence, le noeud D insère l'élément "L" entre les éléments "O" et "D".
+L'opération \emph{insert} correspondante est livrée au noeud C, qui l'intègre en suivant le comportement défini en \autoref{sec:ops-concurrent-to-rename}.
+Le noeud C procède ensuite à l'insertion de l'élément "R" entre les éléments "O" et "L".
+Cette insertion dépend donc causalement de l'opération \emph{rename} effectuée précédemment par C.
+En parallèle, le noeud D effectue un renommage de son état.
+Cette opération \emph{rename} est donc concurrente à l'opération \emph{rename} générée précédemment par C.
+
+Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération \emph{rename} de D est livrée au noeud C.
+L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C1} \lepoch \epoch{D3}), le noeud C procède à l'annulation de son opération \emph{rename}.
+
+L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération \emph{rename} annulée : \id{k}{C1}{1}\id{i}{C2}{0}.
+Cet identifiant est compris entre les identifiants suivants :
+\[k^{C1}_{1} <_{id} k^{C1}_{1}i^{C2}_{0} <_{id} k^{C1}_{1}n^{C0}_{0}e^{D2}_{0}\]
+D'après les règles présentées précédemment :
+\begin{itemize}
+  \item \id{k}{C1}{1} est transformé en \id{n}{C0}{0} (cas \ref{item:revert-rename-1})
+  \item \id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0} est en transformé en \id{n}{C0}{0}\id{e}{D2}{0} (cas \ref{item:revert-rename-2})
+\end{itemize}
+Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C1}{1}\id{i}{C2}{0} tel que :
+\[n^{C0}_{0} <_{id} \trm{id} <_{id} n^{C0}_{0}e^{D2}_{0}\]
+
+Utiliser $\trm{predId}$ (\id{n}{C0}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$.
+Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la \autoref{prop:order}.
+En effet, nous obtiendrions $\trm{id} = $ \id{n}{C0}{0}\id{i}{C2}{0}, or \id{n}{C0}{0}\id{i}{C2}{0} $\nless_{id}$ \id{n}{C0}{0}\id{e}{D2}{0}.
+
+Ainsi, nous devons choisir un autre préfixe dans cette situation, notamment pour garantir que l'identifiant résultant sera plus petit que les identifiants suivants.
+C'est pour cela que nous introduisons $MIN\_TUPLE$.
+En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C0}{0}\id{e}{D2}{0}.
+Nous obtenons donc $\trm{id} = $ \id{n}{C0}{0}$\bot$\id{i}{C2}{0}, ce qui respecte la \autoref{prop:order}.
+
+Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
+Nous avons alors :
+\[\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[\]
+La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre souhaité.
+Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}$ et $MAX\_TUPLE$.
+$\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
+Ainsi, pour préserver l'ordre souhaité, \textsc{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\top~tail}$.
+
+% Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
+
+Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
+Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).
+Les fonctions pour gérer les cas restants sont présentées dans l'\autoref{app:revert-rename-id}.
+
+Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
+\textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération \emph{rename}.
+Par contre, \textsc{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération \emph{rename}.
+Rejouer une opération \emph{rename} précédemment annulée altère donc ces identifiants.
+Cette modification peut entraîner une divergence entre les noeuds, puis qu'un même élément sera désigné par des identifiants différents.
+
+Ce problème est toutefois évité dans notre système grâce à la relation \emph{priority} utilisée.
+Puisque la relation \emph{priority} est définie en utilisant l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, les noeuds se déplacent seulement vers l'époque la plus à droite de l'\emph{arbre des époques} lorsqu'ils changent d'époque.
+Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations \emph{rename} correspondantes.

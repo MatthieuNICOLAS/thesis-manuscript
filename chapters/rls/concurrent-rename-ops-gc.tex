@@ -1,0 +1,160 @@
+\label{sec:gc-mechanism}
+
+Les noeuds stockent les époques et les \emph{anciens états} correspondant pour transformer les identifiants d'une époque à l'autre.
+Au fur et à mesure que le système progresse, certaines époques et métadonnées associées deviennent obsolètes puisque plus aucune opération ne peut être émise depuis ces époques.
+Les noeuds peuvent alors supprimer ces époques.
+Dans cette section, nous présentons un mécanisme permettant aux noeuds de déterminer les époques obsolètes.
+
+Pour proposer un tel mécanisme, nous nous reposons sur la notion de \emph{stabilité causale des opérations} \cite{10.1007/978-3-662-43352-2_11}.
+Une opération est causalement stable une fois qu'elle a été livrée à tous les noeuds.
+Dans le contexte de l'opération \emph{rename}, cela implique que tous les noeuds ont progressé à l'époque introduite par cette opération ou à une époque plus grande d'après la relation \emph{priority}.
+À partir de ce constat, nous définissons les \emph{potentielles époques courantes} :
+
+\begin{definition}[Potentielles époques courantes]
+  L'ensemble des époques auxquelles les noeuds peuvent se trouver actuellement et à partir desquelles ils peuvent émettre des opérations, du point de vue du noeud courant.
+  Il s'agit d'un sous-ensemble de l'ensemble des époques, composé de l'époque maximale introduite par une opération \emph{rename} causalement stable et de toutes les époques plus grande que cette dernière d'après la relation \emph{priority}.
+\end{definition}
+
+Pour traiter les prochaines opérations, les noeuds doivent maintenir les chemins entre toutes les époques de l'ensemble des \emph{potentielles époques courantes}.
+Nous appelons \emph{époques requises} l'ensemble des époques correspondant.
+
+\begin{definition}[Époques requises]
+  L'ensemble des époques qu'un noeud doit conserver pour traiter les potentielles prochaines opérations.
+  Il s'agit de l'ensemble des époques qui forment les chemins entre chaque époque appartenant à l'ensemble des \emph{potentielles époques courantes} et leur \acf{LCA}.
+\end{definition}
+
+Il s'ensuit que toute époque qui n'appartient pas à l'ensemble des \emph{époques requises} peut être retirée par les noeuds.
+La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récupération de mémoire proposé.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution d'opérations \emph{rename}]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+              \path
+                  node {\textbf{A}}
+                  ++(0:0.5) node (a0) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                  ++(0:1) node (a2) {}
+                  ++(0:1) node (a7) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A8}}] (a8) {}
+                  ++(0:1.5) node (a-receives-b2) {}
+                  ++(0:1.5) node[point, label=above:{rename to \epoch{A9}}] (a9) {}
+                  ++(0:1.5) node (a-end) {};
+
+              \draw[->, thick] (a0) --  (a1) -- (a2);
+              \draw[dotted] (a2) -- (a7);
+              \draw[->, thick] (a7) -- (a8) -- (a9) -- (a-end);
+
+              \path
+                  ++(270:2) node {\textbf{B}}
+                  ++(0:0.5) node (b0) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
+                  ++(0:1.5) node (b-receives-a1) {}
+                  ++(0:1.5) node (b3) {}
+                  ++(0:1) node (b6) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B7}}] (b7) {}
+                  ++(0:2.5) node (b-end) {};
+
+              \draw[->, thick] (b0) -- (b2) -- (b3);
+              \draw[dotted] (b3) -- (b6);
+              \draw[->, thick] (b6) -- (b7) -- (b-end);
+
+              \draw[->, dashed, shorten >= 1] (a1) -- (b-receives-a1);
+              \draw[->, dashed, shorten >= 1] (b2) -- (a-receives-b2);
+          \end{tikzpicture}
+          \label{fig:GC-execution}
+      \end{minipage}}
+  \hfil
+  \subfloat[\emph{Arbres des époques} respectifs avec les ensembles \emph{potentielles époques courantes} et \emph{époques requises} illustrés]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+              \path
+                  node {\textbf{A}}
+                  ++(270:1) node[causalop] (Ae0) {\epoch{0}}
+                  ++(225:1.5) node[op] (AeA1) {\epoch{A1}}
+                  ++(270:1.5) node[op] (AeA8) {\epoch{A8}};
+              \path
+                  ++(270:1)
+                  ++(315:1.5) node[causalop] (AeB2) {\epoch{B2}}
+                      node[outer sep=12pt] (A-tl-potential-epochs) {}
+                      node[outer sep=15pt] (A-tl-required-epochs) {}
+                  ++(270:1.5) node[op, red] (AeA9) {\epoch{A9}}
+                      node[outer sep=12pt] (A-br-potential-epochs) {}
+                      node[outer sep=15pt] (A-br-required-epochs) {};
+
+              \draw[dashed] (A-tl-potential-epochs.north west) rectangle (A-br-potential-epochs.south east);
+              \draw[dotted, thick, darkgreen] (A-tl-required-epochs.north west) rectangle (A-br-required-epochs.south east);
+
+              \path
+                  ++(0:4) node {\textbf{B}}
+                  ++(270:1) node[causalop] (Be0) {\epoch{0}}
+                  ++(315:1.5) node[op] (BeB2) {\epoch{B2}}
+                  ++(270:1.5) node[op, red] (BeB7) {\epoch{B7}}
+                      node[outer sep=12pt] (B-br-potential-epochs) {}
+                      node[outer sep=15pt] (B-br-required-epochs) {};
+              \path
+                  ++(0:4)
+                  ++(270:1)
+                  ++(225:1.5) node[causalop] (BeA1) {\epoch{A1}}
+                      node[outer sep=12pt] (B-tl-potential-epochs) {};
+
+              \draw[dashed] (B-tl-potential-epochs.north west) rectangle (B-br-potential-epochs.south east);
+              \draw[dotted, thick, darkgreen] (B-tl-potential-epochs.north west)[xshift=-3pt, yshift=33pt] rectangle (B-br-required-epochs.south east);
+
+              \draw[thick, ->] (Ae0) edge (AeA1) (AeA1) edge (AeA8) (Ae0) edge (AeB2) (AeB2) edge (AeA9);
+              \draw[thick, ->] (Be0) edge (BeB2) (BeB2) edge (BeB7) (Be0) edge (BeA1);
+              \draw[->, dashed, thick, red] (AeA9.135) -- (AeB2.225) (AeB2.180) -- (AeA8.45) -- (AeA1.315) (AeA1.0) -- (Ae0.270);
+              \draw[->, dashed, thick, red] (BeB7.135) -- (BeB2.225) (BeB2.180) -- (BeA1.0) -- (Be0.270);
+
+          \end{tikzpicture}
+          \label{fig:GC-epoch-trees}
+      \end{minipage}}
+  \caption{Suppression des époques obsolètes et récupération de la mémoire des \emph{anciens états} associés}
+  \label{fig:GC-epochs}
+\end{figure}
+
+Dans la \autoref{fig:GC-execution}, nous représentons une exécution au cours de laquelle deux noeuds A et B génère respectivement plusieurs opérations \emph{rename}.
+Dans la \autoref{fig:GC-epoch-trees}, nous représentons les \emph{arbre des époques} respectifs de chaque noeud.
+Les époques introduites par des opérations \emph{rename} causalement stables sont representées en utilisant des doubles cercles.
+L'ensemble des \emph{potentielles époques courantes} est montré sous la forme d'un rectangle noir tireté, tandis que l'ensemble des \emph{époques requises} est représenté par un rectangle vert pointillé.
+
+Le noeud A génère tout d'abord une opération \emph{rename} vers \epoch{A1} et ensuite une opération \emph{rename} vers \epoch{A8}.
+Il reçoit ensuite une opération \emph{rename} du noeud B qui introduit \epoch{B2}.
+Puisque \epoch{B2} est plus grand que son époque courante actuelle (\epoch{e0}\epoch{A1}\epoch{A8} < \epoch{e0}\epoch{B2}), le noeud A la sélectionne comme sa nouvelle époque cible et procède au renommage de son état en conséquence.
+Finalement, le noeud A génère une troisième opération \emph{rename} vers \epoch{A9}.
+
+De manière concurrente, le noeud B génère l'opération \emph{rename} vers \epoch{B2}.
+Il reçoit ensuite l'opération \emph{rename} vers \epoch{A1} du noeud A.
+Cependant, le noeud B conserve \epoch{B2} comme époque courante (puisque \epoch{e0}\epoch{A1} < \epoch{e0}\epoch{B2}).
+Après, le noeud B génère une autre opération \emph{rename} vers \epoch{B7}.
+
+À la livraison de l'opération \emph{rename} introduisant l'époque \epoch{B2} au noeud A, cette opération devient causalement stable.
+À partir de ce point, le noeud A sait que tous les noeuds ont progressé jusqu'à cette époque ou une plus grande d'après la relation \emph{priority}.
+Les époques \epoch{B2} et \epoch{A9} forment donc l'ensemble des \emph{potentielles époques courantes} et les noeuds peuvent seulement émettre des opérations depuis ces époques ou une de leur descendante encore inconnue.
+Le noeud A procède ensuite au calcul de l'ensemble des \emph{époques requises}.
+Pour ce faire, il détermine le \ac{LCA} des \emph{potentielles époques courantes} : \epoch{B2}.
+Il génère ensuite l'ensemble des \emph{époques requises} en ajoutant toutes les époques formant les chemins entre \epoch{B2} et les \emph{potentielles époques courantes}.
+Les époques \epoch{B2} et \epoch{A9} forment donc l'ensemble des \emph{époques requises}.
+Le noeud A déduit que les époques \epoch{0}, \epoch{A1} et \epoch{A8} peuvent être supprimées de manière sûre.
+
+À l'inverse, la livraison de l'opération \emph{rename} vers \epoch{A1} au noeud B ne lui permet pas de supprimer la moindre métadonnée.
+À partir de ses connaissances, le noeud B calcule que \epoch{A1}, \epoch{B2} et \epoch{B7} forment l'ensemble des \emph{potentielles époques courantes}.
+De cette information, le noeud B détermine que ces époques et leur \ac{LCA} forment l'ensemble des \emph{époques requises}.
+Toute époque connue appartient donc à l'ensemble des \emph{époques requises}, empêchant leur suppression.
+
+À terme, une fois que le système devient inactif, les noeuds atteignent la même époque et l'opération \emph{rename} correspondante devient causalement stable.
+Les noeuds peuvent alors supprimer toutes les autres époques et métadonnées associées, supprimant ainsi le surcoût mémoire introduit par le mécanisme de renommage.
+
+Notons que le mécanisme de récupération de mémoire peut être simplifié dans les systèmes empêchant les opérations \emph{rename} concurrentes.
+Puisque les époques forment une chaîne dans de tels systèmes, la dernière époque introduite par une opération \emph{rename} causalement stable devient le \ac{LCA} des \emph{potentielles époques courantes}.
+Il s'ensuit que cette époque et ses descendantes forment l'ensemble des \emph{époques requises}.
+Les noeuds n'ont donc besoin que de suivre les opérations \emph{rename} causalement stables pour déterminer quelles époques peuvent être supprimées dans les systèmes sans opérations \emph{rename} concurrentes.
+
+Pour déterminer qu'une opération \emph{rename} donnée est causalement stable, les noeuds doivent être conscients des autres et de leur avancement.
+Un protocole de gestion de groupe tel que \cite{swim2002,lifeguard2018} est donc requis.
+
+La stabilité causale peut prendre un certain temps à être atteinte.
+En attendant, les noeuds peuvent néanmoins décharger les anciens états sur le disque dur puisqu'ils ne sont seulement nécessaires que pour traiter les opérations concurrentes aux opérations \emph{rename}.
+Nous approfondissons ce sujet dans la \autoref{sec:offloading-former-states}.

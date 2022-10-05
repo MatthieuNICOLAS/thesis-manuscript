@@ -1,0 +1,73 @@
+\label{sec:integration-time-rename}
+
+Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations émises précédemment, \ie en fonction de la taille de l'état.
+Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.
+
+Nous rappellons que le traitement d'une opération \emph{rename} dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
+Le cas des opérations \emph{rename} distantes se décompose donc en trois catégories.
+Les opérations \emph{distantes directes} désignent les opérations \emph{rename} distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
+Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désignent les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
+D'après la relation \emph{priority}, l'époque introduite est plus grande (resp. petite) que l'époque courante du noeud.
+Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Temps d'intégration de l'opération \emph{rename}}
+  \label{tab:evolution-integration-time-rename}
+  \resizebox{.8\columnwidth}{!}{
+    \begin{tabular}{lrrrrrr}
+      \toprule
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7}
+      Type & Nb Ops (k) &  Moyenne & Médiane &    IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
+      \midrule
+      Locale & 30  & 41.8 &   38.7 &   5.66 &       37.3 &        71.7 \\
+          & 60  & 78.3 &   78.2 &   1.58 &       76.2 &        81.4 \\
+          & 90  &  119 &    119 &   2.17 &        116 &         124 \\
+          & 120 &  144 &    144 &   3.24 &        139 &         149 \\
+          & 150 &  158 &    158 &   3.71 &        153 &         164 \\
+      \cmidrule{1-7}
+      Distante directe & 30  &  481 &    477 &   15.2 &        454 &         537 \\
+          & 60  &  982 &    978 &   28.9 &        926 &        1073 \\
+          & 90  & 1491 &   1482 &   58.8 &       1396 &        1658 \\
+          & 120 & 1670 &   1664 &     41 &       1568 &        1814 \\
+          & 150 & 1694 &   1676 &   60.6 &       1591 &        1853 \\
+      \cmidrule{1-7}
+      Cc. int. plus grande époque & 30  &  644 &    644 &   16.6 &        620 &         683 \\
+          & 60  & 1318 &   1316 &   26.5 &       1263 &        1400 \\
+          & 90  & 1998 &   1994 &   46.6 &       1906 &        2112 \\
+          & 120 & 2240 &   2233 &     54 &       2144 &        2368 \\
+          & 150 & 2242 &   2234 &   63.5 &       2139 &        2351 \\
+      \cmidrule{1-7}
+      Cc. int. plus petite époque & 30  & 1.36 &    1.3 & 0.038 &       1.22 &        3.53 \\
+          & 60  & 2.82 &   2.69 &  0.476 &       2.43 &        4.85 \\
+          & 90  & 4.45 &   4.23 &    1.1 &       3.69 &        5.81 \\
+          & 120 & 5.33 &    5.1 &   1.34 &       4.42 &        8.78 \\
+          & 150 & 5.53 &   5.26 &   1.05 &       4.84 &         8.7 \\
+      \bottomrule
+    \end{tabular}
+  }
+\end{table}
+
+Le principal résultat de ces mesures est que les opérations \emph{rename} sont particulièrement coûteuses quand comparées aux autres types d'opérations.
+Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse 40k éléments.
+Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
+Il est donc nécessaire de prendre en compte ce résultat et de
+\begin{enumerate*}
+  \item concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur
+  \item proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration :
+\end{enumerate*}
+
+\begin{itemize}
+  \item Au lieu d'utiliser \textsc{renameId}, qui renomme l'état identifiant par identifiant, nous pourrions définir et utiliser \textsc{renameBlock}.
+    Cette fonction permettrait de renommer l'état bloc par bloc, offrant ainsi une meilleur complexité en temps.
+    De plus, puisque les opérations \emph{rename} fusionnent les blocs existants en un unique bloc, \textsc{renameBlock} permettrait de mettre en place un cercle vertueux où chaque opération \emph{rename} réduirait le temps d'exécution de la suivante.
+  \item Puisque chaque appel à \textsc{revertRenameId} et \textsc{revertRenameId} est indépendant des autres, ces fonctions sont adaptées à la programmation parallèle.
+    Au lieu de renommer les identifiants (ou blocs) de manière séquentielle, nous pourrions diviser la séquence en plusieurs parties et les renommer en parallèle.
+\end{itemize}
+
+Un autre résultat intéressant de ces benchmarks est que les opérations \emph{concurrentes introduisant une plus petite époque} sont rapides à intégrer.
+Puisque ces opérations introduisent une époque qui n'est pas sélectionnée comme nouvelle époque cible, les noeuds ne procèdent pas au renommage de leur état.
+L'intégration des opérations \emph{concurrentes introduisant une plus petite époque} consiste simplement à ajouter l'époque introduite et l'\emph{ancien état} correspondant à l'\emph{arbre des époques}.
+Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
+Nous développons ce sujet dans la \autoref{sec:report-transition-to-target-epoch}.

@@ -1,0 +1,187 @@
+\label{sec:ops-concurrent-to-rename}
+
+Après avoir appliqué des opérations \emph{rename} sur leur état local, les noeuds peuvent recevoir des opérations concurrentes.
+La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            ++(0:5 * \widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A) {HELO}
+            ++(0:8 * \widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S2A-left) {HELO}
+            ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
+                    label={above:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L};
+
+        \path
+            ++(270:2) node {\textbf{B}}
+            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+
+
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
+        \draw[dotted] (S1A) -- (S2A-left);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Modifications concurrentes menant à une anomalie}
+  \label{fig:concurrent-insert-rename-inconsistent}
+\end{figure}
+
+Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
+À la réception de l'opération \emph{insert}, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
+Cependant, puisque les identifiants ont été modifiés par l'opération \emph{rename} concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} $\lid$ \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position souhaitée.
+Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
+Il est donc nécessaire de traiter les opérations concurrentes aux opérations \emph{rename} de manière particulière.
+
+Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opérations \emph{rename}.
+Pour cela, nous utilisons un système basé sur des \emph{époques}.
+Initialement, la séquence répliquée débute à l'époque \emph{origine} notée \epoch{0}.
+Chaque opération \emph{rename} introduit une nouvelle époque et permet aux noeuds d'y avancer depuis l'époque précédente.
+Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A1}.
+Nous définissons les époques de la manière suivante :
+
+\begin{definition}[Époque]
+  Une époque est un couple $\langle$nodeId, nodeSeq$\rangle$ où
+  \begin{itemize}
+    \item nodeId est l'identifiant du noeud qui a générée cette époque.
+    \item nodeSeq est le numéro de séquence du noeud au moment de la génération de cette époque.
+  \end{itemize}
+\end{definition}
+
+Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle$nodeId, nodeSeq$\rangle$.
+
+Au fur et à mesure que les noeuds reçoivent des opérations \emph{rename}, ils construisent et maintiennent localement la \emph{chaîne des époques}.
+Cette structure de données ordonne les époques en fonction de leur relation \emph{parent-enfant} et associe à chaque époque l'\emph{ancien état} correspondant (\ie l'\emph{ancien état} inclus dans l'opération \emph{rename} qui a généré cette époque).
+De plus, les noeuds marquent chaque opération avec leur époque courante au moment de génération de l'opération.
+À la réception d'une opération, les noeuds comparent l'époque de l'opération à l'époque courante de leur séquence.
+
+Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'intégrer.
+Les noeuds déterminent par rapport à quelles opérations \emph{rename} doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.
+
+Les noeuds utilisent la fonction \textsc{renameId}, décrite dans l'\autoref{alg:renameId}, pour transformer les opérations \emph{insert} et \emph{remove} par rapport aux opérations \emph{rename}.
+Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
+L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
+Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
+Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
+
+\begin{algorithm}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function {renameId}{id, renamedIds, nId, nSeq}
+          % \State \Comment{$id$ is the id to rename}
+          % \State \Comment{$renamedIds$ is the list of ids of the \emph{former state}}
+          % \State \Comment{$nId$ is $node~id$ of the node that issued the \emph{rename} op}
+          % \State \Comment{$nSeq$ is $node~seq$ of the node that issued the \emph{rename} op}
+          \State length $\gets$ renamedIds.length
+          \State firstId $\gets$ renamedIds[0]
+          \State lastId $\gets$ renamedIds[length - 1]
+          \State pos $\gets$ position(firstId)
+          \\
+          \If{id < firstId}
+              \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
+              \State \Return renIdLessThanFirstId(id, newFirstId)
+          \ElsIf{id $\in$ renameIds}
+              \State index $\gets$ findIndex(id, renamedIds)
+              \State \Return \new~Id(pos, nId, nSeq, index)
+          \ElsIf{lastId < id}
+              \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
+              \State \Return renIdGreaterThanLastId(id, newLastId)
+          \Else
+              \State \Return renIdFromPredId(id, renamedIds, pos, nId, nSeq)
+          \EndIf
+      \EndFunction
+      \\
+      \Function {renIdFromPredId}{id, renamedIds, pos, nId, nSeq}
+          \State index $\gets$ findIndexOfPred(id, renamedIds)
+          \State newPredId $\gets$ \new~Id(pos, nId, nSeq, index)
+          \\
+          \State \Return concat(newPredId, id)
+      \EndFunction
+  \end{algorithmic}
+  \caption{Fonctions principales pour renommer un identifiant}
+  \label{alg:renameId}
+\end{algorithm}
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+        \path
+            node {\textbf{A}}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                        ] (S1A-right) {HELO}
+            ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                        ] {HE}
+            ++(0:\widthblock) node[letter, fill=mylightblue,
+                    label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                        ] {L}
+            ++(0:\widthletter) node[block, fill=mydarkblue,
+                    label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                        ] {LO};
+
+        \path
+            ++(270:2) node {\textbf{B}}
+            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+            ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+
+
+        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
+        \draw[dotted] (S1A-right) -- (S2A-left);
+        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Renommage de la modification concurrente avant son intégration en utilisant \textsc{renameId} afin de maintenir l'ordre souhaité}
+  \label{fig:concurrent-insert-rename-fixed}
+\end{figure}
+
+L'algorithme procède de la manière suivante.
+Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B0}{0}\id{m}{B1}{0} dans l'ancien état : \id{i}{B0}{0}\id{f}{A0}{0}.
+Ensuite, il calcule l'équivalent de \id{i}{B0}{0}\id{f}{A0}{0} dans l'état renommé : \id{i}{A1}{1}.
+Finalement, le noeud A concatène cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}.
+En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
+
+\textsc{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations \emph{rename} distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
+Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
+À la réception de l'opération \emph{rename} du noeud A, le noeud B utilise \textsc{renameId} sur chacun des identifiants de son état pour le renommer et atteindre un état équivalent à celui du noeud A.
+
+L'\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
+Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans l'\autoref{app:rename-id}.
+
+L'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
+Une extension possible est de concevoir \textsc{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
+\textsc{renameBlock} réduirait le temps d'intégration des opérations \emph{rename}, puisque sa complexité en temps ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
+De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.

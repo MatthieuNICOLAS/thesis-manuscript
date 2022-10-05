@@ -1,0 +1,99 @@
+Nous considérons à présent les scénarios avec des opérations \emph{rename} concurrentes.
+\autoref{fig:conflicting-rename-operations} développe le scénario décrit précédemment dans \autoref{fig:concurrent-insert-rename-fixed}.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+          node {\textbf{A}}
+          ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{A1}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
+                      ] (S1A-right) {HELO}
+          ++(0:8 * \widthletter) node[epoch] (S2A-left) {\epoch{A1}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
+                      ] {HE}
+          ++(0:\widthblock) node[letter, fill=mylightblue,
+                  label={above:{\color{mylightblue!20!mydarkblueid}\id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}} }
+                      ] {L}
+          ++(0:\widthletter) node[block, fill=mydarkblue,
+                  label={below:{\color{mydarkblueid}\id{i}{A1}{2..3}} }
+                      ] (S2A-right) {LO};
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
+          ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+          ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
+          ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
+          ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO}
+          ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{B2}}
+          ++(0:1.3 * \widthepoch) node[block, fill=mydarkpurple,
+                  label={ [] below:{\color{mydarkpurpleid}\id{i}{B2}{0..4}} }
+              ] (S2B-right) {HELLO};
+
+      \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename to \epoch{A1}}} (S1A-left);
+      \draw[dotted] (S1A-right) -- (S2A-left); % (S2A-right) -- (A-sync) (S2B-right) -- (B-sync);
+      \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
+      \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+      \draw[->, thick] (S1B-right) -- node[below, align=center]{\emph{rename to \epoch{B2}}} (S2B-left);
+
+    \end{tikzpicture}
+  }
+  \caption{Opérations \emph{rename} concurrentes menant à des états divergents}
+  \label{fig:conflicting-rename-operations}
+\end{figure}
+
+Après avoir diffusé son opération \emph{insert}, le noeud B effectue une opération \emph{rename} sur son état.
+Cette opération réassigne à chaque élément un nouvel identifiant à partir de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}), de l'identifiant du noeud (\textbf{B}) et de son numéro de séquence courant (2).
+Cette opération introduit aussi une nouvelle époque : \epoch{B2}.
+Puisque l'opération \emph{rename} de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
+
+Puisque des époques concurrentes sont générées, les époques forment désormais l'\emph{arbre des époques}.
+Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les noeuds obtiennent une fois qu'ils se sont synchronisés à terme.
+Les époques sont representées sous la forme de noeuds de l'arbre et la relation \emph{parent-enfant} entre elles est illustrée sous la forme de flèches noires.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+      \path
+          node[op] (e0) {\epoch{0}}
+          ++(270:1.5)
+          ++(180:0.95) node[op] (eA1) {\epoch{A1}};
+      \path
+          ++(270:1.5)
+          ++(0:0.95) node[op] (eB2) {\epoch{B2}};
+
+      \draw[thick, ->] (e0) -- (eA1);
+      \draw[thick, ->] (e0) -- (eB2);
+  \end{tikzpicture}
+  \caption{\emph{Arbre des époques} correspondant au scénario décrit dans la \autoref{fig:conflicting-rename-operations}}
+  \label{fig:epoch-tree}
+\end{figure}
+
+À l'issue du scénario décrit dans la \autoref{fig:conflicting-rename-operations}, les noeuds A et B sont respectivement aux époques \epoch{A1} et \epoch{B2}.
+Pour converger, tous les noeuds devraient atteindre la même époque à terme.
+Cependant, la fonction \textsc{renameId} décrite dans l'\autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
+Le noeud A (resp. B) est donc dans l'incapacité de progresser vers l'époque du noeud B (resp. A).
+Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.
+
+Tout d'abord, les noeuds doivent se mettre d'accord sur une époque commune de l'\emph{arbre des époques} comme époque cible.
+Afin d'éviter des problèmes de performances dûs à une coordination synchrone, les noeuds doivent sélectionner cette époque de manière non-coordonnée, \ie en utilisant seulement les données présentes dans l'\emph{arbre des époques}.
+Nous présentons un tel mécanisme dans la \autoref{sec:priority}.
+
+Ensuite, les noeuds doivent se déplacer à travers l'\emph{arbre des époques} afin d'atteindre l'époque cible.
+La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre.
+Les cas restants à gérer sont ceux où les noeuds se trouvent actuellement à une époque \emph{soeur} ou \emph{cousine} de l'époque cible.
+Dans ces cas, les noeuds doivent être capable de remonter dans l'\emph{arbre des époques} pour retourner au \ac{LCA} de l'époque courante et l'époque cible.
+Ce déplacement est en fait similaire à annuler l'effet des opérations \emph{rename} précédemment appliquées.
+Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.

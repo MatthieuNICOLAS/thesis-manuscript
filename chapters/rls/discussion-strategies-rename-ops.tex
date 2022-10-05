@@ -1,0 +1,31 @@
+Comme indiqué dans la \autoref{sec:def-rename-op}, les opérations \emph{rename} sont des opérations systèmes.
+C'est donc aux concepteurs de systèmes qu'incombe la responsabilité de déterminer quand les noeuds devraient générer des opérations \emph{rename} et de définir une stratégie correspondante.
+Il n'existe cependant pas de solution universelle, chaque système ayant ses particuliarités et contraintes.
+
+Plusieurs aspects doivent être pris en compte lors de la définition de la stratégie de génération des opérations \emph{rename}.
+Le premier porte sur la taille de la structure de données.
+Comme illustré dans la \autoref{fig:evolution-document-size}, les métadonnées augmentent de manière progressive jusqu'à représenter 99\% de la structure de données.
+En utilisant les opérations \emph{rename}, les noeuds peuvent supprimer les métadonnées et ainsi réduire la taille de la structure à un niveau acceptable.
+Pour déterminer quand générer des opérations \emph{rename}, les noeuds peuvent donc monitorer le nombre d'opérations effectuées depuis la dernière opération \emph{rename}, le nombre de blocs qui composent la séquence ou encore la taille des identifiants.
+
+Un second aspect à prendre en compte est le temps d'intégration des opérations \emph{rename}.
+Comme indiqué dans le \autoref{tab:evolution-integration-time-rename}, l'intégration des opérations \emph{rename} distantes peut nécessiter des secondes si elles sont retardées trop longtemps.
+Bien que les opérations \emph{rename} travaillent en coulisses, elles peuvent néanmoins impacter négativement l'expérience utilisateur.
+Notamment, les noeuds ne peuvent pas intégrer d'autres opérations \emph{distantes} tant qu'ils sont en train de traiter des opérations \emph{rename}.
+Du point de vue des utilisateurs, les opérations \emph{rename} peuvent alors être perçues comme des pics de latence.
+Dans le domaine de l'édition collaborative temps réel, \textcite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat} ont montré que le délai dégradait la qualité des collaborations.
+Il est donc important de générer fréquemment des opérations \emph{rename} pour conserver leur temps d'intégration sous une limite perceptible.
+
+Finalement, le dernier aspect à considérer est le nombre d'opérations \emph{rename} concurrentes.
+La \autoref{fig:evolution-document-size} montre que les opérations \emph{rename} concurrentes accroissent la taille de la structure de données tandis que la \autoref{fig:time-to-replay-log} illustre qu'elles augmentent le temps nécessaire pour rejouer le log d'opérations.
+La stratégie proposée doit donc viser à minimiser le nombre d'opérations \emph{rename} concurrentes générées.
+Cependant, elle doit éviter d'utiliser des coordinations synchrones entre les noeuds pour cela (\eg algorithmes de consensus), pour des raisons de performances.
+Pour réduire la probabilité de générer des opérations \emph{rename} concurrentes, plusieurs méthodes peuvent être proposées.
+Par exemple, les noeuds peuvent monitorer à quels autres noeuds ils sont connectés actuellement et déléguer au noeud ayant le plus grand \emph{identifiant de noeud} la responsabilité de générer les opérations \emph{rename}.
+
+Pour récapituler, nous pouvons proposer plusieurs stragégies de génération des opérations \emph{rename}, pour minimiser de manière individuelle chacun des paramètres présentés.
+Mais bien que certaines de ces stratégies convergent (minimiser la taille de la structure de données et minimiser le temps d'intégration des opérations \emph{rename}), d'autres entrent en conflit (générer une opération \emph{rename} dès qu'un seuil est atteint vs. minimiser le nombre d'opérations \emph{rename} concurrentes générées).
+Les concepteurs de systèmes doivent proposer un compromis entre les différents paramètres en fonction des contraintes du système concerné (application temps réel ou asynchrone, limitations matérielles des noeuds...).
+Il est donc nécessaire d'analyser le système pour évaluer ses performances sur chaque aspect, ses usages et trouver le bon compromis entre tous les paramètres de la stratégie de renommage.
+Par exemple, dans le contexte des systèmes d'édition collaborative temps réel, \cite{2014-effect-delay-collaborative-editing-ignat} a montré que le délai diminue la qualité de la collaboration.
+Dans de tels systèmes, nous viserions donc à conserver le temps d'intégration des opérations (en incluant les opérations \emph{rename}) en dessous du temps limite correspondant à leur perception par les utilisateurs.

@@ -1,0 +1,130 @@
+\NumberThisInToc
+\chapter{Renommage dans une séquence répliquée}
+\minitoc
+\label{chap:renamablelogootsplit}
+
+\section{Présentation de l'approche}
+\input{chapters/rls/approche-intro}
+
+\subsection{Définition de l'opération de renommage}
+\input{chapters/rls/approche-def}
+
+\section{Introduction de l'opération \emph{rename}}
+\label{sec:centralised-rls}
+
+\subsection{Opération de renommage proposée}
+\input{chapters/rls/rename-op-proposition}
+
+\subsection{Gestion des opérations concurrentes au renommage}
+\input{chapters/rls/rename-op-concurrent-ops}
+
+\subsection{Évolution du modèle de livraison des opérations}
+\input{chapters/rls/rename-op-delivery-model}
+
+\section{Gestion des opérations \emph{rename} concurrentes}
+\label{sec:distributed-rls}
+
+\subsection{Conflits en cas de renommages concurrents}
+\input{chapters/rls/concurrent-rename-ops-conflicts}
+
+\subsection{Relation de priorité entre renommages}
+\input{chapters/rls/concurrent-rename-ops-priority}
+
+\subsection{Algorithme d'annulation de l'opération de renommage}
+\input{chapters/rls/concurrent-rename-ops-revert-rename}
+
+\subsection{Processus d'intégration d'une opération}
+\input{chapters/rls/concurrent-rename-ops-full-alg}
+
+\subsection{Règles de récupération de la mémoire des états précédents}
+\input{chapters/rls/concurrent-rename-ops-gc}
+
+\section{Validation}
+
+% \subsection{Preuve de correction de \textsc{renameId}}
+
+\subsection{Complexité en temps des opérations}
+\input{chapters/rls/validation-time-complexity}
+
+\subsection{Expérimentations}
+\input{chapters/rls/validation-experimentations-intro}
+
+\subsubsection{Scénario d'expérimentation}
+\input{chapters/rls/validation-experimentations-scenario}
+
+\subsubsection{Implémentation des simulations}
+\input{chapters/rls/validation-experimentations-implem}
+
+\subsection{Résultats}
+\input{chapters/rls/validation-results-intro}
+
+\subsubsection{Convergence}
+\input{chapters/rls/validation-results-convergence}
+
+\subsubsection{Consommation mémoire}
+\input{chapters/rls/validation-results-memory-overhead}
+
+\subsubsection{Temps d'intégration des opérations standards}
+\input{chapters/rls/validation-results-integration-time-standard-ops}
+
+\subsubsection{Temps d'intégration de l'opération de renommage}
+\input{chapters/rls/validation-results-integration-time-rename-ops}
+
+\subsubsection{Temps pour rejouer le log d'opérations}
+\input{chapters/rls/validation-results-time-replay-log}
+
+\subsubsection{Impact de la fréquence de l'opération \emph{rename} sur les performances}
+\input{chapters/rls/validation-results-rename-ops-frequency}
+
+\section{Discussion}
+
+\mnnote{TODO:
+  Ajouter une partie sur la discussion qu'on a pu avoir avec les reviewers sur la présence de pierres tombales dans RenamableLogootSplit, et comment ces pierres tombales diffèrent de celles présentent dans WOOT et RGA.
+}
+
+\subsection{Stratégie de génération des opérations \emph{rename}}
+\input{chapters/rls/discussion-strategies-rename-ops}
+
+\subsection{Stockage des états précédents sur disque}
+\label{sec:offloading-former-states}
+\input{chapters/rls/discussion-offload-former-states}
+
+\subsection{Compression et limitation de la taille de l'opération \emph{rename}}
+\label{sec:compression-rename}
+\input{chapters/rls/discussion-rename-op-compression}
+
+\subsection{Définition de relations de priorité pour minimiser les traitements}
+\label{sec:alt-priority-relation}
+\input{chapters/rls/discussion-alternative-priority-relations}
+
+\subsection{Report de la transition vers la nouvelle époque cible}
+\label{sec:report-transition-to-target-epoch}
+\input{chapters/rls/discussion-delay-transition-to-epoch}
+
+\subsection{Utilisation de l'opération de renommage comme mécanisme de compression du log d'opérations}
+\label{sec:rename-as-compression-mechanism}
+\input{chapters/rls/discussion-rename-op-as-snapshot}
+
+\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le journal d'opérations}
+\label{sec:log-based-rename-mechanism}
+\input{chapters/rls/discussion-log-based-implem}
+
+\mnnote{TODO: Ajouter conclusion à cette sous-section}
+
+\section{Comparaison avec les approches existantes}
+
+\subsection{Core-Nebula}
+\input{chapters/rls/related-work-core-nebula}
+
+\subsection{LSEQ}
+\input{chapters/rls/related-work-lseq}
+
+
+% \subsection{Eager stability determination}
+
+% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{2019-memory-efficient-crdts-dynamic-environments-bauwens, 2020-flec-bauwens, 2020-from-causality-to-stability-reducing-metadata-crdts-bauwens} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
+
+% \mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
+
+\section{Conclusion}
+\input{chapters/rls/conclusion}

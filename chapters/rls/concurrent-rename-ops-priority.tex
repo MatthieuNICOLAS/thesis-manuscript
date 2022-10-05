@@ -1,0 +1,95 @@
+\label{sec:priority}
+
+Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation \emph{priority}.
+
+\begin{definition}[Relation \emph{priority} \lepoch]
+  \label{def:priority-relation}
+  La relation \emph{priority} \lepoch est un ordre strict total sur l'ensemble des époques.
+  Elle permet aux noeuds de comparer n'importe quelle paire d'époques.
+\end{definition}
+
+En utilisant la relation \emph{priority}, nous définissons l'époque cible de la manière suivante :
+
+\begin{definition}[Époque cible]
+  L'époque cible est l'époque de l'ensemble des époques vers laquelle les noeuds doivent progresser.
+  Les noeuds sélectionnent comme époque cible l'époque maximale d'après l'ordre établit par \emph{priority}.
+\end{definition}
+
+Pour définir la relation \emph{priority}, nous pouvons choisir entre plusieurs stratégies.
+Dans le cadre de ce travail, nous utilisons l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}.
+La \autoref{fig:priority-example} fournit un exemple.
+
+\begin{figure}[!ht]
+  \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+              \path
+                  node {\textbf{A}}
+                  ++(0:1) node (a0) {}
+                  ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
+                  ++(0:5) node (a-end) {};
+
+              \draw[->, thick] (a0) --  (a1) -- (a-end);
+
+              \path
+                  ++(270:1.5) node {\textbf{B}}
+                  ++(0:1) node (b0) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
+                  ++(0:4) node[point, label=above:{rename to \epoch{B7}}] (b7) {}
+                  ++(0:1) node (b-end) {};
+
+              \draw[->, thick] (b0) -- (b2) -- (b7) -- (b-end);
+
+              \path
+                  ++(270:3) node {\textbf{C}}
+                  ++(0:1) node (c0) {}
+                  ++(0:3) node (c-receives-a1) {}
+                  ++(0:1) node[point, label=below:{rename to \epoch{C6}}] (c6) {}
+                  ++(0:2) node (c-end) {};
+
+              \draw[->, thick] (c0) -- (c6) -- (c-end);
+
+              \draw[->, dashed, shorten >= 1] (a1) -- (c-receives-a1);
+          \end{tikzpicture}
+          \label{fig:priority-execution}
+      \end{minipage}}
+  \hfil
+  \subfloat[\emph{Arbre des époques} final correspondant avec la relation \emph{priority} illustrée]{
+      \begin{minipage}{\linewidth}
+          \centering
+          \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
+              \path
+                  node[op] (e0) {\epoch{0}}
+                  ++(225:1.5) node[op] (eA1) {\epoch{A1}}
+                  ++(270:1.5) node[op] (eC6) {\epoch{C6}};
+              \path
+                  ++(315:1.5) node[op] (eB2) {\epoch{B2}}
+                  ++(270:1.5) node[op, red] (eB7) {\epoch{B7}};
+
+              \draw[->, thick] (e0) edge (eA1) (eA1) edge (eC6) (e0) edge (eB2) (eB2) edge (eB7);
+              \draw[->, dashed, thick, red] (eB7.135) -- (eB2.225) (eB2.180) -- (eC6.45) -- (eA1.315) (eA1.0) -- (e0.270);
+          \end{tikzpicture}
+          \label{fig:priority-epoch-tree}
+      \end{minipage}}
+  \caption{Sélectionner l'époque cible d'une exécution d'opérations \emph{rename} concurrentes}
+  \label{fig:priority-example}
+\end{figure}
+
+La \autoref{fig:priority-execution} décrit une exécution dans laquelle trois noeuds A, B et C générent plusieurs opérations avant de se synchroniser à terme.
+Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, nous représentons seulement ces opérations dans cette figure.
+Initialement, le noeud A génère une opération \emph{rename} qui introduit l'époque \epoch{A1}.
+Cette opération est livrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
+De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
+
+Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des époques} représenté dans la \autoref{fig:priority-epoch-tree}.
+Dans cette figure, la flèche tireté rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
+
+Pour déterminer l'époque cible, les noeuds reposent sur la relation \emph{priority}.
+D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~<~\epoch{0}\epoch{A1}~<~\epoch{0}\epoch{A1}\epoch{C6}~<~\epoch{0}\epoch{B2}~<~\epoch{0}\epoch{B2}\epoch{B7}.
+Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
+
+D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
+Par exemple, \emph{priority} pourrait reposer sur des métriques intégrées au sein des opérations \emph{rename} pour représenter le travail accumulé sur le document.
+Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le plus de collaborateurs actifs pour minimiser la quantité globale de calculs effectués par les noeuds du système.
+Nous approfondissons ce sujet dans la \autoref{sec:alt-priority-relation}.
