@@ -1,8 +1,8 @@
 Le processus d'intégration d'une opération distante distingue deux cas différents :
-\begin{enumerate*}
+\begin{enumerate}
   \item le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}
   \item le cas de figure où l'opération reçue est une opération \emph{rename}.
-\end{enumerate*}
+\end{enumerate}
 
 \subsubsection{Intégration d'une opération \emph{insert} ou \emph{remove} distante}
 
@@ -171,7 +171,7 @@ Pour cela, le noeud doit identifier les transformations à appliquer à l'opéra
 Pour ce faire, le noeud calcule le chemin entre l'époque de l'opération et l'époque courante à l'aide de la fonction \textsc{getPathBetweenEpochs} (ligne \ref{alg:insertRemote-get-path}).
 
 La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
-\begin{enumerate*}
+\begin{enumerate}
   \item elle calcule le chemin entre l'époque de l'opération et la racine de l'\emph{arbre des époques} ([\epoch{A2}, \epoch{0}])
   \item elle calcule le chemin entre l'époque courante et la racine de l'\emph{arbre des époques} ([\epoch{B2}, \epoch{0}])
   \item elle détermine la première intersection entre ces deux chemins (\epoch{0}).
@@ -179,7 +179,7 @@ La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
   \item elle tronque les deux chemins au niveau du \ac{LCA} ([\epoch{A2}] et [\epoch{B2}])
   \item elle inverse l'ordre des époques du chemin entre l'époque courante et la racine ([\epoch{B2}])
   \item elle retourne les deux chemins obtenus ($\langle$[\epoch{A2}], [\epoch{B2}]$\rangle$).
-\end{enumerate*}
+\end{enumerate}
 
 Le chemin entre l'époque de l'opération et l'époque \ac{LCA} ([\epoch{A2}]) correspond aux renommages dont les effets doivent être retirés de l'opération.
 Pour cela, le noeud récupère les informations de chaque renommage via l'\emph{arbre des époques} (lignes \ref{alg:insertRemote-retrieve-rename-data-1}-\ref{alg:insertRemote-retrieve-rename-data-2}).
@@ -201,7 +201,7 @@ Seules les lignes permettant de récupérer les identifiants supprimés (\ref{al
 
 \label{sec:integration-process-rename-op}
 
-L'autre cas de figure que RenamableLogootSplit doit gérer est l'intégration d'une opération \emph{rename} distante.
+L'autre cas de figure à gérer est l'intégration d'une opération \emph{rename} distante.
 Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autoref{alg:renameRemote}.
 
 \begin{algorithm}[!ht]

@@ -69,16 +69,17 @@ Mais cet identifiant est issu d'une époque (\epoch{A1}) différente de son épo
 Il convient de s'interroger sur l'état à produire dans cette situation.
 
 Comme nous l'avions déjà illustré par la \autoref{fig:concurrent-insert-rename-inconsistent}, les identifiants d'une époque ne peuvent être comparés qu'aux identifiants de la même époque.
-Tenter d'intégrer une opération \emph{insert} ou \emph{remove} provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur.
+Tenter d'intégrer une opération \emph{insert} ou \emph{remove} provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur \cf{prop:rename-op-intention-preservation}.
 Il est donc nécessaire d'empêcher ce scénario de se produire.
 
 Pour cela, nous proposons de faire évoluer le modèle de livraison des opérations de RenamableLogootSplit.
-Celui-ci repose sur celui de LogootSplit, que nous avions défini dans la \autoref{def:ls-delivery-model}.
+Celui-ci repose sur celui de LogootSplit \cf{}, que nous avions défini dans la \autoref{def:ls-delivery-model}.
 Pour rappel, ce modèle requiert que
-\begin{enumerate*}
-  \item les opérations soient livrées qu'une seule et unique fois au \ac{CRDT},
-  \item les opérations \emph{remove} soient livrées au \ac{CRDT} qu'après les opérations \emph{insert} ajoutant les éléments à supprimer.
-\end{enumerate*}
+\begin{enumerate}
+  \item Une opération doit être livrée exactement une fois à chaque noeud.
+  \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
+  \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut être livrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
+\end{enumerate}
 
 Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations qui ont une dépendance causale vers ces dernières.
 Nous obtenons donc le modèle de livraison suivant :
@@ -90,7 +91,7 @@ Nous obtenons donc le modèle de livraison suivant :
     \item Une opération doit être livrée à l'ensemble des noeuds à terme,
     \item Une opération doit être livrée qu'une seule et unique fois aux noeuds,
     \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
-    \item Une opération doit être livrée à un noeud une fois que l'opération \emph{rename} une fois que l'opération \emph{rename} qui introduit son époque de génération a été delivrée à ce dernier.
+    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération \emph{rename} qui a introduit son époque de génération a été délivrée à ce même noeud.
   \end{enumerate}
 \end{definition}
 
@@ -164,7 +165,7 @@ Les opérations correspondantes aux actions du noeud A sont diffusées sur le r�
 
 Cependant, suite à un aléa du réseau, le noeud B reçoit les deux opérations \emph{insert} et \emph{rename} dans le désordre.
 L'opération \emph{rename} est donc livrée en première au noeud B.
-En utilisant les informations contenues dans l'opération, le noeud B est renomme chaque identifiant composant son état.
+En utilisant les informations contenues dans l'opération, le noeud B renomme chaque identifiant composant son état.
 
 Ensuite, le noeud B reçoit l'opération \emph{insert}.
 Comme l'époque de génération de l'opération \emph{insert} (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.

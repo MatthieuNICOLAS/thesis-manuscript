@@ -23,7 +23,7 @@ Cependant, elle doit éviter d'utiliser des coordinations synchrones entre les n
 Pour réduire la probabilité de générer des opérations \emph{rename} concurrentes, plusieurs méthodes peuvent être proposées.
 Par exemple, les noeuds peuvent monitorer à quels autres noeuds ils sont connectés actuellement et déléguer au noeud ayant le plus grand \emph{identifiant de noeud} la responsabilité de générer les opérations \emph{rename}.
 
-Pour récapituler, nous pouvons proposer plusieurs stragégies de génération des opérations \emph{rename}, pour minimiser de manière individuelle chacun des paramètres présentés.
+Pour récapituler, nous pouvons proposer plusieurs stratégies de génération des opérations \emph{rename}, pour minimiser de manière individuelle chacun des paramètres présentés.
 Mais bien que certaines de ces stratégies convergent (minimiser la taille de la structure de données et minimiser le temps d'intégration des opérations \emph{rename}), d'autres entrent en conflit (générer une opération \emph{rename} dès qu'un seuil est atteint vs. minimiser le nombre d'opérations \emph{rename} concurrentes générées).
 Les concepteurs de systèmes doivent proposer un compromis entre les différents paramètres en fonction des contraintes du système concerné (application temps réel ou asynchrone, limitations matérielles des noeuds...).
 Il est donc nécessaire d'analyser le système pour évaluer ses performances sur chaque aspect, ses usages et trouver le bon compromis entre tous les paramètres de la stratégie de renommage.

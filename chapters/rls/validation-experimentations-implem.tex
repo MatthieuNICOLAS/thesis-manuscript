@@ -5,7 +5,7 @@ Enfin, ils partagent et éditent le document de manière collaborative en utilis
 
 Toutes les 200 $\pm$ 50ms, chaque bot génère localement une opération \emph{insert} ou \emph{remove} et la diffuse immédiatement aux autres noeuds.
 Au cours de la première phase, la probabilité d'émettre une opération \emph{insert} (resp. \emph{remove}) est de 80\% (resp. 20\%).
-Une fois que leur copie locale du document atteint 60k caractères (environ 15 pages), les bots basculent à la seconde phase et redéfinissent chaque probabilité à 50\%.
+Une fois que leur copie locale du document atteint 60k caractères (environ 15 pages), les bots basculent dans la seconde phase et redéfinissent chaque probabilité à 50\%.
 De plus, tout au long de la collaboration, les bots ont une probabilité de 5\% de déplacer leur curseur à une position aléatoire dans le document après chaque opération locale.
 
 Chaque bot doit générer 15k opérations \emph{insert} ou \emph{remove}, et s'arrête donc une fois qu'il a intégré les 150k opérations.

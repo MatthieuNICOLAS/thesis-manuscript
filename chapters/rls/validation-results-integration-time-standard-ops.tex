@@ -2,10 +2,10 @@ Nous avons ensuite comparé l'évolution du temps d'intégration des opérations
 Puisque les deux types d'opérations partagent la même complexité en temps, nous avons seulement utilisé des opérations \emph{insert} dans nos benchmarks.
 Nous faisons par contre la différence entre les mises à jours \emph{locales} et \emph{distantes}.
 Conceptuellement, les modifications locales peuvent être décomposées comme présenté dans \cite{baquero2017pure} en les deux étapes suivantes :
-\begin{enumerate*}
+\begin{enumerate}
   \item la génération de l'opération correspondante
   \item l'application de l'opération correspondante sur l'état local.
-\end{enumerate*}
+\end{enumerate}
 Cependant, pour des raisons de performances, nous avons fusionné ces deux étapes dans notre implémentation.
 Nous distinguons donc les résultats des modifications \emph{locales} et des modifications \emph{distantes} dans nos benchmarks.
 La \autoref{fig:evolution-integration-time-insert} présente les résultats obtenus.

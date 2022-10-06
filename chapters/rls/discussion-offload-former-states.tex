@@ -1,9 +1,9 @@
 Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
 Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
-\begin{enumerate*}
+\begin{enumerate}
   \item des noeuds ont émis récemment des opérations \emph{rename}
   \item des noeuds se sont récemment reconnectés.
-\end{enumerate*}
+\end{enumerate}
 Entre deux de ces évènements spécifiques, les \emph{anciens états} ne sont pas nécessaires pour traiter les opérations.
 
 Nous pouvons donc proposer l'optimisation suivante : décharger les \emph{anciens états} sur le disque jusqu'à leur prochaine utilisation ou jusqu'à ce qu'ils puissent être supprimés de manière sûre.

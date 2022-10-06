@@ -18,10 +18,10 @@ Le mécanisme consiste à réduire le nombre d'opérations transmises à un nouv
 L'opération \emph{rename} ayant introduite l'époque courante fournit un état initial au nouveau pair.
 À partir de cet état initial, le nouveau pair peut obtenir l'état courant en intégrant les opérations \emph{insert} et \emph{remove} qui ont été générées de manière concurrente ou causale par rapport à l'opération \emph{rename}.
 En réponse à une demande de synchronisation d'un nouveau pair, un pair peut donc simplement lui envoyer un sous-ensemble de son log composé de :
-\begin{enumerate*}
+\begin{enumerate}
   \item l'opération \emph{rename} ayant introduite son époque courante
   \item les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
-\end{enumerate*}
+\end{enumerate}
 
 Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (cf. \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
 En effet, les données incluses (\emph{ancien état} au moment du renommage, identifiant du noeud auteur de l'opération \emph{rename} et son numéro de séquence au moment de la génération) nous permettent seulement de recréer la structure de la séquence après le renommage.
@@ -38,7 +38,7 @@ Nous définissons donc de la manière suivante l'opération \emph{rename} enrich
   \label{def:-rich-rename-op}
   Une opération \emph{rename enrichie} est un quintuplet $\langle$nodeId, nodeSeq, formerState, versionVector, content$\rangle$ où
   \begin{itemize}
-    \item nodeId est l'identifiant du noeud qui a générée l'opération \emph{rename}.
+    \item nodeId est l'identifiant du noeud qui a généré l'opération \emph{rename}.
     \item nodeSeq est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
     \item formerState est l'ancien état du noeud au moment du renommage.
     \item versionVector est le vecteur de version représentant l'ancien état du noeud au moment du renommage.

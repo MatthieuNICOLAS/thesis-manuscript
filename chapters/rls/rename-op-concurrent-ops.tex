@@ -60,7 +60,7 @@ Nous définissons les époques de la manière suivante :
 \begin{definition}[Époque]
   Une époque est un couple $\langle$nodeId, nodeSeq$\rangle$ où
   \begin{itemize}
-    \item nodeId est l'identifiant du noeud qui a générée cette époque.
+    \item nodeId est l'identifiant du noeud qui a généré cette époque.
     \item nodeSeq est le numéro de séquence du noeud au moment de la génération de cette époque.
   \end{itemize}
 \end{definition}
@@ -79,7 +79,7 @@ Les noeuds utilisent la fonction \textsc{renameId}, décrite dans l'\autoref{alg
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
 L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération \emph{rename} en utilisant leur prédecesseur.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
-Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer les identifiants générés de façon concurrente avant de les insérer dans son état.
+Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer l'identifiants généré de façon concurrente avant de l'insérer dans son état.
 
 \begin{algorithm}[!ht]
   \footnotesize
@@ -181,7 +181,7 @@ Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-ren
 L'\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
 Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans l'\autoref{app:rename-id}.
 
-L'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
+Nous notons que l'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
 Une extension possible est de concevoir \textsc{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
 \textsc{renameBlock} réduirait le temps d'intégration des opérations \emph{rename}, puisque sa complexité en temps ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
 De plus, son exécution réduirait le temps d'intégration des prochaines opérations \emph{rename} puisque le mécanisme de renommage regroupe les éléments en moins de blocs.

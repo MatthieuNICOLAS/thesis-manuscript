@@ -1,5 +1,4 @@
-Notre opération de renommage permet à RenamableLogootSplit de réduire le surcoût en métadonnées des séquences répliquées.
-Pour ce faire, elle réassigne des identifiants arbitraires aux éléments de la séquence.
+Notre opération de renommage réassigne des identifiants arbitraires aux éléments de la séquence de réduire son surcoût en métadonnées.
 
 \begin{figure}[t!]
   \centering
@@ -71,7 +70,7 @@ Pour converger, les autres noeuds doivent renommer leur état de manière identi
 Cependant, ils ne peuvent pas simplement remplacer leur état courant par l'état généré par le renommage.
 En effet, ils peuvent avoir modifié en concurrence leur état.
 Afin de ne pas perdre ces modifications, les noeuds doivent traiter l'opération \emph{rename} eux-mêmes.
-Pour ce faire, le noeud qui a généré l'opération \emph{rename} diffuse son \emph{ancien état} aux autres.
+Pour ce faire, le noeud qui a généré l'opération \emph{rename} diffuse les données sur lesquelles il a basé son renommage aux autres, \ie son \emph{ancien état}.
 
 \begin{definition}[Ancien état]
   Un \emph{ancien état} est la liste des intervalles d'identifiants qui composent l'état courant de la séquence répliquée au moment du renommage.
@@ -83,7 +82,7 @@ De ce fait, nous définissons l'opération \emph{rename} de la manière suivante
   \label{def:rename-op}
   Une opération \emph{rename} est un triplet $\langle$nodeId, nodeSeq, formerState$\rangle$ où
   \begin{itemize}
-    \item nodeId est l'identifiant du noeud qui a générée l'opération \emph{rename}.
+    \item nodeId est l'identifiant du noeud qui a généré l'opération \emph{rename}.
     \item nodeSeq est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
     \item formerState est l'ancien état du noeud au moment du renommage.
   \end{itemize}

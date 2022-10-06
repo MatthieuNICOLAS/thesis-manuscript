@@ -1,28 +1,28 @@
 Nous avons décrit précédemment dans la \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
-\begin{enumerate*}
+\begin{enumerate}
   \item identifier le chemin entre l'époque courante et l'époque cible
   \item appliquer les fonctions de transformations \textsc{revertRenameId} et \textsc{renameId} à l'ensemble des identifiants composant l'état courant
   \item re-créer une séquence à partir des nouveaux identifiants calculés et du contenu courant.
-\end{enumerate*}
+\end{enumerate}
 
 Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération \emph{rename}.
 Cette implémentation repose sur le log des opérations.
 
 Cette implémentation se base sur les observations suivantes :
-\begin{enumerate*}
+\begin{enumerate}
   \item L'état courant est obtenu en intégrant successivement l'ensemble des opérations.
   \item L'opération \emph{rename} est une opération subsumant les opérations passées : elle prend un état donné (l'\emph{ancien état}), somme des opérations précédentes, et génère un nouvel état équivalent compacté.
   \item L'ordre d'intégration des opérations concurrentes n'a pas d'importance sur l'état final obtenu.
-\end{enumerate*}
+\end{enumerate}
 
 Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
-\begin{enumerate*}
+\begin{enumerate}
   \item générer l'état correspondant au renommage de l'\emph{ancien état}
   \item identifier le chemin entre l'époque courante et l'époque cible
   \item identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son log
   \item transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état
-\end{enumerate*}
+\end{enumerate}
 
 Cet algorithme est équivalent à ré-ordonner le log des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
 

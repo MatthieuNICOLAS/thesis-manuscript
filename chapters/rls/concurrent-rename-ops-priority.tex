@@ -1,6 +1,6 @@
 \label{sec:priority}
 
-Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation \emph{priority}.
+Pour que chaque noeud sélectionne la même époque cible de manière non-coordonnée, nous définissons la relation de priorité sur les époques \lepoch.
 
 \begin{definition}[Relation \emph{priority} \lepoch]
   \label{def:priority-relation}
@@ -12,7 +12,7 @@ En utilisant la relation \emph{priority}, nous définissons l'époque cible de l
 
 \begin{definition}[Époque cible]
   L'époque cible est l'époque de l'ensemble des époques vers laquelle les noeuds doivent progresser.
-  Les noeuds sélectionnent comme époque cible l'époque maximale d'après l'ordre établit par \emph{priority}.
+  Les noeuds sélectionnent comme époque cible l'époque maximale d'après l'ordre établi par \emph{priority}.
 \end{definition}
 
 Pour définir la relation \emph{priority}, nous pouvons choisir entre plusieurs stratégies.
@@ -90,6 +90,6 @@ D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre d
 Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
 
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
-Par exemple, \emph{priority} pourrait reposer sur des métriques intégrées au sein des opérations \emph{rename} pour représenter le travail accumulé sur le document.
-Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le plus de collaborateurs actifs pour minimiser la quantité globale de calculs effectués par les noeuds du système.
+Par exemple, l'ordre proposé \emph{priority} pourrait se baser sur une représentation du travail effectué sur le document, à l'aide de métriques additionnelles intégrées au sein des opérations \emph{rename}.
+Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le plus d'activité, que nous conjecturons corrélé avec le nombre de noeuds actifs, pour minimiser la quantité globale de calculs effectués par les noeuds du système.
 Nous approfondissons ce sujet dans la \autoref{sec:alt-priority-relation}.

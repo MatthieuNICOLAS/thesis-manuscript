@@ -5,7 +5,7 @@ Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite co
 
 % \mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations \emph{rename} concurrentes et procéde au renommage de son état à chaque fois}
 
-En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds délaient le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
+En cas d'un grand nombre d'opérations \emph{rename} concurrentes, nous proposons que les noeuds retardent le renommage de leur état vers l'époque cible jusqu'à ce qu'ils aient obtenu un niveau de confiance donné en l'époque cible.
 Ce délai réduit la probabilité que les noeuds effectuent des traitements inutiles.
 Plusieurs stratégies peuvent être proposées pour calculer le niveau de confiance en l'époque cible.
 Ces stratégies peuvent reposer sur une variété de métriques pour produire le niveau de confiance, tel que le temps écoulé depuis que le noeud a reçu une opération \emph{rename} concurrente et le nombre de noeuds en ligne qui n'ont pas encore reçu l'opération \emph{rename}.

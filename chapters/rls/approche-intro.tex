@@ -1,8 +1,8 @@
-Nous proposons un nouveau \ac{CRDT} pour la \emph{Sequence} appartenant à l'approche des identifiants densément ordonnées : RenamableLogootSplit \cite{2020-rls-papoc-nicolas,2022-rls-tpds-nicolas}.
-Cette structure de données permet aux pairs d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
+Nous proposons un nouveau \ac{CRDT} pour le type \emph{Sequence} à identifiants densément ordonnés et à granularité : RenamableLogootSplit \cite{2020-rls-papoc-nicolas,2022-rls-tpds-nicolas}.
+Cette structure de données permet aux noeuds d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
 Nous introduisons une opération \emph{rename} qui permet de
 \begin{enumerate*}
   \item réassigner des identifiants plus courts aux différents éléments de la séquence
   \item fusionner les blocs composant la séquence.
 \end{enumerate*}
-Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en métadonnées.
+Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en termes de métadonnées et de calculs des modifications suivantes.

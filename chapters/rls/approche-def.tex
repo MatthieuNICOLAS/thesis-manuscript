@@ -13,7 +13,8 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
 \end{property}
 
 \begin{property}(Préservation de l'intention de l'utilisateur)
-  Bien que l'opération \emph{rename} n'est pas elle-même n'incarne pas une intention de l'utilisateur, elle ne doit pas entrer en conflit avec les actions des utilisateurs.
+  \label{prop:rename-op-intention-preservation}
+  Bien que l'opération \emph{rename} n'incarne pas elle-même une intention de l'utilisateur, elle ne doit pas entrer en conflit avec les modifications des utilisateurs.
   Notamment, les opérations \emph{rename} ne doivent pas annuler ou altérer le résultat d'opérations \emph{insert} et \emph{remove} du point de vue des utilisateurs.
 \end{property}
 
@@ -25,12 +26,12 @@ Ces propriétés sont inspirées principalement par celles proposées dans \cite
     \item[~]
     \begin{subproperty}(Préservation de l'unicité)
       Chaque identifiant doit être unique.
-      Donc, pour une opération \emph{rename} donnée, chaque identifiant doit être associé à un nouvel identifiant distinct.
+      Donc, pour une opération \emph{rename} donnée, chaque identifiant doit être associé à un nouvel identifiant unique.
     \end{subproperty}
     \item[~]
     \begin{subproperty}(Préservation de l'ordre)
       \label{prop:order}
-      Les éléments de la séquence doivent être triés en fonction de leur identifiants.
+      Les éléments de la séquence doivent être ordonnés en fonction de leur identifiants.
       L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération \emph{rename}.
     \end{subproperty}
   \end{itemize}
@@ -53,6 +54,6 @@ Par conséquent, il est nécessaire de concevoir et d'utiliser des méthodes de 
 
 Dans un souci de simplicité, la présentation de l'opération \emph{rename} est divisée en deux parties.
 Dans le \autoref{sec:centralised-rls}, nous présentons l'opération \emph{rename} proposée avec l'hypothèse qu'aucune opération \emph{rename} concurrente ne peut être générée.
-Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opération \emph{rename} elle-même ainsi que sur comment gérer les opérations \emph{insert} et \emph{remove} concurrentes.
+Cette hypothèse nous permet de nous concentrer sur le fonctionnement de l'opération \emph{rename} elle-même ainsi que sur la gestion des opérations \emph{insert} et \emph{remove} concurrentes.
 Ensuite, dans le \autoref{sec:distributed-rls}, nous supprimons cette hypothèse.
 Nous présentons alors notre approche pour gérer les scénarios avec des opérations \emph{rename} concurrentes.

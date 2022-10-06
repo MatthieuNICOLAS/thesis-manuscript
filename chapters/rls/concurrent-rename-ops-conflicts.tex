@@ -59,7 +59,7 @@ Cette opération réassigne à chaque élément un nouvel identifiant à partir 
 Cette opération introduit aussi une nouvelle époque : \epoch{B2}.
 Puisque l'opération \emph{rename} de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
 
-Puisque des époques concurrentes sont générées, les époques forment désormais l'\emph{arbre des époques}.
+Puisque des époques concurrentes sont générées, les époques forment désormais un \emph{arbre des époques}.
 Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les noeuds obtiennent une fois qu'ils se sont synchronisés à terme.
 Les époques sont representées sous la forme de noeuds de l'arbre et la relation \emph{parent-enfant} entre elles est illustrée sous la forme de flèches noires.
 
@@ -88,12 +88,12 @@ Le noeud A (resp. B) est donc dans l'incapacité de progresser vers l'époque du
 Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.
 
 Tout d'abord, les noeuds doivent se mettre d'accord sur une époque commune de l'\emph{arbre des époques} comme époque cible.
-Afin d'éviter des problèmes de performances dûs à une coordination synchrone, les noeuds doivent sélectionner cette époque de manière non-coordonnée, \ie en utilisant seulement les données présentes dans l'\emph{arbre des époques}.
+Afin d'éviter des problèmes de performance dûs à une coordination synchrone, les noeuds doivent sélectionner cette époque de manière non-coordonnée, \ie en utilisant seulement les données présentes dans l'\emph{arbre des époques}.
 Nous présentons un tel mécanisme dans la \autoref{sec:priority}.
 
 Ensuite, les noeuds doivent se déplacer à travers l'\emph{arbre des époques} afin d'atteindre l'époque cible.
 La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre.
 Les cas restants à gérer sont ceux où les noeuds se trouvent actuellement à une époque \emph{soeur} ou \emph{cousine} de l'époque cible.
 Dans ces cas, les noeuds doivent être capable de remonter dans l'\emph{arbre des époques} pour retourner au \ac{LCA} de l'époque courante et l'époque cible.
-Ce déplacement est en fait similaire à annuler l'effet des opérations \emph{rename} précédemment appliquées.
+Ce déplacement est en fait similaire à l'annulation de l'effet des opérations \emph{rename} précédemment appliquées.
 Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.
