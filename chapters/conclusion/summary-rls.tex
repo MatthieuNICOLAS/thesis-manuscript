@@ -1,7 +1,7 @@
 Pour privilégier leur disponibilité, latence et tolérance aux pannes, les systèmes distribués peuvent adopter le paradigme de la réplication optimiste \cite{2005-optimistic-replication-saito}.
 Ce paradigme consiste à relaxer la cohérence de données entre les noeuds du système pour leur permettre de consulter et modifier leur copie locale sans se coordonner.
 Leur copies peuvent alors temporairement diverger avant de converger de nouveau une fois les modifications de chacun propagées.
-Cependant, cette approche nécessite l'emploi d'un mécanisme de résolution pour assurer la convergence même en cas de modifications concurrentes.
+Cependant, cette approche nécessite l'emploi d'un mécanisme de résolution de conflits pour assurer la convergence même en cas de modifications concurrentes.
 Pour cela, l'approche des \acp{CRDT} \cite{2007-crdt-shapiro,shapiro_2011_crdt} propose d'utiliser des types de données dont les modifications sont nativement commutatives.
 
 Depuis la spécification des \acp{CRDT}, la littérature a proposé plusieurs de ces mécanismes résolution de conflits automatiques pour le type de données Séquence \cite{2006-woot-oster,ROH2011354,2009-treedoc-preguica,2009-logoot-weiss}.
