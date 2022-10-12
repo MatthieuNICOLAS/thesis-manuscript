@@ -14,6 +14,7 @@ Ainsi, il suffit qu'un noeud du système se déconnecte pour bloquer la stabilit
 À notre connaissance, il s'agit du seul mécanisme proposé pour l'approche à pierres tombales.
 
 \subsection{Ré-équilibrage de l'arbre des identifiants de position}
+\label{sec:etat-art-core-nebula}
 
 Concernant l'approche à identifiants densément ordonnés, \textcite{letia:hal-01248270} puis \textcite{zawirski:hal-01248197} proposent un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour Treedoc \cite{2009-treedoc-preguica}.
 Pour rappel, Treedoc souffre des problèmes suivants :
@@ -46,6 +47,7 @@ Cependant, elle requiert de disposer de noeuds stables et bien connectés dans l
 Cette condition est un obstacle pour le déploiement et la pérennité de cette solution.
 
 \subsection{Réduction de la croissance des identifiants de position}
+\label{sec:etat-art-lseq}
 
 L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à réduire la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
 Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.

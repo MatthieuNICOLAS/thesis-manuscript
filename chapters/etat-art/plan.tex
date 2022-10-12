@@ -1,0 +1,13 @@
+Dans ce chapitre, nous définissons le modèle du système que nous considérons (\autoref{sec:system-model}).
+Puis nous présentons le fonctionnement de LogootSplit, le \acf{CRDT} pour le type Séquence qui sert de base pour nos travaux (\autoref{sec:logootsplit}).
+Ensuite, nous présentons les approches proposées pour réduire le surcoût des \acp{CRDT} pour le type Séquence et identifions leurs limites (\autoref{sec:etat-art-core-nebula} et \autoref{sec:etat-art-lseq}).
+Finalement, nous introduisons l'approche que nous proposons (\autoref{sec:etat-art-proposition}) pour répondre à notre première problématique de recherche \cf{sec:research-questions-rls}, que nous présentons en détails par la suite dans le \autoref{chap:rls}.
+
+Néanmoins, afin d'offrir une vision plus globale de notre domaine de recherche, nous complétons notre état de l'art de plusieurs points.
+Dans la \autoref{sec:etat-art-crdts-intro}, nous rappelons la notion de \acp{CRDT}, \ie de types de données répliquées sans conflits.
+Ce rappel se compose d'une section présentant la notion de sémantique pour un mécanisme de résolution de conflits automatiques (\autoref{sec:etat-art-semantique}) et d'une section présentant les différents modèles de synchronisation pour \acp{CRDT} définis dans la littérature, \ie la synchronisation par états, la synchronisation par opérations et la synchronisation par différences d'états (\autoref{sec:etat-art-synchro}).
+À notre connaissance, nous présentons une des études les plus complètes comparant ces modèles de synchronisation en guise de synthèse de cette même section.
+
+De manière similaire, nous rappelons les différents \acp{CRDT} pour le type Séquence définis dans la littérature dans la \autoref{sec:seq-crdts}.
+Ce rappel prend la forme d'un historique des \acp{CRDT} pour le type Séquence, catégorisés en fonction de l'approche sur laquelle se base leur mécanisme de résolution de conflits, \ie l'approche à pierres tombales ou l'approche à identifiants densément ordonnés.
+De nouveau, ce rappel aboutit à notre connaissance à l'une des études les plus précises comparant ces deux approches (\autoref{sec:seq-crdts-synth}).
