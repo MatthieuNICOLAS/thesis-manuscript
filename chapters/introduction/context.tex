@@ -21,11 +21,14 @@
     \item Cependant, la conception de réseaux sociaux fait face à de nombreux défis.
       Notamment, ces applications doivent assurer leur haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle en raison de leur popularité et importance dans notre quotidien.
       \begin{definition}[Disponibilité]
-          \label{def:availability}
+        \label{def:availability}
+        La disponibilité d'un système indique sa capacité à répondre à tout moment à une requête d'un-e utilisateur-rice.
       \end{definition}
       \begin{definition}[Tolérance aux pannes]
+        La tolérance aux pannes d'un système indique sa capacité à continuer à répondre aux requêtes malgré l'absence de réponse d'un ou plusieurs de ses composants.
       \end{definition}
       \begin{definition}[Capacité de passage à l'échelle]
+        La capacité de passage à l'échelle d'un système indique sa capacité à traiter un volume toujours plus conséquent de requêtes.
       \end{definition}
       Pour cela, ces systèmes adoptent une architecture décentralisée\footnotemark, \ie une architecture reposant sur un ensemble de serveurs qui se répartissent la charge de travail et les tâches.
       \footnotetext{Nous utilisons la classification présentée dans \cite{1964-distributed-communications-networks-baran} pour distinguer les architectures systèmes centralisées, décentralisées et distribuées.}
@@ -37,15 +40,19 @@
     \item De part le rôle que jouent les serveurs dans les systèmes décentralisés, ces derniers échouent à assurer un second ensemble de propriétés, que nous jugeons néanmoins fondamentales :
       \begin{definition}[Confidentialité des données]
         \label{def:confidentialite}
+        La confidentialité des données d'un système indique sa capacité à garantir à ses utilisateur-rices que leurs données ne seront pas accessibles par des tiers non autorisés ou par le système lui-même.
       \end{definition}
       \begin{definition}[Souveraineté des données]
         \label{def:souverainete}
+        La souveraineté des données d'un système indique sa capacité à garantir à ses utilisateur-rices leur maîtrise de leurs données, \ie leur capacité à les consulter, modifier, partager, exporter; supprimer ou encore à décider de l'usage qui en est fait.
       \end{definition}
       \begin{definition}[Pérennité]
         \label{def:perennite}
+        La pérennité d'un système indique sa capacité à garantir à ses utilisateur-rices son fonctionnement continu dans le temps.
       \end{definition}
       \begin{definition}[Résistance à la censure]
         \label{def:censorship}
+        La résistance à la censure d'un système indique sa capacité à garantir à ses utilisateur-rices son fonctionnement malgré des actions de contrôle de l'information par des autorités.
       \end{definition}
       Ainsi, les utilisateur-rices des réseaux sociaux prennent, de manière consciente ou non, le risque que ces propriétés soient transgressées par les autorités auxquelles appartiennent ces applications ou par des tiers avec lesquelles ces autorités interagissent, \eg des gouvernements.
     \item Qui plus est, il convient de noter que les autorités auxquelles appartiennent ces applications, \eg des entreprises, possèdent leurs propres intérêts, \eg leur propre profit.
@@ -55,7 +62,7 @@
       Il nous paraît alors fondamental de proposer des moyens technologiques pour concevoir et déployer des réseaux sociaux alternatifs qui minimisent le rôle des autorités centrales, voire l'éliminent.
     \item Dans cette optique, une piste de recherche que nous jugeons intéressante à étudier est celle présentée dans \cite{localfirstsoftware2019}.
       Dans ce travail, les auteurs proposent un nouveau paradigme de conception d'applications, nommées \acp{LFS}.
-      Ce type d'applications se démarque par la place centrale donnée aux utilisateur-rices et leurs propres appareils, les éventuels serveurs étant relegués qu'à de simples rôles de support.
+      Ce type d'applications se démarque de ceux existants, \eg les applications basées sur le cloud, par la place centrale donnée aux utilisateur-rices et leurs propres appareils, les éventuels serveurs étant relegués qu'à de simples rôles de support.
     \item \cite{localfirstsoftware2019} identifie 7 propriétés que doivent satisfaire les applications \acp{LFS}, illustrées dans la \autoref{fig:lfs-properties}.
       \begin{figure}[!ht]
         \centering
@@ -75,11 +82,12 @@
       \end{enumerate}
       Notons qu'il découle de ces propriétés que les applications \acp{LFS} sont fondamentalement \ac{P2P}.
     \item De manière similaire, observons que ce paradigme met en lumière une dernière propriété des applications \acp{LFS} :
-      \begin{definition}[Collaborative]
+      \begin{definition}[Collaborativité]
         \label{def:collaborative}
-        Une application collaborative est une application permettant à plusieurs utilisateur-rices ou robots de travailler ensemble pour réaliser une tâche.
-        Dans ce manuscrit, nous considérons qu'une collaboration peut prendre la forme d'une discussion, \eg en participant à un fil de discussion d'une plateforme de questions et réponses, ou d'une édition collaborative d'un contenu, \eg en participant à la rédaction d'une page de wiki.
+        La collaborativité d'un système indique sa capacité à supporter ses utilisateur-rices dans leurs processus de collaboration pour la réalisation de tâches.
       \end{definition}
+      Nous précisons que nous considérons dans ce manuscrit qu'une collaboration peut prendre bien des formes.
+      Une collaboration peut ainsi prendre la forme d'un échange entre utilisateur-rices, \eg un fil de discussion sur une plateforme de questions et réponses, ou d'une édition collaborative d'un contenu, \eg la rédaction d'une page de wiki.
     % \item \mnnote{TODO: Voir si angle écologique/réduction consommation d'énergie peut être pertinent.}
     \item Ainsi, \cite{localfirstsoftware2019} établit un paradigme de conception d'applications correspondant à notre vision.
       Cependant, de nombreuses problématiques de recherche identifiées dans ce travail sont encore non résolues et entravent la démocratisation des applications \acp{LFS}.
@@ -92,7 +100,7 @@
     \item Cependant, compte tenu des propriétés visées par les applications \acp{LFS}, plusieurs contraintes restreignent le choix des méthodes de réplication possibles.
       Ainsi, pour permettre le fonctionnement en mode hors-ligne de l'application, \ie la consultation et la modification de contenu, les applications \acp{LFS} doivent relaxer la propriété de cohérence des données.
       \begin{definition}[Cohérence]
-
+        La cohérence d'un système indique sa capacité à présenter une vue uniforme de son état à chacun de ses utilisateur-rices à un moment donné.
       \end{definition}
       Les applications \acp{LFS} ne peuvent donc pas reposer sur des méthodes de réplication dites pessimistes, \ie qui empêchent toutes modifications concurrentes d'une même donnée.
     \item Les applications \acp{LFS} doivent donc adopter des méthodes de réplication dites optimistes \cite{2005-optimistic-replication-saito}.
