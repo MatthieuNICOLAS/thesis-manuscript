@@ -11,24 +11,37 @@ Nous avons cependant déterminé que ces mécanismes ne sont pas adaptés aux sy
 
 Dans le cadre de cette thèse, nous avons donc souhaité proposer un nouveau mécanisme adapté à ce type de systèmes.
 Pour cela, nous avons suivi l'approche proposée par \cite{letia:hal-01248270,zawirski:hal-01248197} : l'utilisation d'un mécanisme pour ré-assigner de nouveaux identifiants aux élements stockées dans la séquence.
-Nous avons donc proposé un nouveau mécanisme appartenant à cette approche pour le \ac{CRDT} LogootSplit \cite{2013-logootsplit}.
+Nous avons donc proposé un nouveau mécanisme appartenant à cette approche pour le \ac{CRDT} LogootSplit \cite{2013-logootsplit}.\\
 
 Notre proposition prend la forme d'un nouvel \ac{CRDT} pour Séquence à granularité variable : RenamableLogootSplit.
 Ce nouveau \ac{CRDT} associe à LogootSplit un nouveau type de modification, $\trm{ren}$, permettant de produire une nouvelle séquence équivalente à son état précédent.
 Cette nouvelle modification tire profit de la granularité variable de la séquence pour produire un état de taille minimale : elle assigne à tous les éléments des identifiants de position issus d'un même intervalle.
 Ceci nous permet de minimiser les métadonnées que la séquence doit stocker de manière effective.
-De plus, le passage à une représentation interne minimale de la séquence nous permet d'améliorer le coût des modifications suivantes en termes de calculs.
+% De plus, le passage à une représentation interne minimale de la séquence nous permet d'améliorer le coût des modifications suivantes en termes de calculs.
 
 Afin de gérer les opérations concurrentes aux opérations $\trm{ren}$, nous définissons pour ces dernières un algorithme de transformation.
 Pour cela, nous définissons un mécanisme d'époques nous permettant d'identifier la concurrence entre opérations.
 De plus, nous introduisons une relation d'ordre strict total, \emph{priority}, pour résoudre de manière déterministe le conflit provoqué par deux opérations $\trm{ren}$, \ie pour déterminer quelle opération $\trm{ren}$ privilégier.
 Finalement, nous définissons deux algorithmes, \texttt{renameId} et \texttt{revertRenameId}, qui permettent de transformer les opérations concurrentes à une opération $\trm{ren}$ pour prendre en compte l'effet de cette dernière.
-Ainsi, notre algorithme permet de détecter et de transformer les opérations concurrentes aux opérations $\trm{ren}$, sans nécessiter une coordination synchrone entre les noeuds.
-Le surcoût induit par ce mécanisme, notamment en termes de calculs, est toutefois contrebalancé par l'amélioration précisée précédemment, \ie la réduction de la taille de la séquence.
+Ainsi, notre algorithme permet de détecter et de transformer les opérations concurrentes aux opérations $\trm{ren}$, sans nécessiter une coordination synchrone entre les noeuds.\\
 
-Finalement, le mécanisme que nous proposons est partiellement générique : il peut être adapté à d'autres \acp{CRDT} pour Séquence à granularité variable, \eg un \ac{CRDT} pour Séquence appartenant à l'approche à pierres tombales.
+
+Pour valider notre approche, nous proposons une évaluation expérimentale de cette dernière.
+Cette évaluation se base sur des traces de sessions d'édition collaborative que nous avons généré par simulations.
+Chacune de ces simulations représente la rédaction collaborative d'un document texte par 10 noeuds.
+
+Notre évaluation nous permet de valider de manière empirique les résultats attendus.
+Le premier d'entre eux concerne la convergence des noeuds.
+En effet, nos simulations nous ont permis de valider que l'ensemble des noeuds obtenaient des états finaux équivalents, même en cas d'opérations $\trm{ren}$ concurrentes.
+
+Notre évaluation nous a aussi permis de valider que le mécanisme de renommage réduit à une taille minimale le surcoût du mécanisme de résolution de conflits incorporé dans le \ac{CRDT} pour Séquence.
+
+L'évaluation expérimentale nous a aussi permis de prendre conscience d'effets additionnels du mécanisme de renommage que nous n'avions pas anticipé.
+Notamment, elle montre que le surcoût éventuel du mécanisme de renommage, notamment en termes de calculs, est toutefois contrebalancé par l'amélioration précisée précédemment, \ie la réduction de la taille de la séquence.\\
+
+Finalement, notons que le mécanisme que nous proposons est partiellement générique : il peut être adapté à d'autres \acp{CRDT} pour Séquence à granularité variable, \eg un \ac{CRDT} pour Séquence appartenant à l'approche à pierres tombales.
 Dans le cadre d'une telle démarche, nous pourrions réutiliser le système d'époques, la relation \emph{priority} et l'algorithme de contrôle qui identifie les transformations à effectuer.
-Pour compléter une telle adaptation, nous devrions cependant concevoir de nouveaux algorithmes \texttt{renameId} et \texttt{revertRenameId} spécifiques et adaptés au \ac{CRDT} choisi.
+Pour compléter une telle adaptation, nous devrions cependant concevoir de nouveaux algorithmes \texttt{renameId} et \texttt{revertRenameId} spécifiques et adaptés au \ac{CRDT} choisi.\\
 
 Le mécanisme de renommage que nous présentons souffre néanmoins de plusieurs limites.
 La première d'entre elles concerne ses performances.
