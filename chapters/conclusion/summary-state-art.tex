@@ -1,0 +1,43 @@
+Les \acfp{CRDT} \cite{shapiro_2011_crdt} sont de nouvelles spécifications des types de données.
+Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une même donnée et pour leur permettre de la consulter et de la modifier sans aucune coordination préalable.
+Les noeuds se synchronisent
+
+L'absence de coordination entre les noeuds avant modifications implique que des noeuds peuvent modifier la donnée en concurrence.
+De telles modifications peuvent donner lieu à des conflits, \eg l'ajout et la suppression en concurrence d'un même élément dans un ensemble.
+Pour pallier ce problème, les \acp{CRDT} incorporent un mécanisme de résolution de conflits automatiques directement au sein de leur spécification.
+
+Il convient de noter qu'il existe plusieurs solutions possibles pour résoudre un conflit.
+Pour reprendre l'exemple de l'élément ajouté et supprimé en concurrence d'un ensemble, nous pouvons par exemple soit le conserver l'élément, soit le supprimer.
+Nous parlons alors de sémantique du mécanisme de résolution de conflits automatique.
+
+De la même manière, il existe plusieurs approches possibles pour synchroniser les noeuds, \eg diffuser chaque modification de manière atomique ou diffuser l'entièreté de l'état périodiquement.
+Ainsi, lors de la définition d'un \ac{CRDT}, il convient de préciser les sémantiques de résolution de conflits qu'il adopte et le modèle de synchronisation qu'il utilise \cite{2018-crdts-overview-preguica}.\\
+
+Depuis leur formalisation, les travaux sur les \acp{CRDT} ont abouti à la conception de nouveaux, soit en spécifiant de nouvelles sémantiques de résolution de conflits pour un type de données \cite{2020-cl-set-weihai}, soit en spécifiant de nouveaux modèles de synchronisation \cite{Almeida_2018} ou en enrichissant les spécifications des modèles existants \cite{baquero2017pure,enes2019}.
+
+Dans notre présentation des \acp{CRDT} \cf{sec:etat-art-crdts-intro}, nous présentons chacun de ces aspects.
+Cependant, nous nous ne limitons pas à retranscrire l'état de l'art de la littérature.
+Notamment au sujet du modèle de synchronisation par opérations, nous précisons que le modèle de livraison causal n'est pas nécessaire pour l'ensemble des \acp{CRDT} synchronisés par opérations, \ie que certains peuvent adopter des modèles de livraison moins contraints et donc moins coûteux.
+Cette précision nous permet de proposer une étude comparative des différents modèles de synchronisation qui est, à notre connaissance, l'une des plus précises de la littérature \cf{def:synchro-synthese}.\\
+
+Nous présentons ensuite les différents \acp{CRDT} pour le type Séquence de la littérature \cf{sec:seq-crdts}.
+Nous mettons alors en exergue les deux approches proposées pour concevoir le mécanisme de résolution de conflits automatiques pour le type Séquence, \ie l'approche à pierres tombales et l'approche à identifiants densément ordonnés.
+De nouveau, cette rétrospective nous permet d'expliciter des angles morts des articles d'origine, notamment vis-à-vis des modèle de livraison des opérations des \acp{CRDT} proposés.
+Puis, nous mettons en lumière les limites des évaluations comparant les deux approches, \ie le couplage entretenu entre approche du mécanisme de résolution de conflits et choix d'implémentations.
+Cette limite empêche d'établir la supériorité d'une des approches par rapport à l'autre.
+Finalement, nous conjecturons que le surcoût de ces deux approches est le même, \ie le coût nécessaire à la représentation d'un espace dense.
+Nous précisons dès lors par le biais de notre propre étude comparative comment ce surcoût s'exprime dans chacune des approches , \ie le compromis entre surcoût en métadonnées, calculs et bande-passante proposé par les deux approches \cf{sec:seq-crdts-synth}.\\
+
+Ces réflexions que nous présentons sur l'état des \acp{CRDT} définissent plusieurs pistes de recherches.
+Une première d'entre elles concerne notre étude comparative des modèles de synchronisation.
+D'après les critères que nous utilisons, une conclusion possible de cette comparaison est que le modèle de synchronisation par différences d'états rend obsolètes les modèles de synchronisation par états et par opérations.
+En effet, le modèle de synchronisation par différences d'états apparaît comme adapté à l'ensemble des contextes d'utilisation qui étaient jusqu'à lors exclusifs à ces derniers, de par les multiples stratégies qu'il permet, \eg synchronisation par états complets, synchronisation par états irréductibles...
+
+Cette conclusion nous paraît cependant hâtive.
+Il convient d'étendre notre étude comparative pour prendre en compte des critères de comparaison additionnels pour confirmer cette conjecture, ou l'invalider et définir plus précisément les spécificités de chacun des modèles de synchronisation.
+Nous détaillons cette piste de recherche dans la \autoref{sec:perspective-comparison-sync-models}.\\
+
+Une seconde piste de recherche possible concerne les deux approches utilisées pour concevoir le mécanisme de résolution de conflits des \acp{CRDT} pour le type Séquence.
+Comme dit précédemment, nous conjecturons que ces deux approches ne sont finalement que deux manières différentes de représenter une même information : la position d'un élément dans un espace dense.
+La différence entre ces approches résiderait uniquement dans la manière que chaque représentation influe sur les performances du \ac{CRDT}.
+Une piste de travail serait donc de confirmer cette conjecture, en proposant une formalisation unique des \acp{CRDT} pour le type Séquence.

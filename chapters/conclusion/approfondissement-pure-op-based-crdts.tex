@@ -14,7 +14,7 @@ Les auteurs définissent ensuite le concept de stabilité causale.
 Ce concept leur permet de retirer les métadonnées de causalité des opérations du PO-Log lorsque celles-ci sont déterminées comme étant causalement stables.
 
 Finalement, les auteurs définissent un ensemble de relations, spécifiques à chaque \ac{CRDT}, qui permettent d'exprimer la \emph{redondance causale}.
-La redondance causale permet de spécifier quand retirer une opération du PO-Log, car rendue obsolète par une autre opération.
+La redondance causale permet de spécifier quand retirer une opération du PO-Log, car rendue obsolète par une autre opération.\\
 
 Cette approche souffre toutefois de plusieurs limites.
 Tout d'abord, elle repose sur l'utilisation d'une couche de livraison \ac{RCB}.
@@ -41,7 +41,7 @@ Par exemple, ils définissent que la suppression d'un élément d'un ensemble re
 Cependant, dans le cadre d'autres types de données, \eg la Séquence, une modification peut concerner un ensemble d'éléments de taille variable.
 Une opération peut donc être rendue obsolète non pas par une opération, mais par un ensemble d'opérations.
 Par exemple, les suppressions d'éléments formant une sous-chaîne rendent obsolète l'insertion de cette sous-chaîne.
-Ainsi, la notion de redondance causale est incomplète et souffre de l'absence d'une notion d'obsolescence partielle d'une opération.
+Ainsi, la notion de redondance causale est incomplète et souffre de l'absence d'une notion d'obsolescence partielle d'une opération.\\
 
 Pour répondre aux différents problèmes soulevés, nous souhaitons proposer une extension du framework Pure Operation-Based \acp{CRDT}.
 Nos objectifs sont les suivants :

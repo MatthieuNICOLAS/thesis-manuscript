@@ -173,7 +173,7 @@
 \algdef{C}[IF]{IF}{ElsIf}[1]%
   {\algorithmicelse\ \algorithmicif\ \CONDITION{#1}{\ \algorithmicthen}}
 
-\usepackage[inline,nomargin,index]{fixme}
+\usepackage[draft,inline,nomargin,index]{fixme}
 \fxsetup{theme=color,mode=multiuser,inlineface=\itshape,envface=\itshape}
 \FXRegisterAuthor{mn}{amn}{Matthieu}
 
@@ -497,8 +497,8 @@ WIP
 \input{chapters/introduction/publications}
 
 \import{chapters/etat-art/}{etat-art}
-\import{chapters/rls/}{rls}
-\import{chapters/}{mute}
+% \import{chapters/rls/}{rls}
+% \import{chapters/}{mute}
 
 \NumberThisInToc
 \chapter{Conclusions et perspectives}
@@ -509,6 +509,9 @@ WIP
 \input{chapters/conclusion/intro}
 
 \section{Résumés des contributions}
+
+\subsection{Réflexions sur l'état de l'art des \acp{CRDT}}
+\input{chapters/conclusion/summary-state-art}
 
 \subsection{Ré-identification sans coordination pour les \acp{CRDT} pour Séquence}
 \input{chapters/conclusion/summary-rls}

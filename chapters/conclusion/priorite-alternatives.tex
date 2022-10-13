@@ -5,7 +5,7 @@ Pour rappel, cette relation doit établir un ordre strict total sur les époques
 
 Cette relation nous permet ainsi de résoudre le conflit provoqué par la génération de modifications $\trm{ren}$ concurrentes en les ordonnant.
 Grâce à cette relation relation d'ordre, les noeuds peuvent déterminer vers quelle époque de l'ensemble des époques connues progresser.
-Cette relation permet ainsi aux noeuds de converger à une époque commune à terme.
+Cette relation permet ainsi aux noeuds de converger à une époque commune à terme.\\
 
 La convergence à terme à une époque commune présente plusieurs avantages :
 \begin{enumerate}
@@ -31,7 +31,7 @@ Cette définition présente cependant plusieurs limites.
 La limite que nous identifions est sa décorrélation avec le coût et le bénéfice de progresser vers l'époque cible désignée.
 En effet, l'époque cible est désignée de manière arbitraire par rapport à sa position dans l'arbre des époques.
 Il est ainsi possible que progresser vers cette époque détériore l'état de la séquence, \ie augmente la taille des identifiants et augmente le nombre de blocs.
-De plus, la transition de l'ensemble des noeuds depuis leur époque courante respective vers cette nouvelle époque cible induit un coût en calculs, potentiellement important \cf{fig:worst-case-priority}.
+De plus, la transition de l'ensemble des noeuds depuis leur époque courante respective vers cette nouvelle époque cible induit un coût en calculs, potentiellement important \cf{fig:worst-case-priority}.\\
 
 Pour pallier ce problème, il est nécessaire de proposer une définition de \emph{priority} prenant l'aspect efficacité en compte.
 L'approche considérée consisterait à inclure dans les opérations $\trm{ren}$ une ou plusieurs métriques qui représente le travail accumulé sur la branche courante de l'arbre des époques, \eg le nombre d'opérations intégrées, les noeuds actuellement sur cette branche...

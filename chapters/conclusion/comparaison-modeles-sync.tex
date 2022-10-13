@@ -1,3 +1,4 @@
+\label{sec:perspective-comparison-sync-models}
 Comme évoqué dans l'état de l'art \cf{sec:delta-crdts}, un nouveau modèle de synchronisation pour \ac{CRDT} fut proposé récemment \cite{almeida2015delta}.
 Ce dernier propose une synchronisation des noeuds par le biais de différences d'états.
 
@@ -9,7 +10,7 @@ La spécificité de ce nouveau modèle de synchronisation est de calculer pour c
 Cette différence correspond à un élément irréductible du sup-demi-treillis du \ac{CRDT} \cite{enes2019}, \ie un état particulier de ce dernier.
 Cet élément irréductible peut donc être diffusé et intégré par les autres noeuds, toujours à l'aide de la fonction \texttt{merge}.
 
-Ce modèle de synchronisation permet alors d'adopter une variété de stratégies de synchronisation, \eg diffusion des différences de manière atomique, fusion de plusieurs différences puis diffusion du résultat..., et donc de répondre à une grande variété de cas d'utilisation.
+Ce modèle de synchronisation permet alors d'adopter une variété de stratégies de synchronisation, \eg diffusion des différences de manière atomique, fusion de plusieurs différences puis diffusion du résultat..., et donc de répondre à une grande variété de cas d'utilisation.\\
 
 Dans notre comparaison des modèles de synchronisation \cf{def:synchro-synthese}, nous avons justifié que les \acp{CRDT} synchronisés par différences d'états peuvent être utilisés dans les mêmes contextes que les \acp{CRDT} synchronisés par états et que les \acp{CRDT} synchronisés par opérations.
 Cette conclusion nous mène à reconsidérer l'intérêt des autres modèles de synchronisation de nos jours.
@@ -17,7 +18,7 @@ Cette conclusion nous mène à reconsidérer l'intérêt des autres modèles de 
 Par exemple, un \ac{CRDT} synchronisé par différences d'états correspond à un \ac{CRDT} synchronisé par états dont nous avons identifié les éléments irréductibles.
 La différence entre ces deux modèles de synchronisation semble reposer seulement sur la possibilité d'utiliser ces éléments irréductibles pour propager les modifications, en place et lieu des états complets.
 Nous conjecturons donc que le modèle de synchronisation par états est rendu obsolète par celui par différences d'états.
-Il serait intéressant de confirmer cette supposition.
+Il serait intéressant de confirmer cette supposition.\\
 
 En revanche, l'utilisation du modèle de synchronisation par opérations conduit généralement à une spécification différente du \ac{CRDT}, les opérations permettant d'encoder plus librement les modifications.
 Notamment, l'utilisation d'opérations peut mener à des algorithmes d'intégration des modifications différents que ceux de la fonction \texttt{merge}.

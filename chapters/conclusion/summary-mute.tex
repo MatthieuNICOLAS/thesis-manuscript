@@ -3,13 +3,13 @@ Elles permettent à plusieurs utilisateur-rices de consulter la version actuelle
 Ceci permet de mettre en place une réflexion de groupe, ce qui améliore la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing,2005-internet-encyclopaedias-head-to-head}.
 
 Cependant, les applications collaboratives sont historiquement des applications centralisées, \eg Google Docs \cite{gdocs}.
-Ce type d'architecture induit des défauts d'un point de vue technique, \eg faible capacité de passage à l'échelle et faible tolérance aux pannes, mais aussi d'un point de vue utilisateur, \eg perte de la souveraineté des données et absence de garantie de pérennité.
+Ce type d'architecture induit des défauts d'un point de vue technique, \eg faible capacité de passage à l'échelle et faible tolérance aux pannes, mais aussi d'un point de vue utilisateur, \eg perte de la souveraineté des données et absence de garantie de pérennité.\\
 
 Les travaux de l'équipe Coast s'inscrivent dans une mouvance souhaitant résoudre ces problèmes et qui a conduit à la définition d'un nouveau paradigme d'applications : les \acp{LFS} \cite{localfirstsoftware2019}.
 Le but de ce paradigme est la conception d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateur-rices.
 
 Dans le cadre de cette démarche, l'équipe Coast développe depuis plusieurs années l'application \acf{MUTE}, un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \ac{PoC} pour les \acp{LFS}.
+Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \ac{PoC} pour les \acp{LFS}.\\
 
 Dans le cadre de cette thèse, nous avons implémenté dans \ac{MUTE} nos travaux de recherche portant sur le nouvel \ac{CRDT} pour le type Séquence : RenamableLogootSplit.
 \ac{MUTE} a aussi servi à l'équipe pour présenter ses travaux concernant l'authentification des utilisateur-rices dans un système \ac{P2P} \cite{2018-trusternity-long}.
@@ -28,7 +28,7 @@ Cependant, cela ne dispense pas \ac{MUTE} de souffrir de plusieurs limites.
 Tout d'abord, l'environnement web implique un certain nombre de contraintes, notamment au niveau des technologies et protocoles disponibles.
 Notamment, le protocole WebRTC repose sur l'utilisation de serveurs de signalisation, \ie de points de rendez-vous des pairs, et de serveurs de relai, \ie d'intermédiaires pour communiquer entre pairs lorsque les configurations de leur réseaux respectifs interdisent l'établissement d'une connection directe.
 Ainsi, les applications \ac{P2P} web doivent soit déployer et maintenir leur propre infrastructure de serveurs, soit reposer sur une infrastructure existante, \eg celle proposée par OpenRelay \cite{openrelay}.
-Afin de minimiser l'effort requis aux applications \ac{P2P} et la confiance exigée à leurs utilisateur-rices, nous devons supporter la mise en place d'une telle infrastructure transparente et pérenne.
+Afin de minimiser l'effort requis aux applications \ac{P2P} et la confiance exigée à leurs utilisateur-rices, nous devons supporter la mise en place d'une telle infrastructure transparente et pérenne.\\
 
 Une autre limite de ce système que nous identifions concerne l'utilisabilité des systèmes \ac{P2P} de manière générale.
 L'expérience vécue suivante constitue à notre avis un exemple éloquent des limites actuelles de l'application \ac{MUTE} dans ce domaine.

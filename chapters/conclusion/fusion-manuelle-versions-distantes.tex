@@ -9,9 +9,9 @@ Le contexte causal est utilisé par les mécanismes de résolution de conflits p
     \item Permettre de préserver l'intention d'une modification malgré l'intégration préalable de modifications concurrentes.
 \end{enumerate}
 
-Le contexte causal est utilisé de manière différente en fonction du mécanisme de résolution de conflit.
-Dans l'approche \ac{OT}, le contexte causal est utilisé par l'algorithme de contrôle pour déterminer les modifications concurrentes à une modification lors de son intégration, afin de prendre en compte leurs effets.
-Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification nativement commutative avec les modifications concurrentes, \ie pour en faire un élément du sup-demi-treillis représentant la structure de données répliquée.
+% Le contexte causal est utilisé de manière différente en fonction du mécanisme de résolution de conflit.
+% Dans l'approche \ac{OT}, le contexte causal est utilisé par l'algorithme de contrôle pour déterminer les modifications concurrentes à une modification lors de son intégration, afin de prendre en compte leurs effets.
+% Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification nativement commutative avec les modifications concurrentes, \ie pour en faire un élément du sup-demi-treillis représentant la structure de données répliquée.
 
 Le contexte causal peut être représenté de différentes manières.
 Par exemple, le contexte causal peut prendre la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'un \ac{DAG} des modifications \cite{1997-causal-barrier}.
@@ -20,7 +20,7 @@ Cependant, de manière intrinsèque, le contexte causal ne fait que de croître 
 La stabilité causale permet cependant de réduire le surcoût lié au contexte causal.
 En effet, la stabilité causale permet d'établir le contexte commun à l'ensemble des noeuds, \ie l'ensemble des modifications que l'ensemble des noeuds ont intégré.
 Ces modifications font alors partie de l'histoire commune et n'ont plus besoin d'être considérées par les mécanismes de résolution de conflits automatiques.
-La stabilité causale permet donc de déterminer et de tronquer la partie commune du contexte causal pour éviter que ce dernier ne pénalise les performances du système à terme.
+La stabilité causale permet donc de déterminer et de tronquer la partie commune du contexte causal pour éviter que ce dernier ne pénalise les performances du système à terme.\\
 
 La stabilité causale est cependant une contrainte forte dans les systèmes \ac{P2P} dynamiques à large échelle sujet au churn.
 Il ne suffit en effet que d'un noeud déconnecté pour empêcher la stabilité causale de progresser.
@@ -53,7 +53,7 @@ Cependant, dans le cadre de collaborations asynchrones ou à large échelle, nou
 Cette accumulation peut atteindre un seuil rendant laborieuse la déduction et le rétablissement de l'intention initiale des modifications.
 Le travail imposé aux utilisateur-rices pour résoudre ces anomalies par le biais d'actions de compensation peut alors entraver la collaboration.
 Pour reprendre l'exemple de l'édition collaborative de texte, nous pouvons constater de tels cas suite à de la duplication de contenu et/ou l'entrelacement de mots, phrases voire paragraphes nuisant à la clarté et correction du texte.
-Il convient alors de s'interroger sur le bien-fondé de l'utilisation de mécanismes de résolutions de conflits automatiques pour intégrer un ensemble de modifications dans l'ensemble des situations.
+Il convient alors de s'interroger sur le bien-fondé de l'utilisation de mécanismes de résolutions de conflits automatiques pour intégrer un ensemble de modifications dans l'ensemble des situations.\\
 
 Ainsi, pour répondre aux limites des mécanismes de résolution conflits automatiques dans les systèmes \ac{P2P} à large échelle, \ie l'augmentation de leur surcoût et la pertinence de leur résultat, nous souhaitons proposer une approche combinant un ou des mécanismes de résolution de conflits automatiques avec un ou des mécanismes de résolution de conflits manuels.
 L'idée derrière cette approche est de faire varier le mécanisme de résolution de conflits utilisé pour intégrer des modifications.
@@ -71,7 +71,7 @@ Cette approche nous permettrait de répondre aux limites soulevées précédemme
 En effet, elle permettrait de limiter la génération d'anomalies par le mécanisme de résolution de conflits automatique en faisant intervenir les utilisateur-rices.
 Puis, puisque nous déléguons aux utilisateur-rices l'intégration des modifications à partir d'une distance seuil, nous pouvons dès lors reconsidérer les métadonnées conservées par les noeuds pour les mécanismes de résolution de conflits automatiques.
 Notamment, nous pouvons identifier les noeuds se trouvant au-delà de cette distance seuil d'après leur dernier contexte causal connu et ne plus les prendre en compte pour le calcul de la stabilité causale.
-Cette approche permettrait donc de réduire le surcoût lié au contexte causal et limiter la perte de modifications, tout en prenant en considération l'ajout de travail aux utilisateur-rices.
+Cette approche permettrait donc de réduire le surcoût lié au contexte causal et limiter la perte de modifications, tout en prenant en considération l'ajout de travail aux utilisateur-rices.\\
 
 Pour mener à bien ce travail, il conviendra tout d'abord de définir la notion de distance entre versions de la donnée répliquée.
 Nous envisageons de baser cette dernière sur les deux aspects temporel et spatial, \ie en utilisant la distance entre contextes causaux et la distance entre contenus.
