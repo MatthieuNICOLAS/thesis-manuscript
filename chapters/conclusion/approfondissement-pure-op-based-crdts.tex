@@ -1,5 +1,12 @@
-\textcite{baquero2017pure} proposent un framework pour concevoir des \acp{CRDT} synchronisés par opérations : Pure Operation-Based \acp{CRDT}.
-Ce framework a plusieurs objectifs :
+Plusieurs approches ont été proposées dans la littérature pour guider la conception de \acp{CRDT} :
+\begin{enumerate}
+    \item L'utilisation de la théorie des treillis pour la conception de \acp{CRDT} synchronisés par états et par différences d'états \cite{shapiro_2011_crdt,enes2019}.
+    \item L'utilisation d'un journal partiellement ordonné des opérations, nommé PO-Log, pour la conception de \acp{CRDT} synchronisés par opérations \cite{baquero2017pure}.
+\end{enumerate}
+Cependant, ce framework proposé par \cite{baquero2017pure} souffre de plusieurs limitations.
+Nous souhaitons donc proposer un nouveau framework pour la conception de \acp{CRDT} synchronisés par opérations, en nous basant sur ce dernier.\\
+
+Le framework proposé dans \cite{baquero2017pure} possède plusieurs objectifs :
 \begin{enumerate}
     \item Proposer une approche partiellement générique pour définir un \ac{CRDT} synchronisé par opérations.
     \item Factoriser les métadonnées utilisées par le \ac{CRDT} pour le mécanisme de résolution de conflits, notamment pour identifier les éléments, et celles utilisées par la couche livraison, notamment pour identifier les opérations.
@@ -7,7 +14,7 @@ Ce framework a plusieurs objectifs :
 \end{enumerate}
 
 Pour cela, les auteurs se limitent aux \acp{CRDT} purs synchronisés par opérations, \ie les \acp{CRDT} dont les modifications enrichies de leurs arguments et d'une estampille fournie par la couche de livraison des messages sont commutatives.
-Pour ces \acp{CRDT}, les auteurs proposent un framework générique permettant leur spécification sous la forme d'un journal partiellement ordonné des opérations, nommé PO-Log.
+Pour ces \acp{CRDT}, les auteurs proposent un framework générique permettant leur spécification sous la forme d'un PO-Log.
 Les auteurs associent le PO-Log à une couche de livraison \ac{RCB} des opérations.
 
 Les auteurs définissent ensuite le concept de stabilité causale.
@@ -16,11 +23,11 @@ Ce concept leur permet de retirer les métadonnées de causalité des opération
 Finalement, les auteurs définissent un ensemble de relations, spécifiques à chaque \ac{CRDT}, qui permettent d'exprimer la \emph{redondance causale}.
 La redondance causale permet de spécifier quand retirer une opération du PO-Log, car rendue obsolète par une autre opération.\\
 
-Cette approche souffre toutefois de plusieurs limites.
+Comme évoqué précédemment, cette approche souffre toutefois de plusieurs limites.
 Tout d'abord, elle repose sur l'utilisation d'une couche de livraison \ac{RCB}.
 Cette couche satisfait le modèle de livraison causale.
 Mais pour rappel, ce modèle induit l'ajout de données de causalité précises à chaque opération, sous la forme d'un vecteur de version ou d'une barrière causale.
-Nous jugeons ce modèle trop coûteux pour un système \ac{P2P} dynamique à large échelle sujet au churn.
+Nous jugeons ce modèle trop coûteux pour les systèmes \ac{P2P} dynamiques à large échelle sujets au churn.
 
 En plus du coût induit en termes de métadonnées et de bande-passante, le modèle de livraison causale peut aussi introduire un délai superflu dans la livraison des opérations.
 En effet, ce modèle impose que tous les messages précédant un nouveau message d'après la relation \hb soient eux-mêmes livrés avant de livrer ce dernier.
@@ -43,17 +50,17 @@ Une opération peut donc être rendue obsolète non pas par une opération, mais
 Par exemple, les suppressions d'éléments formant une sous-chaîne rendent obsolète l'insertion de cette sous-chaîne.
 Ainsi, la notion de redondance causale est incomplète et souffre de l'absence d'une notion d'obsolescence partielle d'une opération.\\
 
-Pour répondre aux différents problèmes soulevés, nous souhaitons proposer une extension du framework Pure Operation-Based \acp{CRDT}.
+Pour répondre aux différents problèmes soulevés, nous souhaitons proposer un nouveau framework en nous basant sur \cite{baquero2017pure}.
 Nos objectifs sont les suivants :
 \begin{enumerate}
     \item Proposer un framework mettant en lumière la présence et le rôle de deux modèles de livraison :
         \begin{enumerate}
             \item Le modèle de livraison minimal requis par le \ac{CRDT} pour assurer la convergence forte à terme \cite{shapiro_2011_crdt}.
-            \item Le modèle de livraison utilisé par le système, qui doit être égal ou plus contraint que modèle de livraison minimal du \ac{CRDT}.
+            \item Le modèle de livraison employé par le système qui utilise le \ac{CRDT}.
                 Ce second modèle de livraison est une stratégie permettant au système de respecter un modèle de cohérence donné et régissant les règles de compaction de l'état.
-                Il peut être amené à évoluer en fonction de l'état du système et de ses besoins.
-                Par exemple, un système peut par défaut utiliser le modèle de livraison causale pour assurer le modèle de cohérence causal.
-                Puis, lorsque le nombre de noeuds atteint un seuil donné, le système peut passer au modèle de livraison FIFO pour assurer le modèle de cohérence PRAM afin de réduire les coûts en bande-passante.
+                Il doit être égal ou plus contraint que modèle de livraison minimal du \ac{CRDT} et peut être amené à évoluer en fonction de l'état du système et de ses besoins.
+                Par exemple, un système pourrait par défaut utiliser le modèle de livraison causale pour assurer le modèle de cohérence causal.
+                Puis, lorsque le nombre de noeuds atteint un seuil donné et que le coût de la livraison causale devient trop élevé, le système pourrait passer au modèle de livraison FIFO pour assurer le modèle de cohérence PRAM afin de réduire les coûts en bande-passante.
         \end{enumerate}
     \item Étendre la notion de redondance causale pour prendre en compte la redondance partielle des opérations.
         De plus, nous souhaitons rendre cette notion accessible à la couche de livraison, pour détecter au plus tôt les opérations désormais obsolètes et prévenir leur diffusion.
