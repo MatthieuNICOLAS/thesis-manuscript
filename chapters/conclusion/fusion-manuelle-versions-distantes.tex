@@ -1,8 +1,25 @@
 \label{sec:manual-merge}
 
-À l'issue de cette thèse, nous constatons plusieurs limites des mécanismes de résolution de conflits automatiques dans les systèmes \ac{P2P} à large échelle sujet au churn.
-La première d'entre elles est l'utilisation d'un contexte causal.
-Le contexte causal est utilisé par les mécanismes de résolution de conflits pour :
+À l'issue de cette thèse, nous identifions deux limites des mécanismes de résolution de conflits automatiques dans les systèmes \ac{P2P} à large échelle sujets au churn :
+\begin{enumerate}
+    \item La croissance continue de leur surcoût dûe à l'utilisation du contexte causal.
+    \item Leur compréhension limitée des intentions des utilisateur-rices, ce qui peut conduire à la génération d'anomalies lors de l'intégration de modifications.
+\end{enumerate}
+
+Nous conjecturons que la probabilité que l'intégration de modifications résulte en des anomalies et que le travail nécessaire par les utilisateur-rices pour corriger ces anomalies augmentent avec la distance entre la version de génération des modifications et la version d'intégration de ces dernières.
+Si cette conjecture se vérifie, nous proposons d'identifier la distance seuil entre versions à partir de laquelle l'utilisation d'un mécanisme de résolution de conflit automatique donné s'avère inefficace.
+Dès lors, nous proposons de recourir à un mécanisme d'intégration manuelle des modifications lorsque des modifications reçues sont originaires d'une version du document se trouvant au-delà de ce seuil.
+
+Le recours à un mécanisme d'intégration manuelle des modifications permettrait alors :
+\begin{enumerate}
+    \item Prévenir la génération d'anomalies entravant la collaboration.
+    \item Supprimer les métadonnées nécessaires pour intégrer automatiquement des modifications originaires d'une version au-delà de la distance seuil, celles-ci n'étant dès lors plus requises puisque ces modifications seront intégrées manuellement.
+        Par exemple, dans le cadre de RenamableLogootSplit, ce mécanisme nous permettrait de supprimer les époques se trouvant au-delà de cette distance, et ainsi leurs métadonnées associées.
+\end{enumerate}
+Ainsi, cette approche nous permettrait de répondre aux deux problèmes identifiés précédemment.\\
+
+Pour expliciter cette approche, revenons sur l'utilisation du contexte causal par les mécanismes de résolution de conflits automatiques.
+Le contexte causal est utilisé par les mécanismes de résolution de conflits automatiques pour :
 \begin{enumerate}
     \item Satisfaire le modèle de cohérence causale, \ie assurer que si nous avons deux modifications $m_1$ et $m_2$ telles que $m1 \to m_2$, alors l'effet de $m_2$ supplantera celui de $m_1$.
         Ceci permet d'éviter des anomalies de comportement de la part de la structure de données du point de vue des utilisateur-rices, par exemple la résurgence d'un élément supprimé au préalable.
@@ -13,8 +30,9 @@ Le contexte causal est utilisé par les mécanismes de résolution de conflits p
 % Dans l'approche \ac{OT}, le contexte causal est utilisé par l'algorithme de contrôle pour déterminer les modifications concurrentes à une modification lors de son intégration, afin de prendre en compte leurs effets.
 % Dans l'approche \ac{CRDT}, le contexte causal est utilisé par la structure de données répliquée à la génération de la modification pour en faire une modification nativement commutative avec les modifications concurrentes, \ie pour en faire un élément du sup-demi-treillis représentant la structure de données répliquée.
 
+Les mécanismes de résolution de conflits automatiques maintiennent donc le contexte causal de l'état de la donnée.
 Le contexte causal peut être représenté de différentes manières.
-Par exemple, le contexte causal peut prendre la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'un \ac{DAG} des modifications \cite{1997-causal-barrier}.
+Par exemple, le contexte causal peut prendre la forme du journal des opérations auquel on associe soit le vecteur de version correspondant à l'état de la donnée \cite{1988-version-vector-mattern,1991-version-vector-fidge}, soit l'ensemble des extremités du \ac{DAG} formé par les opérations \cite{1997-causal-barrier}.
 Cependant, de manière intrinsèque, le contexte causal ne fait que de croître au fur et à mesure que des modifications sont effectuées ou que des noeuds rejoignent le système, incrémentant son surcoût en métadonnées, calculs et bande-passante.
 
 La stabilité causale permet cependant de réduire le surcoût lié au contexte causal.
@@ -82,6 +100,5 @@ Il conviendra ensuite de déterminer comment établir la valeur seuil à partir 
 Les approches d'évaluation de la qualité du résultat \cite{2016-quality-assessment-wikipedia-articles-dang} pourront être utilisées pour déterminer un couple $\langle$ méthode de calcul de la distance, valeur de distance $\rangle$ spécifiant les cas pour lesquels les méthodes de résolution de conflits automatiques ne produisent plus un résultat satisfaisant.
 \mnnote{TODO: Insérer refs travaux Claudia et Vinh}
 Le couple obtenu pourra ensuite être confirmé par le biais d'expériences utilisateurs inspirées de \cite{2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
-
 
 Finalement, il conviendra de proposer un mécanisme de résolution de conflits adapté pour gérer les éventuelles fusions d'une même modification de façon concurrente par un mécanisme automatique et par un mécanisme manuel, ou à défaut un mécanisme de conscience de groupe invitant les utilisateur-rices à effectuer des actions de compensation.
