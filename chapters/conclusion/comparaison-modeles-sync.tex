@@ -1,6 +1,8 @@
 \label{sec:perspective-comparison-sync-models}
 Comme évoqué dans l'état de l'art \cf{sec:delta-crdts}, un nouveau modèle de synchronisation pour \ac{CRDT} fut proposé récemment \cite{almeida2015delta}.
 Ce dernier propose une synchronisation des noeuds par le biais de différences d'états.
+Dans notre étude comparative des différents modèles de synchronisation \cf{def:synchro-synthese}, nous avons justifié que ce modèle de synchronisation est adapté à l'ensemble des contextes d'utilisation qui étaient jusqu'à lors exclusifs soit au modèle de synchronisation par états, soit par opérations.
+Dans cette piste de recherche, nous souhaitons approfondir notre étude comparative pour déterminer si le modèle de synchronisation par différences d'états rend obsolètes les modèles de synchronisation précédents. \\
 
 Pour rappel, ce nouveau modèle de synchronisation se base sur le modèle de synchronisation par états.
 Il partage les mêmes pré-requis, à savoir la nécessité d'une fonction \texttt{merge} associative, commutative et idempotente.
@@ -12,10 +14,7 @@ Cet élément irréductible peut donc être diffusé et intégré par les autres
 
 Ce modèle de synchronisation permet alors d'adopter une variété de stratégies de synchronisation, \eg diffusion des différences de manière atomique, fusion de plusieurs différences puis diffusion du résultat..., et donc de répondre à une grande variété de cas d'utilisation.\\
 
-Dans notre comparaison des modèles de synchronisation \cf{def:synchro-synthese}, nous avons justifié que les \acp{CRDT} synchronisés par différences d'états peuvent être utilisés dans les mêmes contextes que les \acp{CRDT} synchronisés par états et que les \acp{CRDT} synchronisés par opérations.
-Cette conclusion nous mène à reconsidérer l'intérêt des autres modèles de synchronisation de nos jours.
-
-Par exemple, un \ac{CRDT} synchronisé par différences d'états correspond à un \ac{CRDT} synchronisé par états dont nous avons identifié les éléments irréductibles.
+Ainsi, un \ac{CRDT} synchronisé par différences d'états correspond à un \ac{CRDT} synchronisé par états dont nous avons identifié les éléments irréductibles.
 La différence entre ces deux modèles de synchronisation semble reposer seulement sur la possibilité d'utiliser ces éléments irréductibles pour propager les modifications, en place et lieu des états complets.
 Nous conjecturons donc que le modèle de synchronisation par états est rendu obsolète par celui par différences d'états.
 Il serait intéressant de confirmer cette supposition.\\
@@ -30,14 +29,13 @@ Au-delà de ce premier aspect, il convient d'explorer d'autres pistes pouvant in
     \item La composition de \acp{CRDT}, \ie la capacité de combiner et de mettre en relation plusieurs \acp{CRDT} au sein d'un même système, afin d'offrir des fonctionnalités plus complexes.
         Par exemple, une composition de \acp{CRDT} peut se traduire par l'ajout de dépendances entre les modifications des différents \acp{CRDT} composés.
         Le modèle de synchronisation par opérations nous apparaît plus adapté pour cette utilisation, de par le découplage qu'il induit entre les \acp{CRDT} et la couche de livraison de messages.
-
     \item L'utilisation de \acp{CRDT} au sein de systèmes non-sûrs, \ie pouvant compter un ou plusieurs adversaires byzantins \cite{2019-byzantine-generals-problem-lamport}.
         Dans de tels systèmes, les adversaires byzantins peuvent générer des modifications différentes mais qui sont perçues comme identiques par les mécanismes de résolution de conflits.
         Cette attaque, nommée \emph{équivoque}, peut provoquer la divergence définitive des copies.
         \cite{2018-prunable-authenticated-log-vic} propose une solution adaptée aux systèmes \ac{P2P} à large échelle.
         Celle-ci se base notamment sur l'utilisation de journaux infalsifiables.
         \mnnote{TODO: Ajouter refs}
-        Il convient alors d'étudier si l'utilisation de ces structures ne limite pas le potentiel du modèle de synchronisation par différences d'états, \eg en interdisant la diffusion des modifications par états complets.
+        Il convient alors d'étudier si l'utilisation de journaux infalsifiables ne limite pas le potentiel du modèle de synchronisation par différences d'états, \eg en interdisant la diffusion des modifications par états complets.
 \end{enumerate}
 
 Un premier objectif de notre travail serait de proposer des directives sur le modèle de synchronisation à privilégier en fonction du contexte d'utilisation du \ac{CRDT}.
