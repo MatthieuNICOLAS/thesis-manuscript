@@ -3,8 +3,8 @@
 \minitoc
 \label{chap:mute}
 
-Les systèmes collaboratifs temps réels permettent à plusieurs utilisateurs de réaliser une tâche de manière coopérative.
-Ils permettent aux utilisateurs de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateurs.
+Les systèmes collaboratifs temps réels permettent à plusieurs utilisateur-rices de réaliser une tâche de manière coopérative.
+Ils permettent aux utilisateur-rices de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateurs.
 L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
 L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
 
@@ -15,14 +15,33 @@ Notamment, ces solutions rencontrent des difficultés à passer à l'échelle \c
 L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P} \cite{2011-evaluation-crdts-ahmed-nacer}.
 Ainsi, de nombreux travaux \cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
 De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
-Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.
+Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.\\
 
 \mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
 
 De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
 Elle développe \acf{MUTE} \cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
 \ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
-Nous avons donc intégré dans \ac{MUTE} les travaux de cette thèse.
+
+Ainsi, nous avons contribué à son développement dans le cadre de cette thèse.
+Notamment, nous avons participé à :
+\begin{enumerate}
+  \item L'implémentation de \acp{CRDT}, LogootSplit \cite{2013-logootsplit} et RenamableLogootSplit \cite{2022-rls-tpds-nicolas}, pour représenter le document texte.
+  \item L'implémentation de leur modèle de livraison de livraison respectifs.
+  \item L'implémentation d'un protocole d'appartenance au réseau, SWIM \cite{swim2002}.
+\end{enumerate}
+
+Dans ce chapitre, nous commençons par présenter le projet \ac{MUTE} : ses objectifs, ses fonctionnalités et son architecture système et logicielle.
+Puis nous détaillons ses différentes couches logicielles : leur rôle, l'approche choisie pour leur implémentation et finalement leurs limites.
+Notamment, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie \autoref{sec:mute-crdts}, \autoref{sec:mute-delivery-model} et \autoref{sec:mute-membership-protocol}.
+
+\section{Présentation}
+\input{chapters/mute/presentation}
+
+\subsection{Fonctionnalités}
+\input{chapters/mute/fonctionnalites}
+
+\subsection{Architecture système et logicielle}
 
 La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
 MUTE étant une application web, chaque noeud représenté ici correspond à un navigateur.
@@ -48,16 +67,7 @@ De la même façon, nous précisons dans ce chapitre les différents composants 
 
 \section{Couche interface utilisateur}
 
-La \autoref{fig:interface-mute} illustre l'interface utilisateur de l'éditeur de document de MUTE.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=\linewidth]{img/screenshot-mute.png}
-  \caption{Capture d'écran d'une session d'édition collaborative avec MUTE}
-  \label{fig:interface-mute}
-\end{figure}
-
-L'interface se compose d'un éditeur de texte supportant le langage de balisage Markdown.
+Comme illustré par la \autoref{fig:interface-mute-editor}, l'interface de la page d'un document se compose d'un éditeur de texte supportant le langage de balisage Markdown.
 Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
 Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.
 
@@ -76,6 +86,7 @@ Une seconde page, listant les documents sauvegardés, permet à l'utilisateur de
 \section{Couche réplication}
 
 \subsection{Modèle de données du document texte}
+\label{sec:mute-crdts}
 
 MUTE propose plusieurs alternatives pour représenter le document texte.
 MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}}.
@@ -95,6 +106,7 @@ Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Win
 De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par opérations pour représenter la date de création du document.
 
 \subsection{Module de livraison des opérations}
+\label{sec:mute-delivery-model}
 
 Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
 Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
@@ -711,6 +723,7 @@ Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations 
 Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
 
 \subsection{Collaborateurs}
+\label{sec:mute-membership-protocol}
 
 Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
 Une de ces fonctionnalités est de fournir la liste des collaborateurs actuellement connectés.
@@ -994,7 +1007,7 @@ Ce serveur retourne en réponse au noeud qui le contacte son adresse IP publique
 
 \subsubsection{Serveur TURN}
 
-Il est possible que des noeuds provenant de réseaux différents ne puissent établir une connection \ac{P2P} directe entre eux, par exemple à cause de restrictions imposées par leur pare-feux respectifs.
+Il est possible que des noeuds provenant de réseaux différents ne puissent établir une connexion \ac{P2P} directe entre eux, par exemple à cause de restrictions imposées par leur pare-feux respectifs.
 Pour contourner ce cas de figure, \ac{WebRTC} utilise le protocole TURN.
 
 Ce protocole consiste à utiliser un serveur tiers comme relais entre les noeuds.
