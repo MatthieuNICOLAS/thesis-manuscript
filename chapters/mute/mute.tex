@@ -24,24 +24,10 @@
 \input{chapters/mute/interface-utilisateur}
 
 \section{Couche réplication}
+\label{sec:mute-replication}
 
 \subsection{Modèle de données du document texte}
 \input{chapters/mute/modele-donnees-document}
-
-\subsection{Module de livraison des opérations}
-\input{chapters/mute/livraison-intro}
-
-\subsubsection{Livraison des opérations en exactement un exemplaire}
-\input{chapters/mute/livraison-exactly-once}
-
-\subsubsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
-\input{chapters/mute/livraison-remove-apres-insert}
-
-\subsubsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
-\input{chapters/mute/livraison-epoch-based}
-
-\subsubsection{Livraison des opérations à terme}
-\input{chapters/mute/livraison-eventual}
 
 \subsection{Collaborateur-rices}
 \input{chapters/mute/swim-intro}
@@ -78,6 +64,22 @@
 % \begin{itemize}
 %   \item Cambria \cite{2021-cambria-schema-evolution}
 % \end{itemize}
+\section{Couche livraison}
+\label{sec:mute-livraison}
+
+\input{chapters/mute/livraison-intro}
+
+\subsection{Livraison des opérations en exactement un exemplaire}
+\input{chapters/mute/livraison-exactly-once}
+
+\subsection{Livraison de l'opération \emph{remove} après l'opération \emph{insert}}
+\input{chapters/mute/livraison-remove-apres-insert}
+
+\subsection{Livraison des opérations après l'opération \emph{rename} introduisant leur époque}
+\input{chapters/mute/livraison-epoch-based}
+
+\subsection{Livraison des opérations à terme}
+\input{chapters/mute/livraison-eventual}
 
 \section{Couche réseau}
 \label{sec:mute-couche-reseau}

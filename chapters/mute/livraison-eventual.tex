@@ -1,13 +1,13 @@
 \label{sec:mute-anti-entropy}
 
-La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être livrées à tous les noeuds à terme.
+La contrainte restante du modèle de livraison précise que toutes les opérations doivent être livrées à l'ensemble des noeuds à terme.
 Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
 Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
 
 Pour cela, nous implémentons un mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
 Ce mécanisme permet à un noeud source de se synchroniser avec un autre noeud cible.
 Il est executé par l'ensemble des noeuds de manière indépendante.
-Nous décrivons ci-dessous son fonctionnement.
+Nous décrivons ci-dessous son fonctionnement.\\
 
 De manière périodique, le noeud choisit un autre noeud cible de manière aléatoire.
 Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de version.
@@ -18,7 +18,7 @@ Grâce à leur dot, le noeud cible retrouve ces opérations depuis son log des o
 Il envoie alors une réponse composée de ces opérations au noeud source.
 
 À la réception de la réponse, le noeud source intègre normalement les opérations reçues.
-La \autoref{fig:anti-entropy} illustre ce mécanisme.
+La \autoref{fig:anti-entropy} illustre ce mécanisme.\\
 
 \begin{figure}[!ht]
   \centering
@@ -98,7 +98,7 @@ Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9
 B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
 
 À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
-Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.
+Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.\\
 
 Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.
 Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
@@ -107,7 +107,7 @@ Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'env
 Ce mécanisme propose plusieurs avantages.
 Son exécution n'implique que le noeud source et le noeud cible, ce qui limite les coûts de coordination.
 De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'un des messages, panne du noeud cible...), cette défaillance n'est pas critique : le noeud source se synchronisera à la prochaine exécution du mécanisme.
-Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison \emph{exactly-once}, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
+Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison en exactement un exemplaire, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
 Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
 
 En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.

@@ -84,9 +84,9 @@ Pour rappel, ce modèle requiert que
 Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations qui ont une dépendance causale vers ces dernières.
 Nous obtenons donc le modèle de livraison suivant :
 
-\begin{definition}[Exactly-once + Causal remove + Epoch-based]
+\begin{definition}[Modèle de livraison RenamableLogootSplit]
   \label{def:rls-delivery-model}
-  Le modèle de livraison \emph{Exactly-once + Causal remove + Epoch-based} définit les 4 règles suivantes sur la livraison des opérations :
+  Le modèle de livraison RenamableLogootSplit définit les 4 règles suivantes sur la livraison des opérations :
   \begin{enumerate}
     \item Une opération doit être livrée à l'ensemble des noeuds à terme,
     \item Une opération doit être livrée qu'une seule et unique fois aux noeuds,

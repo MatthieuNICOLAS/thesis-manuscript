@@ -1,8 +1,8 @@
 \label{sec:mute-crdts}
 
 MUTE propose plusieurs alternatives pour représenter le document texte.
-MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}}.
-Ce choix est effectué via une valeur de configuration de l'application choisie au moment de son déploiement.
+MUTE permet de soit utiliser une implémentation de LogootSplit\footnote{Les deux implémentations proviennent de la librairie \texttt{mute-structs} : \url{https://github.com/coast-team/mute-structs}} \cf{sec:logootsplit}, soit de RenamableLogootSplit\footnotemark[\value{footnote}] \cf{chap:rls} ou soit de Dotted LogootSplit \footnote{Implémentation fournie par la librairie suivante : \url{https://github.com/coast-team/dotted-logootsplit}} \cite{2021-these-vic}.
+Ce choix est effectué via une valeur de configuration de l'application choisie au moment de son déploiement.\\
 
 Le modèle de données utilisé interagit avec l'éditeur de texte par l'intermédiaire d'opérations textes.
 Lorsque l'utilisateur effectue des modifications locales, celles-ci sont détectées et mises sous la forme d'opérations textes.
@@ -10,7 +10,7 @@ Elles sont transmises au modèle de données, qui les intègre alors à la struc
 Le \ac{CRDT} retourne en résultat l'opération distante à propager aux autres noeuds.
 
 De manière complémentaire, lorsqu'une opération distante est livrée au modèle de données, elle est intégrée par le \ac{CRDT} pour actualiser son état.
-Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.
+Le \ac{CRDT} génère les opérations textes correspondantes et les transmet à l'éditeur de texte pour mettre à jour la vue.\\
 
 En plus du texte, MUTE maintient un ensemble de métadonnées par document.
 Par exemple, les utilisateurs peuvent donner un titre au document.

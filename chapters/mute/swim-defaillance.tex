@@ -68,14 +68,14 @@ Le mécanisme prend alors fin, jusqu'à sa prochaine exécution.
 
 Si C n'avait pas reçu de réponse suite à sa \emph{ping-req B} envoyée à A, C aurait supposé que B a eu une défaillance.
 Afin de réduire le taux de faux positifs, SWIM ne considère pas directement les noeuds n'ayant pas répondu comme en panne : ils sont tout d'abord \emph{suspectés} d'être en panne.
-Après un certain temps sans signe de vie d'un noeud suspecté d'être en panne, le noeud est \emph{confirmé} comme défaillant.
+Après un certain temps sans signe de vie d'un noeud suspecté d'être en panne, le noeud est \emph{confirmé} comme défaillant.\\
 
 L'information qu'un noeud est suspecté d'être en panne est propagé dans le réseau via le mécanisme de dissémination des mises à jour du groupe décrit ci-dessous.
-Si un noeud apprend qu'il est suspecté d'une panne, il dissémine à son tour l'information qu'il est toujours opérationnel pour éviter d'être confirmé comme défaillant.
+Si un noeud apprend qu'il est suspecté d'une panne, il dissémine à son tour l'information qu'il est toujours opérationnel pour éviter d'être confirmé comme défaillant.\\
 
 Pour éviter qu'un message antérieur n'invalide une suspicion d'une défaillance et retarde ainsi sa détection, SWIM introduit un numéro d'\emph{incarnation}.
 Chaque noeud maintient un numéro d'incarnation.
-Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.
+Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.\\
 
 Ainsi, afin de représenter la liste des collaborateur-rices, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
 
@@ -83,9 +83,9 @@ Ainsi, afin de représenter la liste des collaborateur-rices, le protocole SWIM 
   \label{def:collaborator-list}
   La \emph{liste des collaborateur-rices} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
   \begin{itemize}
-    \item $\trm{nodeId}$ correspond à l'identifiant du noeud correspondant à ce tuple.
-    \item $\trm{nodeStatus}$ correspond au statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
-    \item $\trm{nodeIncarn}$ correspond au numéro d'incarnation maximal, \ie le plus récent, connu pour le noeud correspondant à ce tuple.
+    \item $\trm{nodeId}$, l'identifiant du noeud correspondant à ce tuple.
+    \item $\trm{nodeStatus}$, le statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
+    \item $\trm{nodeIncarn}$, le numéro d'incarnation maximal, \ie le plus récent, connu pour le noeud correspondant à ce tuple.
   \end{itemize}
 \end{definition}
 

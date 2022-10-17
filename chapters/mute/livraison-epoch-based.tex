@@ -1,15 +1,15 @@
 La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être livrée après l'opération \emph{rename} qui a introduite son époque de génération.
 
-Pour cela, le module \texttt{Sync} doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
-Cependant, dans notre implémentation, le module \texttt{Sync} et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.
+Pour cela, le module de livraison doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
+Cependant, dans notre implémentation, le module de livraison et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.\\
 
-Pour remédier à ce problème, le module \texttt{Sync} maintient une structure supplémentaire : un vecteur des dots des opérations \emph{rename} connues.
+Pour remédier à ce problème, le module de livraison maintient une structure supplémentaire : un vecteur des dots des opérations \emph{rename} connues.
 À la réception d'une opération \emph{rename} distante, l'entrée correspondante de son auteur est mise à jour avec le dot de la nouvelle époque introduite.
 À la génération d'une opération locale, l'opération est examinée pour récupérer son époque de génération.
-\texttt{Sync} conserve alors seulement l'entrée correspondante dans le vecteur des dots des opérations \emph{rename}.
+Le module conserve alors seulement l'entrée correspondante dans le vecteur des dots des opérations \emph{rename}.
 À ce stade, le contenu du vecteur est ajouté en tant que dépendance de l'opération.
 Ensuite, si l'opération locale s'avère être une opération \emph{rename}, le vecteur est modifié pour ne conserver que le dot de l'époque introduite par l'opération.
-La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.
+La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.\\
 
 \begin{figure}[!ht]
   \subfloat[Exécution]{
@@ -60,7 +60,7 @@ La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.
           \end{minipage}
         }
         \hfil
-  \subfloat[État et comportement de la couche \texttt{Sync} au cours de l'exécution décrite en \autoref{fig:epoch-based-delivery-execution}]{
+  \subfloat[État et comportement du module de livraison au cours de l'exécution décrite en \autoref{fig:epoch-based-delivery-execution}]{
     \begin{minipage}{\linewidth}
       \centering
       \resizebox{\columnwidth}{!}{
@@ -110,7 +110,7 @@ La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.
       }
       \end{minipage}
     }
-  \caption{Gestion de la livraison \emph{epoch based} des opérations}
+  \caption{Gestion de la livraison des opérations après l'opération \emph{rename} qui introduit leur époque}
   \label{fig:epoch-based-delivery}
 \end{figure}
 
@@ -123,7 +123,7 @@ De son côté, le noeud C reçoit les opérations \emph{b3}, puis \emph{a1} et \
 Il émet ensuite une opération \emph{insert} (\emph{c1}).
 Le noeud A reçoit cette opération avant de finalement recevoir l'opération \emph{b3}.
 
-Dans la \autoref{fig:epoch-based-delivery-sync}, nous faisons apparaître l'état de \texttt{Sync} et les décisions prises par ce dernier au cours de l'exécution.
+Dans la \autoref{fig:epoch-based-delivery-sync}, nous faisons apparaître l'état du module de livraison et les décisions prises par ce dernier au cours de l'exécution.
 Initialement, le vecteur des dots des opérations \emph{rename} connues est vide.
 Ainsi, lorsque A génère l'opération \emph{a1}, celle-ci ne se voit ajouter aucune dépendance (nous ne représentons pas les dépendances des opérations qui correspondent à l'ensemble vide).
 A met ensuite à jour son vecteur des dots des opérations \emph{rename} avec le dot $\langle A:1 \rangle$.
@@ -132,22 +132,22 @@ B procède de manière similaire avec l'opération \emph{b3}.
 Quand A génère l'opération \emph{a7}, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
 Le dot $\langle A:7 \rangle$ remplace ensuite ce dernier dans le vecteur des dots des opérations \emph{rename}.
 
-À la réception de l'opération \emph{b3}, le module \texttt{Sync} de C peut la livrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
+À la réception de l'opération \emph{b3}, le module de livraison de C peut la livrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
 Le noeud C ajoute alors à son vecteur des dots des opérations \emph{rename} le dot $\langle B:3 \rangle$.
 Il procède de même pour l'opération \emph{a1} : il la livre et ajoute le dot $\langle A:1 \rangle$.
-Le module \texttt{Sync} ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
+Le module de livraison ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
 
 Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été livrée précédemment.
 L'opération est donc livrée et le vecteur de dots des opérations \emph{rename} mis à jour avec $\langle A:7 \rangle$.
 
-Quand le noeud C effectue l'opération locale \emph{c1}, le module \texttt{Sync} obtient l'information de l'époque courante de la séquence : \epoch{b3}.
+Quand le noeud C effectue l'opération locale \emph{c1}, le module de livraison obtient l'information de l'époque courante de la séquence : \epoch{b3}.
 C met à jour son vecteur de dots des opérations \emph{rename} pour ne conserver que l'entrée du noeud B : $\langle B:3 \rangle$.
 Ce dot est ajouté en tant que dépendance de l'opération \emph{c1} avant sa diffusion.
 
-À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par \texttt{Sync}, l'opération \emph{b3} n'ayant pas encore été livrée.
+À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par le module de livraison, l'opération \emph{b3} n'ayant pas encore été livrée.
 Le noeud reçoit ensuite l'opération \emph{b3}.
 Son vecteur des dots des opérations \emph{rename} est mis à jour et l'opération livrée.
-Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors livrée.
+Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors livrée.\\
 
 Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispose de plusieurs avantages : sa complexité spatiale dépend linéairement du nombre de noeuds et les opérations de mise à jour du vecteur des dots des opérations \emph{rename} s'effectuent en temps constant.
 De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.

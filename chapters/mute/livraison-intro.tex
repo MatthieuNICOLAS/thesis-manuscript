@@ -1,5 +1,17 @@
 \label{sec:mute-delivery-model}
 
-Dans le cadre de LogootSplit et de RenamableLogootSplit, le modèle de données utilisé pour représenter le document texte est couplé au composant \texttt{Sync}.
-Le rôle de ce composant est d'assurer le respect du modèle de livraison des opérations au \ac{CRDT}.
-Pour cela, le module \texttt{Sync} doit implémenter les contraintes présentées dans la \autoref{def:ls-delivery-model} et dans la \autoref{def:rls-delivery-model}.
+Comme indiqué précédemment, la couche livraison est formée d'un unique composant, que nous nommons module de livraison.
+Ce module est associé aux \acp{CRDT} synchronisés par opérations représentant le document texte, \ie LogootSplit ou RenamableLogootSplit.
+
+Le rôle de ce module est de garantir que le modèle de livraison des opérations requis par le \ac{CRDT} pour assurer la convergence à terme \cf{def:eventual-consistency} soit satisfait, \ie que l'ensemble des opérations soient livrées dans un ordre correct à l'ensemble des noeuds.
+
+Pour cela, le module de livraison doit implémenter les contraintes imposées par ces \acp{CRDT} sur l'ordre de livraison des opérations (cf. \autoref{def:ls-delivery-model}, page \pageref{def:ls-delivery-model} et \autoref{def:rls-delivery-model}, page \pageref{def:ls-delivery-model}).
+Pour rappel, le modèle de livraison de RenamableLogootSplit est le suivant :
+\begin{enumerate}
+    \item Une opération doit être livrée à l'ensemble des noeuds à terme,
+    \item Une opération doit être livrée qu'une seule et unique fois aux noeuds,
+    \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
+    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération \emph{rename} qui a introduit son époque de génération a été délivrée à ce même noeud.
+\end{enumerate}
+
+Nous décrivons ci-dessous comment nous assurons chacune de ces contraintes.
