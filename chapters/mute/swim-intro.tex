@@ -1,0 +1,19 @@
+\label{sec:mute-membership-protocol}
+
+Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
+Une de ces fonctionnalités est de fournir la liste des collaborateur-rices actuellement connectés.
+Les protocoles d'appartenance au réseau sont une catégorie de protocoles spécifiquement dédiée à cet effet.
+Ainsi, nous devions en implémenter un dans MUTE.
+
+MUTE présente cependant plusieurs contraintes liées à notre modèle du système que le protocole sélectionné doit respecter.
+Tout d'abord, le protocole doit être compatible avec un environnement \ac{P2P}, où les noeuds partagent les mêmes droits et responsabilités.
+De plus, le protocole doit présenter une capacité de passage à l'échelle pour être adapté aux collaborations à large échelle.
+
+En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM \cite{swim2002}.
+Proposé par \citeauthor{swim2002}, ce protocole d'appartenance au réseau offre les propriétés intéressantes suivantes.
+Tout d'abord, le nombre de messages diffusés sur le réseau est proportionnel de façon linéaire au nombre de pairs.
+Pour être plus précis, le nombre de messages envoyés par un pair par période du protocole est constant.
+De plus, il fournit à chaque noeud une vue de la liste des collaborateur-rices cohérente à terme, même en cas de réception désordonnée des messages du protocoles.
+Finalement, il intègre un mécanisme permettant de réduire le taux de faux positifs, \ie le taux de pairs déclarés injustement comme défaillants.
+
+Pour cela, SWIM découple les deux composants d'un protocole d'appartenance au réseau : le mécanisme de \emph{détection des défaillances des pairs} et le mécanisme de \emph{dissémination des mises à jour du groupe}.

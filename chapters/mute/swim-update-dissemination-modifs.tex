@@ -1,0 +1,47 @@
+Nous avons ensuite apporté plusieurs modifications à la version du protocole SWIM présentée dans \cite{swim2002}.
+Notre première modification porte sur l'ordre de priorité entre les états d'un pair.
+
+\paragraph{Modification de l'ordre de précédence}
+
+Dans la version originale, un pair désigné comme défaillant l'est de manière irrévocable.
+Ce comportement est dû à la règle de précédence suivante :
+
+\[\forall i,j \in \mathbb{N}, \forall s \in \{\trm{Alive}, \trm{Suspect}\} \cdot \langle s,i \rangle < \langle \trm{Confirm},j \rangle\]
+
+pour un noeud donné.
+Ainsi, un noeud déclaré comme défaillant par un autre noeud doit changer d'identité pour rejoindre de nouveau le groupe.
+
+Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateur-rices croît de manière linéaire avec le nombre de connexions.
+S'agissant du paramètre avec le plus grand ordre de grandeur de l'application, nous avons cherché à le diminuer.
+
+Nous avons donc modifié les règles de précédence de la manière suivante :
+
+\[\forall i,j \in \mathbb{N}, i < j, \forall s,t \in \{\trm{Alive}, \trm{Suspect}, \trm{Confirm}\} \cdot \langle i,s \rangle < \langle j,t \rangle\]
+
+et
+
+\[\forall i \in \mathbb{N} \cdot \langle i,\trm{Alive} \rangle < \langle i,\trm{Suspect} \rangle < \langle i,\trm{Confirm} \rangle\]
+
+Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
+Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
+La taille de la liste des collaborateur-rices devient dès lors linéaire par rapport au nombre de noeuds.
+
+Ces modifications n'ont pas d'impact sur la convergence des listes des collaborateur-rices des différents noeuds.
+Une étude approfondie reste néanmoins à effectuer pour déterminer si ces modifications ont un impact sur la vitesse à laquelle un noeud défaillant est déterminé comme tel par l'ensemble des noeuds.
+
+\paragraph{Ajout d'un mécanisme de synchronisation}
+
+La seconde modification que nous avons effectué concerne l'ajout d'un mécanisme de synchronisation entre pairs.
+En effet, le papier ne précise pas de procédure particulière lorsqu'un nouveau pair rejoint le réseau.
+Pour obtenir la liste des collaborateur-rices, ce dernier doit donc la demander à un autre pair.
+
+Nous avons donc implémenté pour la liste des collaborateur-rices un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
+Ce message sert aussi à transmettre l'état courant du noeud source au noeud cible.
+En réponse, le noeud cible lui envoie l'état courant de sa liste.
+À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
+Cette fusion conserve l'entrée la plus récente pour chaque noeud.
+
+Pour récapituler, les mises à jour du groupe sont diffusées de manière atomique de façon épidémique, en utilisant les messages du mécanisme de détection des défaillances des noeuds.
+De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser leur état.
+Ce mécanisme nous permet de pallier aux défaillances éventuelles du réseau.
+Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par différences pour la liste des collaborateur-rices.

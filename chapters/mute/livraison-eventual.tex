@@ -1,0 +1,117 @@
+\label{sec:mute-anti-entropy}
+
+La dernière contrainte du modèle de livraison précise que toutes les opérations doivent être livrées à tous les noeuds à terme.
+Cependant, le réseau étant non-fiable, des messages peuvent être perdus au cours de l'exécution.
+Il est donc nécessaire que les noeuds rediffusent les messages perdus pour assurer leur livraison à terme.
+
+Pour cela, nous implémentons un mécanisme d'anti-entropie basé sur \cite{1983-anti-entropy-vv}.
+Ce mécanisme permet à un noeud source de se synchroniser avec un autre noeud cible.
+Il est executé par l'ensemble des noeuds de manière indépendante.
+Nous décrivons ci-dessous son fonctionnement.
+
+De manière périodique, le noeud choisit un autre noeud cible de manière aléatoire.
+Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de version.
+
+À la réception de ce message, le noeud cible compare le vecteur de version reçu par rapport à son propre vecteur de version.
+À partir de ces données, il identifie les dots des opérations de sa connaissance qui sont inconnues au noeud source.
+Grâce à leur dot, le noeud cible retrouve ces opérations depuis son log des opérations.
+Il envoie alors une réponse composée de ces opérations au noeud source.
+
+À la réception de la réponse, le noeud source intègre normalement les opérations reçues.
+La \autoref{fig:anti-entropy} illustre ce mécanisme.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{\columnwidth}{!}{
+    \begin{tikzpicture}
+      \path
+        node {\textbf{A}}
+        +(0:37) node (a-end) {}
+        ++(0:0.5) node (a0) {}
+        ++(0:3) node[op, label=above:{$\langle A:8,B:3,C:1 \rangle$}] (a8) {a8}
+        ++(0:6) node [op, label=above:{$\langle A:9,B:3,C:1 \rangle$}] (a9) {a9}
+        ++(0:15) node[point, label=above:{$\langle A:9,B:4,C:1 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b4) {};
+
+
+      \draw[thick] (a0) --  (a8) -- (a9) -- (a-receives-b4) -- (a-end);
+
+      \path
+          ++(270:2) node {\textbf{B}}
+          +(0:37) node (b-end) {}
+          ++(0:0.5) node (b0) {}
+          ++(0:9) node[point, label=below:{$\langle A:8,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}] (b-receives-a8) {}
+          ++(0:6) node[point, label=below:{$\langle A:9,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}](b-receives-a9) {}
+          ++(0:4) node[op, label=above:{$\langle A:9,B:4,C:1 \rangle$}] (b4) {b4}
+          ++(0:12) node[point, label=above:{\emph{reply to sync query}}] (b-receives-c-sync-request) {};
+
+      \draw[thick] (b0) -- (b-receives-a8) -- (b-receives-a9) -- (b4) -- (b-receives-c-sync-request) -- (b-end);
+
+      \path
+          ++(270:4) node {\textbf{C}}
+          +(0:37) node (c-end) {}
+          ++(0:0.5) node (c0) {}
+          ++(0:8) node (c-receives-a8) {}
+          +(90:0.5) node[cross] (fail-a8) {}
+          ++(0:6) node (c-receives-a9) {}
+          +(90:0.5) node[cross] (fail-a9) {}
+          ++(0:10) node[point, label=below:{$\langle A:7,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b4) {}
+          ++(0:4) node[op, label=below:{$\langle A:7,B:4,C:1 \rangle$}] (c-query-sync) {sync}
+          ++(0:6) node[point, label=below:{$\langle A:9,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b-sync-reply) {};
+
+
+      \draw[thick] (c0) -- (c-receives-b4) -- (c-query-sync) --  (c-receives-b-sync-reply) -- (c-end);
+
+      \draw[->, dashed, shorten >= 1]
+        (a8.east) edge (b-receives-a8.west)
+        (a8.east) edge (fail-a8)
+        (a9.east) edge (b-receives-a9.west)
+        (a9.east) edge (fail-a9)
+        (b4.east) edge (a-receives-b4.west)
+        (b4.east) edge (c-receives-b4.west)
+        (b-receives-c-sync-request.east) edge (c-receives-b-sync-reply.west)
+        (c-query-sync.east) edge (b-receives-c-sync-request.west);
+
+    \end{tikzpicture}
+  }
+  \caption{Utilisation du mécanisme d'anti-entropie par le noeud C pour se synchroniser avec le noeud B}
+  \label{fig:anti-entropy}
+\end{figure}
+
+Dans cette figure, nous représentons une exécution à laquelle participent trois noeuds : A, B et C.
+Initialement, les trois noeuds sont synchronisés.
+Leur vecteurs de version sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
+
+Le noeud A effectue les opérations \emph{a8} puis \emph{a9} et les diffusent sur le réseau.
+Le noeud B reçoit ces opérations et les livre à son \ac{CRDT}.
+Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et livrée par A.
+Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
+
+De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une défaillance réseau.
+Néanmoins, cela ne l'empêche pas de livrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
+
+Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
+Il choisit aléatoirement le noeud B comme noeud cible.
+Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:7,B:8,C:1 \rangle$.
+
+À la réception de ce message, le noeud B compare ce vecteur avec le sien.
+Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9}.
+B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
+
+À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
+Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.
+
+Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.
+Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
+Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de version vide pour récupérer l'intégralité des opérations.
+
+Ce mécanisme propose plusieurs avantages.
+Son exécution n'implique que le noeud source et le noeud cible, ce qui limite les coûts de coordination.
+De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'un des messages, panne du noeud cible...), cette défaillance n'est pas critique : le noeud source se synchronisera à la prochaine exécution du mécanisme.
+Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison \emph{exactly-once}, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
+Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
+
+En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
+La complexité spatiale et en temps du mécanisme dépend donc linéairement du nombre d'opérations.
+Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations en se basant sur la stabilité causale des opérations puisque nous utilisons ce mécanisme pour mettre à niveau les nouveaux pairs.
+À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
+Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
