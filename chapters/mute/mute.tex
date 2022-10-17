@@ -26,17 +26,20 @@ Elle développe \acf{MUTE} \cite{MUTE2017}\footnote{Disponible à l'adresse : \u
 Ainsi, nous avons contribué à son développement dans le cadre de cette thèse.
 Notamment, nous avons participé à :
 \begin{enumerate}
-  \item L'implémentation de \acp{CRDT}, LogootSplit \cite{2013-logootsplit} et RenamableLogootSplit \cite{2022-rls-tpds-nicolas}, pour représenter le document texte.
+  \item L'implémentation des \acp{CRDT} LogootSplit \cite{2013-logootsplit} et RenamableLogootSplit \cite{2022-rls-tpds-nicolas} pour représenter le document texte.
   \item L'implémentation de leur modèle de livraison de livraison respectifs.
   \item L'implémentation d'un protocole d'appartenance au réseau, SWIM \cite{swim2002}.
 \end{enumerate}
 
 Dans ce chapitre, nous commençons par présenter le projet \ac{MUTE} : ses objectifs, ses fonctionnalités et son architecture système et logicielle.
-Puis nous détaillons ses différentes couches logicielles : leur rôle, l'approche choisie pour leur implémentation et finalement leurs limites.
-Notamment, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie les sous-sections \ref{sec:mute-crdts}, \ref{sec:mute-delivery-model} et \ref{sec:mute-membership-protocol}.
+Puis nous détaillons ses différentes couches logicielles : leur rôle, l'approche choisie pour leur implémentation et finalement leurs limites actuelles.
+Au cours de cette description, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie les sous-sections \ref{sec:mute-crdts}, \ref{sec:mute-delivery-model} et \ref{sec:mute-membership-protocol}.
 
 \section{Présentation}
-\input{chapters/mute/presentation}
+% \input{chapters/mute/presentation}
+
+\subsection{Objectifs}
+\input{chapters/mute/objectifs}
 
 \subsection{Fonctionnalités}
 \input{chapters/mute/fonctionnalites}

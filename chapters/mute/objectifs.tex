@@ -1,0 +1,14 @@
+Comme indiqué dans l'introduction \cf{sec:intro-contexte}, le but de ce projet est de proposer un éditeur de texte collaboratif \acf{LFS}, \ie un éditeur de texte collaboratif qui satisfait les propriétés suivantes :
+\begin{enumerate}
+    \item Toujours disponible, \ie qui permet à tout moment à un-e utilisateur-rice de consulter, créer ou éditer un document, même par exemple en l'absence de connexion internet.
+    \item Collaboratif, \ie qui permet à un-e utilisateur-rice de partager un document avec d'autres utilisateur-rices pour éditer à plusieurs le document, de manière synchrone et asynchrone.
+        Nous considérons la capacité d'un-e utilisateur-rice à partager le document avec ses propres autres appareils comme un cas particulier de collaboration.
+    \item Performant, \ie qui garantit que le délai entre la génération d'une modification par un pair et l'intégration de cette dernière par un autre pair connecté soit assimilable à du temps réel et que ce délai ne soit pas impacté par le nombre de pairs dans la collaboration.
+    \item Pérenne, \ie qui garantit à ses utilisateur-rices qu'iels pourront continuer à utiliser l'application sur une longue période.
+        Notamment, nous considérons la capacité des utilisateur-rices à configurer et déployer aisément leur propre instance du système comme un gage de pérennité du système.
+    \item Garantissant la confidentialité des données, \ie qui permet à un-e utilisateur-rice de contrôler avec quelles personnes une version d'un document est partagée.
+        Aussi, le système doit garantir qu'un adversaire ne doit pas être en mesure d'espionner les utilisateur-rices, \eg en usurpant l'identité d'un-e utilisateur-rice ou en interceptant les messages diffusés sur le réseau.
+    \item Garantissant la souveraineté des données, \ie qui permet à un-e utilisateur-rice de maîtriser l'usage de ses données, \eg pouvoir les consulter, modifier, partager ou encore exporter vers d'autres formats ou applications.
+\end{enumerate}
+
+Ainsi, ces différentes propriétés nous conduisent à concevoir un éditeur de texte collaboratif \ac{P2P} temps réel chiffré de bout en bout et qui est dépourvu d'autorités centrales.
