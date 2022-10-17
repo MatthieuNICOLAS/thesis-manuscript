@@ -51,22 +51,7 @@ Au cours de cette description, nous mettons l'emphase sur les composants auxquel
 \input{chapters/mute/architecture-logicielle}
 
 \section{Couche interface utilisateur}
-
-Comme illustré par la \autoref{fig:interface-mute-editor}, l'interface de la page d'un document se compose d'un éditeur de texte supportant le langage de balisage Markdown.
-Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
-Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.
-
-L'éditeur est agrémenté de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateur-rices.
-L'indicateur en haut à droite de la fenêtre représente le statut de connexion de l'utilisateur.
-Ceci lui indique s'il est actuellement connecté au réseau \ac{P2P}, en cours de connexion, ou si un incident réseau a lieu.
-
-MUTE affiche la liste des collaborateur-rices actuellement connectés sur la droite de l'éditeur.
-De plus, un curseur ou une sélection distante est associée à chaque collaborateur de la liste.
-Elle permet d'indiquer à l'utilisateur courant dans quelles sections du document ses collaborateur-rices sont en train de travailler.
-Ainsi, ils peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un collaborateur-rice.
-
-Les documents de l'utilisateur étant sauvegardés dans le navigateur, les documents sont aussi bien disponibles en étant en ligne que hors ligne.
-Une seconde page, listant les documents sauvegardés, permet à l'utilisateur de parcourir ses différents documents.
+\input{chapters/mute/interface-utilisateur}
 
 \section{Couche réplication}
 

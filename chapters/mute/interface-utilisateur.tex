@@ -1,0 +1,37 @@
+Comme illustré par la \autoref{fig:interface-mute-editor}, l'interface de la page d'un document se compose principalement d'un éditeur de texte.
+Ce dernier supporte le langage de balisage Markdown \cite{2004-markdown}.
+Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
+Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.\\
+
+L'interface de la page de l'éditeur de document est agrémentée de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateur-rices.
+L'indicateur en haut à droite de la page représente le statut de connexion de l'utilisateur-rice.
+Celui-ci permet d'indiquer à l'utilisateur-rice s'iel est actuellement connecté-e au réseau \ac{P2P}, en cours de connexion, ou si un incident réseau a lieu.
+
+De plus, \ac{MUTE} affiche sur la droite de l'éditeur la liste des collaborateur-rices actuellement connecté-es.
+Un curseur ou une sélection distante est associée pour chaque membre de la liste.
+Ces informations permettent d'indiquer à l'utilisateur-rice dans quelles sections du document ses collaborateur-rices sont en train de travailler.
+Ainsi, iels peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un-e collaborateur-rice.\\
+
+Bien que fonctionnelle, cette interface souffre néanmoins de plusieurs limites.
+Notamment, nous n'avons pas encore pu étudier la littérature concernant les mécanismes de conscience pour supporter la collaboration, au-delà du système de curseurs distants.
+
+Nous identifions ainsi plusieurs axes de travail pour ces mécanismes.
+Tout d'abord, l'axe des \emph{mécanismes de conscience des changements}.
+Le but serait de proposer des mécanismes pour :
+\begin{enumerate}
+    \item Mettre en lumière de manière intelligible les modifications effectuées par les collabateur-rices dans le cadre de collaborations temps réel à large échelle.
+        Un tel mécanisme représente un défi de part le débit important de changements, potentiellement à plusieurs endroits du document de manière quasi-simultanée, à présenter à l'utilisateur-rice.
+    \item Mettre en lumière de manière intelligible les modifications effectuées par les collaborateur-rices dans le cadre de collaborations asynchrones.
+        De nouveau, ce mécanisme représente un défi de part la quantité massive de changements, une fois encore potentiellement à plusieurs endroits du document, à présenter à l'utilisateur-rice.
+\end{enumerate}
+Une piste de travail potentiellement liée serait l'ajout d'une fonctionnalité d'historique du document, permettant aux utilisateur-rices de parcourir ses différentes versions obtenues au fur et à mesure des modifications.
+L'intégration d'une telle fonctionnalité dans un éditeur \ac{P2P} pose cependant plusieurs questions : quel historique présenter aux utilisateur-rices, sachant que chacun-e a potentiellement observé un ordre différent des modifications ?
+Doit-on convenir d'une seule version de l'historique ?
+Dans ce cas, comment choisir et construire cet historique ?\\
+
+Le second axe de travail sur les mécanismes de conscience concerne les \emph{mécanismes de conscience de groupe}.
+Actuellement, nous affichons l'ensemble des collaborateur-rices actuellement connecté-es.
+Cette approche s'avère lourde voire entravante dans le cadre de collaborations à large échelle où le nombre de collaborateur-rices dépasse plusieurs centaines.
+Il convient donc de déterminer quelles informations présenter à l'utilisateur-rice dans cette situation, \eg une liste compacte de pairs et leur curseur respectif, ainsi que le nombre de pairs total.\\
+
+Ainsi, pour chacun de ses axes d'amélioration, il convient d'étudier leur littérature respective et de déterminer les solutions proposées qui sont adaptées à \ac{MUTE}.
