@@ -22,9 +22,11 @@ Pour garantir la confidentialité des échanges, \ac{MUTE} utilise un protocole 
 Ce protocole permet d'établir une clé de chiffrement connue seulement des pairs actuellement connectés, qui est ensuite utilisée pour chiffrer les messages entre pairs.
 Ce protocole permet de garantir les propriétés de \emph{backward secrecy} et de \emph{forward secrecy}.
 \begin{definition}[Backward Secrecy]
+    \label{def:backward-secrecy}
     La \emph{Backward Secrecy} est une propriété de sécurité garantissant qu'un nouveau noeud ne pourra pas déchiffrer avec la nouvelle clé de chiffrement les anciens messages chiffrés avec une clé de chiffrement précédente.
 \end{definition}
 \begin{definition}[Forward Secrecy]
+    \label{def:forward-secrecy}
     La \emph{Forward Secrecy} est une propriété de sécurité garantissant qu'un nouveau noeud ne pourra pas déchiffrer avec la nouvelle clé de chiffrement les futurs messages chiffrés avec une prochaine clé de chiffrement.
 \end{definition}
 

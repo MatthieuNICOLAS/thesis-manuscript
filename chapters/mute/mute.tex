@@ -115,41 +115,7 @@
 % \end{itemize}
 
 \section{Couche sécurité}
-\label{sec:mute-couche-securite}
-
-La couche sécurité a pour but de garantir l'authenticité et la confidentialité des messages échangés par les noeuds.
-Pour cela, elle implémente un mécanisme de chiffrement de bout en bout.
-
-Pour chiffrer les messages, MUTE utilise un mécanisme de chiffrement à base de clé de groupe.
-Le protocole choisi est le protocole Burmester-Desmedt \cite{1995-burmester-desmedt}.
-Il nécessite que chaque noeud possède une paire de clés de chiffrement et enregistre sa clé publique auprès d'un PKI\footnote{\acf{PKI} : Infrastructure de gestion de clés}.
-
-Afin d'éviter qu'un \ac{PKI} malicieux n'effectue une attaque de l'homme au milieu sur la collaboration, les noeuds doivent vérifier le bon comportement des PKI de manière non-coordonnée.
-À cet effet, MUTE implémente le mécanisme d'audit de PKI Trusternity \cite{2018-trusternity-short, 2018-trusternity-long}.
-Son fonctionnement nécessite l'utilisation d'un registre publique sécurisé \emph{append-only}, \ie une blockchain.
-
-L'architecture système nécessaire pour la couche sécurité est présentée dans la \autoref{fig:architecture-systeme-trusternity}.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[page=4, trim=3cm 1cm 4cm 1cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
-  \caption{Architecture système pour la couche sécurité de MUTE}
-  \label{fig:architecture-systeme-trusternity}
-\end{figure}
-
-Cette couche sécurité s'ajoute au mécanisme de chiffrement des messages inhérent à \ac{WebRTC}.
-Cela nous offre de nouvelles possibilités : plutôt que de créer un réseau \ac{P2P} par document, nous pouvons désormais mettre en place un réseau \ac{P2P} global.
-Les messages étant chiffrés de bout en bout, les noeuds peuvent communiquer en toute sécurité et confidentialité par l'intermédiaire de noeuds tiers, \ie des noeuds extérieurs à la collaboration.
-
-Une limite de l'approche actuelle est que la clé de groupe change avec l'évolution des noeuds connectés : à chaque connexion ou déconnexion d'un noeud, une nouvelle clé est recalculée avec les collaborateur-rices présents.
-Cette évolution fréquente de la clé de chiffrement, nécessaire pour garantir la \emph{backward secrecy} et \emph{forward secrecy}, nous empêche par exemple de stocker les opérations de manière chiffrée chez des noeuds tiers.
-Cette fonctionnalité serait cependant bien pratique pour permettre à un noeud de récupérer la dernière version de ses documents, même en l'absence de ses collaborateur-rices.
-Une autre clé de chiffrement, dédiée au stockage, devrait être mise en place, ainsi qu'un mécanisme de découverte des noeuds tiers stockant les données de la collaboration.
-
-% \begin{itemize}
-%   \item Librairies alternatives (libP2P, hypercore)
-%   \item Topologies alternatives (SPRAY)
-% \end{itemize}
+\input{chapters/mute/securite}
 
 \section{Conclusion}
 
