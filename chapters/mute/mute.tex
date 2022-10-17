@@ -4,7 +4,7 @@
 \label{chap:mute}
 
 Les systèmes collaboratifs temps réels permettent à plusieurs utilisateur-rices de réaliser une tâche de manière coopérative.
-Ils permettent aux utilisateur-rices de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateurs.
+Ils permettent aux utilisateur-rices de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateur-rices.
 L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
 L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
 
@@ -48,18 +48,7 @@ Au cours de cette description, nous mettons l'emphase sur les composants auxquel
 \input{chapters/mute/architecture-sys}
 
 \subsection{Architecture logicielle}
-
-Nous décrivons l'architecture logicielle d'un noeud dans la \autoref{fig:architecture-log-mute}.
-Dans ce chapitre, nous présentons les différentes couches logicielles de MUTE.
-Notamment, nous détaillons les couches correspondantes à l'implémentation des travaux présentés dans le \autoref{chap:renamablelogootsplit}.
-De la même façon, nous précisons dans ce chapitre les différents composants de l'architecture système de MUTE autre que les pairs eux-mêmes.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[page=2, trim=0cm 0cm 0cm 0cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
-  \caption{Architecture logicielle de l'application MUTE}
-  \label{fig:architecture-log-mute}
-\end{figure}
+\input{chapters/mute/architecture-logicielle}
 
 \section{Couche interface utilisateur}
 
@@ -67,14 +56,14 @@ Comme illustré par la \autoref{fig:interface-mute-editor}, l'interface de la pa
 Ainsi, l'éditeur permet d'inclure plusieurs éléments légers de style.
 Les balises du langage Markdown étant du texte, elles sont répliquées nativement par la structure de données utilisée en interne par MUTE.
 
-L'éditeur est agrémenté de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateurs.
+L'éditeur est agrémenté de plusieurs mécanismes permettant d'établir une conscience de groupe entre les collaborateur-rices.
 L'indicateur en haut à droite de la fenêtre représente le statut de connexion de l'utilisateur.
 Ceci lui indique s'il est actuellement connecté au réseau \ac{P2P}, en cours de connexion, ou si un incident réseau a lieu.
 
-MUTE affiche la liste des collaborateurs actuellement connectés sur la droite de l'éditeur.
+MUTE affiche la liste des collaborateur-rices actuellement connectés sur la droite de l'éditeur.
 De plus, un curseur ou une sélection distante est associée à chaque collaborateur de la liste.
-Elle permet d'indiquer à l'utilisateur courant dans quelles sections du document ses collaborateurs sont en train de travailler.
-Ainsi, ils peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un collaborateur.
+Elle permet d'indiquer à l'utilisateur courant dans quelles sections du document ses collaborateur-rices sont en train de travailler.
+Ainsi, ils peuvent se répartir la rédaction du document de manière implicite ou suivre facilement les modifications d'un collaborateur-rice.
 
 Les documents de l'utilisateur étant sauvegardés dans le navigateur, les documents sont aussi bien disponibles en étant en ligne que hors ligne.
 Une seconde page, listant les documents sauvegardés, permet à l'utilisateur de parcourir ses différents documents.
@@ -718,11 +707,11 @@ Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations 
 À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
 Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.
 
-\subsection{Collaborateurs}
+\subsection{Collaborateur-rices}
 \label{sec:mute-membership-protocol}
 
 Pour assurer la qualité de la collaboration même à distance, il est important d'offrir des fonctionnalités de conscience de groupe aux utilisateurs.
-Une de ces fonctionnalités est de fournir la liste des collaborateurs actuellement connectés.
+Une de ces fonctionnalités est de fournir la liste des collaborateur-rices actuellement connectés.
 Les protocoles d'appartenance au réseau sont une catégorie de protocoles spécifiquement dédiée à cet effet.
 Ainsi, nous devions en implémenter un dans MUTE.
 
@@ -734,7 +723,7 @@ En raison de ces contraintes, notre choix s'est porté sur le protocole SWIM \ci
 Proposé par \citeauthor{swim2002}, ce protocole d'appartenance au réseau offre les propriétés intéressantes suivantes.
 Tout d'abord, le nombre de messages diffusés sur le réseau est proportionnel de façon linéaire au nombre de pairs.
 Pour être plus précis, le nombre de messages envoyés par un pair par période du protocole est constant.
-De plus, il fournit à chaque noeud une vue de la liste des collaborateurs cohérente à terme, même en cas de réception désordonnée des messages du protocoles.
+De plus, il fournit à chaque noeud une vue de la liste des collaborateur-rices cohérente à terme, même en cas de réception désordonnée des messages du protocoles.
 Finalement, il intègre un mécanisme permettant de réduire le taux de faux positifs, \ie le taux de pairs déclarés injustement comme défaillants.
 
 Pour cela, SWIM découple les deux composants d'un protocole d'appartenance au réseau : le mécanisme de \emph{détection des défaillances des pairs} et le mécanisme de \emph{dissémination des mises à jour du groupe}.
@@ -820,11 +809,11 @@ Pour éviter qu'un message antérieur n'invalide une suspicion d'une défaillanc
 Chaque noeud maintient un numéro d'incarnation.
 Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.
 
-Ainsi, afin de représenter la liste des collaborateur, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
+Ainsi, afin de représenter la liste des collaborateur-rices, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
 
-\begin{definition}[Liste des collaborateurs]
+\begin{definition}[Liste des collaborateur-rices]
   \label{def:collaborator-list}
-  La \emph{liste des collaborateurs} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
+  La \emph{liste des collaborateur-rices} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
   \begin{itemize}
     \item $\trm{nodeId}$ correspond à l'identifiant du noeud correspondant à ce tuple.
     \item $\trm{nodeStatus}$ correspond au statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
@@ -839,7 +828,7 @@ Lorsqu'une mise à jour est effectuée, celle-ci est diffusée de la manière pr
 
 \label{sec:swim-update-dissemination}
 
-Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateurs, cette mise à jour doit être propagée au reste des noeuds.
+Quand l'exécution du mécanisme de détection des défaillances par un noeud met en lumière une évolution de la liste des collaborateur-rices, cette mise à jour doit être propagée au reste des noeuds.
 
 Or, diffuser cette mise à jour à l'ensemble du réseau serait coûteux pour un seul noeud.
 Afin de propager cette information de manière efficace, SWIM propose d'utiliser un protocole de diffusion épidémique : le noeud transmet la mise à jour qu'à un nombre réduit $\lambda$\footnote{
@@ -853,12 +842,12 @@ Leur compteurs respectifs sont décrémentés.
 Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.
 
 À la réception d'un message, le noeud le traite comme définit précédemment en \autoref{sec:swim-failure-detection}.
-De manière additionnelle, il intègre dans sa liste des collaborateurs les mises à jour attachées au message en utilisant la règle suivante :
+De manière additionnelle, il intègre dans sa liste des collaborateur-rices les mises à jour attachées au message en utilisant la règle suivante :
 
 \[\forall i,j,k \cdot i \leq j \cdot \langle \trm{Alive},i \rangle < \langle \trm{Suspect},j \rangle < \langle \trm{Confirm},k \rangle \]
 
 Ainsi, le mécanisme de dissémination des mises à jour du groupe réutilise les messages du mécanisme de détection des défaillances pour diffuser les modifications.
-Cela permet de propager les évolutions de la liste des collaborateurs sans ajouter de message supplémentaire.
+Cela permet de propager les évolutions de la liste des collaborateur-rices sans ajouter de message supplémentaire.
 De plus, les règles de précédence sur l'état d'un collaborateur permettent aux noeuds de converger même si les mises à jour sont reçues dans un ordre distinct.
 
 \subsubsection{Modifications apportées}
@@ -876,7 +865,7 @@ Ce comportement est dû à la règle de précédence suivante :
 pour un noeud donné.
 Ainsi, un noeud déclaré comme défaillant par un autre noeud doit changer d'identité pour rejoindre de nouveau le groupe.
 
-Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateurs croît de manière linéaire avec le nombre de connexions.
+Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateur-rices croît de manière linéaire avec le nombre de connexions.
 S'agissant du paramètre avec le plus grand ordre de grandeur de l'application, nous avons cherché à le diminuer.
 
 Nous avons donc modifié les règles de précédence de la manière suivante :
@@ -889,18 +878,18 @@ et
 
 Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
 Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
-La taille de la liste des collaborateurs devient dès lors linéaire par rapport au nombre de noeuds.
+La taille de la liste des collaborateur-rices devient dès lors linéaire par rapport au nombre de noeuds.
 
-Ces modifications n'ont pas d'impact sur la convergence des listes des collaborateurs des différents noeuds.
+Ces modifications n'ont pas d'impact sur la convergence des listes des collaborateur-rices des différents noeuds.
 Une étude approfondie reste néanmoins à effectuer pour déterminer si ces modifications ont un impact sur la vitesse à laquelle un noeud défaillant est déterminé comme tel par l'ensemble des noeuds.
 
 \paragraph{Ajout d'un mécanisme de synchronisation}
 
 La seconde modification que nous avons effectué concerne l'ajout d'un mécanisme de synchronisation entre pairs.
 En effet, le papier ne précise pas de procédure particulière lorsqu'un nouveau pair rejoint le réseau.
-Pour obtenir la liste des collaborateurs, ce dernier doit donc la demander à un autre pair.
+Pour obtenir la liste des collaborateur-rices, ce dernier doit donc la demander à un autre pair.
 
-Nous avons donc implémenté pour la liste des collaborateurs un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
+Nous avons donc implémenté pour la liste des collaborateur-rices un mécanisme similaire à celui présenté en \autoref{sec:mute-anti-entropy} : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
 Ce message sert aussi à transmettre l'état courant du noeud source au noeud cible.
 En réponse, le noeud cible lui envoie l'état courant de sa liste.
 À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
@@ -909,11 +898,11 @@ Cette fusion conserve l'entrée la plus récente pour chaque noeud.
 Pour récapituler, les mises à jour du groupe sont diffusées de manière atomique de façon épidémique, en utilisant les messages du mécanisme de détection des défaillances des noeuds.
 De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser leur état.
 Ce mécanisme nous permet de pallier aux défaillances éventuelles du réseau.
-Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par différences pour la liste des collaborateurs.
+Ainsi, nous avons dans les faits mis en place un \ac{CRDT} synchronisé par différences pour la liste des collaborateur-rices.
 
 \subsubsection{Synthèse}
 
-Pour générer et maintenir la liste des collaborateurs, nous avons implémenté le protocole distribué d'appartenance au réseau SWIM \cite{swim2002}.
+Pour générer et maintenir la liste des collaborateur-rices, nous avons implémenté le protocole distribué d'appartenance au réseau SWIM \cite{swim2002}.
 Par rapport à la version originale, nous avons procédé à plusieurs modifications, notamment pour gérer plus efficacement les reconnexions successives d'un même noeud.
 
 Ainsi, nous avons implémenté un mécanisme dont la complexité spatiale dépend linéairement du nombre de noeuds.
@@ -928,9 +917,9 @@ Ainsi, une perspective est d'implémenter ces améliorations dans MUTE.
 
 Toujours dans le but d'offrir des fonctionnalités de conscience de groupe aux utilisateurs pour leur permettre de se coordonner aisément, nous avons implémenté dans MUTE l'affichage des curseurs distants.
 
-Pour représenter fidèlement la position des curseurs des collaborateurs distants, nous nous reposons sur les identifiants du \ac{CRDT} choisi pour représenter la séquence.
+Pour représenter fidèlement la position des curseurs des collaborateur-rices distants, nous nous reposons sur les identifiants du \ac{CRDT} choisi pour représenter la séquence.
 Le fonctionnement est similaire à la gestion des modifications du document : lorsque l'éditeur indique que l'utilisateur a déplacé son curseur, nous récupérons son nouvel index.
-Nous recherchons ensuite l'identifiant correspondant à cet index dans la séquence répliquée et le diffusons aux collaborateurs.
+Nous recherchons ensuite l'identifiant correspondant à cet index dans la séquence répliquée et le diffusons aux collaborateur-rices.
 
 À la réception de la position d'un curseur distant, nous récupérons l'index correspondant à cet identifiant dans la séquence répliquée et représentons un curseur à cet index.
 Il est intéressant de noter que si l'identifiant a été supprimé en concurrence, nous pouvons à la place récupérer l'index de l'élément précédent et ainsi indiquer à l'utilisateur où son collaborateur est actuellement en train de travailler.
@@ -1037,7 +1026,7 @@ D'autres topologies limitant le nombre de connexions par noeuds, telle que celle
 % \begin{itemize}
 %   \item Pour faciliter la collaboration, MUTE propose l'utilisation de bots
 %   \item Par exemple, un bot de stockage se contentant de suivre une collaboration et de stocker les opérations
-%   \item De façon à permettre à un pair de récupérer la dernière version du document même si les autres collaborateurs sont actuellement déconnectés
+%   \item De façon à permettre à un pair de récupérer la dernière version du document même si les autres collaborateur-rices sont actuellement déconnectés
 %   \item Afin de réutiliser les structures de données implémentées, développés en NodeJS
 %   \item Cependant, NodeJS ne supporte pas WebRTC nativement
 %   \item Utilise alors des websockets
@@ -1071,9 +1060,9 @@ Cette couche sécurité s'ajoute au mécanisme de chiffrement des messages inhé
 Cela nous offre de nouvelles possibilités : plutôt que de créer un réseau \ac{P2P} par document, nous pouvons désormais mettre en place un réseau \ac{P2P} global.
 Les messages étant chiffrés de bout en bout, les noeuds peuvent communiquer en toute sécurité et confidentialité par l'intermédiaire de noeuds tiers, \ie des noeuds extérieurs à la collaboration.
 
-Une limite de l'approche actuelle est que la clé de groupe change avec l'évolution des noeuds connectés : à chaque connexion ou déconnexion d'un noeud, une nouvelle clé est recalculée avec les collaborateurs présents.
+Une limite de l'approche actuelle est que la clé de groupe change avec l'évolution des noeuds connectés : à chaque connexion ou déconnexion d'un noeud, une nouvelle clé est recalculée avec les collaborateur-rices présents.
 Cette évolution fréquente de la clé de chiffrement, nécessaire pour garantir la \emph{backward secrecy} et \emph{forward secrecy}, nous empêche par exemple de stocker les opérations de manière chiffrée chez des noeuds tiers.
-Cette fonctionnalité serait cependant bien pratique pour permettre à un noeud de récupérer la dernière version de ses documents, même en l'absence de ses collaborateurs.
+Cette fonctionnalité serait cependant bien pratique pour permettre à un noeud de récupérer la dernière version de ses documents, même en l'absence de ses collaborateur-rices.
 Une autre clé de chiffrement, dédiée au stockage, devrait être mise en place, ainsi qu'un mécanisme de découverte des noeuds tiers stockant les données de la collaboration.
 
 % \begin{itemize}
