@@ -33,7 +33,7 @@ Notamment, nous avons participé à :
 
 Dans ce chapitre, nous commençons par présenter le projet \ac{MUTE} : ses objectifs, ses fonctionnalités et son architecture système et logicielle.
 Puis nous détaillons ses différentes couches logicielles : leur rôle, l'approche choisie pour leur implémentation et finalement leurs limites.
-Notamment, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie \autoref{sec:mute-crdts}, \autoref{sec:mute-delivery-model} et \autoref{sec:mute-membership-protocol}.
+Notamment, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie les sous-sections \ref{sec:mute-crdts}, \ref{sec:mute-delivery-model} et \ref{sec:mute-membership-protocol}.
 
 \section{Présentation}
 \input{chapters/mute/presentation}
@@ -41,17 +41,10 @@ Notamment, nous mettons l'emphase sur les composants auxquelles nous avons contr
 \subsection{Fonctionnalités}
 \input{chapters/mute/fonctionnalites}
 
-\subsection{Architecture système et logicielle}
+\subsection{Architecture système}
+\input{chapters/mute/architecture-sys}
 
-La \autoref{fig:architecture-sys-mute} réprésente l'architecture système d'une collaboration utilisant MUTE.
-MUTE étant une application web, chaque noeud représenté ici correspond à un navigateur.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[page=1, trim=0cm 0cm 0cm 0cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
-  \caption{Architecture système de l'application MUTE}
-  \label{fig:architecture-sys-mute}
-\end{figure}
+\subsection{Architecture logicielle}
 
 Nous décrivons l'architecture logicielle d'un noeud dans la \autoref{fig:architecture-log-mute}.
 Dans ce chapitre, nous présentons les différentes couches logicielles de MUTE.
@@ -960,6 +953,7 @@ De façon similaire, nous gérons les sélections de texte à l'aide de deux cur
 % \end{itemize}
 
 \section{Couche réseau}
+\label{sec:mute-couche-reseau}
 
 Pour permettre aux différents noeuds de communiquer, MUTE repose sur la librairie Netflux\footnote{\url{https://github.com/coast-team/netflux}}.
 Développée au sein de l'équipe Coast, cette librairie permet de construire un réseau \ac{P2P} entre des navigateurs, mais aussi des bots.
@@ -1048,6 +1042,7 @@ D'autres topologies limitant le nombre de connexions par noeuds, telle que celle
 % \end{itemize}
 
 \section{Couche sécurité}
+\label{sec:mute-couche-securite}
 
 La couche sécurité a pour but de garantir l'authenticité et la confidentialité des messages échangés par les noeuds.
 Pour cela, elle implémente un mécanisme de chiffrement de bout en bout.

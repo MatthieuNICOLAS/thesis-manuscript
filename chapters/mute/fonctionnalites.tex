@@ -9,7 +9,7 @@
         Peut alors modifier le document, \ie ajouter, supprimer du contenu ou encore modifier son titre.
         Modifications sont partagées en temps réel aux autres pairs.
         À la réception de modifications, celles-ci sont intégrées à la copie locale du document.
-        \autoref{fig:interface-mute} illustre l'interface utilisateur de l'éditeur de document de MUTE.
+        \autoref{fig:interface-mute-editor} illustre l'interface utilisateur de l'éditeur de document de MUTE.
         \begin{figure}[!ht]
             \centering
             \includegraphics[width=\linewidth]{img/screenshot-mute-editor.png}
@@ -17,7 +17,7 @@
             \label{fig:interface-mute-editor}
         \end{figure}
     \item Pour garantir la confidentialité des échanges, application utilise un protocole de création de génération de clé de groupe.
-        Ce protocole permet d'établir une clé de chiffrement connue seulement des pairs actuellement connectés, qui est ensuite utilisée pour chiffrer et déchiffrer les messages entre pairs.
+        Ce protocole permet d'établir une clé de chiffrement connue seulement des pairs actuellement connectés, qui est ensuite utilisée pour chiffrer les messages entre pairs.
         Ce protocole permet de garantir les propriétés de \emph{backward secrecy} et de \emph{forward secrecy}.
         \begin{definition}[Backward Secrecy]
             La \emph{Backward Secrecy} est une propriété de sécurité garantissant qu'un nouveau noeud ne pourra pas déchiffrer avec la nouvelle clé de chiffrement les anciens messages chiffrés avec une clé de chiffrement précédente.
