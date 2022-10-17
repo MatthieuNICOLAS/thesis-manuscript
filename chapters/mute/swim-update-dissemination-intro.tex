@@ -8,7 +8,7 @@ Afin de propager cette information de manière efficace, SWIM propose d'utiliser
 } de pairs, qui se chargeront de la transmettre à leur tour.
 Le mécanisme de dissémination des mises à jour de SWIM fonctionne donc de la manière suivante.
 
-Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur, initialisé avec $\lambda \log{} n$ avec $n$ le nombre de noeuds.
+Chaque mise à jour du groupe est stockée dans une liste et se voit attribuer un compteur entier, initialisé avec $\lambda \log{} n$ où $n$ est le nombre de noeuds.
 À chaque génération d'un message pour le mécanisme de détection des défaillances, un nombre arbitraire de mises à jour sont sélectionnées dans la liste et attachées au message.
 Leur compteurs respectifs sont décrémentés.
 Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.

@@ -7,7 +7,7 @@ Pour rappel, le processus consiste à
 \end{enumerate}
 
 Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération \emph{rename}.
-Cette implémentation repose sur le log des opérations.
+Cette implémentation repose sur le journal des opérations.
 
 Cette implémentation se base sur les observations suivantes :
 \begin{enumerate}
@@ -24,12 +24,12 @@ Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
   \item transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état
 \end{enumerate}
 
-Cet algorithme est équivalent à ré-ordonner le log des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
+Cet algorithme est équivalent à ré-ordonner le journal des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
 
 Cette approche présente plusieurs avantages par rapport à l'implémentation décrite dans la \autoref{sec:integration-process-rename-op}.
 Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
 La version décrite dans la \autoref{sec:integration-process-rename-op} transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si nous disposons de \textsc{renameBlock}) de l'état courant.
-La version présentée ici effectue une transformation pour chaque opération du log concurrente à l'opération \emph{rename} à intégrer.
+La version présentée ici effectue une transformation pour chaque opération concurrente à l'opération \emph{rename} à intégrer présente dans le journal des opérations.
 Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
 
 Un autre avantage de cette approche est qu'elle permet de récupérer et de réutiliser les identifiants originaux des opérations.
@@ -38,11 +38,11 @@ Ceci permet de réinitialiser les transformations appliquées à un identifiant 
 Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \textsc{renameId} et \textsc{revertRenameId}.
 
 Cette implémentation dispose néanmoins de plusieurs limites.
-Tout d'abord, elle nécessite que chaque noeud maintienne localement le log des opérations.
+Tout d'abord, elle nécessite que chaque noeud maintienne localement le journal des opérations.
 Les métadonnées accumulées par la structure de données répliquées vont alors croître avec le nombre d'opérations effectuées.
 Cependant, ce défaut est à nuancer.
-En effet, les noeuds doivent déjà maintenir le log des opérations pour le mécanisme d'anti-entropie, afin de renvoyer une opération passée à un noeud l'ayant manquée.
-Plus globalement, les noeuds doivent aussi conserver le log des opérations pour permettre à un nouveau noeud de rejoindre la collaboration et de calculer l'état courant en rejouant l'ensemble des opérations.
+En effet, les noeuds doivent déjà maintenir le journal des opérations pour le mécanisme d'anti-entropie, afin de renvoyer une opération passée à un noeud l'ayant manquée.
+Plus globalement, les noeuds doivent aussi conserver le journal des opérations pour permettre à un nouveau noeud de rejoindre la collaboration et de calculer l'état courant en rejouant l'ensemble des opérations.
 Il s'agit donc d'une contrainte déjà imposée aux noeuds pour d'autres fonctionnalités du système.
 
 Un autre défaut de cette implémentation est qu'elle nécessite de détecter les opérations concurrentes à l'opération \emph{rename} à intégrer.
@@ -52,11 +52,11 @@ Diffuser cette information à l'ensemble des noeuds peut donc représenter un co
 Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
 Les opérations \emph{rename} étant rares en comparaison, ce surcoût nous paraît acceptable.
 
-Finalement, cette approche implique aussi de parcourir le log des opérations à la recherche d'opérations concurrentes.
-Comme dit précédemment, la taille du log croît de façon monotone au fur et à mesure que les noeuds émettent des opérations.
+Finalement, cette approche implique aussi de parcourir le journal des opérations à la recherche d'opérations concurrentes.
+Comme dit précédemment, la taille du journal croît de façon monotone au fur et à mesure que les noeuds émettent des opérations.
 Cette étape du nouvel algorithme d'intégration de l'opération \emph{rename} devient donc de plus en plus coûteuse.
 Des méthodes permettent néanmoins de réduire son coût computationnel.
 Notamment, chaque noeud traquent les informations de progression des autres noeuds afin de supprimer les métadonnées du mécanisme de renommage (cf. \autoref{sec:gc-mechanism}).
 Ces informations permettent de déterminer la stabilité causale des opérations et donc d'identifier les opérations qui ne peuvent plus être concurrentes à une nouvelle opération \emph{rename}.
-Les noeuds peuvent ainsi maintenir, en plus du log complet des opérations, un log composé uniquement des opérations non stables causalement.
-Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent alors parcourir ce log réduit à la recherche des opérations concurrentes.
+Les noeuds peuvent ainsi maintenir, en plus du journal complet des opérations, un journal composé uniquement des opérations non stables causalement.
+Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent alors parcourir ce journal réduit à la recherche des opérations concurrentes.

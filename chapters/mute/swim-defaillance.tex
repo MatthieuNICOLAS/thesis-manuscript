@@ -56,14 +56,14 @@ Le noeud C démarre l'exécution du mécanisme de détection des défaillances.
 
 Tout d'abord, le noeud C sélectionne un noeud cible de manière aléatoire, ici B, et lui envoie un message \emph{ping}.
 À la réception de ce message, le noeud B lui signifie qu'il est toujours opérationnel en lui répondant avec un message \emph{ack}.
-À la réception de ce message par C, cette exécution du mécanisme de détection des défaillances prendrait fin.
+À la réception de ce message par C, cette exécution du mécanisme de détection des défaillances devrait prendre fin.
 Mais dans l'exemple présenté ici, ce message est perdu par le réseau.
 
 En l'absence de réponse de la part de B au bout d'un temps spécifié au préalable, le noeud C passe à l'étape suivante du mécanisme.
 Le noeud C sélectionne un autre noeud, ici A, et lui demande de vérifier via le message \emph{ping-req B} si B a eu une défaillance.
 À la réception de la requête de ping, le noeud A envoie un message \emph{ping} à B.
 Comme précédemment, B répond au \emph{ping} par le biais d'un \emph{ack} à A.
-A informe alors C du bon fonctionnement du B via le message \emph{ack B}.
+A informe alors C du bon fonctionnement de B via le message \emph{ack B}.
 Le mécanisme prend alors fin, jusqu'à sa prochaine exécution.
 
 Si C n'avait pas reçu de réponse suite à sa \emph{ping-req B} envoyée à A, C aurait supposé que B a eu une défaillance.
@@ -77,16 +77,16 @@ Pour éviter qu'un message antérieur n'invalide une suspicion d'une défaillanc
 Chaque noeud maintient un numéro d'incarnation.
 Lorsqu'un noeud apprend qu'il est suspecté d'une panne, il incrémente son numéro d'incarnation avant de propager l'information contradictoire.\\
 
-Ainsi, afin de représenter la liste des collaborateur-rices, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
+Afin de représenter la liste des collaborateur-rices, le protocole SWIM utilise la structure de données présentée par la \autoref{def:collaborator-list} :
 
 \begin{definition}[Liste des collaborateur-rices]
   \label{def:collaborator-list}
-  La \emph{liste des collaborateur-rices} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ où
-  \begin{itemize}
+  La \emph{liste des collaborateur-rices} est un ensemble de triplets $\langle \trm{nodeId},\trm{nodeStatus},\trm{nodeIncarn} \rangle$ avec :
+  \begin{enumerate}
     \item $\trm{nodeId}$, l'identifiant du noeud correspondant à ce tuple.
     \item $\trm{nodeStatus}$, le statut courant du noeud correspondant à ce tuple, \ie $\trm{Alive}$ s'il est considéré comme opérationnel, $\trm{Suspect}$ s'il est suspecté d'une défaillance, $\trm{Confirm}$ s'il est considéré comme défaillant.
     \item $\trm{nodeIncarn}$, le numéro d'incarnation maximal, \ie le plus récent, connu pour le noeud correspondant à ce tuple.
-  \end{itemize}
+  \end{enumerate}
 \end{definition}
 
 Chaque noeud réplique cette liste et la fait évoluer au cours de l'exécution du mécanisme présenté jusqu'ici.

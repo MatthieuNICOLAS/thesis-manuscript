@@ -70,7 +70,7 @@
 \subsubsection{Temps d'intégration de l'opération de renommage}
 \input{chapters/rls/validation-results-integration-time-rename-ops}
 
-\subsubsection{Temps pour rejouer le log d'opérations}
+\subsubsection{Temps pour rejouer le journal des opérations}
 \input{chapters/rls/validation-results-time-replay-log}
 
 \subsubsection{Impact de la fréquence de l'opération \emph{rename} sur les performances}
@@ -101,11 +101,11 @@
 \label{sec:report-transition-to-target-epoch}
 \input{chapters/rls/discussion-delay-transition-to-epoch}
 
-\subsection{Utilisation de l'opération de renommage comme mécanisme de compression du log d'opérations}
+\subsection{Utilisation de l'opération de renommage comme mécanisme de compression du journal des opérations}
 \label{sec:rename-as-compression-mechanism}
 \input{chapters/rls/discussion-rename-op-as-snapshot}
 
-\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le journal d'opérations}
+\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le journal des opérations}
 \label{sec:log-based-rename-mechanism}
 \input{chapters/rls/discussion-log-based-implem}
 
@@ -122,7 +122,7 @@
 
 % \subsection{Eager stability determination}
 
-% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{2019-memory-efficient-crdts-dynamic-environments-bauwens, 2020-flec-bauwens, 2020-from-causality-to-stability-reducing-metadata-crdts-bauwens} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le log des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
+% \mnnote{Peut aussi aborder les travaux de Jim Bauwens et Elisa Gonzalez Boix \cite{2019-memory-efficient-crdts-dynamic-environments-bauwens, 2020-flec-bauwens, 2020-from-causality-to-stability-reducing-metadata-crdts-bauwens} sur l'accélération de la stabilité causale : ne concerne pas seulement les séquences, mais les operation-based CRDTs. Permet de tronquer le journal des opérations mais aussi d'accélerer le mécanisme de GC de RGA (et le mien aussi)}
 
 % \mnnote{Peut aborder les travaux de Weidner, Miller et Meiklejohn \cite{10.1145/3380787.3393687, 10.1145/3408976} qui combinent aussi CRDT et OT dans une certaine mesure. Pas vraiment dans le but de réduire les métadonnées du CRDT. Mais reste intéressant à présenter pour se différencier (eux proposent d'utiliser OT pour fusionner 2 CRDTs, moi pour ajouter une action qui est incompatible nativement avec les autres actions du CRDT)}
 

@@ -1,4 +1,4 @@
-La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être livrée après l'opération \emph{rename} qui a introduite son époque de génération.
+La troisième contrainte spécifiée par le modèle de livraison est qu'une opération doit être livrée après l'opération \emph{rename} qui a introduit son époque de génération.
 
 Pour cela, le module de livraison doit donc récupérer l'époque courante de la séquence répliquée, récupérer le dot de l'opération \emph{rename} l'ayant introduite et l'ajouter en tant que dépendance de chaque opération.
 Cependant, dans notre implémentation, le module de livraison et le module représentant la séquence répliquée sont découplés et ne peuvent interagir directement l'un avec l'autre.\\

@@ -143,7 +143,7 @@ L'opération est donc ignorée, et la résurgence de l'élément "I" illustrée 
 
 Il est à noter que dans le cas où un noeud reçoit une opération avec un dot plus élevé que celui attendu (\eg le noeud A reçoit une opération \emph{b3} à la fin de l'exemple), cette opération est mise en attente.
 En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
-L'opération \emph{b3} serait donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
+L'opération \emph{b3} est donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
 
 Ainsi, l'implémentation de livraison en exactement un exemplaire d'une opération avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
 Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
@@ -151,4 +151,4 @@ Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme d
 
 Pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
 Au lieu d'enregistrer seulement le dernier dot intégré par noeud, cette structure de données enregistre les intervalles de dots intégrés.
-Ceci permet une livraison \emph{out of order} des opérations tout en garantissant une livraison en exactement un exemplaire et en compactant efficacement les données stockées par le module de livraison à terme.
+Ceci permet une livraison \emph{dans le désordre} des opérations, \ie une livraison des opérations dans un ordre différent de leur ordre d'émission, tout en garantissant une livraison en exactement un exemplaire et en compactant efficacement les données stockées par le module de livraison à terme.

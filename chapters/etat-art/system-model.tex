@@ -22,6 +22,7 @@ Les modifications sont ensuite transmises aux autres noeuds de manière asynchro
 L'application garantit la convergence à terme des copies.
 
 \begin{definition}[Convergence à terme]
+    \label{def:eventual-consistency}
     La convergence à terme est une propriété de sûreté indiquant que l'ensemble des noeuds du système ayant intégrés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
     \footnotetext{Nous considérons comme équivalents deux états pour lesquels chaque observateur du type de données renvoie un même résultat, \ie les deux états sont indifférenciables du point de vue des utilisateur-rices du système.}
 \end{definition}

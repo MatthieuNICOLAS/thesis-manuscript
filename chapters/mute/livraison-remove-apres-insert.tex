@@ -142,7 +142,7 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emp
   \label{fig:causal-remove-delivery}
 \end{figure}
 
-Cet exemple reprend et complète celui de la \autoref{fig:causal-remove-delivery}.
+Cet exemple reprend et complète celui de la \autoref{fig:why-causal-remove}.
 Trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
 Les trois noeuds partagent le même état initial : une séquence contenant les éléments "OGNON" et un vecteur de version $\langle A:5 \rangle$.
 
@@ -166,8 +166,8 @@ Le module de livraison ré-évalue alors le cas de l'opération \emph{b1} et dé
 
 Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
 En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
-Nous n'ajoutons pas les dots des opérations qui ont spécifiquement insérés les éléments supprimés.
-Pour cela, il serait nécessaire de parcourir le log des opérations à la recherche des opérations \emph{insert} correspondante.
-Cette méthode serait plus coûteuse, sa complexité dépendant du nombre d'opérations dans le log d'opérations, et incompatible avec un mécanisme tronquant le log des opérations en utilisant la stabilité causale.
+Nous n'ajoutons pas les dots des opérations qui ont spécifiquement inséré les éléments supprimés.
+Pour cela, il serait nécessaire de parcourir le journal des opérations à la recherche des opérations \emph{insert} correspondantes.
+Cette méthode serait plus coûteuse, sa complexité dépendant du nombre d'opérations dans le journal des opérations, et incompatible avec un mécanisme tronquant le journal des opérations en utilisant la stabilité causale.
 Notre approche introduit un potentiel délai dans la livraison d'une opération \emph{remove} par rapport à une livraison utilisant ses dépendances exactes, puisqu'elle va reposer sur des opérations plus récentes et potentiellement encore inconnues par le noeud.
 Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le surcoût du mécanisme de livraison et l'expérience utilisateur.

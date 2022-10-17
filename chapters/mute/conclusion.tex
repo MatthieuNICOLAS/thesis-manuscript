@@ -1,0 +1,12 @@
+Dans ce chapitre, nous avons présenté \acf{MUTE}, notre éditeur collaboratif temps réel \ac{P2P} chiffré de bout en bout.
+
+MUTE permet d'éditer de manière collaborative des documents texte.
+Pour représenter les documents, MUTE implémente les structures de données répliquées décrites dans la \autoref{sec:logootsplit} et le \autoref{chap:renamablelogootsplit}.
+Ces \acp{CRDT} offrent de nouvelles méthodes de collaborer, notamment en permettant de collaborer de manière synchrone ou asynchrone de manière transparente.
+
+Pour permettre aux noeuds de communiquer, MUTE utilise WebRTC.
+Cette technologie permet de construire un réseau \ac{P2P} entre navigateurs.
+Plusieurs serveurs sont néanmoins requis, notamment pour la découverte des pairs et pour la communication entre des noeuds dont les pare-feux respectifs empêche l'établissement d'une connexion directe.
+
+Finalement, MUTE implémente un mécanisme de chiffrement de bout en bout garantissant l'authenticité et la confidentialité des échanges entre les noeuds.
+Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécanisme d'audit permettant de détecter leurs éventuels comportements malicieux.

@@ -14,7 +14,7 @@ Le noeud source lui envoie alors une représentation de son état courant, \ie s
 
 À la réception de ce message, le noeud cible compare le vecteur de version reçu par rapport à son propre vecteur de version.
 À partir de ces données, il identifie les dots des opérations de sa connaissance qui sont inconnues au noeud source.
-Grâce à leur dot, le noeud cible retrouve ces opérations depuis son log des opérations.
+Grâce à leur dot, le noeud cible retrouve ces opérations depuis son journal des opérations.
 Il envoie alors une réponse composée de ces opérations au noeud source.
 
 À la réception de la réponse, le noeud source intègre normalement les opérations reçues.
@@ -95,7 +95,7 @@ Il lui envoie un message de synchronisation avec pour contenu le vecteur de vers
 
 À la réception de ce message, le noeud B compare ce vecteur avec le sien.
 Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9}.
-B les récupère depuis son log des opérations et les envoie à C par le biais d'un nouveau message.
+B les récupère depuis son journal des opérations et les envoie à C par le biais d'un nouveau message.
 
 À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
 Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.\\
@@ -110,8 +110,8 @@ De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'
 Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison en exactement un exemplaire, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
 Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
 
-En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le log des opérations pour répondre aux requêtes de synchronisation.
+En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le journal des opérations pour répondre aux requêtes de synchronisation.
 La complexité spatiale et en temps du mécanisme dépend donc linéairement du nombre d'opérations.
-Qui plus est, nous sommes dans l'incapacité de tronquer le log des opérations en se basant sur la stabilité causale des opérations puisque nous utilisons ce mécanisme pour mettre à niveau les nouveaux pairs.
-À moins de mettre en place un mécanisme de compression du log comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce log des opérations croit de manière monotone.
+Qui plus est, nous sommes dans l'incapacité de tronquer le journal des opérations en se basant sur la stabilité causale des opérations puisque nous utilisons ce mécanisme pour mettre à niveau les nouveaux pairs.
+À moins de mettre en place un mécanisme de compression du journal comme évoqué en \autoref{sec:rename-as-compression-mechanism}, ce journal des opérations croit de manière monotone.
 Néanmoins, une alternative possible est de mettre en place un système de chargement différé des opérations pour ne pas surcharger la mémoire.

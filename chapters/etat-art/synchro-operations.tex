@@ -142,7 +142,7 @@ Il génère alors une réponse contenant cette opération et lui envoie.
 À la réception de l'opération, le noeud B l'intègre.
 Il obtient l'état $\set{a,b,c,d,e}$ et converge ainsi avec A.
 
-Avant de conclure, nous noterons qu'il est nécessaire pour les noeuds de maintenir leur journal d'opérations.
+Avant de conclure, nous noterons qu'il est nécessaire pour les noeuds de maintenir leur journal des opérations.
 En effet, les noeuds l'utilisent pour renvoyer les opérations manquées lors de l'exécution du mécanisme d'anti-entropie évoqué ci-dessus.
 Ceci se traduit par une augmentation perpétuelle des métadonnées des \acp{CRDT} synchronisés par opérations.
 Pour y pallier, des travaux \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} proposent de tronquer le journal des opérations pour en supprimer les opérations connues de tous.

@@ -17,7 +17,7 @@ Dans le domaine de l'édition collaborative temps réel, \textcite{2014-effect-d
 Il est donc important de générer fréquemment des opérations \emph{rename} pour conserver leur temps d'intégration sous une limite perceptible.
 
 Finalement, le dernier aspect à considérer est le nombre d'opérations \emph{rename} concurrentes.
-La \autoref{fig:evolution-document-size} montre que les opérations \emph{rename} concurrentes accroissent la taille de la structure de données tandis que la \autoref{fig:time-to-replay-log} illustre qu'elles augmentent le temps nécessaire pour rejouer le log d'opérations.
+La \autoref{fig:evolution-document-size} montre que les opérations \emph{rename} concurrentes accroissent la taille de la structure de données tandis que la \autoref{fig:time-to-replay-log} illustre qu'elles augmentent le temps nécessaire pour rejouer le journal des opérations.
 La stratégie proposée doit donc viser à minimiser le nombre d'opérations \emph{rename} concurrentes générées.
 Cependant, elle doit éviter d'utiliser des coordinations synchrones entre les noeuds pour cela (\eg algorithmes de consensus), pour des raisons de performances.
 Pour réduire la probabilité de générer des opérations \emph{rename} concurrentes, plusieurs méthodes peuvent être proposées.

@@ -3,43 +3,13 @@ Ils permettent aux utilisateur-rices de consulter le contenu actuel, de le modif
 L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
 L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
 
-Plusieurs outils d'édition collaborative centralisés basés sur l'approche \ac{OT} \cite{1989-grove-ellis-gibbs} ont permis de populariser l'édition collaborative temps réel de texte \cite{gdocs, etherpad}.
-Ces approchent souffrent néanmoins de leur architecture centralisée.
+Plusieurs outils d'édition collaborative centralisés basés sur l'approche \acf{OT} \cite{1989-grove-ellis-gibbs} ont permis de populariser l'édition collaborative temps réel de texte \cite{gdocs, etherpad}.
+Ces approches souffrent néanmoins de leur architecture centralisée.
 Notamment, ces solutions rencontrent des difficultés à passer à l'échelle \cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité \cite{prism-washington-post, prism-guardian}.
 
 L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P} \cite{2011-evaluation-crdts-ahmed-nacer}.
 Ainsi, de nombreux travaux \cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
-De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
-Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.\\
-
-\mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
-
-De manière semblable, l'équipe Coast conçoit depuis plusieurs années des applications avec ces mêmes objectifs et étudient les problématiques de recherche liées.
-Elle développe \acf{MUTE} \cite{MUTE2017}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}}\footnote{Code source disponible à l'adresse suivante : \url{https://github.com/coast-team/mute}}, un éditeur collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-\ac{MUTE} sert de plateforme d'expérimentation et de démonstration pour les travaux de l'équipe.
-
-Ainsi, nous avons contribué à son développement dans le cadre de cette thèse.
-Notamment, nous avons participé à :
-\begin{enumerate}
-  \item L'implémentation des \acp{CRDT} LogootSplit \cite{2013-logootsplit} et RenamableLogootSplit \cite{2022-rls-tpds-nicolas} pour représenter le document texte.
-  \item L'implémentation de leur modèle de livraison de livraison respectifs.
-  \item L'implémentation d'un protocole d'appartenance au réseau, SWIM \cite{swim2002}.
-\end{enumerate}
-
-Dans ce chapitre, nous commençons par présenter le projet \ac{MUTE} : ses objectifs, ses fonctionnalités et son architecture système et logicielle.
-Puis nous détaillons ses différentes couches logicielles : leur rôle, l'approche choisie pour leur implémentation et finalement leurs limites actuelles.
-Au cours de cette description, nous mettons l'emphase sur les composants auxquelles nous avons contribué, \ie les sous-sections \ref{sec:mute-crdts}, \ref{sec:mute-delivery-model} et \ref{sec:mute-membership-protocol}.Les systèmes collaboratifs temps réels permettent à plusieurs utilisateur-rices de réaliser une tâche de manière coopérative.
-Ils permettent aux utilisateur-rices de consulter le contenu actuel, de le modifier et d'observer en direct les modifications effectuées par les autres collaborateur-rices.
-L'observation en temps réel des modifications des autres favorise une réflexion de groupe et permet une répartition efficace des tâches.
-L'utilisation des systèmes collaboratifs se traduit alors par une augmentation de la qualité du résultat produit \cite{2004-empirical-study-collaborative-writing, 2005-internet-encyclopaedias-head-to-head}.
-
-Plusieurs outils d'édition collaborative centralisés basés sur l'approche \ac{OT} \cite{1989-grove-ellis-gibbs} ont permis de populariser l'édition collaborative temps réel de texte \cite{gdocs, etherpad}.
-Ces approchent souffrent néanmoins de leur architecture centralisée.
-Notamment, ces solutions rencontrent des difficultés à passer à l'échelle \cite{2015-cope-delay-collaborative-note-taking-ignat, 2016-performance-collaborative-editors-dang-ignat} et posent des problèmes de confidentialité \cite{prism-washington-post, prism-guardian}.
-
-L'approche \ac{CRDT} offre une meilleure capacité de passage à l'échelle et est compatible avec une architecture \ac{P2P} \cite{2011-evaluation-crdts-ahmed-nacer}.
-Ainsi, de nombreux travaux \cite{Nedelec2016CRATE, peerpad, serenity-notes} ont été entrepris pour proposer une alternative distribuée répondant aux limites des éditeurs collaboratifs centralisés.
-De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \emph{Local-First Softwares} \cite{localfirstsoftware2019, pushpin2020}.
+De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des \acfp{LFS} \cite{localfirstsoftware2019, pushpin2020}.
 Ce paradigme vise le développement d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateurs.\\
 
 \mnnote{TODO: Serait intéressant d'ajouter une catégorisation des éditeurs collaboratifs en fonction de leurs caractéristiques (décentralisé vs. p2p, pas de chiffrement vs. chiffrement serveur vs. chiffrement de bout en bout, OT vs CRDT vs mécanisme de résolution de conflits custom...) pour mettre en avant le caractère unique de MUTE}
