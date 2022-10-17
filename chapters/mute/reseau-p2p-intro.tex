@@ -1,0 +1,16 @@
+Pour créer un réseau \ac{P2P} entre navigateurs, Netflux utilise la technologie \acf{WebRTC}.
+\ac{WebRTC} est une API\footnote{\ac{API} : Interface de Programmation} de navigateur spécifiée en 2011, et en cours d'implémentation dans les différents navigateurs depuis 2013.
+Elle permet de créer une connexion directe entre deux navigateurs pour échanger des médias audio et/ou vidéo, ou simplement des données.
+
+Cette API utilise pour cela un ensemble de protocoles.
+Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
+Dans la \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[page=3, trim=7cm 3cm 4cm 2cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
+  \caption{Architecture système pour la couche réseau de MUTE}
+  \label{fig:architecture-systeme-webrtc}
+\end{figure}
+
+Nous décrivons ci-dessous leur rôle respectif dans la collaboration.

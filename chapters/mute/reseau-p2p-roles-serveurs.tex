@@ -1,0 +1,10 @@
+Ainsi, \ac{WebRTC} implique l'utilisation de plusieurs serveurs.
+
+Les serveurs de signalisation et STUN sont nécessaires pour permettre à de nouveaux noeuds de rejoindre la collaboration.
+Autrement dit, leur rôle est ponctuel : une fois le réseau \ac{P2P} établit, les noeuds n'ont plus besoin d'eux.
+Ces serveurs peuvent alors être coupés sans impacter la collaboration.
+
+À l'inverse, les serveurs TURN jouent un rôle plus prédominant dans la collaboration.
+Ils sont nécessaires dès lors que des noeuds proviennent de réseaux différents et sont alors requis tout au long de la collaboration.
+Une panne de ces derniers entraverait la collaboration puisqu'elle résulterait en une partition des noeuds.
+Il est donc primordial de s'assurer de la disponibilité et fiabilité de ces serveurs.

@@ -1,0 +1,7 @@
+Pour se connecter, les noeuds doivent s'échanger plusieurs informations logicielles et matérielles, notamment leur adresse IP publique respective.
+Cependant, un noeud n'a pas accès à cette donnée lorsque son routeur utilise le protocole NAT.
+Le noeud doit alors la récupérer.
+
+Pour permettre aux noeuds de découvrir leur adresse IP publique, \ac{WebRTC} repose sur le protocole STUN.
+Ce protocole consiste simplement à contacter un serveur tiers dédié à cet effet.
+Ce serveur retourne en réponse au noeud qui le contacte son adresse IP publique.

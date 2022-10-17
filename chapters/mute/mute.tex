@@ -82,81 +82,25 @@
 \input{chapters/mute/livraison-eventual}
 
 \section{Couche réseau}
-\label{sec:mute-couche-reseau}
-
-Pour permettre aux différents noeuds de communiquer, MUTE repose sur la librairie Netflux\footnote{\url{https://github.com/coast-team/netflux}}.
-Développée au sein de l'équipe Coast, cette librairie permet de construire un réseau \ac{P2P} entre des navigateurs, mais aussi des bots.
+\input{chapters/mute/reseau-intro}
 
 \subsection{Établissement d'un réseau \ac{P2P} entre navigateurs}
-
-Pour créer un réseau \ac{P2P} entre navigateurs, Netflux utilise la technologie \acf{WebRTC}.
-\ac{WebRTC} est une API\footnote{\ac{API} : Interface de Programmation} de navigateur spécifiée en 2011, et en cours d'implémentation dans les différents navigateurs depuis 2013.
-Elle permet de créer une connexion directe entre deux navigateurs pour échanger des médias audio et/ou vidéo, ou simplement des données.
-
-Cette API utilise pour cela un ensemble de protocoles.
-Ces protocoles réintroduisent des serveurs dans l'architecture système de MUTE.
-Dans la \autoref{fig:architecture-systeme-webrtc}, nous représentons un réseau \ac{P2P} créé avec \ac{WebRTC} et les différents serveurs impliqués.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[page=3, trim=7cm 3cm 4cm 2cm, clip, width=.7\linewidth]{img/mute-figures.pdf}
-  \caption{Architecture système pour la couche réseau de MUTE}
-  \label{fig:architecture-systeme-webrtc}
-\end{figure}
-
-Nous décrivons ci-dessous leur rôle respectif dans la collaboration.
+\input{chapters/mute/reseau-p2p-intro}
 
 \subsubsection{Serveur de signalisation}
-
-Pour rejoindre un réseau \ac{P2P} déjà établi, un nouveau noeud a besoin de découvrir les noeuds déjà connectés et de pouvoir communiquer avec eux.
-Le serveur de signalisation offre ces fonctionnalités.
-
-Au moins un noeud du réseau \ac{P2P} doit maintenir une connexion avec le serveur de signalisation.
-À sa connexion, un nouveau noeud contacte le serveur de signalisation.
-Il est mis en relation avec un noeud du réseau \ac{P2P} par son intermédiaire et échange les différents messages de \ac{WebRTC} nécessaires à l'établissement d'une connexion \ac{P2P} entre eux.
-
-Une fois cette première connexion \ac{P2P} établie, le nouveau noeud contacte et communique avec les autres noeuds par l'intermédiaire du premier noeud.
-Il peut alors terminer sa connexion avec le serveur de signalisation.
+\input{chapters/mute/reseau-p2p-signalisation}
 
 \subsubsection{Serveur STUN}
-
-Pour se connecter, les noeuds doivent s'échanger plusieurs informations logicielles et matérielles, notamment leur adresse IP publique respective.
-Cependant, un noeud n'a pas accès à cette donnée lorsque son routeur utilise le protocole NAT.
-Le noeud doit alors la récupérer.
-
-Pour permettre aux noeuds de découvrir leur adresse IP publique, \ac{WebRTC} repose sur le protocole STUN.
-Ce protocole consiste simplement à contacter un serveur tiers dédié à cet effet.
-Ce serveur retourne en réponse au noeud qui le contacte son adresse IP publique.
+\input{chapters/mute/reseau-p2p-stun}
 
 \subsubsection{Serveur TURN}
+\input{chapters/mute/reseau-p2p-turn}
 
-Il est possible que des noeuds provenant de réseaux différents ne puissent établir une connexion \ac{P2P} directe entre eux, par exemple à cause de restrictions imposées par leur pare-feux respectifs.
-Pour contourner ce cas de figure, \ac{WebRTC} utilise le protocole TURN.
-
-Ce protocole consiste à utiliser un serveur tiers comme relais entre les noeuds.
-Ainsi, les noeuds peuvent communiquer par son intermédiaire tout au long de la collaboration.
-Les échanges sont chiffrés, afin que le serveur TURN ne représente pas une faille de sécurité.
-
-\subsubsection{Rôle des serveurs}
-
-Ainsi, \ac{WebRTC} implique l'utilisation de plusieurs serveurs.
-
-Les serveurs de signalisation et STUN sont nécessaires pour permettre à de nouveaux noeuds de rejoindre la collaboration.
-Autrement dit, leur rôle est ponctuel : une fois le réseau \ac{P2P} établit, les noeuds n'ont plus besoin d'eux.
-Ces serveurs peuvent alors être coupés sans impacter la collaboration.
-
-À l'inverse, les serveurs TURN jouent un rôle plus prédominant dans la collaboration.
-Ils sont nécessaires dès lors que des noeuds proviennent de réseaux différents et sont alors requis tout au long de la collaboration.
-Une panne de ces derniers entraverait la collaboration puisqu'elle résulterait en une partition des noeuds.
-Il est donc primordial de s'assurer de la disponibilité et fiabilité de ces serveurs.
+\subsubsection{Rôles des serveurs}
+\input{chapters/mute/reseau-p2p-roles-serveurs}
 
 \subsection{Topologie réseau}
-
-Netflux établit un réseau \ac{P2P} par document.
-Chaque réseau \ac{P2P} est un réseau entièrement maillé : chaque noeud se connecte à l'ensemble des autres noeuds.
-
-Cette topologie simple est adaptée à des groupes de petite taille, mais ne passe pas à l'échelle.
-D'autres topologies limitant le nombre de connexions par noeuds, telle que celle décrite par \cite{2018-spray-nedelec}, pourraient être implémentées pour adresser cette limite.
+\input{chapters/mute/reseau-topologie}
 
 % \subsection{Gestion des bots}
 
