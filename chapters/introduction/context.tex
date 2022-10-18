@@ -4,27 +4,18 @@ L'évolution des technologies du web a conduit à l'avènement de ce qui est com
 La principale caractéristique de ce média est la possibilité aux utilisateur-rices non plus seulement de le consulter, mais aussi d'y contribuer.
 
 Ces nouvelles fonctionnalités ont permis l'apparition d'applications incitant les utilisateur-rices à créer et partager leur propre contenu, ainsi que d'échanger avec d'autres utilisateur-rices à ce sujet.
-\cite{2015-social-media-definition-obar} définit ce type d'applications, \ie les \emph{réseaux sociaux}, de la manière suivante :
-\begin{definition}
-  Un réseau social est une application respectant les critères suivants :
-  \begin{enumerate}
-    \item Elle prend la forme d'une application interactive.
-    \item Elle permet à ses utilisateur-rices de produire et de partager leur propre contenu.
-      Ce contenu généré par les utilisateur-rices constitue le contenu principal de l'application.
-    \item Elle permet à ses utilisateur-rices de possèder et de maintenir leur propre profil sur la plateforme.
-    \item Elle encourage ses utilisateur-rices à étendre leur réseau social en se connectant à d'autres utilisateur-rices, voire en créant ou en s'intégrant à des communautés.
-  \end{enumerate}
+Un cas particulier de ces applications proposent aux utilisateur-rices de travailler ensemble pour la création d'un même contenu, en d'autres termes de collaborer.
+Nous appelons ces applications des \emph{systèmes collaboratifs} :
+\begin{definition}[Système collaboratif]
+  \label{def:collaborative-system}
+  Un système collaboratif est un système supportant ses utilisateur-rices dans leurs processus de collaboration pour la réalisation de tâches.
 \end{definition}
-De nos jours, les réseaux sociaux représentent les applications les plus populaires du paysage internet, \eg Facebook compte 2,9 millards d'utilisateur-rices par mois \cite{2022-01-monthly-active-users-social-networks}, Youtube 2,5 milliards \cite{2022-01-monthly-active-users-social-networks}, Wikipedia 788 millions {\cite{2022-09-monthly-active-users-wikipedia}} ou encore Quora 300 millions \cite{2022-01-monthly-active-users-social-networks}.
-\mnnote{TODO: Wikipedia, Quora, réseaux sociaux ? Pas d'après la définition}
 
-La démocratisation de ces applications présente plusieurs bienfaits.
-Notamment, nous notons que les réseaux sociaux permettent, en diminuant le coût individuel pour tout à chacun-e de contribuer, d'améliorer la diffusion de l'information \cite{2012-youtube-social-movements-meek,2013-wealth-occupation-networks-theocharis}.
-Aussi, ils contribuent à la création de communautés \cite{2013-understanding-social-media-logic-van-dijck}.
-Finalement, en permettant à chacun-e de partager son savoir, ils permettent la création de bases de connaissances complètes \cite{2005-internet-encyclopaedias-head-to-head,2008-knowledge-sharing-yahoo-answers-adamic}.
+De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg GoogleDocs compte XX millions utilisateur-rices, GitHub YY millions, Wikipedia 788 millions {\cite{2022-09-monthly-active-users-wikipedia}} ou Quora 300 millions \cite{2022-01-monthly-active-users-social-networks}.
+\mnnote{TODO: Ajouter chiffres et refs}
+De leur côté, d'autres plateformes impliquent leur communautés en organisant ponctuellement des collaborations éphémères et généralement massives, \eg r/Place \cite{2022-rplace} ou TwitchPlaysPokemon \cite{2014-twitch-plays-pokemon}.\\
 
-Cependant, la conception de réseaux sociaux fait face à de nombreux défis.
-Notamment, ces applications doivent assurer leur haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle en raison de leur popularité et importance dans notre quotidien.
+En raison de leur popularité, les systèmes collaboratifs doivent assurer plusieurs propriétés pour garantir leur bon fonctionnement et qualité de service : une haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle.
 \begin{definition}[Disponibilité]
   \label{def:availability}
   La disponibilité d'un système indique sa capacité à répondre à tout moment à une requête d'un-e utilisateur-rice.
@@ -35,16 +26,25 @@ Notamment, ces applications doivent assurer leur haute disponibilité, toléranc
 \begin{definition}[Capacité de passage à l'échelle]
   La capacité de passage à l'échelle d'un système indique sa capacité à traiter un volume toujours plus conséquent de requêtes.
 \end{definition}
-Pour cela, ces systèmes adoptent une architecture décentralisée\footnotemark, \ie une architecture reposant sur un ensemble de serveurs qui se répartissent la charge de travail et les tâches.
-\footnotetext{Nous utilisons la classification présentée dans \cite{1964-distributed-communications-networks-baran} pour distinguer les architectures systèmes centralisées, décentralisées et distribuées.}
-Malgré ce que le nom de cette architecture peut suggérer, il convient de noter que de manière globale les serveurs jouent toujours un rôle central dans les systèmes décentralisés.
-Par exemple, les serveurs servent à authentifier les utilisateur-rices, à stocker leurs données ou encore à assurer la communication entre utilisateur-rices.
 
-Additionnellement, il convient de préciser que ces serveurs ne sont pas une ressource libre.
-En effet, ils sont mis à disposition et maintenus par la ou les organisations qui proposent le réseau social.
-Ces organisations font alors office d'\emph{autorités centrales} du système, \eg en se portant garantes de l'identité des utilisateur-rices ou encore de l'authenticité d'un contenu.
+Pour cela, ces systèmes adoptent une architecture décentralisée, que nous illustrons par la \autoref{fig:decentralised-system}.
+\begin{figure}[!ht]
+  \centering
+  \resizebox{0.3 \columnwidth}{!}{
+    \includegraphics[trim=12cm 0cm 13cm 0cm, clip]{img/centralised-decentralised-distributed}
+  }
+  \caption[Caption for decentralised-system]{Représentation d'une architecture décentralisée\footnotemark}
+  \label{fig:decentralised-system}
+\end{figure}
+\footnotetext{Source : \cite{1964-distributed-communications-networks-baran}}
 
-De part le rôle que jouent les serveurs dans les systèmes décentralisés, ces derniers échouent à assurer un second ensemble de propriétés, que nous jugeons néanmoins fondamentales :
+Dans ce type d'architecture, les responsabilités, tâches et la charge travail sont réparties entre un ensemble de serveurs.
+Il convient toutefois de noter que les serveurs jouent de manière globale toujours un rôle central dans ces systèmes, malgré ce que le nom de cette architecture peut suggérer.
+En effet, ces systèmes reposent toujours sur leurs serveurs pour authentifier les utilisateur-rices, stocker les données de leurs utilisateur-rices ou encore fusionner les modifications effectuées par ces dernier-es.\\
+% La nuance porte seulement sur le fait que ce n'est plus un serveur unique qui est en charge de ces tâches, mais un ensemble de serveurs.
+
+Bien que cette architecture système permette de répondre aux problèmes d'ordre technique que nous présentons précédemment, nous considérons que cette architecture souffre néanmoins de limites.
+Notamment, de part le rôle prédominant que jouent les serveurs dans les systèmes décentralisés, ces derniers échouent à assurer un second ensemble de propriétés, que nous jugeons néanmoins fondamentales :
 \begin{definition}[Confidentialité des données]
   \label{def:confidentialite}
   La confidentialité des données d'un système indique sa capacité à garantir à ses utilisateur-rices que leurs données ne seront pas accessibles par des tiers non autorisés ou par le système lui-même.
@@ -61,52 +61,57 @@ De part le rôle que jouent les serveurs dans les systèmes décentralisés, ces
   \label{def:censorship}
   La résistance à la censure d'un système indique sa capacité à garantir à ses utilisateur-rices son fonctionnement malgré des actions de contrôle de l'information par des autorités.
 \end{definition}
-Ainsi, les utilisateur-rices des réseaux sociaux prennent, de manière consciente ou non, le risque que ces propriétés soient transgressées par les autorités auxquelles appartiennent ces applications ou par des tiers avec lesquelles ces autorités interagissent, \eg des gouvernements.
 
-Qui plus est, il convient de noter que les autorités auxquelles appartiennent ces applications, \eg des entreprises, possèdent leurs propres intérêts, \eg leur propre profit.
-De nombreux faits d'actualité ont malheureusement montré que ces autorités ont tendance à privilégier leurs intérêts, quitte à prendre des décisions s'avérant nocives pour une partie de leurs utilisateur-rices.
-Nous pouvons par exemple noter la mise en avant de contenu à caractère raciste \cite{2018-algorithms-oppression-noble}, la non-modération de contenu misogyne \cite{2018-violence-abuse-against-women-amnesty}, l'encouragement à la production de contenu toxique \cite{2021-facebook-files-algorithm-favoring-toxicity-wsj} ou l'inaction et même entrave à la correction des effets délétères de son réseau social sur la santé mentale de ses utilisatrices \cite{2021-facebook-files-instagram-toxic-teen-girls-wsj}.
+De plus, les serveurs ne sont pas une ressource libre.
+En effet, ils sont déployés et maintenus par la ou les organisations qui proposent le système collaboratif.
+Ces organisations font alors office d'\emph{autorités centrales} du système, \eg en se portant garantes de l'identité des utilisateur-rices, de l'authenticité d'un contenu ou encore de la disponibilité dudit contenu.
 
-Ainsi, la présence d'autorités centrales dans les réseaux sociaux représente un danger pour les utilisateur-rices.
-Il nous paraît alors fondamental de proposer des moyens technologiques pour concevoir et déployer des réseaux sociaux alternatifs qui minimisent le rôle des autorités centrales, voire l'éliminent.
+De part le fait que les autorités centrales possèdent les serveurs hébergeant le système, elles ont tout pouvoir sur ces derniers.
+Ainsi, les utilisateur-rices de systèmes collaboratifs prennent, de manière consciente ou non, le risque que les propriétés présentées précédemment soient transgressées par les autorités auxquelles appartiennent ces applications ou par des tiers avec lesquelles ces autorités interagissent, \eg des gouvernements.
+Plusieurs faits d'actualités nous ont malheureusement montré de tels faits, \eg la censure de Wikipedia par des gouvernements \cite{2022-wikipedia-censorship}, la fermeture de services par les entreprises les proposant \cite{2022-killed-by-google} ou encore la mise à disposition des données hébergées par les GAFAMs aux services de renseignement de différentes nations \cite{prism-guardian,prism-washington-post}.
+Cependant, le coût de l'infrastructure nécessaire pour déployer des systèmes à large échelle équivalents entrave l'apparition d'alternatives, plus respectueuses de leurs utilisateur-rices.\\
 
-Dans cette optique, une piste de recherche que nous jugeons intéressante à étudier est celle présentée dans \cite{localfirstsoftware2019}.
-Dans ce travail, les auteurs proposent un nouveau paradigme de conception d'applications, nommées \acp{LFS}.
-Ce type d'applications se démarque de ceux existants, \eg les applications basées sur le cloud, par la place centrale donnée aux utilisateur-rices et leurs propres appareils, les éventuels serveurs étant relegués qu'à de simples rôles de support.
+\emph{Ainsi, il nous paraît fondamental de proposer des moyens technologiques rendant accessible la conception et le déploiement des systèmes collaboratifs alternatifs.
+Ces derniers devraient minimiser le rôle des autorités centrales, voire l'éliminer, de façon à protéger les intérêts de leurs utilisateur-rices.}\\
 
-\cite{localfirstsoftware2019} identifie 7 propriétés que doivent satisfaire les applications \acp{LFS}, illustrées dans la \autoref{fig:lfs-properties}.
+Dans cette optique, une piste de recherche que nous jugeons intéressante à étudier est celle des systèmes collaboratifs \acf{P2P}.
+Cette architecture système, que nous illustrons par la \autoref{fig:distributed-system}, place les utilisateur-rices au centre du système et relègue les éventuels serveurs à un simple rôle de support de la collaboration, \eg la mise en relation des pairs.
+
+\begin{figure}[!ht]
+  \centering
+  \resizebox{0.25 \columnwidth}{!}{
+    \includegraphics[trim=26cm 0cm 1cm 0cm, clip]{img/centralised-decentralised-distributed}
+  }
+  \caption[Caption for distributed-system]{Représentation d'une architecture distribuée\footnotemark[\value{footnote}]}
+  \label{fig:distributed-system}
+\end{figure}
+
+Récemment, la conception de systèmes collaboratifs \ac{P2P} a gagné en traction suite à \cite{localfirstsoftware2019}.
+Dans cet article, les auteurs définissent un ensemble de propriétés qui correspondent à celles que nous avons établies précédemment, de la \autoref{def:collaborative-system} à la \autoref{def:censorship}.
+
+En utilisant ces propriétés comme critères, les auteurs comparent les fonctionnalités et garanties offertes par les différents types d'applications, notamment les applications lourdes et les applications basées sur le cloud.
+
+Le résultat de cette comparaison est le suivant : alors que les applications basées sur le cloud permettent de nouveaux usages, notamment la collaboration entre utilisateur-rices ou la synchronisation automatique entre appareils, elles retirent à leurs utilisateur-rices toute garantie de pérennité, confidentialité des données et souveraineté des données.
+Ces dernières propriétés sont pourtant communément offertes par les applications lourdes.
+La \autoref{fig:lfs-comparison-apps} détaille ce résultat.
+
 \begin{figure}[!ht]
   \centering
   \resizebox{\columnwidth}{!}{
-    \includegraphics{img/lfs-properties}
+    \includegraphics{img/lfs-comparison-apps}
   }
-  \caption[Caption for lfs-properties]{Liste des propriétés visées par les \acp{LFS}\footnotemark}
-  \label{fig:lfs-properties}
+  \caption[Caption for lfs-comparison-apps]{Évaluation d'applications et de technologies vis-à-vis des 7 propriétés visées par les \acl{LFS}\footnotemark}
+  \label{fig:lfs-comparison-apps}
 \end{figure}
-\footnotetext{Source : \url{https://www.inkandswitch.com/local-first/\#towards-a-better-future}}
-Ces propriétés se recoupent en grande partie avec celles que nous avons identifiées précédemment :
-\begin{enumerate}
-  \item Le fonctionnement en mode hors-ligne et le fonctionnement avec une latence minimale sont tous deux assurés en privilégiant la disponibilité \cite{pacelc2012} (\autoref{def:availability}).
-  \item Le respect de la vie privée des utilisateur-rices correspond à la propriété de confidentialité (\autoref{def:confidentialite}).
-  \item Le contrôle des utilisateur-rices sur leurs données correspond à la propriété de souveraineté (\autoref{def:souverainete}).
-  \item La longétivité de l'application correspond aux propriétés de pérennité (\autoref{def:perennite}) et de résistance à la censure (\autoref{def:censorship}).
-\end{enumerate}
-Notons qu'il découle de ces propriétés que les applications \acp{LFS} sont fondamentalement \ac{P2P}.
 
-De manière similaire, observons que ce paradigme met en lumière une dernière propriété des applications \acp{LFS} :
-\begin{definition}[Collaborativité]
-  \label{def:collaborative}
-  La collaborativité d'un système indique sa capacité à supporter ses utilisateur-rices dans leurs processus de collaboration pour la réalisation de tâches.
-\end{definition}
-\mnnote{TODO: Introduire notion d'agents artificiels/logiciels}
-Nous précisons que nous considérons dans ce manuscrit qu'une collaboration peut prendre bien des formes.
-Une collaboration peut ainsi prendre la forme d'un échange entre utilisateur-rices, \eg un fil de discussion sur une plateforme de questions et réponses, ou d'une édition collaborative d'un contenu, \eg la rédaction d'une page de wiki.
+Malgré ce que ce résultat pourrait suggérer, les auteurs affirment que les fonctionnalités de collaboration entre utilisateur-rices ou même de synchronisation entre appareils ne sont pas antinomiques avec les propriétés de confidentialité, souveraineté, pérennité.
 
-\mnnote{TODO: Voir si angle écologique/réduction consommation d'énergie peut être pertinent.}
+Ainsi, ils proposent un nouveau paradigme de conception d'applications collaboratives \ac{P2P}, nommées \acp{LFS}.
+Ce paradigme vise à la conception d'applications offrant le meilleur des approches existantes, \ie cochant l'intégralité des critères de la \autoref{fig:lfs-comparison-apps}.
+Nous partageons cette vision.\\
+% Ce type d'applications se démarque de ceux existants, \eg les applications basées sur le cloud, par la place centrale donnée aux utilisateur-rices et leurs propres appareils, les éventuels serveurs étant relegués qu'à de simples rôles de support.
 
-Ainsi, \cite{localfirstsoftware2019} établit un paradigme de conception d'applications correspondant à notre vision.
-Cependant, de nombreuses problématiques de recherche identifiées dans ce travail sont encore non résolues et entravent la démocratisation des applications \acp{LFS}.
-
+Cependant, de nombreuses problématiques de recherche identifiées dans \cite{localfirstsoftware2019} sont encore non résolues et entravent la démocratisation des applications \acp{LFS}.
 Notamment, les applications \acp{LFS} se doivent de répliquer les données entre appareils pour permettre :
 \begin{enumerate}
   \item Le fonctionnement en mode hors-ligne et le fonctionnement avec une faible latence.
@@ -114,14 +119,14 @@ Notamment, les applications \acp{LFS} se doivent de répliquer les données entr
   \item Le partage de contenu entre utilisateur-rices pour la collaboration.
 \end{enumerate}
 
-Cependant, compte tenu des propriétés visées par les applications \acp{LFS}, plusieurs contraintes restreignent le choix des méthodes de réplication possibles.
+Toutefois, compte tenu des propriétés visées par les applications \acp{LFS}, plusieurs contraintes restreignent le choix des méthodes de réplication possibles.
 Ainsi, pour permettre le fonctionnement en mode hors-ligne de l'application, \ie la consultation et la modification de contenu, les applications \acp{LFS} doivent relaxer la propriété de cohérence des données.
 \begin{definition}[Cohérence]
   La cohérence d'un système indique sa capacité à présenter une vue uniforme de son état à chacun de ses utilisateur-rices à un moment donné.
 \end{definition}
 
 Les applications \acp{LFS} doivent donc adopter des méthodes de réplication dites optimistes \cite{2005-optimistic-replication-saito}.
-Ces méthodes autorisent chaque noeud possédant une copie de la donnée de la consulter et de la modifier sans coordination au préalable\footnote{Par opposition aux méthodes de réplication dites pessimistes, \ie qui nécessitent une coordination préalable entre les noeuds pour modifier la donnée.} avec les autres noeuds.
+Ces méthodes autorisent chaque noeud possédant une copie de la donnée de la consulter et de la modifier sans coordination au préalable avec les autres noeuds\footnote{Par opposition aux méthodes de réplication dites pessimistes, qui nécessitent une coordination préalable entre les noeuds avant toute modification de la donnée.}.
 L'état des copies des noeuds peut donc diverger temporairement.
 Un mécanisme de synchronisation permet ensuite aux noeuds de partager les modifications effectuées et de les intégrer de façon à converger à terme \cite{10.1145/224057.224070}, \ie obtenir à terme de nouveau des états équivalents.
 
