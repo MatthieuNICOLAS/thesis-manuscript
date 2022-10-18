@@ -2,7 +2,7 @@
 \label{sec:research-questions-rls}
 
 Les \acfp{CRDT} \cite{2007-crdt-shapiro,shapiro_2011_crdt} sont des types de données répliqués.
-Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une donnée et pour leur permettre de la consulter et dee la modifier sans aucune coordination préalable.
+Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une donnée et pour leur permettre de la consulter, de la modifier sans aucune coordination préalable et d'assurer à terme la convergence des copies.
 Dans ce but, les \acp{CRDT} incorporent des mécanismes de résolution de conflits automatiques directement au sein leur spécification.
 
 Cependant, ces mécanimes induisent un surcoût, aussi bien en termes de métadonnées et de calculs que de bande-passante.
