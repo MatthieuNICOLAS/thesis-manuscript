@@ -1,0 +1,47 @@
+\Annex{Algorithmes \textsc{revertRenameId}}
+
+\label{app:revert-rename-id}
+
+\begin{algorithm}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{revRenIdLessThanNewFirstId}{id, firstId, newFirstId}
+          \State predNewFirstId $\gets$ createIdFromBase(newFirstId, -1)
+          \If{isPrefix(predNewFirstId, id)}
+              \State tail $\gets$ getTail(id, 1)
+              \If{tail < firstId}
+                  \State \Return tail
+              \Else
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State offset $\gets$ getLastOffset(firstId)
+                  \State predFirstId $\gets$ createIdFromBase(firstId, offset)
+                  \State \Return concat(predFirstId, MAX\_TUPLE, tail)
+              \EndIf
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+      \\
+      \Function{revRenIdGreaterThanNewLastId}{id, lastId}
+          \If{id < lastId}
+              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+              \State \Return concat(lastId, MIN\_TUPLE, id)
+          \ElsIf{isPrefix(newLastId, id)}
+              \State tail $\gets$ getTail(id, 1)
+              \If{tail < lastId}
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State \Return concat(lastId, MIN\_TUPLE, tail)
+              \ElsIf{tail < newLastId}
+                  \State \Return tail
+              \Else
+                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \State \Return id
+              \EndIf
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Remaining functions to revert an identifier renaming}
+  \label{alg:appendix-revert-rename-id}
+\end{algorithm}

@@ -1,0 +1,31 @@
+\Annex{Algorithmes \textsc{renameId}}
+
+\label{app:rename-id}
+
+\begin{algorithm}[!ht]
+  \footnotesize
+  \begin{algorithmic}
+      \Function{renIdLessThanFirstId}{id, newFirstId}
+      \If{id < newFirstId}
+          \State \Return id
+      \Else
+          \State pos $\gets$ position(newFirstId)
+          \State nId $\gets$ nodeId(newFirstId)
+          \State nSeq $\gets$ nodeSeq(newFirstId)
+          \State predNewFirstId $\gets$ \new~Id(pos, nId, nSeq, -1)
+          \\
+          \State \Return concat(predNewFirstId, id)
+          \EndIf
+      \EndFunction
+      \\
+      \Function{renIdGreaterThanLastId}{id, newLastId}
+          \If{id < newLastId}
+              \State \Return concat(newLastId, id)
+          \Else
+              \State \Return id
+          \EndIf
+      \EndFunction
+  \end{algorithmic}
+  \caption{Remaining functions to rename an identifier}
+  \label{alg:appendix-rename-id}
+\end{algorithm}
