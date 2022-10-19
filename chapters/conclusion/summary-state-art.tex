@@ -1,6 +1,8 @@
 Les \acfp{CRDT} \cite{shapiro_2011_crdt} sont de nouvelles spécifications des types de données.
 Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une même donnée et pour leur permettre de la consulter et de la modifier sans aucune coordination préalable.
-Les noeuds se synchronisent
+Les copies des noeuds divergent alors temporairement.
+Les noeuds se synchronisent ensuite pour s'échanger leurs modifications respectives.
+Les \acp{CRDT} garantissent alors la convergence forte à terme, \ie que les noeuds obtiennent de nouveau des copies équivalentes de la donnée.
 
 L'absence de coordination entre les noeuds avant modifications implique que des noeuds peuvent modifier la donnée en concurrence.
 De telles modifications peuvent donner lieu à des conflits, \eg l'ajout et la suppression en concurrence d'un même élément dans un ensemble.
