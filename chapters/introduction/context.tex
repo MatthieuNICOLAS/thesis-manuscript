@@ -13,7 +13,7 @@ Nous appelons ces applications des \emph{systèmes collaboratifs} :
 
 De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg GoogleDocs compte XX millions utilisateur-rices, GitHub YY millions, Wikipedia 788 millions {\cite{2022-09-monthly-active-users-wikipedia}} ou Quora 300 millions \cite{2022-01-monthly-active-users-social-networks}.
 \mnnote{TODO: Ajouter chiffres et refs}
-De leur côté, d'autres plateformes impliquent leur communautés en organisant ponctuellement des collaborations éphémères et généralement massives, \eg r/Place \cite{2022-rplace} ou TwitchPlaysPokemon \cite{2014-twitch-plays-pokemon}.\\
+De leur côté, d'autres plateformes fédèrent leur communautés en organisant ponctuellement des collaborations éphémères et généralement massives, \eg r/Place \cite{2022-rplace} ou TwitchPlaysPokemon \cite{2014-twitch-plays-pokemon}.\\
 
 En raison de leur popularité, les systèmes collaboratifs doivent assurer plusieurs propriétés pour garantir leur bon fonctionnement et qualité de service : une haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle.
 \begin{definition}[Disponibilité]
@@ -43,8 +43,8 @@ Il convient toutefois de noter que les serveurs jouent de manière globale toujo
 En effet, ces systèmes reposent toujours sur leurs serveurs pour authentifier les utilisateur-rices, stocker les données de leurs utilisateur-rices ou encore fusionner les modifications effectuées par ces dernier-es.\\
 % La nuance porte seulement sur le fait que ce n'est plus un serveur unique qui est en charge de ces tâches, mais un ensemble de serveurs.
 
-Bien que cette architecture système permette de répondre aux problèmes d'ordre technique que nous présentons précédemment, nous considérons que cette architecture souffre néanmoins de limites.
-Notamment, de part le rôle prédominant que jouent les serveurs dans les systèmes décentralisés, ces derniers échouent à assurer un second ensemble de propriétés, que nous jugeons néanmoins fondamentales :
+Bien que cette architecture système permette de répondre aux problèmes d'ordre technique que nous présentons précédemment, elle souffre néanmoins de limites.
+Notamment, de part le rôle prédominant que jouent les serveurs dans les systèmes décentralisés, ces derniers échouent à assurer un second ensemble de propriétés que nous jugeons néanmoins fondamentales :
 \begin{definition}[Confidentialité des données]
   \label{def:confidentialite}
   La confidentialité des données d'un système indique sa capacité à garantir à ses utilisateur-rices que leurs données ne seront pas accessibles par des tiers non autorisés ou par le système lui-même.
@@ -68,13 +68,13 @@ Ces organisations font alors office d'\emph{autorités centrales} du système, \
 
 De part le fait que les autorités centrales possèdent les serveurs hébergeant le système, elles ont tout pouvoir sur ces derniers.
 Ainsi, les utilisateur-rices de systèmes collaboratifs prennent, de manière consciente ou non, le risque que les propriétés présentées précédemment soient transgressées par les autorités auxquelles appartiennent ces applications ou par des tiers avec lesquelles ces autorités interagissent, \eg des gouvernements.
-Plusieurs faits d'actualités nous ont malheureusement montré de tels faits, \eg la censure de Wikipedia par des gouvernements \cite{2022-wikipedia-censorship}, la fermeture de services par les entreprises les proposant \cite{2022-killed-by-google} ou encore la mise à disposition des données hébergées par les GAFAMs aux services de renseignement de différentes nations \cite{prism-guardian,prism-washington-post}.
-Cependant, le coût de l'infrastructure nécessaire pour déployer des systèmes à large échelle équivalents entrave l'apparition d'alternatives, plus respectueuses de leurs utilisateur-rices.\\
+Plusieurs faits d'actualités nous ont malheureusement montré de tels faits, \eg la censure de Wikipedia par des gouvernements \cite{2022-wikipedia-censorship}, la fermeture de services par les entreprises les proposant \cite{2022-killed-by-google} ou encore la mise à disposition des données hébergées par des applications aux services de renseignement de différentes nations \cite{prism-guardian,prism-washington-post}.
+Cependant, le coût conséquent de l'infrastructure nécessaire pour déployer des systèmes à large échelle équivalents entrave la mise en place d'alternatives, plus respectueuses de leurs utilisateur-rices.\\
 
 \emph{Ainsi, il nous paraît fondamental de proposer des moyens technologiques rendant accessible la conception et le déploiement des systèmes collaboratifs alternatifs.
-Ces derniers devraient minimiser le rôle des autorités centrales, voire l'éliminer, de façon à protéger les intérêts de leurs utilisateur-rices.}\\
+Ces derniers devraient minimiser le rôle des autorités centrales, voire l'éliminer, de façon à protéger et privilégier les intérêts de leurs utilisateur-rices.}\\
 
-Dans cette optique, une piste de recherche que nous jugeons intéressante à étudier est celle des systèmes collaboratifs \acf{P2P}.
+Dans cette optique, une piste de recherche que nous jugeons intéressante est celle des systèmes collaboratifs \acf{P2P}.
 Cette architecture système, que nous illustrons par la \autoref{fig:distributed-system}, place les utilisateur-rices au centre du système et relègue les éventuels serveurs à un simple rôle de support de la collaboration, \eg la mise en relation des pairs.
 
 \begin{figure}[!ht]
@@ -88,7 +88,6 @@ Cette architecture système, que nous illustrons par la \autoref{fig:distributed
 
 Récemment, la conception de systèmes collaboratifs \ac{P2P} a gagné en traction suite à \cite{localfirstsoftware2019}.
 Dans cet article, les auteurs définissent un ensemble de propriétés qui correspondent à celles que nous avons établies précédemment, de la \autoref{def:collaborative-system} à la \autoref{def:censorship}.
-
 En utilisant ces propriétés comme critères, les auteurs comparent les fonctionnalités et garanties offertes par les différents types d'applications, notamment les applications lourdes et les applications basées sur le cloud.
 
 Le résultat de cette comparaison est le suivant : alors que les applications basées sur le cloud permettent de nouveaux usages, notamment la collaboration entre utilisateur-rices ou la synchronisation automatique entre appareils, elles retirent à leurs utilisateur-rices toute garantie de pérennité, confidentialité des données et souveraineté des données.
@@ -104,15 +103,15 @@ La \autoref{fig:lfs-comparison-apps} détaille ce résultat.
   \label{fig:lfs-comparison-apps}
 \end{figure}
 
-Malgré ce que ce résultat pourrait suggérer, les auteurs affirment que les fonctionnalités de collaboration entre utilisateur-rices ou même de synchronisation entre appareils ne sont pas antinomiques avec les propriétés de confidentialité, souveraineté, pérennité.
+Malgré ce que ce résultat pourrait suggérer, les auteurs affirment que les nouveaux usages offerts par les applications basées sur le cloud ne sont pas antinomiques avec les propriétés de confidentialité, souveraineté, pérennité.
 
 Ainsi, ils proposent un nouveau paradigme de conception d'applications collaboratives \ac{P2P}, nommées \acp{LFS}.
-Ce paradigme vise à la conception d'applications offrant le meilleur des approches existantes, \ie cochant l'intégralité des critères de la \autoref{fig:lfs-comparison-apps}.
+Ce paradigme vise à la conception d'applications offrant le meilleur des approches existantes, \ie des applications cochant l'intégralité des critères de la \autoref{fig:lfs-comparison-apps}.
 Nous partageons cette vision.\\
 % Ce type d'applications se démarque de ceux existants, \eg les applications basées sur le cloud, par la place centrale donnée aux utilisateur-rices et leurs propres appareils, les éventuels serveurs étant relegués qu'à de simples rôles de support.
 
-Cependant, de nombreuses problématiques de recherche identifiées dans \cite{localfirstsoftware2019} sont encore non résolues et entravent la démocratisation des applications \acp{LFS}.
-Notamment, les applications \acp{LFS} se doivent de répliquer les données entre appareils pour permettre :
+Cependant, de nombreuses problématiques de recherche identifiées dans \cite{localfirstsoftware2019} sont encore non résolues et entravent la démocratisation des applications \acp{LFS}, notamment celles à large échelle.
+Spécifiquement, les applications \acp{LFS} se doivent de répliquer les données entre les appareils pour permettre :
 \begin{enumerate}
   \item Le fonctionnement en mode hors-ligne et le fonctionnement avec une faible latence.
   \item Le partage de contenu entre appareils d'un-e même utilisateur-rice.
@@ -126,25 +125,24 @@ Ainsi, pour permettre le fonctionnement en mode hors-ligne de l'application, \ie
 \end{definition}
 
 Les applications \acp{LFS} doivent donc adopter des méthodes de réplication dites optimistes \cite{2005-optimistic-replication-saito}.
-Ces méthodes autorisent chaque noeud possédant une copie de la donnée de la consulter et de la modifier sans coordination au préalable avec les autres noeuds\footnote{Par opposition aux méthodes de réplication dites pessimistes, qui nécessitent une coordination préalable entre les noeuds avant toute modification de la donnée.}.
+Ces méthodes autorisent chaque noeud possédant une copie de la donnée à la consulter et à la modifier sans coordination au préalable avec les autres noeuds\footnote{Par opposition aux méthodes de réplication dites pessimistes, qui nécessitent une coordination préalable entre les noeuds avant toute modification de la donnée.}.
 L'état des copies des noeuds peut donc diverger temporairement.
 Un mécanisme de synchronisation permet ensuite aux noeuds de partager les modifications effectuées et de les intégrer de façon à converger à terme \cite{10.1145/224057.224070}, \ie obtenir à terme de nouveau des états équivalents.
 
 Cependant, il convient de noter que les méthodes de réplication optimistes autorisent la génération en concurrence de modifications provoquant un conflit, \eg la modification et la suppression d'une même page dans un wiki.
 Un mécanisme de résolution de conflits est alors nécessaire pour assurer la convergence à terme des noeuds.
 
-De nouveau, le modèle du système des applications \acp{LFS} limitent les choix possibles concernant les mécanismes de résolution de conflits.
-Notamment, les applications \acp{LFS} ne disposent d'aucun contrôle sur le nombre de noeuds qui compose le système, \ie le nombre d'appareils utilisés par l'ensemble de leurs utilisateur-rices.
-\mnnote{TODO: Rattacher à la notion d'échelle des réseaux sociaux.}
-Le nombre de noeuds peut donc croître de manière non-bornée.
-La complexité algorithmique des mécanismes de résolution de conflits doit donc être indépendante de ce paramètre, ou alors en être fonction uniquement de manière logarithmique.
+De nouveau, le modèle du système des applications que nous visons, \ie des applications \acp{LFS} à large échelle, limitent les choix possibles concernant les mécanismes de résolution de conflits.
+Notamment, ces applications ne disposent d'aucun contrôle sur le nombre de noeuds qui compose le système, \ie le nombre d'appareils utilisés par l'ensemble de leurs utilisateur-rices.
+Ce nombre de noeuds peut donc croître de manière non-bornée.
+Les mécanismes de résolution de conflits choisis devraient donc rester efficaces, de manière indépendante à l'évolution de ce paramètre.
 
-De plus, ces noeuds n'offrent aucune garantie sur leur stabilité.
+De plus, les noeuds composant le système n'offrent aucune garantie sur leur stabilité.
 Des noeuds peuvent donc rejoindre et participer au système, mais uniquement de manière éphèmère.
 Ce phénonème est connu sous le nom de \emph{churn} \cite{understandingChurnP2PNetworks2006}.
-Ainsi, de part l'absence de garantie sur le nombre de noeuds connectés de manière stable, les applications \acp{LFS} ne peuvent pas utiliser des mécanismes de résolution de conflits reposant sur une coordination synchrone d'une proportion des noeuds du système, \ie sur des algorithmes de consensus \cite{1998-paxos-lamport, 2014-raft-ongaro}.
+Ainsi, de part l'absence de garantie sur le nombre de noeuds connectés de manière stable, les applications \acp{LFS} à large échelle ne peuvent pas utiliser des mécanismes de résolution de conflits reposant sur une coordination synchrone d'une proportion des noeuds du système, \ie sur des algorithmes de consensus \cite{1998-paxos-lamport, 2014-raft-ongaro}.
 
-Ainsi, pour permettre la conception d'applications \acp{LFS}, il convient de disposer de mécanismes de résolution de conflits pour l'ensemble des types de données avec une complexité algorithmique efficace par rapport au nombre de noeuds et ne nécessitant pas de coordination synchrone entre une proportion des noeuds du système.
+Ainsi, pour permettre la conception d'applications \acp{LFS} à large échelle, il convient de disposer de mécanismes de résolution de conflits pour l'ensemble des types de données avec une complexité algorithmique efficace peu importe le nombre de noeuds et ne nécessitant pas de coordination synchrone entre une proportion des noeuds du système.
 
 % \subsection{Réplication de données mutables}
 
