@@ -11,8 +11,7 @@ Nous appelons ces applications des \emph{systèmes collaboratifs} :
   Un système collaboratif est un système supportant ses utilisateur-rices dans leurs processus de collaboration pour la réalisation de tâches.
 \end{definition}
 
-De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg GoogleDocs compte XX millions utilisateur-rices, GitHub YY millions, Wikipedia 788 millions {\cite{2022-09-monthly-active-users-wikipedia}} ou Quora 300 millions \cite{2022-01-monthly-active-users-social-networks}.
-\mnnote{TODO: Ajouter chiffres et refs}
+De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg la suite logicielle dont fait partie GoogleDocs compte 2 milliards utilisateur-rices \cite{2020-google-g-suite-users}, Wikipedia 788 millions \cite{2022-09-monthly-active-users-wikipedia}, Quora 300 millions \cite{2022-01-monthly-active-users-social-networks} ou encore GitHub 60 millions \cite{2022-github-users}.
 De leur côté, d'autres plateformes fédèrent leur communautés en organisant ponctuellement des collaborations éphémères et généralement massives, \eg r/Place \cite{2022-rplace} ou TwitchPlaysPokemon \cite{2014-twitch-plays-pokemon}.\\
 
 En raison de leur popularité, les systèmes collaboratifs doivent assurer plusieurs propriétés pour garantir leur bon fonctionnement et qualité de service : une haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle.
@@ -33,7 +32,10 @@ Pour cela, ces systèmes adoptent une architecture décentralisée, que nous ill
   \resizebox{0.3 \columnwidth}{!}{
     \includegraphics[trim=12cm 0cm 13cm 0cm, clip]{img/centralised-decentralised-distributed}
   }
-  \caption[Caption for decentralised-system]{Représentation d'une architecture décentralisée\footnotemark}
+  \caption[Caption for decentralised-system]{
+    Représentation d'une architecture décentralisée\footnotemark.
+    Les noeuds aux extrêmités du graphe correspondent à des clients, les noeuds internes à des serveurs et les arêtes du graphe représentent les connexions entre appareils.
+  }
   \label{fig:decentralised-system}
 \end{figure}
 \footnotetext{Source : \cite{1964-distributed-communications-networks-baran}}
@@ -82,7 +84,9 @@ Cette architecture système, que nous illustrons par la \autoref{fig:distributed
   \resizebox{0.25 \columnwidth}{!}{
     \includegraphics[trim=26cm 0cm 1cm 0cm, clip]{img/centralised-decentralised-distributed}
   }
-  \caption[Caption for distributed-system]{Représentation d'une architecture distribuée\footnotemark[\value{footnote}]}
+  \caption[Caption for distributed-system]{
+    Représentation d'une architecture distribuée\footnotemark[\value{footnote}].
+    Ici, tout noeud du graphe correspond à un pair du système \ac{P2P}.}
   \label{fig:distributed-system}
 \end{figure}
 
@@ -99,7 +103,10 @@ La \autoref{fig:lfs-comparison-apps} détaille ce résultat.
   \resizebox{\columnwidth}{!}{
     \includegraphics{img/lfs-comparison-apps}
   }
-  \caption[Caption for lfs-comparison-apps]{Évaluation d'applications et de technologies vis-à-vis des 7 propriétés visées par les \acl{LFS}\footnotemark}
+  \caption[Caption for lfs-comparison-apps]{
+    Évaluation d'applications et de technologies vis-à-vis des 7 propriétés visées par les applications \aclp{LFS}\footnotemark.
+    {\color{lfsgreen} \checked}, {\color{lfsorange} \Flatsteel} et {\color{lfsred} \ding{108}} indiquent respectivement que l'application ou la technologie satisfait pleinement, partiellement ou aucunement le critère évalué.
+  }
   \label{fig:lfs-comparison-apps}
 \end{figure}
 
@@ -143,56 +150,3 @@ Ce phénonème est connu sous le nom de \emph{churn} \cite{understandingChurnP2P
 Ainsi, de part l'absence de garantie sur le nombre de noeuds connectés de manière stable, les applications \acp{LFS} à large échelle ne peuvent pas utiliser des mécanismes de résolution de conflits reposant sur une coordination synchrone d'une proportion des noeuds du système, \ie sur des algorithmes de consensus \cite{1998-paxos-lamport, 2014-raft-ongaro}.
 
 Ainsi, pour permettre la conception d'applications \acp{LFS} à large échelle, il convient de disposer de mécanismes de résolution de conflits pour l'ensemble des types de données avec une complexité algorithmique efficace peu importe le nombre de noeuds et ne nécessitant pas de coordination synchrone entre une proportion des noeuds du système.
-
-% \subsection{Réplication de données mutables}
-
-% Les techniques de réplication de données mutables introduisent de la redondance de données dans les systèmes.
-% Cette redondance a pour but et effet d'améliorer plusieurs propriétés des systèmes :
-
-% \begin{definition}[Disponibilité]
-% \end{definition}
-
-% \begin{definition}[Tolérance aux pannes]
-% \end{definition}
-
-% \begin{definition}[Capacité de passage à l'échelle]
-% \end{definition}
-
-% \begin{definition}[Latence]
-% \end{definition}
-
-% Les techniques de réplication de données peuvent être classées en deux approches : les \emph{techniques de réplication de données pessimistes} et les \emph{techniques de réplication de données optimistes}.
-% Ces deux catégories offrent des compromis différents vis-à-vis des propriétés décrites par les théorèmes CAP \cite{brewer_2000_podc} et PACELC \cite{pacelc2012}.
-% Notamment, la différence entre ces catégories concerne le cas de la propriété de \emph{cohérence}.
-
-% \begin{definition}[Cohérence]
-% \end{definition}
-
-% \subsection{Réplication de données pessimiste}
-
-% Les techniques de réplication de données dites \emph{pessimistes} privilègie la cohérence des données.
-% Notamment, ces techniques empêchent les modifications en concurrence d'une même donnée.
-% Pour cela, plusieurs approches sont possibles.
-
-% \begin{itemize}
-%     \item Première approche consiste à utiliser un verrou.
-%     \item Seconde approche consiste à utiliser un système de vote pour décider de la prochaine modification.
-%         Consensus, élection de leader, SMR.
-%     \item Le choix de privilégier la cohérence des données se fait au détriment de la disponibilité, tolérance aux pannes, capacité de passage à l'échelle et latence.
-%         Par exemple, un système basé sur un leader deviendra temporairement indisponible lors d'une panne de son leader, le temps que la panne soit détectée et qu'un nouveau leader soit élu.
-% \end{itemize}
-
-% \subsection{Réplication de données optimiste}
-
-% À l'inverse, les techniques de réplication de données dites \emph{optimistes} jugent acceptable de relâcher les contraintes existantes sur la cohérence des données.
-% Dans ce paradigme, chaque noeud qui possède une copie de la donnée répliquée peut la consulter et la modifier à tout moment, sans coordination préalable avec les autres noeuds.
-% Les copies des noeuds sont donc autorisées à diverger de manière temporaire.
-
-% Les modifications effectuées par chacun sont ensuite diffusées pour être intégrées par l'ensemble des noeuds et converger de nouveau, \ie atteindre des états équivalents.
-% Cependant, certaines modifications effectuées en concurrence par les noeuds peuvent provoquer des conflits.
-% \mnnote{NOTE: Pourrait insérer exemple de conflits de l'édition collaborative ici.}
-% Des mécanismes de résolution de conflits, potentiellement automatiques, sont alors requis pour assurer la convergence à terme.
-
-% Cette approche permet donc de privilégier la disponibilité, tolérance aux pannes, capacité de passage à l'échelle et latence en échange de la cohérence forte.
-
-% Dans le cadre de cette thèse, nous nous intéressons aux techniques de réplication de données optimistes.
