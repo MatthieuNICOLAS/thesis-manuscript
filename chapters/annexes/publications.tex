@@ -1,10 +1,19 @@
-Notre travail sur la problématique identifiée dans la \autoref{sec:research-questions-rls}, \ie la proposition d'un mécanisme ne nécessitant aucune coordination synchrone pour réduire le surcoût des \acp{CRDT} pour le type Séquence, a donné lieu à des publications à différents stades de son avancement :
+\Annex{Publications}
+
+Notre travail sur RenamableLogootSplit \cf{chap:renamablelogootsplit}, \ie la proposition d'un mécanisme ne nécessitant aucune coordination synchrone pour réduire le surcoût des \acp{CRDT} pour le type Séquence, a donné lieu à des publications à différents stades de son avancement :
 \begin{enumerate}
-    \item Dans \cite{2018-rls-middleware-nicolas}, nous motivons le problème identifié et présentons l'idée de notre approche pour y répondre.
-    \item Dans \cite{2020-rls-papoc-nicolas}, nous détaillons une première partie de notre approche et présentons notre protocole d'évaluation expérimentale ainsi que ses premiers résultats.
-    \item Dans \cite{2022-rls-tpds-nicolas}, nous détaillons notre proposition dans son entièreté.
-        Nous accompagnons cette proposition d'une évaluation expérimentale poussée.
-        Finalement, nous complétons notre travail d'une discussion identifiant plusieurs de ses limites et présentant des pistes de travail possibles pour y répondre.
+    \item Dans \cite{2018-rls-middleware-nicolas}, nous motivons le problème identifié et présentons l'idée de RenamableLogootSplit, un \ac{CRDT} pour le type Séquence incorporant un mécanisme de renommage.
+    \item Dans \cite{2020-rls-papoc-nicolas}, nous détaillons une première version de RenamableLogootSplit et son mécanisme de renommage.
+        Nous présentons dans cette version le mécanisme de résolution de conflits automatique conçu pour intégrer les opérations $\trm{ins}$ et $\trm{rmv}$ concurrentes aux opérations $\trm{ren}$, et inversement.
+        Nous présentons aussi dans ce travail notre protocole d'évaluation expérimentale ainsi que ses premiers résultats concernant l'impact du mécanisme de renommage sur le surcoût en métadonnées et en calculs du \ac{CRDT}.
+    \item Dans \cite{2022-rls-tpds-nicolas}, nous détaillons RenamableLogootSplit dans son entièreté.
+        Ainsi, nous présentons les mécanismes additionnels pour :
+        \begin{enumerate}
+            \item Intégrer les opérations $\trm{ren}$ concurrentes.
+            \item Supprimer à terme les métadonnées introduites par le mécanisme de renommage.
+        \end{enumerate}
+        Nous accompagnons cette proposition d'une évaluation expérimentale plus poussée, prenant en compte des scénarios avec des opérations $\trm{ren}$ concurrentes et mesurant de nouvelles métriques telles que le temps nécessaire pour rejouer le journal des opérations d'une collaboration.
+        Finalement, nous complétons notre travail d'une discussion identifiant plusieurs des limites de RenamableLogootSplit et présentant des pistes possibles pour y répondre.
 \end{enumerate}
 Nous précisons ci-dessous les informations relatives à chacun de ces articles.
 
