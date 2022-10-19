@@ -25,8 +25,9 @@ Cependant, l'exécution en concurrence du mécanisme de ré-assignation des iden
 Pour éviter ce dernier type de conflit, les auteurs choisissent de subordonner à un algorithme de consensus l'exécution du mécanisme de ré-assignation des identifiants.
 Ainsi, le mécanisme de ré-assignation des identifiants ne peut être déclenché en concurrence par plusieurs noeuds du systèmes.
 
-Comme nous l'avons évoqué précédemment, reposer sur un algorithme de consensus qui requiert une coordination synchrone entre une proportion de noeuds du système est une contrainte incompatible avec les systèmes \ac{P2P} à large échelle sujets au churn.
-Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \acp{LFS} ?}
+Comme nous l'avons évoqué précédemment, reposer sur un algorithme de consensus qui requiert une coordination synchrone entre une proportion de noeuds du système est une contrainte incompatible avec les systèmes \ac{P2P} à large échelle sujets au churn.\\
+
+Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \acp{LFS} ?}\\
 
 Pour répondre à cette problématiquee, nous proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
 Ce \ac{CRDT} intègre un mécanisme de ré-assignation des identifiants, dit de renommage, directement au sein de sa spécification.
@@ -36,39 +37,21 @@ Ainsi, nous proposons un \ac{CRDT} pour le type Séquence dont le surcoût est p
 \subsection{Éditeur de texte collaboratif \ac{P2P} temps réel chiffré de bout en bout}
 \label{sec:research-questions-mute}
 
-Les systèmes collaboratifs permettent à plusieurs utilisateur-rices de collaborer pour la réalisation d'une tâche.
-Les systèmes collaboratifs actuels adoptent principalement une architecture décentralisée, \ie un ensemble de serveurs avec lesquels les utilisateur-rices interagissent pour réaliser leur tâche, \eg Google Docs \cite{gdocs}.
-Par rapport à une architecture centralisée, cette architecture leur permet d'améliorer leur disponibilité et tolérance aux pannes, notamment grâce aux méthodes de réplication de données.
-Cette architecture à base de serveurs facilite aussi la collaboration, les serveurs permettant d'intégrer les modifications effectuées par les utilisateur-rices, de stocker les données, d'assurer la communication entre les utilisateur-rices ou encore de les authentifier.
-
-De part le rôle qui leur incombe, ces serveurs occupent une place primordiale dans ces systèmes.
-Il en découle plusieurs problématiques :
-\begin{enumerate}
-    \item Ces serveurs manipulent et hébergent les données faisant l'objet de collaborations.
-        Ces systèmes ont donc connaissance des données manipulées et de l'identité des auteur-rices des modifications.
-        Les systèmes collaboratifs décentralisés demandent donc à leurs utilisateur-rices d'abandonner la souveraineté et la confidentialité de leur travail.
-    \item Ces serveurs sont gérés par des autorités centrales, \eg Google.
-        Les systèmes collaboratifs devenant non-fonctionnels en cas d'arrêt de leurs serveurs, les utilisateur-rices de ces systèmes dépendent de ces autorités centrales.
-        Ainsi, de part leur pouvoir de vie et de mort sur les services qu'elles proposent, les autorités centrales représentent une menace pour la pérennité de ces systèmes, \eg \cite{2022-killed-by-google}.
-\end{enumerate}
-
-Pour répondre à ces problématiques, \ie confidentialité et souveraineté des données, dépendance envers des tiers, pérennité des systèmes, un nouveau paradigme de conception d'applications propose de concevoir des applications \acp{LFS}, \ie des applications mettant les utilisateur-rices et leurs appareils au coeur du système.
-Dans ce cadre d'applications \ac{P2P}, les serveurs sont relégués seulement à un rôle de support à la collaboration.
-
-Dans le cadre de ses travaux, notre équipe de recherche étudie notamment la conception d'applications respectant ce paradigme.
-Ce changement de modèle, d'une architecture décentralisée appartenant à des autorités centrales à une architecture \ac{P2P} sans autorités centrales, introduit un ensemble de problématiques de domaines variés, \eg
+Comme évoqué précédemment, la conception d'applications \acp{LFS} à large échelle présente un ensemble de problématiques issues de domaines variés, \eg
 \begin{enumerate}
     \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
     \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
     \item Comment structurer le réseau de manière efficace, \ie en limitant le nombre de connexions par pair ?
 \end{enumerate}
 
-Cet ensemble de questions peut être résumé en la problématique suivante : \emph{pouvons-nous concevoir une application collaborative \ac{P2P} à large échelle, sûre et sans autorités centrales ?}
+Cet ensemble de questions peut être résumé en la problématique suivante : \emph{pouvons-nous concevoir une application \ac{LFS} à large échelle, sûre et sans autorités centrales ?}\\
 
 Pour étudier cette problématique, l'équipe Coast développe l'application \acf{MUTE}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}} \cite{MUTE2017}.
-Il s'agit d'un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-Ce projet nous permet de présenter les travaux de recherche de l'équipe portant sur les mécanismes de résolutions de conflits automatiques pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} et les mécanismes d'authentification des pairs dans les systèmes sans autorités centrales \cite{2018-trusternity-short,2018-trusternity-long}.
-Puis, ce projet nous donne l'opportunité d'étudier la littérature des nombreux domaines de recherche nécessaires à la conception d'un tel système, \ie le domaine des protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, des topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} ou encore des protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
-Ce projet nous permet ainsi de valoriser nos travaux et d'identifier de nouvelles perspectives de recherche.
-Finalement, il résulte de ce projet le \acf{PoC} le plus complet d'applications \acp{LFS}, à notre connaissance.
-\mnnote{TODO: Vérifier du côté des applis de IPFS}
+Il s'agit d'un \ac{PoC} d'éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
+
+Ce projet permet à l'équipe de présenter ses travaux de recherche portant sur les mécanismes de résolutions de conflits automatiques pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} et les mécanismes d'authentification des pairs dans les systèmes sans autorités centrales \cite{2018-trusternity-short,2018-trusternity-long}.
+
+De plus, en inscrivant ses travaux dans le cadre d'un système complet, ce projet permet à l'équipe d'identifier de nouvelles problématiques en relation avec les nombreux domaines de recherche nécessaires à la conception d'un tel système, \ie le domaine des protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, des topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} ou encore des protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.\\
+
+Dans le cadre de notre thèse, nous avons contribué au développement de ce projet.
+Nous avons notamment implémenté plusieurs \acp{CRDT} pour le type Séquence \cite{2013-logootsplit,2022-rls-tpds-nicolas} et le protocole d'appartenance au réseau SWIM \cite{swim2002}.
