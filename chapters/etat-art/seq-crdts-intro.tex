@@ -59,15 +59,15 @@ Celle-ci définit deux modifications :
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
       \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{len}(s),
-      s = \langle e_0, ..., e_{i-1}, e_{i}, ..., e_{m-1} \rangle~\cdot \\
-      \trm{ins}(s,i,e) = \langle e_0, ..., e_{i-1}, e, e_{i}, ..., e_{m-1}  \rangle
+      s = \langle e_0, \cdots, e_{i-1}, e_{i}, \cdots, e_{m-1} \rangle~\cdot \\
+      \trm{ins}(s,i,e) = \langle e_0, \cdots, e_{i-1}, e, e_{i}, \cdots, e_{m-1}  \rangle
     \end{multline*}
   \item $\trm{rmv}(s,i)$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
       \forall s \in S, e \in E, i \in [0,m[~|~m = \trm{len}(s),
-      s = \langle e_0, ..., e_{i-1}, e_{i}, e{i+1}, ..., e_{m-1} \rangle~\cdot \\
-      \trm{rmv}(s,i) = \langle e_0, ..., e_{i-1}, e_{i+1}, ..., e_{m-1}  \rangle
+      s = \langle e_0, \cdots, e_{i-1}, e_{i}, e{i+1}, \cdots, e_{m-1} \rangle~\cdot \\
+      \trm{rmv}(s,i) = \langle e_0, \cdots, e_{i-1}, e_{i+1}, \cdots, e_{m-1}  \rangle
     \end{multline*}
 \end{enumerate}
 Les modifications définies dans \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.

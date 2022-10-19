@@ -29,10 +29,10 @@ Comme nous l'avons évoqué précédemment, reposer sur un algorithme de consens
 
 Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \acp{LFS} ?}\\
 
-Pour répondre à cette problématiquee, nous proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
+Pour répondre à cette problématique, nous proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
 Ce \ac{CRDT} intègre un mécanisme de ré-assignation des identifiants, dit de renommage, directement au sein de sa spécification.
 Nous associons au mécanisme de renommage un mécanisme de résolution de conflits automatique additionnel pour gérer ses exécutions concurrentes.
-Ainsi, nous proposons un \ac{CRDT} pour le type Séquence dont le surcoût est périodiquement réduit par le biais d'un mécanisme n'introduisant aucune contrainte de coordination synchrone entre les noeuds du système.
+Ainsi, nous proposons un \ac{CRDT} pour le type Séquence dont le surcoût est périodiquement réduit par le biais d'un mécanisme, tout en n'introduisant aucune contrainte de coordination synchrone entre les noeuds du système.
 
 \subsection{Éditeur de texte collaboratif \ac{P2P} temps réel chiffré de bout en bout}
 \label{sec:research-questions-mute}
@@ -51,7 +51,7 @@ Il s'agit d'un \ac{PoC} d'éditeur de texte web collaboratif \ac{P2P} temps rée
 
 Ce projet permet à l'équipe de présenter ses travaux de recherche portant sur les mécanismes de résolutions de conflits automatiques pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} et les mécanismes d'authentification des pairs dans les systèmes sans autorités centrales \cite{2018-trusternity-short,2018-trusternity-long}.
 
-De plus, en inscrivant ses travaux dans le cadre d'un système complet, ce projet permet à l'équipe d'identifier de nouvelles problématiques en relation avec les nombreux domaines de recherche nécessaires à la conception d'un tel système, \ie le domaine des protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, des topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} ou encore des protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.\\
+De plus, en inscrivant ses travaux dans le cadre d'un système complet, ce projet permet à l'équipe d'identifier de nouvelles problématiques en relation avec les nombreux domaines de recherche nécessaires à la conception d'un tel système, \eg le domaine des protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, des topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} ou encore des protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.\\
 
-Dans le cadre de notre thèse, nous avons contribué au développement de ce projet.
+Dans le cadre de cette thèse, nous avons contribué au développement de ce projet.
 Nous avons notamment implémenté plusieurs \acp{CRDT} pour le type Séquence \cite{2013-logootsplit,2022-rls-tpds-nicolas} et le protocole d'appartenance au réseau SWIM \cite{swim2002}.

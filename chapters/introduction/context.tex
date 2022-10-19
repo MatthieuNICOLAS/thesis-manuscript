@@ -11,7 +11,7 @@ Nous appelons ces applications des \emph{systèmes collaboratifs} :
   Un système collaboratif est un système supportant ses utilisateur-rices dans leurs processus de collaboration pour la réalisation de tâches.
 \end{definition}
 
-De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg la suite logicielle dont fait partie GoogleDocs compte 2 milliards utilisateur-rices \cite{2020-google-g-suite-users}, Wikipedia 788 millions \cite{2022-09-monthly-active-users-wikipedia}, Quora 300 millions \cite{2022-01-monthly-active-users-social-networks} ou encore GitHub 60 millions \cite{2022-github-users}.
+De nos jours, ces systèmes font parties des applications les plus populaires du paysage internet, \eg la suite logicielle dont fait partie GoogleDocs compte 2 milliards d'utilisateur-rices \cite{2020-google-g-suite-users}, Wikipedia 788 millions \cite{2022-09-monthly-active-users-wikipedia}, Quora 300 millions \cite{2022-01-monthly-active-users-social-networks} ou encore GitHub 60 millions \cite{2022-github-users}.
 De leur côté, d'autres plateformes fédèrent leur communautés en organisant ponctuellement des collaborations éphémères et généralement massives, \eg r/Place \cite{2022-rplace} ou TwitchPlaysPokemon \cite{2014-twitch-plays-pokemon}.\\
 
 En raison de leur popularité, les systèmes collaboratifs doivent assurer plusieurs propriétés pour garantir leur bon fonctionnement et qualité de service : une haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle.
@@ -33,12 +33,11 @@ Pour cela, ces systèmes adoptent une architecture décentralisée, que nous ill
     \includegraphics[trim=12cm 0cm 13cm 0cm, clip]{img/centralised-decentralised-distributed}
   }
   \caption[Caption for decentralised-system]{
-    Représentation d'une architecture décentralisée\footnotemark.
+    Représentation d'une architecture décentralisée \cite{1964-distributed-communications-networks-baran}.
     Les noeuds aux extrêmités du graphe correspondent à des clients, les noeuds internes à des serveurs et les arêtes du graphe représentent les connexions entre appareils.
   }
   \label{fig:decentralised-system}
 \end{figure}
-\footnotetext{Source : \cite{1964-distributed-communications-networks-baran}}
 
 Dans ce type d'architecture, les responsabilités, tâches et la charge travail sont réparties entre un ensemble de serveurs.
 Il convient toutefois de noter que les serveurs jouent de manière globale toujours un rôle central dans ces systèmes, malgré ce que le nom de cette architecture peut suggérer.
@@ -85,7 +84,7 @@ Cette architecture système, que nous illustrons par la \autoref{fig:distributed
     \includegraphics[trim=26cm 0cm 1cm 0cm, clip]{img/centralised-decentralised-distributed}
   }
   \caption[Caption for distributed-system]{
-    Représentation d'une architecture distribuée\footnotemark[\value{footnote}].
+    Représentation d'une architecture distribuée \cite{1964-distributed-communications-networks-baran}.
     Ici, tout noeud du graphe correspond à un pair du système \ac{P2P}.}
   \label{fig:distributed-system}
 \end{figure}
@@ -104,7 +103,7 @@ La \autoref{fig:lfs-comparison-apps} détaille ce résultat.
     \includegraphics{img/lfs-comparison-apps}
   }
   \caption[Caption for lfs-comparison-apps]{
-    Évaluation d'applications et de technologies vis-à-vis des 7 propriétés visées par les applications \aclp{LFS}\footnotemark.
+    Évaluation d'applications et de technologies vis-à-vis des 7 propriétés visées par les applications \aclp{LFS} \cite{localfirstsoftware2019}.
     {\color{lfsgreen} \checked}, {\color{lfsorange} \Flatsteel} et {\scriptsize \color{lfsred} \ding{108}} indiquent respectivement que l'application ou la technologie satisfait pleinement, partiellement ou aucunement le critère évalué.
   }
   \label{fig:lfs-comparison-apps}

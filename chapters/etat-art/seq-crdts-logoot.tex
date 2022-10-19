@@ -26,7 +26,7 @@ Logoot définit un ordre strict total $\lid$ sur les identifiants de position.
 Cet ordre lui permet de les ordonner relativement les uns aux autres, et ainsi ordonner les éléments associés.
 Pour définir $\lid$, Logoot se base sur l'ordre lexicographique.
 \begin{definition}[Relation $\lid$]
-  Étant donné deux identifiants $id = t_1 \oplus t_2 \oplus ... \oplus t_n$ et $id' = t'_1 \oplus t'_2 \oplus ... \oplus t'_m$, nous avons :
+  Étant donné deux identifiants $id = t_1 \oplus t_2 \oplus \cdots \oplus t_n$ et $id' = t'_1 \oplus t'_2 \oplus \cdots \oplus t'_m$, nous avons :
   \begin{equation*}
     \begin{split}
       id \lid id' \quad \trm{iff} \quad     & (n < m \land \forall i \in [1,n] \cdot t_i = t'_i) \quad \lor \\
@@ -57,13 +57,13 @@ Par souci de simplicité, nous présentons dans \autoref{alg:logoot-generateId} 
   \begin{algorithmic}[1]
     \Function{generateId}{predId $\in \mathbb{I}$, succId $\in \mathbb{I}$, nodeId $\in \mathbb{N}$, seq $\in \mathbb{N^{*}}$}
       \Statex \Comment \textbf{precondition:} $\text{predId} \lid \text{succId}$
-      \If{$\text{succId} = \text{predId} \oplus \logootuple{j} \oplus ...$} \label{alg:logoot-generateId-if-start}
+      \If{$\text{succId} = \text{predId} \oplus \logootuple{j} \oplus \cdots$} \label{alg:logoot-generateId-if-start}
         \Statex \Comment predId is a prefix of succId
         \State $\text{pos} \gets \text{random} \in ]\botn, \text{pos}_j[$
         \State $\text{id} \gets \text{predId} \oplus \logootuple{}$ \label{alg:logoot-generateId-if-end}
       \ElsIf{
-          $\text{predId} = \text{common} \oplus \logootuple{i} \oplus ... \land$ \\
-          $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus ... \land$ \\
+          $\text{predId} = \text{common} \oplus \logootuple{i} \oplus \cdots \land$ \\
+          $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus \cdots \land$ \\
           $\text{pos}_j - \text{pos}_i \leq 1$
         } \label{alg:logoot-generateId-elsif-start}
         \Statex \Comment Not enough space between predId and succId
@@ -72,8 +72,8 @@ Par souci de simplicité, nous présentons dans \autoref{alg:logoot-generateId} 
         \State $\text{pos} \gets \text{random} \in ]\text{pos}_{i+1}, \topn]$
         \State $\text{id} \gets \text{common} \oplus \logootuple{i} \oplus \logootuple{}$ \label{alg:logoot-generateId-elsif-end}
       \Else \label{alg:logoot-generateId-else-start}
-        \Statex \Comment  $\text{predId} = \text{common} \oplus \logootuple{i} \oplus ... \land$
-        \Statex \Comment $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus ... \land$
+        \Statex \Comment  $\text{predId} = \text{common} \oplus \logootuple{i} \oplus \cdots \land$
+        \Statex \Comment $\text{succId} = \text{common} \oplus  \logootuple{j} \oplus \cdots \land$
         \Statex \Comment $\text{pos}_j - \text{pos}_i > 1$
         \Statex \Comment common may be empty
         \State $\text{pos} \gets \text{random} \in ]\text{pos}_i,\text{pos}_j[$
