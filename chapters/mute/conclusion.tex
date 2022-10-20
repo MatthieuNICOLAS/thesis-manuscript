@@ -1,12 +1,16 @@
-Dans ce chapitre, nous avons présenté \acf{MUTE}, notre éditeur collaboratif temps réel \ac{P2P} chiffré de bout en bout.
+Dans ce chapitre, nous avons présenté \acf{MUTE}, l'éditeur collaboratif temps réel \ac{P2P} chiffré de bout en bout développé par notre équipe de recherche.\\
 
 MUTE permet d'éditer de manière collaborative des documents texte.
-Pour représenter les documents, MUTE implémente les structures de données répliquées décrites dans la \autoref{sec:logootsplit} et le \autoref{chap:renamablelogootsplit}.
-Ces \acp{CRDT} offrent de nouvelles méthodes de collaborer, notamment en permettant de collaborer de manière synchrone ou asynchrone de manière transparente.
+Pour représenter les documents, MUTE propose plusieurs \acp{CRDT} pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} issus des travaux de l'équipe.
+Ces \acp{CRDT} offrent de nouvelles méthodes de collaborer, notamment en permettant de collaborer de manière synchrone ou asynchrone de manière transparente.\\
 
-Pour permettre aux noeuds de communiquer, MUTE utilise WebRTC.
-Cette technologie permet de construire un réseau \ac{P2P} entre navigateurs.
-Plusieurs serveurs sont néanmoins requis, notamment pour la découverte des pairs et pour la communication entre des noeuds dont les pare-feux respectifs empêche l'établissement d'une connexion directe.
+Pour permettre aux noeuds de communiquer, MUTE repose sur la technologie WebRTC.
+Cette technologie permet de construire un réseau \ac{P2P} directement entre plusieurs navigateurs.
+Plusieurs serveurs sont néanmoins requis, notamment pour la découverte des pairs et pour la communication entre des noeuds lorsque leur pare-feux respectifs empêchent l'établissement d'une connexion directe.\\
 
 Finalement, MUTE implémente un mécanisme de chiffrement de bout en bout garantissant l'authenticité et la confidentialité des échanges entre les noeuds.
-Ce mécanisme reposant sur d'autres serveurs, les PKIs, MUTE intègre un mécanisme d'audit permettant de détecter leurs éventuels comportements malicieux.
+Ce mécanisme repose sur une clé de groupe de chiffrement qui est établie à l'aide du protocole \cite{1995-burmester-desmedt}.
+
+Ce protocole nécessite que chaque noeud possède une paire de clés de chiffrement et qu'ils partagent leur clé publique.
+\ac{MUTE} repose sur des \acp{PKI} pour cela.
+Avant de détecter tout éventuel comportement malicieux de la part de ces derniers, \ac{MUTE} intègre un mécanisme d'audit \cite{2018-trusternity-short,2018-trusternity-long}.\\
