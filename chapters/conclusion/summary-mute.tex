@@ -5,40 +5,43 @@ Ceci permet de mettre en place une réflexion de groupe, ce qui améliore la qua
 Cependant, les applications collaboratives sont historiquement des applications centralisées, \eg Google Docs \cite{gdocs}.
 Ce type d'architecture induit des défauts d'un point de vue technique, \eg faible capacité de passage à l'échelle et faible tolérance aux pannes, mais aussi d'un point de vue utilisateur, \eg perte de la souveraineté des données et absence de garantie de pérennité.\\
 
-Les travaux de l'équipe Coast s'inscrivent dans une mouvance souhaitant résoudre ces problèmes et qui a conduit à la définition d'un nouveau paradigme d'applications : les \acp{LFS} \cite{localfirstsoftware2019}.
+Les travaux de l'équipe Coast s'inscrivent dans une mouvance souhaitant résoudre ces problèmes et qui a conduit à la définition d'un nouveau paradigme d'applications : les applications \acf{LFS} \cite{localfirstsoftware2019}.
 Le but de ce paradigme est la conception d'applications collaboratives, \ac{P2P}, pérennes et rendant la souveraineté de leurs données aux utilisateur-rices.
 
 Dans le cadre de cette démarche, l'équipe Coast développe depuis plusieurs années l'application \acf{MUTE}, un éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \ac{PoC} pour les \acp{LFS}.\\
-
-Dans le cadre de cette thèse, nous avons implémenté dans \ac{MUTE} nos travaux de recherche portant sur le nouvel \ac{CRDT} pour le type Séquence : RenamableLogootSplit.
-\ac{MUTE} a aussi servi à l'équipe pour présenter ses travaux concernant l'authentification des utilisateur-rices dans un système \ac{P2P} \cite{2018-trusternity-long}.
-Finalement, \ac{MUTE} nous a permis de nous d'étudier et/ou de présenter les travaux de recherche existants concernant :
+Cette application sert à la fois de plateforme de démonstration et de recherche pour les travaux de l'équipe, mais aussi de \acf{PoC} pour les \ac{LFS}.
+Ainsi, \ac{MUTE} propose au moment où nous écrivons ces lignes un aperçu des travaux de recherche existants concernant :
 \begin{enumerate}
+    \item Les mécanismes de résolution de résolutions de conflits automatiques pour l'édition collaborative de documents textes \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas}.
     \item Les protocoles distribués d'appartenance au groupe \cite{swim2002}.
     \item Les mécanismes d'anti-entropie \cite{1983-anti-entropy-vv}.
-    \item Les protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
-    \item Les protocoles d'établissement de topologies réseaux efficientes \cite{2018-spray-nedelec}.
+    \item Les protocoles distribués d'authentification d'utilisateur-rices \cite{2018-trusternity-short,2018-trusternity-long}.
+    \item Les protocoles distribués d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.
     \item Les mécanismes de conscience de groupe.
 \end{enumerate}
+Dans cette liste, nous avons personnellement contribué à l'implémentation des \acp{CRDT} LogootSplit \cite{2013-logootsplit} et RenamableLogootSplit \cite{2022-rls-tpds-nicolas}, et du protocole d'appartenance au groupe SWIM \cite{swim2002}.\\
 
-\ac{MUTE} offre donc, à notre connaissance, le tour d'horizon le plus complet des travaux de recherche permettant la conception d'applications \acp{LFS}.
-Cependant, cela ne dispense pas \ac{MUTE} de souffrir de plusieurs limites.
-
+En son état actuel, \ac{MUTE} présente cependant plusieurs limites.
 Tout d'abord, l'environnement web implique un certain nombre de contraintes, notamment au niveau des technologies et protocoles disponibles.
-Notamment, le protocole WebRTC repose sur l'utilisation de serveurs de signalisation, \ie de points de rendez-vous des pairs, et de serveurs de relai, \ie d'intermédiaires pour communiquer entre pairs lorsque les configurations de leur réseaux respectifs interdisent l'établissement d'une connexion directe.
+Notamment, le protocole \acf{WebRTC} repose sur l'utilisation de serveurs de signalisation, \ie de points de rendez-vous des pairs, et de serveurs de relais, \ie d'intermédiaires pour communiquer entre pairs lorsque les configurations de leur réseaux respectifs interdisent l'établissement d'une connexion directe.
 Ainsi, les applications \ac{P2P} web doivent soit déployer et maintenir leur propre infrastructure de serveurs, soit reposer sur une infrastructure existante, \eg celle proposée par OpenRelay \cite{openrelay}.
-Afin de minimiser l'effort requis aux applications \ac{P2P} et la confiance exigée à leurs utilisateur-rices, nous devons supporter la mise en place d'une telle infrastructure transparente et pérenne.\\
+
+Dans le cadre de \ac{MUTE}, nous avons opté pour cette seconde solution.
+Cependant, ce choix introduit un \acf{SPOF}\footnote{\acf{SPOF} : Point de défaillance unique} dans \ac{MUTE} : OpenRelay elle-même.
+Afin de garantir la pérennité de \ac{MUTE}, nous devrions reposer non pas sur une unique infrastructure de serveurs de signalisation et de relais mais sur une multitude.
+Malheureusement, l'écosystème actuel brille par la rareté d'infrastructures publiques offrant ces services.
+Nous devons donc encourager et supporter la mise en place de telles infrastructures par une pluralité d'organisations.\\
 
 Une autre limite de ce système que nous identifions concerne l'utilisabilité des systèmes \ac{P2P} de manière générale.
 L'expérience vécue suivante constitue à notre avis un exemple éloquent des limites actuelles de l'application \ac{MUTE} dans ce domaine.
 Après avoir rédigé une version initiale d'un document, nous avons envoyé le lien du document à notre collaborateur pour relecture et validation.
-Lorsque notre collaborateur a souhaité accéder au document, celui-ci s'est retrouvé devant une page blanche : comme nous nous étions déconnecté du système entretemps, \ie plus aucun pair n'était disponible pour effectuer une synchronisation.
-Notre collaborateur était donc dans l'incapacité de récupérer l'état et d'effectuer sa tâche.
+Lorsque notre collaborateur a souhaité accéder au document, celui-ci s'est retrouvé devant une page blanche : comme nous nous étions déconnecté du système entretemps, plus aucun pair possédant une copie n'était disponible pour se synchroniser.
+
+Notre collaborateur était donc dans l'incapacité de récupérer le document et d'effectuer sa tâche.
 Afin de pallier ce problème, une solution possible est de faire reposer \ac{MUTE} sur un réseau \ac{P2P} global, \eg le réseau de \ac{IPFS} \cite{ipfs}, et d'utiliser les pairs de ce dernier, potentiellement des pairs étrangers à l'application, comme pairs de stockage pour permettre une synchronisation future.
-Cette solution limite ainsi le risque qu'un pair ne puisse récupérer l'état du document faute de pairs disponibles.
-Cependant, elle nécessite de mettre en place un mécanisme de réplication de données additionnel.
-Ce mécanisme de réplication sur des pairs additionnels doit cependant garantir qu'il n'introduit pas de vulnérabilités, \eg la possibilité pour les pairs de stockage selectionnés de reconstruire et consulter le document.
+Cette solution limiterait ainsi le risque qu'un pair ne puisse récupérer l'état du document faute de pairs disponibles.
+Pour garantir l'utilisabilité du système \ac{P2P}, une telle solution devrait donc permettre à un pair de récupérer l'état du document à sa reconnexion, malgré la potentielle évolution du groupe des collaborateur-rices et des pairs de stockage, \eg l'ajout, l'éviction ou la déconnexion d'un des pairs.
+Cependant, la solution devrait en parallèle garantir qu'elle n'introduit aucune vulnérabilité, \eg la possibilité pour les pairs de stockage selectionnés de reconstruire et consulter le document.
 % \item Finalement, une dernière limite que nous identifions est la pérennité économique de ce type d'applications.
 %     Selon nous, les systèmes \ac{P2P} chiffrés de bout en bout s'interdisent les modèles économiques dominants et acceptés par les organisations et utilisateur-rices, \ie la collecte et revente de données.
 %     En effet,

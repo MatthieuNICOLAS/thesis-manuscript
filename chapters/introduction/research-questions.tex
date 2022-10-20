@@ -1,7 +1,7 @@
 \subsection{Ré-identification sans coordination synchrone pour les \acp{CRDT} pour le type Séquence}
 \label{sec:research-questions-rls}
 
-Les \acfp{CRDT} \cite{2007-crdt-shapiro,shapiro_2011_crdt} sont des types de données répliqués.
+Les \acfp{CRDT}\footnote{\acf{CRDT} : Type de données répliquées sans conflits} \cite{2007-crdt-shapiro,shapiro_2011_crdt} sont des nouvelles spécifications des types de données usuels, \eg l'Ensemble ou la Séquence.
 Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une donnée et pour leur permettre de la consulter, de la modifier sans aucune coordination préalable et d'assurer à terme la convergence des copies.
 Dans ce but, les \acp{CRDT} incorporent des mécanismes de résolution de conflits automatiques directement au sein leur spécification.
 
@@ -14,7 +14,7 @@ Le surcoût introduit par les \acp{CRDT} pour ce type de données se révèle do
 
 De manière plus précise, le surcoût des \acp{CRDT} pour le type Séquence provient de la croissance des métadonnées utilisées par leur mécanisme de résolution de conflits automatique.
 Ces métadonnées correspondent à des identifiants qui sont associés aux éléments de la Séquence.
-Ces identifiants permettent de résoudre les conflits, \eg en précisant quel est l'élement à supprimer ou en spécifiant la position d'un nouvel élément à insérer par rapport aux autres.
+Ces identifiants permettent d'intégrer les modifications, \eg en précisant quel est l'élement à supprimer ou en spécifiant la position d'un nouvel élément à insérer par rapport aux autres.
 
 Plusieurs approches ont été proposées pour réduire le coût induit par ces identifiants.
 Notamment, \cite{letia:hal-01248270,zawirski:hal-01248197} proposent un mécanisme de ré-assignation des identifiants pour réduire leur coût a posteriori.
@@ -23,21 +23,22 @@ Les auteurs résolvent ce problème en proposant un mécanisme de transformation
 
 Cependant, l'exécution en concurrence du mécanisme de ré-assignation des identifiants par plusieurs noeuds provoque elle-même un conflit.
 Pour éviter ce dernier type de conflit, les auteurs choisissent de subordonner à un algorithme de consensus l'exécution du mécanisme de ré-assignation des identifiants.
-Ainsi, le mécanisme de ré-assignation des identifiants ne peut être déclenché en concurrence par plusieurs noeuds du systèmes.
+Ainsi, le mécanisme de ré-assignation des identifiants ne peut être déclenché en concurrence par plusieurs noeuds du système.
 
 Comme nous l'avons évoqué précédemment, reposer sur un algorithme de consensus qui requiert une coordination synchrone entre une proportion de noeuds du système est une contrainte incompatible avec les systèmes \ac{P2P} à large échelle sujets au churn.\\
 
-Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \acp{LFS} ?}\\
+Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \ac{LFS} ?}\\
 
-Pour répondre à cette problématique, nous proposons RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
+Pour répondre à cette problématique, nous proposons dans cette thèse RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
 Ce \ac{CRDT} intègre un mécanisme de ré-assignation des identifiants, dit de renommage, directement au sein de sa spécification.
 Nous associons au mécanisme de renommage un mécanisme de résolution de conflits automatique additionnel pour gérer ses exécutions concurrentes.
-Ainsi, nous proposons un \ac{CRDT} pour le type Séquence dont le surcoût est périodiquement réduit par le biais d'un mécanisme, tout en n'introduisant aucune contrainte de coordination synchrone entre les noeuds du système.
+Finalement, nous définissons un mécanisme de \acf{GC}\footnote{\acf{GC} : Récupération de la mémoire} des métadonnées du mécanisme de renommage pour supprimer à terme son propre surcoût.
+De cette manière, nous proposons un \ac{CRDT} pour le type Séquence dont le surcoût est périodiquement réduit, tout en n'introduisant aucune contrainte de coordination synchrone entre les noeuds du système.
 
 \subsection{Éditeur de texte collaboratif \ac{P2P} temps réel chiffré de bout en bout}
 \label{sec:research-questions-mute}
 
-Comme évoqué précédemment, la conception d'applications \acp{LFS} à large échelle présente un ensemble de problématiques issues de domaines variés, \eg
+Comme évoqué précédemment, la conception d'applications \ac{LFS} à large échelle présente un ensemble de problématiques issues de domaines variés, \eg
 \begin{enumerate}
     \item Comment permettre aux utilisateur-rices de collaborer en l'absence d'autorités centrales pour résoudre les conflits de modifications ?
     \item Comment authentifier les utilisateur-rices en l'absence d'autorités centrales ?
@@ -47,8 +48,7 @@ Comme évoqué précédemment, la conception d'applications \acp{LFS} à large �
 Cet ensemble de questions peut être résumé en la problématique suivante : \emph{pouvons-nous concevoir une application \ac{LFS} à large échelle, sûre et sans autorités centrales ?}\\
 
 Pour étudier cette problématique, l'équipe Coast développe l'application \acf{MUTE}\footnote{Disponible à l'adresse : \url{https://mutehost.loria.fr}} \cite{MUTE2017}.
-Il s'agit d'un \ac{PoC} d'éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
-
+Il s'agit d'un \acf{PoC}\footnote{\acf{PoC} : Preuve de concept} d'éditeur de texte web collaboratif \ac{P2P} temps réel chiffré de bout en bout.
 Ce projet permet à l'équipe de présenter ses travaux de recherche portant sur les mécanismes de résolutions de conflits automatiques pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} et les mécanismes d'authentification des pairs dans les systèmes sans autorités centrales \cite{2018-trusternity-short,2018-trusternity-long}.
 
 De plus, en inscrivant ses travaux dans le cadre d'un système complet, ce projet permet à l'équipe d'identifier de nouvelles problématiques en relation avec les nombreux domaines de recherche nécessaires à la conception d'un tel système, \eg le domaine des protocoles d'appartenance aux groupes \cite{swim2002, lifeguard2018}, des topologies réseaux \ac{P2P} \cite{2018-spray-nedelec} ou encore des protocoles d'établissement de clés de chiffrement de groupe \cite{1995-burmester-desmedt}.\\

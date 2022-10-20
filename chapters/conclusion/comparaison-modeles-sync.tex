@@ -6,7 +6,7 @@ Dans cette piste de recherche, nous souhaitons approfondir notre étude comparat
 
 Pour rappel, ce nouveau modèle de synchronisation se base sur le modèle de synchronisation par états.
 Il partage les mêmes pré-requis, à savoir la nécessité d'une fonction \texttt{merge} associative, commutative et idempotente.
-Cette dernière doit permettre de la fusion toute paire d'états possible en calculant leur borne supérieure, \ie leur \ac{LUB} \cite{2018-crdts-perguica-baquero-shapiro}.
+Cette dernière doit permettre la fusion de toute paire d'états possible en calculant leur borne supérieure, \ie leur \acf{LUB} \cite{2018-crdts-perguica-baquero-shapiro}.
 
 La spécificité de ce nouveau modèle de synchronisation est de calculer pour chaque modification la différence d'état correspondante.
 Cette différence correspond à un élément irréductible du sup-demi-treillis du \ac{CRDT} \cite{enes2019}, \ie un état particulier de ce dernier.
@@ -30,12 +30,12 @@ Au-delà de ce premier aspect, il convient d'explorer d'autres pistes pouvant in
         Par exemple, une composition de \acp{CRDT} peut se traduire par l'ajout de dépendances entre les modifications des différents \acp{CRDT} composés.
         Le modèle de synchronisation par opérations nous apparaît plus adapté pour cette utilisation, de par le découplage qu'il induit entre les \acp{CRDT} et la couche de livraison de messages.
     \item L'utilisation de \acp{CRDT} au sein de systèmes non-sûrs, \ie pouvant compter un ou plusieurs adversaires byzantins \cite{2019-byzantine-generals-problem-lamport}.
-        Dans de tels systèmes, les adversaires byzantins peuvent générer des modifications différentes mais qui sont perçues comme identiques par les mécanismes de résolution de conflits.
+        Dans de tels systèmes, les adversaires byzantins peuvent par exemple générer des modifications différentes mais qui sont perçues comme identiques par les mécanismes de résolution de conflits.
         Cette attaque, nommée \emph{équivoque}, peut provoquer la divergence définitive des copies.
         \cite{2018-prunable-authenticated-log-vic} propose une solution adaptée aux systèmes \ac{P2P} à large échelle.
         Celle-ci se base notamment sur l'utilisation de journaux infalsifiables.
         \mnnote{TODO: Ajouter refs}
-        Il convient alors d'étudier si l'utilisation de journaux infalsifiables ne limite pas le potentiel du modèle de synchronisation par différences d'états, \eg en interdisant la diffusion des modifications par états complets.
+        Il convient alors d'étudier si l'utilisation de ces journaux infalsifiables ne limite pas le potentiel du modèle de synchronisation par différences d'états, \eg en interdisant la diffusion des modifications par états complets.
 \end{enumerate}
 
 Un premier objectif de notre travail serait de proposer des directives sur le modèle de synchronisation à privilégier en fonction du contexte d'utilisation du \ac{CRDT}.

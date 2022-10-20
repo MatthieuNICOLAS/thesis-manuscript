@@ -1,7 +1,7 @@
 L'augmentation du surcoût des \acp{CRDT} pour Séquence, qu'il soit dû à des pierres tombales ou à des identifiants de taille non-bornée, est un problème bien identifié dans la littérature \cite{ROH2011354,2009-treedoc-preguica,letia:hal-01248270,zawirski:hal-01248197,lseq2013,lseq2017}.
 Plusieurs approches ont donc été proposées pour réduire sa croissance.
 
-\subsection{Mécanisme de \ac{GC} des pierres tombales}
+\subsection{Mécanisme de \acl{GC} des pierres tombales}
 
 Pour réduire l'impact des pierres tombales sur les performances de \ac{RGA}, \textcite{ROH2011354} proposent un mécanisme de \ac{GC} des pierres tombales.
 Pour rappel, ce mécanisme nécessite qu'une pierre tombale ne puisse plus être utilisée comme prédecesseur par une opération $\trm{ins}$ reçue dans le futur pour pouvoir être supprimée définitivement.

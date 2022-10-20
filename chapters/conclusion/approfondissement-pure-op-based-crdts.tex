@@ -11,18 +11,21 @@ Cette contrainte limite à des types de données simples, \eg le Compteur ou l'E
 
 Une seconde limite de ce framework est qu'il repose sur le modèle de livraison causal des opérations.
 Ce modèle induit l'ajout de données de causalité précises à chaque opération, sous la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'une barrière causale \cite{1997-causal-barrier}.
-Nous jugeons ce modèle trop coûteux pour les applications \acp{LFS} à large échelle.
+Nous jugeons ce modèle trop coûteux pour les applications \ac{LFS} à large échelle.
 
 Nous souhaitons donc proposer un nouveau framework pour la conception de \acp{CRDT} synchronisés par opérations répondant à ces limites.
 Nos objectifs sont multiples.
 
 Notre framework devrait permettre la conception de \acp{CRDT} non-purs.
-Ce framework devrait aussi mettre en lumière la présence et le rôle de deux modèles de livraison dans les \acp{CRDT} synchronisés par opérations :
+Ce framework devrait aussi mettre en lumière la présence et le rôle de deux modèles de livraison dans les \acp{CRDT} synchronisés par opérations, ainsi que leur relation :
 \begin{enumerate}
     \item Le modèle de livraison minimal requis par le \ac{CRDT} pour assurer la convergence forte à terme \cite{shapiro_2011_crdt}.
-    \item Le modèle de livraison employé par le système qui utilise le \ac{CRDT}.
-        Ce second modèle de livraison est une stratégie permettant au système de respecter un modèle de cohérence donné et régissant les règles de compaction de l'état.
-        Il doit être égal ou plus contraint que modèle de livraison minimal du \ac{CRDT} et peut être amené à évoluer en fonction de l'état du système et de ses besoins.
-        Par exemple, un système pourrait par défaut utiliser le modèle de livraison causale pour assurer le modèle de cohérence causal.
-        Puis, lorsque le nombre de noeuds atteint un seuil donné et que le coût de la livraison causale devient trop élevé, le système pourrait passer au modèle de livraison FIFO pour assurer le modèle de cohérence PRAM afin de réduire les coûts en bande-passante.
+    \item Le modèle de livraison employé par le système qui utilise le \ac{CRDT}, qui est une stratégie offrant un compromis entre modèle de cohérence et performances.
+        Ce second modèle de livraison doit être égal ou plus contraint que le modèle de livraison minimal du \ac{CRDT}.
 \end{enumerate}
+Notamment, nous souhaitons expliciter que pour un \ac{CRDT} synchronisé par opérations, le premier modèle de livraison est immuable tandis que le second peut être amené à évoluer en fonction de l'état du système et de ses besoins.
+
+Par exemple, un système peut initialement garantir le modèle de cohérence causale\footnote{Le modèle de cohérence causale est le modèle de cohérence auquel les utilisateur-rices sont généralement habitué-es : il garantit que l'ensemble des modifications seront intégrées dans leur ordre de génération \cf{def:causal-consistency}.} à ses utilisateur-rices, et pour cela utiliser le modèle de livraison causal.
+Cependant, ce modèle de livraison implique un surcoût qui dépend du nombre de noeuds du système.
+Ce modèle de livraison peut donc devenir trop coûteux si le nombre de noeuds devient important.
+Ainsi, le système peut décider de temporairement relaxer le modèle de cohérence garanti, \eg garantir seulement le modèle de cohérence PRAM\footnote{Le modèle de cohérence PRAM garantit seulement que les modifications d'un noeud seront intégrés par les autres noeuds dans leur ordre de génération.} \cite{1988-pram-lipton}, dans le but d'utiliser un modèle de livraison moins coûteux, \eg le modèle de livraison FIFO\footnote{Le modèle de livraison FIFO garantit que les messages d'un noeud seront livrés aux autres noeuds dans le même ordre qu'ils ont été envoyés.}.

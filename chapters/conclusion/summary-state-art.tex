@@ -2,7 +2,7 @@ Les \acfp{CRDT} \cite{shapiro_2011_crdt} sont de nouvelles spécifications des t
 Ils sont conçus pour permettre à un ensemble de noeuds d'un système de répliquer une même donnée et pour leur permettre de la consulter et de la modifier sans aucune coordination préalable.
 Les copies des noeuds divergent alors temporairement.
 Les noeuds se synchronisent ensuite pour s'échanger leurs modifications respectives.
-Les \acp{CRDT} garantissent alors la convergence forte à terme, \ie que les noeuds obtiennent de nouveau des copies équivalentes de la donnée.
+Les \acp{CRDT} garantissent alors la convergence forte à terme \cite{shapiro_2011_crdt}, \ie que les noeuds obtiennent de nouveau des copies équivalentes de la donnée.
 
 L'absence de coordination entre les noeuds avant modifications implique que des noeuds peuvent modifier la donnée en concurrence.
 De telles modifications peuvent donner lieu à des conflits, \eg l'ajout et la suppression en concurrence d'un même élément dans un ensemble.
@@ -15,7 +15,7 @@ Nous parlons alors de sémantique du mécanisme de résolution de conflits autom
 De la même manière, il existe plusieurs approches possibles pour synchroniser les noeuds, \eg diffuser chaque modification de manière atomique ou diffuser l'entièreté de l'état périodiquement.
 Ainsi, lors de la définition d'un \ac{CRDT}, il convient de préciser les sémantiques de résolution de conflits qu'il adopte et le modèle de synchronisation qu'il utilise \cite{2018-crdts-overview-preguica}.\\
 
-Depuis leur formalisation, les travaux sur les \acp{CRDT} ont abouti à la conception de nouveaux, soit en spécifiant de nouvelles sémantiques de résolution de conflits pour un type de données \cite{2020-cl-set-weihai}, soit en spécifiant de nouveaux modèles de synchronisation \cite{Almeida_2018} ou en enrichissant les spécifications des modèles existants \cite{baquero2017pure,enes2019}.
+Depuis leur formalisation, de nombreux travaux ont abouti à la conception de nouveaux \acp{CRDT}, soit en spécifiant de nouvelles sémantiques de résolution de conflits pour un type de données \cite{2020-cl-set-weihai}, soit en spécifiant de nouveaux modèles de synchronisation \cite{Almeida_2018} ou en enrichissant les spécifications des modèles existants \cite{baquero2017pure,enes2019}.
 
 Dans notre présentation des \acp{CRDT} \cf{sec:etat-art-crdts-intro}, nous présentons chacun de ces aspects.
 Cependant, nous nous ne limitons pas à retranscrire l'état de l'art de la littérature.

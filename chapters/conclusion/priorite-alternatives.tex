@@ -30,7 +30,7 @@ Cette approche se démarque par :
 Cette définition présente cependant plusieurs limites.
 La limite que nous identifions est sa décorrélation avec le coût et le bénéfice de progresser vers l'époque cible désignée.
 En effet, l'époque cible est désignée de manière arbitraire par rapport à sa position dans l'arbre des époques.
-Il est ainsi possible que progresser vers cette époque détériore l'état de la séquence, \ie augmente la taille des identifiants et augmente le nombre de blocs.
+Il est ainsi possible que progresser vers cette époque détériore l'état de la séquence, \ie augmente la taille des identifiants et augmente le nombre de blocs, \eg si l'état courant comporte majoritairement des éléments ayant été insérés en concurrence de la génération de l'époque cible.
 De plus, la transition de l'ensemble des noeuds depuis leur époque courante respective vers cette nouvelle époque cible induit un coût en calculs, potentiellement important \cf{fig:worst-case-priority}.\\
 
 Pour pallier ce problème, il est nécessaire de proposer une définition de \emph{priority} prenant l'aspect efficacité en compte.
@@ -42,5 +42,5 @@ Il conviendra d'adjoindre à cette nouvelle définition de \emph{priority} un no
 Il conviendra aussi d'étudier la possibilité de combiner l'utilisation de plusieurs relations \emph{priority} pour minimiser le surcoût global du mécanisme de renommage, \eg en fonction de la distance entre deux époques.
 
 Finalement, il sera nécessaire de valider l'approche proposée par une évaluation comparative par rapport à l'approche actuelle.
-Cette évaluation pourrait consister à monitorer le coût du système pour observer si l'approche proposée permet de réduire les calculs de manière globale.
+Cette évaluation pourrait consister à mesurer le coût du système pour observer si l'approche proposée permet de réduire les calculs de manière globale.
 Plusieurs configurations de paramètres pourraient aussi être utilisées pour déterminer l'impact respectif de chaque paramètre sur les résultats.
