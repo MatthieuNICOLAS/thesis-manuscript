@@ -1,0 +1,38 @@
+\begin{ThesisAbstract}
+    \vspace{-3cm}
+    \begin{FrenchAbstract}
+        Un système collaboratif permet à plusieurs utilisateur-rices de travailler ensemble pour créer un contenu.
+        Afin de supporter des collaborations impliquant des millions d'utilisateurs, ces systèmes adoptent une architecture décentralisée pour garantir leur haute disponibilité, tolérance aux pannes et capacité de passage à l'échelle.
+        % Cependant, de part le rôle prédominant des serveurs dans leur fonctionnement, ces sytèmes échouent à garantir un autre ensemble de propriétés : confidentialité des données, souveraineté des données, pérennité et résistance à la censure.
+        Cependant, ces sytèmes échouent à garantir un autre ensemble de propriétés : confidentialité des données, souveraineté des données, pérennité et résistance à la censure.
+        % Pour répondre à ce problème, la littérature propose la conception d'applications \acf{LFS} : des applications collaboratives \acf{P2P} réléguant les serveurs à un simple rôle de support de la collaboration.
+        Pour répondre à ce problème, la littérature propose la conception d'applications \acf{LFS} : des applications collaboratives \acf{P2P}.
+
+        Une pierre angulaire des applications \ac{LFS} sont les \acfp{CRDT}.
+        Il s'agit de nouvelles spécifications des types de données, tels que l'Ensemble ou la Séquence, permettant à un ensemble de noeuds de répliquer une donnée.
+        Les \acp{CRDT} permettent aux noeuds de consulter et de modifier la donnée sans coordination préalable, et incorporent un mécanisme de résolution de conflits pour intégrer les modifications concurrentes.
+        Cependant, les \acp{CRDT} pour le type Séquence souffrent d'une croissance monotone du surcoût de leur mécanisme de résolution de conflits.
+        Pouvons-nous proposer un mécanisme de réduction du surcoût des \acp{CRDT} pour le type Séquence qui soit compatible avec les applications \ac{LFS} ?
+        Dans cette thèse, nous proposons un nouveau \ac{CRDT} pour le type Séquence, RenamableLogootSplit.
+        Ce \ac{CRDT} intègre un mécanisme de renommage qui minimise périodiquement le surcoût de son mécanisme de résolution de conflits ainsi qu'un mécanisme de résolution de conflits pour intégrer les modifications concurrentes à un renommage.
+        Finalement, nous proposons un mécanisme de \acf{GC} qui supprime à terme le propre surcoût du mécanisme de renommage.
+
+      % \KeyWords{CRDTs, édition collaborative en temps réel, cohérence à terme, optimisation mémoire, performance}
+    \end{FrenchAbstract}
+    \begin{EnglishAbstract}
+        A collaborative system enables multiple users to work together to create content.
+        To support collaborations involving millions of users, these systems adopt a decentralised architecture to ensure high availability, fault tolerance and scalability.
+        However, these systems fail to guarantee another set of properties: data confidentiality, data sovereignty, durability and resistance to censorship.
+        To address this problem, the literature proposes the design of \acf{LFS} applications: collaborative peer-to-peer applications.
+
+        A cornerstone of LFS applications are \acfp{CRDT}.
+        \acp{CRDT} are new specifications of data types, \eg Set or Sequence, enabling a set of nodes to replicate a data.
+        \acp{CRDT} enable nodes to access and modify the data without prior coordination, and incorporate a conflict resolution mechanism to integrate concurrent modifications.
+        However, Sequence \acp{CRDT} suffer from a monotonous growth in the overhead of their conflict resolution mechanism.
+        Can we propose a mechanism for reducing the overhead of Sequence-type CRDTs that is compatible with LFS applications?
+        In this thesis, we propose a novel \ac{CRDT} for the Sequence type, RenamableLogootSplit.
+        This \ac{CRDT} embeds a renaming mechanism that periodically minimizes the overhead of its conflict resolution mechanism as well as a conflict resolution mechanism to integrate concurrent modifications to a rename.
+        Finally, we propose a mechanism of \acf{GC} that eventually removes the own overhead of the renaming mechanism.
+      % \KeyWords{CRDTs, real-time collaborative editing, eventual consistency, memory-wise optimisation, performance}
+    \end{EnglishAbstract}
+\end{ThesisAbstract}
