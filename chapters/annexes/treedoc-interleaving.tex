@@ -6,13 +6,131 @@
 
   \centering
   \resizebox{\columnwidth}{!}{
-    \includegraphics{img/contre-exemple-treedoc}
-  }
-  \caption{Modifications concurrentes d'une séquence Treedoc résultant en un entrelacement}
-\end{figure}
+    \begin{tikzpicture}[level distance=80, level/.style={sibling distance=80/#1}]
+      \newcommand\treedocnode[2]{
+        node[rounded corners, matrix, draw] {
+          \node {$d_#1$};           \\
+          \node[circle, draw] {#2}; \\
+        }
+      }
 
-\mnnote{
-  TODO: Réaliser au propre contre-exemple.
-  Nécessite que $d_E < d_O$, inverser A et B histoire d'éviter toute confusion.
-  En soi, C pas nécessaire, à voir si le conserve.
-}
+      \newcommand\nodeh{ \treedocnode{1}{H} }
+      \newcommand\nodee{ \treedocnode{2}{E} }
+      \newcommand\nodeo{ \treedocnode{3}{O} }
+      \newcommand\nodel{ \treedocnode{4}{L} }
+
+      \newcommand\treedocsupernode[4]{
+        node[rounded corners, matrix, draw, ampersand replacement=\&, column sep=3] {
+          \node {$d_#1$};            \& \node {$d_#3$};           \\
+          \node[circle, draw] {#2}; \& \node[circle, draw] {#4}; \\
+        }
+      }
+
+      \newcommand\nodeeo{ \treedocsupernode{2}{E}{3}{O} }
+
+      \newcommand\initialstate[2]{
+        \path
+          #1
+          ++#2
+          \nodeh
+      }
+
+      \newcommand\he[2]{
+        \path
+          #1
+          ++#2
+          \nodeh
+            child[missing]
+            child {
+              \nodee edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\hel[2]{
+        \path
+          #1
+          ++#2
+          \nodeh
+            child[missing]
+            child {
+              \nodee
+                child[missing]
+                child {
+                  \nodel edge from parent node[right] {1}
+                }
+              edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\ho[2]{
+        \path
+          #1
+          ++#2
+          \nodeh
+            child[missing]
+            child {
+              \nodeo edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\finalstate[2]{
+        \path
+          #1
+          ++#2
+          \nodeh
+            child[missing]
+            child {
+              \nodeeo
+                child[missing]
+                child {\nodel edge from parent node[right] {1}}
+                edge from parent node[right] {1}
+            };
+      }
+
+      \newcommand\offseta{ (90:7) }
+      \newcommand\offsetb{ (270:1.5) }
+
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:28) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:6) node[point, label=-170:{$\trm{ins}(H \prec E)$}, label={[xshift=1em]-10:{$\trm{ins}(\langle 1,d_2 \rangle,e)$}}] (a-ins-e) {}
+          +(0:14) node[point, label=-170:{$\trm{ins}(E \prec L)$}, label={[xshift=1em]-10:{$\trm{ins}(1 \oplus \langle 1,d_4 \rangle,L)$}}] (a-ins-l) {}
+          +(0:20) node[point, label=-170:{$\trm{sync}$}] (a-send-sync) {}
+          +(0:24) node[point] (a-recv-sync) {}
+          +(0:26) node (a-final) {};
+
+
+      \initialstate{(a-initial)}{\offseta};
+      \he{(a-ins-e)}{\offseta};
+      \hel{(a-ins-l)}{\offseta};
+      \finalstate{(a-recv-sync)}{\offseta};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-e) --  (a-ins-l) -- (a-send-sync) -- (a-recv-sync) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:28) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:6) node[point, label=170:{$\trm{ins}(H \prec O)$}, label={[xshift=1em]10:{$\trm{ins}(\langle 1, d_3 \rangle,O)$}}] (b-ins-o) {}
+          +(0:20) node[point, label=170:{$\trm{sync}$}] (b-send-sync) {}
+          +(0:24) node[point] (b-recv-sync) {}
+          +(0:26) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb};
+      \ho{(b-ins-o)}{\offsetb};
+      \finalstate{(b-recv-sync)}{\offsetb};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) --  (b-ins-o) -- (b-send-sync) -- (b-recv-sync) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-send-sync) -- (b-recv-sync);
+      \draw[->, dashed, shorten >= 1] (b-send-sync) -- (a-recv-sync);
+    \end{tikzpicture}
+  }
+  \caption{Entrelacement d'insertions concurrentes dans une séquence Treedoc}
+  \label{fig:treedoc-interleaving}
+\end{figure}
