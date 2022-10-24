@@ -54,10 +54,11 @@ Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes
 Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
 Il est donc nécessaire de prendre en compte ce résultat et de
 \begin{enumerate}
-  \item concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur
-  \item proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration :
+  \item Concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur.
+  \item Proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration.
 \end{enumerate}
 
+Nous identifions plusieurs pistes d'amélioration de \textsc{renameId} et \textsc{revertRenameId} :
 \begin{itemize}
   \item Au lieu d'utiliser \textsc{renameId}, qui renomme l'état identifiant par identifiant, nous pourrions définir et utiliser \textsc{renameBlock}.
     Cette fonction permettrait de renommer l'état bloc par bloc, offrant ainsi une meilleur complexité en temps.

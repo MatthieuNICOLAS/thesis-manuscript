@@ -1,7 +1,7 @@
 Le processus d'intégration d'une opération distante distingue deux cas différents :
 \begin{enumerate}
-  \item le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}
-  \item le cas de figure où l'opération reçue est une opération \emph{rename}.
+  \item Le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}.
+  \item Le cas de figure où l'opération reçue est une opération \emph{rename}.
 \end{enumerate}
 
 \subsubsection{Intégration d'une opération \emph{insert} ou \emph{remove} distante}
@@ -172,13 +172,13 @@ Pour ce faire, le noeud calcule le chemin entre l'époque de l'opération et l'�
 
 La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
 \begin{enumerate}
-  \item elle calcule le chemin entre l'époque de l'opération et la racine de l'\emph{arbre des époques} ([\epoch{A2}, \epoch{0}])
-  \item elle calcule le chemin entre l'époque courante et la racine de l'\emph{arbre des époques} ([\epoch{B2}, \epoch{0}])
-  \item elle détermine la première intersection entre ces deux chemins (\epoch{0}).
+  \item Elle calcule le chemin entre l'époque de l'opération et la racine de l'\emph{arbre des époques} ([\epoch{A2}, \epoch{0}]).
+  \item Elle calcule le chemin entre l'époque courante et la racine de l'\emph{arbre des époques} ([\epoch{B2}, \epoch{0}]).
+  \item Elle détermine la première intersection entre ces deux chemins (\epoch{0}).
     Cette époque correspond au \acf{LCA} entre l'époque de l'opération et l'époque courante.
-  \item elle tronque les deux chemins au niveau du \ac{LCA} ([\epoch{A2}] et [\epoch{B2}])
-  \item elle inverse l'ordre des époques du chemin entre l'époque courante et la racine ([\epoch{B2}])
-  \item elle retourne les deux chemins obtenus ($\langle$[\epoch{A2}], [\epoch{B2}]$\rangle$).
+  \item Elle tronque les deux chemins au niveau du \ac{LCA} ([\epoch{A2}] et [\epoch{B2}]).
+  \item Elle inverse l'ordre des époques du chemin entre l'époque courante et la racine ([\epoch{B2}]).
+  \item Elle retourne les deux chemins obtenus ($\langle$[\epoch{A2}], [\epoch{B2}]$\rangle$).
 \end{enumerate}
 
 Le chemin entre l'époque de l'opération et l'époque \ac{LCA} ([\epoch{A2}]) correspond aux renommages dont les effets doivent être retirés de l'opération.

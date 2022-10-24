@@ -122,9 +122,9 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 Les objectifs de \textsc{revertRenameId} sont les suivants :
 \begin{enumerate}
   \item \label{item:revert-rename-1}
-    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée
+    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée.
   \item \label{item:revert-rename-2}
-    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération \emph{rename} annulée
+    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération \emph{rename} annulée.
   \item \label{item:revert-rename-3}
     Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
 \end{enumerate}
@@ -151,8 +151,8 @@ Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident le
 Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans \autoref{fig:revertRenameId}.
 Pour cet identifiant, nous avons :
 \begin{itemize}
-  \item $newPredId = $\id{i}{A1}{1}, donc $predId = $\id{i}{B0}{0}\id{f}{A0}{0} d'après le cas \ref{item:revert-rename-1}
-  \item $newSuccId = $\id{i}{A1}{2}, donc $succId = $\id{i}{B0}{1} d'après le cas \ref{item:revert-rename-1}
+  \item $newPredId = $\id{i}{A1}{1}, donc $predId = $\id{i}{B0}{0}\id{f}{A0}{0} d'après le cas \ref{item:revert-rename-1}.
+  \item $newSuccId = $\id{i}{A1}{2}, donc $succId = $\id{i}{B0}{1} d'après le cas \ref{item:revert-rename-1}.
 \end{itemize}
 Nous avons donc bien :
 \[i^{A1}_{1}i^{B0}_{0}m^{B1}_{0} \in ]i^{A1}_{1}i^{B0}_{0}f^{A0}_{0}, i^{A1}_{1}i^{B0}_{1}[\]
@@ -351,8 +351,8 @@ Cet identifiant est compris entre les identifiants suivants :
 \[k^{C1}_{1} <_{id} k^{C1}_{1}i^{C2}_{0} <_{id} k^{C1}_{1}n^{C0}_{0}e^{D2}_{0}\]
 D'après les règles présentées précédemment :
 \begin{itemize}
-  \item \id{k}{C1}{1} est transformé en \id{n}{C0}{0} (cas \ref{item:revert-rename-1})
-  \item \id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0} est transformé en \id{n}{C0}{0}\id{e}{D2}{0} (cas \ref{item:revert-rename-2})
+  \item \id{k}{C1}{1} est transformé en \id{n}{C0}{0} (cas \ref{item:revert-rename-1}).
+  \item \id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0} est transformé en \id{n}{C0}{0}\id{e}{D2}{0} (cas \ref{item:revert-rename-2}).
 \end{itemize}
 Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C1}{1}\id{i}{C2}{0} tel que :
 \[n^{C0}_{0} <_{id} \trm{id} <_{id} n^{C0}_{0}e^{D2}_{0}\]

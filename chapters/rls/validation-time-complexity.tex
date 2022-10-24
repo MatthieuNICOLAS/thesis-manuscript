@@ -58,7 +58,7 @@ Le procédé de l'intégration de l'opération \emph{remove} étant similaire à
 
 L'opération \emph{rename} locale se décompose en 2 étapes :
 \begin{enumerate}
-  \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op})
+  \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op}).
   \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
 \end{enumerate}
 La première étape consiste à parcourir et à linéariser la séquence actuelle pour en extraire les intervalles d'identifiants.
@@ -69,12 +69,12 @@ L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
 
 L'intégration de l'opération \emph{rename} se décompose en les étapes suivantes :
 \begin{enumerate}
-  \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}
-  \item La récupération des $n$ identifiants formant l'état courant
-  \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible
-  \item L'identification des $k$ opérations \emph{rename} à inverser et des $l$ opérations \emph{rename} à jouer
-  \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}
-  \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence
+  \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}.
+  \item La récupération des $n$ identifiants formant l'état courant.
+  \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible.
+  \item L'identification des $k$ opérations \emph{rename} à inverser et des $l$ opérations \emph{rename} à jouer.
+  \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}.
+  \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence.
 \end{enumerate}
 L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
 La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque intervalle d'identifiants en liste d'identifiants, ce qui nécessite \bigO{n} instructions.
@@ -87,7 +87,7 @@ Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n +
 Nous pouvons néanmoins améliorer ce premier résultat.
 Notamment, nous pouvons tirer parti des faits suivants :
 \begin{enumerate}
-  \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe
+  \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe.
   \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
 \end{enumerate}
 Ainsi, plutôt que d'effectuer une recherche dichotomique sur l'\emph{ancien état} pour trouver le prédecesseur de l'identifiant à renommer, nous pouvons parcourir les deux listes en parallèle.

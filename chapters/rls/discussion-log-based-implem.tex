@@ -1,9 +1,9 @@
 Nous avons décrit précédemment dans la \autoref{sec:integration-process-rename-op}, et plus précisément dans l'\autoref{alg:renameRemote}, le processus d'intégration de l'opération \emph{rename} évaluée dans ce manuscrit.
 Pour rappel, le processus consiste à
 \begin{enumerate}
-  \item identifier le chemin entre l'époque courante et l'époque cible
-  \item appliquer les fonctions de transformations \textsc{revertRenameId} et \textsc{renameId} à l'ensemble des identifiants composant l'état courant
-  \item re-créer une séquence à partir des nouveaux identifiants calculés et du contenu courant.
+  \item Identifier le chemin entre l'époque courante et l'époque cible.
+  \item Appliquer les fonctions de transformations \textsc{revertRenameId} et \textsc{renameId} à l'ensemble des identifiants composant l'état courant.
+  \item Re-créer une séquence à partir des nouveaux identifiants calculés et du contenu courant.
 \end{enumerate}
 
 Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération \emph{rename}.
@@ -18,10 +18,10 @@ Cette implémentation se base sur les observations suivantes :
 
 Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut
 \begin{enumerate}
-  \item générer l'état correspondant au renommage de l'\emph{ancien état}
-  \item identifier le chemin entre l'époque courante et l'époque cible
-  \item identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son log
-  \item transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état
+  \item Générer l'état correspondant au renommage de l'\emph{ancien état}.
+  \item Identifier le chemin entre l'époque courante et l'époque cible.
+  \item Identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son log.
+  \item Transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état.
 \end{enumerate}
 
 Cet algorithme est équivalent à ré-ordonner le journal des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.

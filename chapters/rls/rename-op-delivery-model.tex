@@ -88,8 +88,8 @@ Nous obtenons donc le modèle de livraison suivant :
   \label{def:rls-delivery-model}
   Le modèle de livraison RenamableLogootSplit définit les 4 règles suivantes sur la livraison des opérations :
   \begin{enumerate}
-    \item Une opération doit être livrée à l'ensemble des noeuds à terme,
-    \item Une opération doit être livrée qu'une seule et unique fois aux noeuds,
+    \item Une opération doit être livrée à l'ensemble des noeuds à terme.
+    \item Une opération doit être livrée qu'une seule et unique fois aux noeuds.
     \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
     \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération \emph{rename} qui a introduit son époque de génération a été délivrée à ce même noeud.
   \end{enumerate}

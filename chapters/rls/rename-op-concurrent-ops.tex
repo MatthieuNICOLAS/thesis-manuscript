@@ -58,14 +58,14 @@ Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-in
 Nous définissons les époques de la manière suivante :
 
 \begin{definition}[Époque]
-  Une époque est un couple $\langle$nodeId, nodeSeq$\rangle$ où
+  Une époque est un couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ où
   \begin{itemize}
-    \item nodeId est l'identifiant du noeud qui a généré cette époque.
-    \item nodeSeq est le numéro de séquence du noeud au moment de la génération de cette époque.
+    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré cette époque.
+    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de cette époque.
   \end{itemize}
 \end{definition}
 
-Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle$nodeId, nodeSeq$\rangle$.
+Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$.
 
 Au fur et à mesure que les noeuds reçoivent des opérations \emph{rename}, ils construisent et maintiennent localement la \emph{chaîne des époques}.
 Cette structure de données ordonne les époques en fonction de leur relation \emph{parent-enfant} et associe à chaque époque l'\emph{ancien état} correspondant (\ie l'\emph{ancien état} inclus dans l'opération \emph{rename} qui a généré cette époque).

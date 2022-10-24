@@ -19,8 +19,8 @@ L'opération \emph{rename} ayant introduite l'époque courante fournit un état 
 À partir de cet état initial, le nouveau pair peut obtenir l'état courant en intégrant les opérations \emph{insert} et \emph{remove} qui ont été générées de manière concurrente ou causale par rapport à l'opération \emph{rename}.
 En réponse à une demande de synchronisation d'un nouveau pair, un pair peut donc simplement lui envoyer un sous-ensemble de son journal composé de :
 \begin{enumerate}
-  \item l'opération \emph{rename} ayant introduite son époque courante
-  \item les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
+  \item L'opération \emph{rename} ayant introduite son époque courante.
+  \item Les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
 \end{enumerate}
 
 Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (cf. \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
@@ -34,18 +34,19 @@ L'ajout à l'opération \emph{rename} d'un \emph{vecteur de version}, structure 
 
 Nous définissons donc de la manière suivante l'opération \emph{rename} enrichie compatible avec ce mécanisme de compression du journal :
 
-\begin{definition}[rename enrichie]
-  \label{def:-rich-rename-op}
-  Une opération \emph{rename enrichie} est un quintuplet $\langle$nodeId, nodeSeq, formerState, versionVector, content$\rangle$ où
-  \begin{itemize}
-    \item nodeId est l'identifiant du noeud qui a généré l'opération \emph{rename}.
-    \item nodeSeq est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
-    \item formerState est l'ancien état du noeud au moment du renommage.
-    \item versionVector est le vecteur de version représentant l'ancien état du noeud au moment du renommage.
-    \item content est le contenu du document au moment du renommage.
-  \end{itemize}
-\end{definition}
-
+\indent\withmathbreak{
+  \begin{definition}[rename enrichie]
+    \label{def:-rich-rename-op}
+    Une opération \emph{rename enrichie} est un quintuplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{formerState}, \trm{versionVector}, \trm{content} \rangle$ où
+    \begin{itemize}
+      \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename}.
+      \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
+      \item $\trm{formerState}$ est l'ancien état du noeud au moment du renommage.
+      \item $\trm{versionVector}$ est le vecteur de version représentant l'ancien état du noeud au moment du renommage.
+      \item $\trm{content}$ est le contenu du document au moment du renommage.
+    \end{itemize}
+  \end{definition}
+}
 Ce mécanisme de compression du journal introduit néanmoins le problème suivant.
 Un nouveau pair synchronisé de cette manière ne possède qu'un sous-ensemble du journal des opérations.
 Si ce pair reçoit ensuite une demande de synchronisation d'un second pair, il est possible qu'il ne puisse répondre à la requête.

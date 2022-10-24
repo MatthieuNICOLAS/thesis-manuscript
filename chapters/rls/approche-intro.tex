@@ -2,7 +2,7 @@ Nous proposons un nouveau \ac{CRDT} pour le type \emph{Sequence} à identifiants
 Cette structure de données permet aux noeuds d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
 Nous introduisons une opération \emph{rename} qui permet de
 \begin{enumerate*}
-  \item réassigner des identifiants plus courts aux différents éléments de la séquence
-  \item fusionner les blocs composant la séquence.
+  \item Réassigner des identifiants plus courts aux différents éléments de la séquence.
+  \item Fusionner les blocs composant la séquence.
 \end{enumerate*}
 Ces deux actions permettent à l'opération \emph{rename} de produire un nouvel état minimisant son surcoût en termes de métadonnées et de calculs des modifications suivantes.
