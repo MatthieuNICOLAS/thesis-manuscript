@@ -325,7 +325,7 @@ Notons ici que le noeud de l'arbre des identifiants n'est pas supprimé suite à
 Nous détaillons ci-après le fonctionnement des pierres tombales dans Treedoc.
 
 Les deux noeuds procèdent ensuite à une synchronisation, échangeant leurs opérations respectives.
-Lorsque A (resp. B) intègre $\trm{ins}(\langle 1,d_5 \rangle, L)$ (resp. $\trm{ins}(\langle 1,d_4 \rangle, L)$), il ajoute cet élément avec son désambiguateur dans noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_4 < d_5$).
+Lorsque A (resp. B) intègre $\trm{ins}(\langle 1,d_5 \rangle, L)$ (resp. $\trm{ins}(\langle 1,d_4 \rangle, L)$), il ajoute cet élément avec son désambiguateur dans son noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_4 < d_5$).
 
 B intègre ensuite $\trm{ins}(1 \oplus \langle 1,d_6 \rangle, O)$.
 Il existe cependant une ambiguité sur la position de "O" : cet élément doit-il être placé après l'élément "L" ayant pour identifiant $\langle 1,d_4 \rangle$, ou l'élément "L" ayant pour identifiant $\langle 1,d_5 \rangle$ ?

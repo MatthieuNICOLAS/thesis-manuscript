@@ -1,6 +1,9 @@
 \Annex{Entrelacement d'insertions concurrentes dans Treedoc}
-
 \label{app:treedoc-interleaving}
+
+Dans cette annexe, nous présentons un contre-exemple à la conjecture présentée dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+Cette conjecture suppose que Treedoc ne souffre pas d'anomalies d'entrelacement, \ie que des éléments insérés en concurrence ne se retrouvent pas entrelacés après l'intégration de l'ensemble des modifications.
+La \autoref{fig:treedoc-interleaving} illustre notre contre-exemple.
 
 \begin{figure}[!ht]
 
@@ -134,3 +137,22 @@
   \caption{Entrelacement d'insertions concurrentes dans une séquence Treedoc}
   \label{fig:treedoc-interleaving}
 \end{figure}
+
+Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée Treedoc.
+Initialement, ils possèdent le même état : la séquence contient l'élément "H".
+
+Le noeud A insère l'élément "E" en fin de séquence, \ie $\trm{ins}(H \prec E)$.
+Treedoc génère l'opération correspondante, $\trm{ins}(\langle 1,d_2 \rangle, E)$, et l'intègre à sa copie locale.
+Puis A insère l'élément "L", toujours en fin de séquence.
+La modification $\trm{ins}(E \prec L)$ est convertie en opération $\trm{ins}(1 \oplus \langle 1,d_4 \rangle, L)$ et intégrée.
+
+En concurrence, le noeud B insère l'élément "O" en fin de séquence.
+Cette modification résulte en l'opération $\trm{ins}(\langle 1,d_3 \rangle, O)$, qui est intégrée.
+
+Les deux noeuds procèdent ensuite à une synchronisation, échangeant leurs opérations respectives.
+Lorsque A (resp. B) intègre $\trm{ins}(\langle 1,d_3 \rangle, O)$ (resp. $\trm{ins}(\langle 1,d_2 \rangle, E)$), il ajoute cet élément avec son désambiguateur dans son noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_2 < d_3$).
+
+Ainsi, l'état obtenu après l'intégration de l'ensemble des modifications par les noeuds A et B est "HEOL".
+L'élément "O", inséré par le noeud B en concurrence de l'insertion des éléments "E" et "L" par le noeud A, se retrouve inséré entre ces derniers.
+
+Nous présentons donc dans cet exemple un entrelacement des insertions concurrentes, contredisant la conjecture de \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
