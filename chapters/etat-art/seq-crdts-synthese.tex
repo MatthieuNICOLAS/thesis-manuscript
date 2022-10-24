@@ -55,7 +55,7 @@ Nous les présentons ci-dessous.
 Les identifiants des deux approches partagent donc les propriétés \ref{def:id-prop-1}, \ref{def:id-prop-2} et \ref{def:id-prop-3}.
 
 Pour respecter les propriétés \ref{def:id-prop-1} et \ref{def:id-prop-2}, les \acp{CRDT} reposent généralement sur des dots \cf{def:dot}.
-Ainsi, un couple de taille fixe, $\langle \trm{nodeId},\trm{seq} \rangle$, permet de respecter la contrainte d'unicité des identifiants.
+Ainsi, un couple de taille fixe, $\langle \trm{nodeId},\trm{nodeSeq} \rangle$, permet de respecter la contrainte d'unicité des identifiants.
 
 Le rôle des identifiants diffère entre les approches au niveau des propriétés \ref{def:id-prop-4} et \ref{def:id-prop-5} : les identifiants dans l'approche à pierres tombales doivent permettre d'ordonner un élément par rapport aux éléments insérés en concurrence uniquement, tandis que ceux de la seconde approche doivent permettre d'ordonner un élément par rapport à l'ensemble des éléments insérés.
 Cette nuance se traduit dans la structure des identifiants, notamment leur taille.
@@ -100,12 +100,6 @@ Cependant, il s'agit d'une garantie offerte par l'approche à pierres tombales d
 Pour confirmer notre conjecture et évaluer son impact sur l'expérience utilisateur, il conviendrait de mener un ensemble d'expériences utilisateurs dans la lignée de \cite{2011-evaluation-crdts-ahmed-nacer,2014-effect-delay-collaborative-editing-ignat,2015-cope-delay-collaborative-note-taking-ignat}.
 
 Nous récapitulons cette discussion dans le \autoref{tab:sequence-crdts}.
-
-% Néanmoins, malgré les évaluations et comparaisons, la littérature n'a pas établi une supériorité d'une approche sur l'autre.
-% Les approches proposent seulement des compromis différents sur la nature du surcoût, que nous récapitulons dans \autoref{tab:sequence-crdts}.
-% L'approche basée sur pierres tombales offre une consommation réseau constante grâce à ses identifiants de taille fixe, mais souffre d'une consommation mémoire ne pouvant qu'augmenter.
-% L'approche basée sur identifiants densément ordonnés bénéficie d'un meilleur délai de diffusion des modifications, les modifications pouvant être livrées dans le désordre, mais souffre d'une empreinte réseau augmentant avec la taille de ses identifiants.
-% L'approche basée sur pierres tombales et l'approche basée sur identifiants densément ordonnés souffrent toutes les deux d'une augmentation théorique de leur surcoût en mémoire et en computations, respectivement dûe au nombre forcément croissant d'éléments stockées dans la Séquence et à la taille croissante\footnote{\cite{2011-evaluation-crdts-ahmed-nacer} montre expérimentalement que les performances de l'approche basée sur identifiants densément ordonnés restent stables tout au long des tâches d'édition collaborative proposées.} des identifiants associés aux éléments de la Séquence.
 
 \begin{table}[!ht]
   \centering

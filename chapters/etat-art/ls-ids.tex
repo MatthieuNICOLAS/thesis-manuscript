@@ -5,18 +5,18 @@ Pour ce faire, LogootSplit associe aux éléments des identifiants définis de l
   Les tuples LogootSplit sont définis de la manière suivante :
   \begin{subdefinition}[Tuple LogootSplit]
     Un tuple LogootSplit est un quadruplet $\langle \trm{pos},\trm{nodeId},$ \\
-    $\trm{seq},\trm{offset} \rangle$ avec :
+    $\trm{nodeSeq},\trm{offset} \rangle$ avec :
     \begin{enumerate}
       \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense,
       \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément,
-      \item $\trm{seq}$, le numéro de séquence courant du noeud auteur de l'élément.
+      \item $\trm{nodeSeq}$, le numéro de séquence courant du noeud auteur de l'élément.
       \item $\trm{offset}$, la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
     \end{enumerate}
   \end{subdefinition}
 \end{definition}
 
 Dans ce manuscrit, nous représentons les tuples LogootSplit par le biais de la notation suivante : $\betterid{position}{nodeId~nodeSeq}{offset}$.
-Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{seq}$ et $\trm{offset}$.
+Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{nodeSeq}$ et $\trm{offset}$.
 Par exemple, nous représentons l'identifiant $\langle \langle i,A,1,1 \rangle \langle f,B,1,1 \rangle \rangle$ par $\betterid{i}{A1}{1}\betterid{f}{B1}{1}$.
 
 LogootSplit utilise les identifiants de position pour ordonner relativement les éléments les uns par rapport aux autres.
@@ -33,13 +33,13 @@ Cette relation repose sur l'ordre lexicographique.
   \end{equation*}
   avec $\ltuple$ défini de la manière suivante :
   \begin{subdefinition}[Relation $\ltuple$]
-    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{seq},\trm{offset} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{seq'},\trm{offset'} \rangle$, nous avons :
+    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{nodeSeq'},\trm{offset'} \rangle$, nous avons :
     \begin{equation*}
       \begin{split}
         t \ltuple t' \quad \trm{iff} \quad  & (\trm{pos} < \trm{pos}') \quad \lor \\
                                             & (\trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}) \quad \lor \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} < \trm{seq'}) \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} = \trm{seq'} \land \trm{offset} = \trm{offset'}) \\
+                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} < \trm{nodeSeq'}) \\
+                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} = \trm{nodeSeq'} \land \trm{offset} < \trm{offset'}) \\
       \end{split}
     \end{equation*}
   \end{subdefinition}
@@ -51,4 +51,4 @@ Par exemple, nous avons :
   \item \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second.
 \end{enumerate}
 
-Il est intéressant de noter que le triplet $\langle \trm{nodeId},\trm{seq},\trm{offset} \rangle$ du dernier tuple d'un identifiant permet de l'identifier de manière unique.
+Il est intéressant de noter que le triplet $\langle \trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ du dernier tuple d'un identifiant permet de l'identifier de manière unique.

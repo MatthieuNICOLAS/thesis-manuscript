@@ -148,7 +148,7 @@ Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
 Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
 Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
-Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans \autoref{fig:revertRenameId}.
+Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans la \autoref{fig:revertRenameId}.
 Pour cet identifiant, nous avons :
 \begin{itemize}
   \item $newPredId = $\id{i}{A1}{1}, donc $predId = $\id{i}{B0}{0}\id{f}{A0}{0} d'après le cas \ref{item:revert-rename-1}.

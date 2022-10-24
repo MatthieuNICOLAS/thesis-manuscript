@@ -1,6 +1,6 @@
 En parallèle à Treedoc \cite{2009-treedoc-preguica}, \textcite{2009-logoot-weiss} proposent Logoot.
 Ce nouvel \ac{CRDT} pour Séquence repose sur idée similaire à celle de Treedoc : il associe un identifiant de position, provenant d'un espace dense, à chaque élément de la séquence.
-Ainsi, ces identifiants ont les mêmes propriétés que celles décrites dans \autoref{def:dense-ids}.
+Ainsi, ces identifiants ont les mêmes propriétés que celles décrites dans la \autoref{def:dense-ids}.
 
 Les identifiants de position utilisés par Logoot sont spécifiés de manière différente dans \cite{2009-logoot-weiss} et \cite{2010-logoot-undo-weiss}.
 Dans ce manuscrit, nous nous basons sur la spécification de \cite{2010-logoot-undo-weiss} :
@@ -8,18 +8,18 @@ Dans ce manuscrit, nous nous basons sur la spécification de \cite{2010-logoot-u
   Un identifiant Logoot est une liste de tuples Logoot.
   Les tuples Logoot sont définis de la manière suivante :
   \begin{subdefinition}[Tuple Logoot]
-    Un tuple Logoot est un triplet $\langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ avec
+    Un tuple Logoot est un triplet $\langle \trm{pos},\trm{nodeId},\trm{nodeSeq} \rangle$ avec
     \begin{enumerate}
       \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense.
       \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément.
-      \item $\trm{seq}$, le numéro de séquence courant du noeud auteur de l'élément.
+      \item $\trm{nodeSeq}$, le numéro de séquence courant du noeud auteur de l'élément.
     \end{enumerate}
   \end{subdefinition}
 \end{definition}
 
 Dans le cadre de cette section, nous nous basons sur cette dernière spécification.
 Nous utiliserons la notation suivante $\betterid{pos}{nodeId~seq}{}$ pour représenter un tuple Logoot.
-Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{seq}$.
+Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{nodeSeq}$.
 Par exemple, l'identifiant $\langle \langle i,A,1 \rangle \langle f,B,1 \rangle \rangle$ est représenté par $\betterid{i}{A1}{}\betterid{f}{B1}{}$.
 
 Logoot définit un ordre strict total $\lid$ sur les identifiants de position.
@@ -35,12 +35,12 @@ Pour définir $\lid$, Logoot se base sur l'ordre lexicographique.
   \end{equation*}
   avec $\ltuple$ défini de la manière suivante :
   \begin{subdefinition}[Relation $\ltuple$]
-    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{seq} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{seq'} \rangle$, nous avons :
+    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{nodeSeq} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{nodeSeq'} \rangle$, nous avons :
     \begin{equation*}
       \begin{split}
         t \ltuple t' \quad \trm{iff} \quad  & (\trm{pos} < \trm{pos}') \quad \lor \\
                                             & (\trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}) \quad \lor \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{seq} < \trm{seq'}) \\
+                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} < \trm{nodeSeq'}) \\
       \end{split}
     \end{equation*}
   \end{subdefinition}
@@ -89,19 +89,19 @@ Par souci de simplicité, nous présentons dans \autoref{alg:logoot-generateId} 
 
 Pour illustrer cet algorithme, considérons son exécution avec :
 \begin{enumerate}
-  \item $\trm{predId} = \betterid{e}{A1}{}$, $\trm{nextId} = \betterid{m}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{seq} = 1$.
+  \item $\trm{predId} = \betterid{e}{A1}{}$, $\trm{nextId} = \betterid{m}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{nodeSeq} = 1$.
     \texttt{generateId} commence par déterminer où fini le préfixe commun entre les deux identifiants.
     Dans cet exemple, $\trm{predId}$ et $\trm{succId}$ n'ont aucun préfixe commun, \ie $common = \emptyset$.
     \texttt{generateId} compare donc les valeurs de $\trm{pos}$ de leur premier tuple respectifs, \ie $e$ et $m$, pour déterminer si un nouvel identifiant de taille 1 peut être inséré dans cet intervalle.
-    S'agissant du cas ici, \texttt{generateId} choisit une valeur aléatoire dans $]e,m[$, \eg $l$, et renvoie un identifiant composé de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{seq}$, \ie $id = \betterid{l}{C1}{}$ (lignes \ref{alg:logoot-generateId-else-start}-\ref{alg:logoot-generateId-else-end}).
-  \item $\trm{predId} = \betterid{i}{A1}{}\betterid{f}{A2}{}$, $\trm{succId} = \betterid{i}{A1}{}\betterid{g}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{seq} = 1$.
+    S'agissant du cas ici, \texttt{generateId} choisit une valeur aléatoire dans $]e,m[$, \eg $l$, et renvoie un identifiant composé de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{nodeSeq}$, \ie $id = \betterid{l}{C1}{}$ (lignes \ref{alg:logoot-generateId-else-start}-\ref{alg:logoot-generateId-else-end}).
+  \item $\trm{predId} = \betterid{i}{A1}{}\betterid{f}{A2}{}$, $\trm{succId} = \betterid{i}{A1}{}\betterid{g}{B1}{}$, $\trm{nodeId} = \trm{C}$ et $\trm{nodeSeq} = 1$.
     De manière similaire à précédemment, \texttt{generateId} détermine le préfixe commun entre $\trm{predId}$ et $\trm{succId}$.
     Ici, $\trm{common} = \betterid{i}{A1}{}$.
     \texttt{generateId} compare ensuite les valeurs de $\trm{pos}$ de leur second tuple respectifs, \ie $f$ et $g$, pour déterminer si un nouvel identifiant de taille 2 peut être inséré dans cet intervalle.
     Ce n'est point le cas ici, \texttt{generateId} doit donc recopier le second tuple de $\trm{predId}$ pour former $\trm{id}$ et y concaténer un nouveau tuple.
     Pour générer ce nouveau tuple, \texttt{generateId} choisit une valeur aléatoire entre la valeur de $\trm{pos}$ du troisième tuple de $\trm{predId}$ et la valeur maximale notée $\topn$.
     $\trm{predId}$ n'ayant pas de troisième tuple, \texttt{generateId} utilise la valeur minimale pour $\trm{pos}$, $\botn$.
-    \texttt{generateId} choisit donc une valeur aléatoire dans $]\botn,\topn]$\footnotemark, \eg $m$, et renvoie un identifiant composé du préfixe commun, du tuple suivant de $\trm{predId}$ et d'un tuple formé à partir de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{seq}$, \ie $id = \betterid{i}{A1}{}\betterid{f}{A2}{}\betterid{m}{C1}{}$ (lignes \ref{alg:logoot-generateId-elsif-start}-\ref{alg:logoot-generateId-elsif-end}).
+    \texttt{generateId} choisit donc une valeur aléatoire dans $]\botn,\topn]$\footnotemark, \eg $m$, et renvoie un identifiant composé du préfixe commun, du tuple suivant de $\trm{predId}$ et d'un tuple formé à partir de cette valeur pour $\trm{pos}$ et avec les valeurs de $\trm{nodeId}$ et $\trm{nodeSeq}$, \ie $id = \betterid{i}{A1}{}\betterid{f}{A2}{}\betterid{m}{C1}{}$ (lignes \ref{alg:logoot-generateId-elsif-start}-\ref{alg:logoot-generateId-elsif-end}).
     \footnotetext{Il est important d'exclure $\botn$ des valeurs possibles pour $\trm{pos}$ du dernier tuple d'un identifiant $\trm{id}$ afin de garantir que l'espace reste dense, notamment pour garantir qu'un noeud sera toujours en mesure de générer un nouvel identifiant $\trm{id'}$ tel que $\trm{id'} \lid \trm{id}$.}
 \end{enumerate}
 

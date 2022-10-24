@@ -19,11 +19,11 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
 \begin{definition}[Identifiants contigus]
   Deux identifiants sont contigus si et seulement si les deux identifiants sont identiques à l'exception de leur dernier offset et que leur derniers offsets sont consécutifs.
 
-  De manière plus formelle, étant donné deux identifiants $\trm{id} = t_1 \oplus t_2 \oplus \cdots \oplus t_{n-1} \oplus \langle \trm{pos},\trm{nodeId},\trm{seq},\trm{offset} \rangle$ et $\trm{id'} = t^\prime_1 \oplus t^\prime_2 \oplus \cdots \oplus t^\prime_{n-1} \oplus \langle \trm{pos}',\trm{nodeId}',\trm{seq}',\trm{offset}' \rangle$, nous avons :
+  De manière plus formelle, étant donné deux identifiants $\trm{id} = t_1 \oplus t_2 \oplus \cdots \oplus t_{n-1} \oplus \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ et $\trm{id'} = t^\prime_1 \oplus t^\prime_2 \oplus \cdots \oplus t^\prime_{n-1} \oplus \langle \trm{pos}',\trm{nodeId}',\trm{nodeSeq}',\trm{offset}' \rangle$, nous avons :
   \begin{equation*}
     \begin{split}
       \trm{contigus}(id,id') \quad \trm{iff} \quad     & (\forall i \in [1,n[ \cdot t_i = t'_i) \quad \land \\
-                                            & (\trm{pos} = \trm{pos}' \land \trm{nodeId} = \trm{nodeId}' \land \trm{seq} = \trm{seq}') \quad \land \\
+                                            & (\trm{pos} = \trm{pos}' \land \trm{nodeId} = \trm{nodeId}' \land \trm{nodeSeq} = \trm{nodeSeq}') \quad \land \\
                                             & (\trm{offset} + 1 = \trm{offset}' \lor \trm{offset} - 1 = \trm{offset}') \\
     \end{split}
   \end{equation*}
@@ -99,6 +99,6 @@ Cette fonctionnalité permet d'améliorer les performances de la structure de do
     Ceci permet de réduire la taille des messages diffusés sur le réseau.
 \end{enumerate}
 
-Il est intéressant de noter que la paire $\langle \trm{nodeId},\trm{seq} \rangle$ du dernier tuple d'un identifiant permet d'identifier de manière unique la partie commune des identifiants de l'intervalle d'identifiants auquel il appartient.
-Ainsi, nous pouvons identifier de manière unique un intervalle d'identifiants avec le quadruplet $\langle \trm{nodeId}, \trm{seq}, \trm{offsetBegin}, \trm{offsetEnd} \rangle$.
+Il est intéressant de noter que la paire $\langle \trm{nodeId},\trm{nodeSeq} \rangle$ du dernier tuple d'un identifiant permet d'identifier de manière unique la partie commune des identifiants de l'intervalle d'identifiants auquel il appartient.
+Ainsi, nous pouvons identifier de manière unique un intervalle d'identifiants avec le quadruplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{offsetBegin}, \trm{offsetEnd} \rangle$.
 Par exemple, l'intervalle d'identifiants $\betterid{i}{B1}{2}\betterid{f}{A1}{2..4}$ peut être référencé à l'aide du quadruplet $\langle A,1,2,4 \rangle$.

@@ -125,12 +125,6 @@ Nous récapitulons les complexités en temps présentées précédemment dans le
 
 \subsubsection{Complexité en temps du mécanisme de récupération de mémoire des époques}
 
-% \mnnote{
-%   NOTE: Dans \autoref{sec:gc-mechanism}, je présente le principe du mécanisme de GC.
-%   Dans cette partie, je décris l'algo correspondant et l'évalue.
-%   Rédiger l'algo ? Dans quelle partie l'insérer dans ce cas ?
-% }
-
 Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
 
 L'algorithme du mécanisme de récupération de la mémoire se compose des étapes suivantes.
@@ -159,7 +153,7 @@ Il parcourt l'arbre des époques et supprime toute époque qui n'appartient pas 
 Cette étape finale s'exécute en \bigO{e}.
 
 Ainsi, nous obtenons que la complexité en temps du mécanisme de récupération de mémoire des époques est en \bigO{n^2 + e \cdot h}.
-Nous récapitulons ce résultat dans \autoref{tab:time-complexity-gc-mechanism-epochs}.
+Nous récapitulons ce résultat dans la \autoref{tab:time-complexity-gc-mechanism-epochs}.
 
 \begin{table}[!ht]
   \centering

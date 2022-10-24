@@ -54,7 +54,7 @@ Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opé
 Pour cela, nous utilisons un système basé sur des \emph{époques}.
 Initialement, la séquence répliquée débute à l'époque \emph{origine} notée \epoch{0}.
 Chaque opération \emph{rename} introduit une nouvelle époque et permet aux noeuds d'y avancer depuis l'époque précédente.
-Par exemple, l'opération \emph{rename} décrite dans \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A1}.
+Par exemple, l'opération \emph{rename} décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A1}.
 Nous définissons les époques de la manière suivante :
 
 \begin{definition}[Époque]
