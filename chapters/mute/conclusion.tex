@@ -4,7 +4,7 @@ MUTE permet d'éditer de manière collaborative des documents texte.
 Pour représenter les documents, MUTE propose plusieurs \acp{CRDT} pour le type Séquence \cite{2013-logootsplit,2021-these-vic,2022-rls-tpds-nicolas} issus des travaux de l'équipe.
 Ces \acp{CRDT} offrent de nouvelles méthodes de collaborer, notamment en permettant de collaborer de manière synchrone ou asynchrone de manière transparente.\\
 
-Pour permettre aux noeuds de communiquer, MUTE repose sur la technologie WebRTC.
+Pour permettre aux noeuds de communiquer, MUTE repose sur la technologie \acf{WebRTC}.
 Cette technologie permet de construire un réseau \ac{P2P} directement entre plusieurs navigateurs.
 Plusieurs serveurs sont néanmoins requis, notamment pour la découverte des pairs et pour la communication entre des noeuds lorsque leur pare-feux respectifs empêchent l'établissement d'une connexion directe.\\
 
@@ -12,5 +12,28 @@ Finalement, MUTE implémente un mécanisme de chiffrement de bout en bout garant
 Ce mécanisme repose sur une clé de groupe de chiffrement qui est établie à l'aide du protocole \cite{1995-burmester-desmedt}.
 
 Ce protocole nécessite que chaque noeud possède une paire de clés de chiffrement et qu'ils partagent leur clé publique.
-\ac{MUTE} repose sur des \acp{PKI} pour cela.
-Avant de détecter tout éventuel comportement malicieux de la part de ces derniers, \ac{MUTE} intègre un mécanisme d'audit \cite{2018-trusternity-short,2018-trusternity-long}.\\
+Pour partager leur clé publique, les noeuds utilisent des \acfp{PKI}.
+Cependant, afin de détecter un éventuel comportement malicieux de la part de ces derniers, \ac{MUTE} intègre un mécanisme d'audit \cite{2018-trusternity-short,2018-trusternity-long}.\\
+
+Plusieurs tâches restent néanmoins à réaliser afin de répondre à notre objectif initial, \ie la conception d'un éditeur collaboratif \ac{P2P} temps réel, à large échelle, sûr et sans autorités centrales.
+Une première d'entre elles concerne les droits d'accès aux documents.
+Actuellement, tout-e utilisateur-rice possédant l'URL d'un document peut découvrir les noeuds travaillant sur ce document, établir une connexion avec eux, participer à la génération d'une nouvelle clé de chiffrement de groupe puis obtenir l'état du document en se synchronisant avec un noeuds.
+Pour empêcher un tier ou un-e collaborateur-rice expulsé-e précédemment d'accéder au document, il est nécessaire d'intégrer un mécanisme de gestion de droits d'accès adapté aux systèmes \ac{P2P} à large échelle \cite{2021-access-control-crdts,2022-dist-access-control-pa}.\\
+
+Une seconde piste de travail concerne l'amélioration de la couche réseau de \ac{MUTE}.
+Comme mentionné précédemment \cf{sec:mute-topologie-protocole-diffusion}, notre couche réseau actuelle souffre de plusieurs limites.
+Tout d'abord, les noeuds qui travaillent sur un même document établissent un réseau \ac{P2P} entièrement maillé.
+Cette topologie réseau requiert un nombre de connexions par noeud qui dépend linéairement du nombre total de noeuds.
+Cette topologie s'avère donc coûteuse et inadaptée aux collaborations à large échelle.
+
+Ensuite, le protocole de diffusion des messages que nous employons s'avère lui aussi inadapté aux collaborations à large échelle.
+En effet, c'est le noeud auteur d'un message qui a pour responsabilité d'en envoyer une copie à chacun des noeuds de la collaboration.
+Ainsi, ce protocole concentre toute la charge de travail pour la diffusion d'un message sur un seul noeud.
+Cette tâche s'avère excessive pour un unique noeud quand la collaboration est à large échelle.
+
+Ces limites entravent donc la capacité à utiliser \ac{MUTE} dans le cadre de collaborations à large échelle.
+Pour y répondre, nous identifions deux pistes d'amélioration :
+\begin{enumerate}
+    \item L'utilisation d'un protocole d'échantillonnage aléatoire de pairs adaptatif, tel que Spray \cite{2018-spray-nedelec}, qui limite la taille du voisinage d'un noeud à un facteur logarithmique du nombre total de noeuds.
+    \item L'emploi d'un protocole de diffusion épidémique des messages \cite{1999-epidemic-dissemination-birman}, qui répartit sur l'ensemble des noeuds la charge de travail pour diffuser d'un message à tout le réseau.
+\end{enumerate}
