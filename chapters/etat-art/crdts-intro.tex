@@ -11,6 +11,7 @@ Pour les ordonner, la littérature repose généralement sur la relation de caus
 Nous l'adaptons ci-dessous à notre contexte, en ne considérant que les modifications\footnote{Nous utilisons le terme \emph{modifications} pour désigner les \emph{opérations de modifications} des types abstraits de données afin d'éviter une confusion avec le terme \emph{opération} introduit ultérieurement.} effectuées et celles intégrées :
 
 \begin{definition}[Relation \hb]
+  \label{def:happens-before}
   La relation \hb indique qu'une modification $m_1$ a eu lieu avant une modification $m_2$, notée $m_1 \rightarrow m_2$, si et seulement si une des conditions suivantes est satisfaite :
   \begin{enumerate}
     \item $m_1$ a été effectuée avant $m_2$ sur le même noeud.

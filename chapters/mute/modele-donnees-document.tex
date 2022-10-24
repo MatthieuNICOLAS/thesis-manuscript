@@ -15,6 +15,40 @@ Le \ac{CRDT} génère les opérations texte correspondantes et les transmet à l
 En plus du texte, MUTE maintient un ensemble de métadonnées par document.
 Par exemple, les utilisateurs peuvent donner un titre au document.
 Pour représenter cette donnée additionnelle, nous associons un Last-Writer-Wins Register \ac{CRDT} synchronisé par états \cite{shapiro_2011_crdt} au document.
-De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par états pour représenter la date de création du document.
+De façon similaire, nous utilisons un First-Writer-Wins Register \ac{CRDT} synchronisé par états pour représenter la date de création du document.\\
 
+L'utilisation de ces structures de données nous permet donc de représenter le document texte ainsi que ses métadonnées.
+Nous identifions cependant plusieurs axes d'évolution pour cette couche.
+La première d'entre elles concerne l'ajout de styles au document.
+Comme indiqué dans la \autoref{sec:mute-interface-utilisateur}, nous utilisons le langage de balisage Markdown pour inclure plusieurs éléments de style.
+Cette solution a pour principal intérêt de reposer sur du texte qui s'intègre directement dans le contenu du document.
+Ainsi, les balises de style sont répliquées nativement avec le contenu du document par le \ac{CRDT} représentant ce dernier.
+Cette solution montre cependant ses limites lorsque plusieurs éléments styles sont ajoutés sur des zones de texte se superposant, notamment en concurrence.
+Les balises Markdown produites sont alors entrelacées.
+La figure \autoref{fig:mute-interleaving-markdown} illustre un tel exemple.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{img/screenshot-mute-interleaving-markdown}
+    \caption{Entrelacement de balises Markdown produisant une anomalie de style}
+    \label{fig:mute-interleaving-markdown}
+\end{figure}
+
+Dans cet exemple, le texte "diam venenatis" a été mis en gras tandis que le texte "venenatis vitae" a été mis en italique.
+Le résultat attendu est donc "\textbf{diam \emph{venenatis}} \emph{vitae}".
+Il ne s'agit toutefois pas du résultat affiché par notre éditeur de texte, la syntaxe du langage Markdown n'étant pas respectée.
+Les utilisateur-rices doivent donc manuellement corriger l'anomalie de style engendrée.
+
+Afin de prévenir ce type d'anomalie, il conviendrait d'intégrer un \ac{CRDT} pour représenter le style du document, tel que Peritext \cite{2022-peritext-litt}.
+Un type de donnée dédié nous permettrait de plus d'inclure des effets de style non-disponibles dans le langage Markdown, \eg la mise en page ou encore l'utilisation de couleurs.\\
+
+Une second piste d'évolution consiste à rendre possible l'intégration et l'édition collaborative d'autres types de contenu que du texte au sein d'un document \ac{MUTE}, \eg des listes de tâches, des feuilles de calcul ou encore des schémas.
+L'évolution d'éditeur collaboratif de documents texte à éditeur collaboratif de documents multimédia élargirait ainsi les contextes d'utilisation de \ac{MUTE}.
+
+Cette piste de recherche nécessite de concevoir et d'intégrer des \acp{CRDT} pour chaque type de document supplémentaire.
+Elle nécessite aussi la conception d'un mécanisme assurant la composition de ces \acp{CRDT}, \ie la conception d'un méta-\ac{CRDT}.
+Ce méta-\ac{CRDT} devrait assurer plusieurs responsabilités.
+Tout d'abord, il devrait permettre l'ajout et la suppression de \acp{CRDT} au sein du document multimédia, ainsi que leur ré-ordonnement.
+Ensuite, le méta-\ac{CRDT} devrait définir les sémantiques de résolution de conflits employées en cas de modifications concurrentes sur le document, \eg la modification du contenu d'un des \acp{CRDT} du document en concurrence de la suppression dudit \ac{CRDT}.
+Finalement, le méta-\ac{CRDT} devrait proposer différents modèles de cohérence à l'application.
+Il devrait par exemple proposer de garantir le modèle de cohérence causal, \ie d'ordonner les modifications sur le méta-\ac{CRDT} et les \acp{CRDT} qui composent le document en utilisant la relation \hb \cf{def:happens-before}.
