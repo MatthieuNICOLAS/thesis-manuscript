@@ -41,10 +41,10 @@ La séquence LogootSplit autorise deux types de modifications :
   \item $\trm{ins}(s, i, \trm{elts}, \trm{nodeId}, \trm{nodeSeq})$, qui génère l'opération permettant d'insérer les éléments $\trm{elts}$ dans la séquence $s$ à l'index $i$.
     Cette fonction génère et associe un intervalle d'identifiants aux éléments à insérer en utilisant les valeurs pour $\trm{nodeId}$ et $\trm{nodeSeq}$ fournies.
     Elle retourne les données nécessaires pour l'opération $\trm{ins}$, \ie le premier identifiant de l'intervalle d'identifiants alloué et les éléments.
-    Par soucis de simplicité, nous noterons cette modification $\trm{ins}(\trm{pred} \prec \trm{elts} \prec \trm{succ})$ et utiliserons l'état courant de la séquence comme valeur pour $s$, l'identifiant du noeud auteur de la modification comme valeur pour $\trm{nodeId}$ et le nombre de blocs que le noeud a créé comme valeur pour $\trm{nodeSeq}$ dans nos exemples.
+    Par souci de simplicité, nous noterons cette modification $\trm{ins}(\trm{pred} \prec \trm{elts} \prec \trm{succ})$ et utiliserons l'état courant de la séquence comme valeur pour $s$, l'identifiant du noeud auteur de la modification comme valeur pour $\trm{nodeId}$ et le nombre de blocs que le noeud a créé comme valeur pour $\trm{nodeSeq}$ dans nos exemples.
   \item  \emph{rmv(s, i, nbElts)}, qui génère l'opération permettant de supprimer $\trm{nbElts}$ dans la séquence $s$ à partir de l'index $i$.
     Elle retourne les données nécessaires pour l'opération $\trm{rmv}$, \ie les intervalles d'identifiants supprimés.
-    Par soucis de simplicité, nous noterons cette modifications $\trm{rmv}(\trm{elts})$ dans nos exemples.
+    Par souci de simplicité, nous noterons cette modifications $\trm{rmv}(\trm{elts})$ dans nos exemples.
 \end{enumerate}
 
 Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de cette séquence répliquée.

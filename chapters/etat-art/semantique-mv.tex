@@ -49,5 +49,5 @@ Dans la \autoref{fig:set-mv}, résoudre le conflit revient à re-effectuer une m
 Ainsi, si plusieurs personnes résolvent en concurrence le conflit de manière contraire, la sémantique \ac{MV} exposera de nouveau les différents états proposés sous la forme d'un conflit.
 
 Il est intéressant de noter que cette sémantique mène à un changement du domaine du \ac{CRDT} considéré : en cas de conflit, la valeur retournée par le \ac{CRDT} correspond à un Ensemble de valeurs du type initialement considéré.
-E.g. si nous considérons que le type correspondant au \ac{CRDT} dans la \autoref{fig:set-mv} est le type $\trm{Set}\langle V \rangle$, nous observons que la valeur finale obtenue a pour type $\trm{Set}\langle \trm{Set}\langle V \rangle \rangle$.
+Par exemple, si nous considérons que le type correspondant au \ac{CRDT} dans la \autoref{fig:set-mv} est le type $\trm{Set}\langle V \rangle$, nous observons que la valeur finale obtenue a pour type $\trm{Set}\langle \trm{Set}\langle V \rangle \rangle$.
 Il s'agit à notre connaissance de la seule sémantique opérant ce changement.

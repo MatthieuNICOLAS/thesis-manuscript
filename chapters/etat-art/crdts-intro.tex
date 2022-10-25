@@ -25,7 +25,7 @@ En effet, deux modifications $m_1$ et $m_2$ peuvent être effectuées en parall�
 De telles modifications sont alors dites \emph{concurrentes} :
 
 \begin{definition}[Concurrence]
-  Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \land m_1 \nrightarrow m_2$.
+  Deux modifications $m_1$ et $m_2$ sont concurrentes, noté $m_1 \parallel m_2$, si et seulement si $m_1 \nrightarrow m_2 \land m_2 \nrightarrow m_1$.
 \end{definition}
 
 Lorsque les modifications possibles sur un type de données sont commutatives, l'intégration des modifications effectuées par les autres noeuds, même concurrentes, ne nécessite aucun mécanisme particulier.

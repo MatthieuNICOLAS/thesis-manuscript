@@ -3,10 +3,11 @@
 Le système que nous considérons est un système \acf{P2P} à large échelle.
 Il est composé d'un ensemble de noeuds dynamique.
 En d'autres termes, un noeud peut rejoindre ou quitter le système à tout moment.
+Certains noeuds peuvent participer au système que de manière éphémère, \eg le temps d'une session.
 
-À un instant donné, un noeud est soit connecté, soit déconnecté.
-Nous considérons possible qu'un noeud se déconnecte de manière définitive, sans indication au préalable.
-Ainsi, du point de vue des autres noeuds du système, il est impossible de déterminer le statut d'un noeud déconnecté.
+Du point de vue d'un noeud du système, les autres noeuds sont soit connectés, \ie joignables par le biais des connexions \ac{P2P} disponibles, soit déconnectés, \ie injoignable.
+Lorsqu'un noeud se déconnecte, nous considérons possible qu'il se déconnecte de manière définitive sans indication au préalable.
+Du point de vue des autres noeuds du système, il est donc impossible de déterminer le statut d'un noeud déconnecté.
 Ce dernier peut être déconnecté de manière temporaire ou définitive.
 Toutefois, nous assimilons les noeuds déconnectés de manière définitive à des noeuds ayant quittés le système, ceux-ci ne participant plus au système.
 
@@ -46,4 +47,3 @@ Les noeuds ne peuvent dévier du protocole de la couche de livraison des message
 Les noeuds peuvent cependant rencontrer des défaillances.
 Nous considérons que les noeuds disposent d'une mémoire durable et fiable.
 Ainsi, nous considérons que les noeuds peuvent restaurer le dernier état valide, \ie pas en cours de modification, qu'il possédait juste avant la défaillance.
-% Nous considérons qu'en cas de perte de données, les noeuds quittent et re-rejoignent le système sous une autre identité.

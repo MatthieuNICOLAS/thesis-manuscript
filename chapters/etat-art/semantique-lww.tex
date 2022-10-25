@@ -48,7 +48,7 @@ Ici, nous considérons que $\trm{add}(a)$ a eu lieu plus tôt que $\trm{rmv}(a)$
 La sémantique \ac{LWW} désigne donc $\trm{rmv}(a)$ comme prioritaire et ignore $\trm{add}(a)$.
 L'état obtenu à l'issue de cet exemple par chaque noeud est donc $\{\}$.
 
-Il est à noter que si la modification $\trm{rmv}(a)$ du noeud B avait eu lieu plus tôt dans notre exemple, l'état final obtenu aurait été $\{a\}$.
+Il est à noter que si la modification $\trm{rmv}(a)$ du noeud B avait eu lieu plus tôt que la modification $\trm{add}(a)$ du noeud A dans notre exemple, l'état final obtenu aurait été $\{a\}$.
 Ainsi, des exécutions reproduisant le même ensemble de modifications produiront des résultats différents en fonction de l'ordre créé par les estampilles associées à chaque modification.
 Ces estampilles étant des métadonnées du mécanisme de résolution de conflits, elles sont dissimulées aux utilisateur-rices.
 Le comportement de cette sémantique peut donc être perçu comme aléatoire et s'avérer perturbant pour les utilisateur-rices.
