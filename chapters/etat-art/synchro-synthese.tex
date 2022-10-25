@@ -1,6 +1,6 @@
 \label{def:synchro-synthese}
 
-Ainsi, plusieurs modèles de synchronisation ont été proposées pour permettre aux noeuds utilisant un \ac{CRDT} pour répliquer une donnée de diffuser leurs modifications et d'intégrer celles des autres.
+Ainsi, plusieurs modèles de synchronisation ont été proposés pour permettre aux noeuds utilisant un \ac{CRDT} pour répliquer une donnée de diffuser leurs modifications et d'intégrer celles des autres.
 Nous récapitulons dans cette section les principales propriétés et différences entre ces modèles.
 
 Tout d'abord, rappelons que chaque approche repose sur l'utilisation d'un sup-demi-treillis pour assurer la convergence forte.
@@ -23,7 +23,7 @@ Le modèle de synchronisation par différences d'états permet quant à lui d'in
 Dans les deux cas, les \acp{CRDT} synchronisés par différences d'états reposent sur la fonction de fusion du sup-demi-treillis pour intégrer les modifications.
 
 De cette différence d'unité de synchronisation découle l'ensemble des différences entre ces modèles.
-La capacité d'intégrer les modifications par le biais d'une fusion d'états permet aux \acp{CRDT} synchronisé par états et différences d'états de résister aux défaillances du réseau.
+La capacité d'intégrer les modifications par le biais d'une fusion d'états permet aux \acp{CRDT} synchronisés par états et différences d'états de résister aux défaillances du réseau.
 En effet, la perte, le ré-ordonnement ou la duplication de messages, \ie d'états ou de différences d'états, n'empêche pas la convergence des noeuds.
 Tant que deux noeuds peuvent à terme échanger leur états respectifs et les fusionner, la fonction de fusion garantit qu'ils obtiendront à terme des états équivalents.
 

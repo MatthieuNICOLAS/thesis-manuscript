@@ -1,7 +1,7 @@
 L'approche de la synchronisation par états propose que les noeuds diffusent leurs modifications en transmettant leur état.
 Les \acp{CRDT} adoptant cette approche doivent définir une fonction \texttt{merge}.
 Cette fonction correspond à la fonction de fusion mentionnée précédemment \cf{def:spec-crdts} : elle prend en paramètres une paire d'états et génère en retour leur \ac{LUB}, \ie l'état correspondant à la borne supérieure des deux états en paramètres.
-Cette fonction doit être associative, commutative et idempotente.
+Cette fonction doit être associative, commutative et idempotente \cite{shapiro_2011_crdt}.
 
 Ainsi, lorsqu'un noeud reçoit l'état d'un autre noeud, il fusionne ce dernier avec son état courant à l'aide de la fonction \texttt{merge}.
 Il obtient alors un nouvel état intégrant l'ensemble des modifications ayant été effectuées sur les deux états.

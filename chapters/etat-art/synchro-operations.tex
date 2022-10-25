@@ -2,7 +2,7 @@ L'approche de la synchronisation par opérations propose quant à elle que les n
 Pour chaque modification possible, les \acp{CRDT} synchronisés par opérations doivent définir deux fonctions : \texttt{prepare} et \texttt{effect} \cite{baquero2017pure}.
 
 La fonction \texttt{prepare} a pour but de générer une opération correspondant à la modification effectuée, et commutative avec les potentielles opérations concurrentes.
-Elle prend en paramètres la modification ainsi que ses paramètres, et l'état courant du noeud.
+Cette fonction prend en paramètres la modification ainsi que ses paramètres, et l'état courant du noeud.
 Cette fonction n'a pas d'effet de bord, \ie ne modifie pas l'état courant, et génère en retour l'opération à diffuser à l'ensemble des noeuds.
 
 Une opération est un message.
@@ -30,7 +30,7 @@ Ces avantages rendent possible la diffusion et l'intégration une à une des mod
 Il est à noter que la seule contrainte imposée aux \acp{CRDT} synchronisés par opérations est que leurs opérations concurrentes soient commutatives \cite{shapiro_2011_crdt}.
 Ainsi, il n'existe aucune contrainte sur la commutativité des opérations liées causalement.
 De la même manière, aucune contrainte n'est définie sur l'idempotence des opérations.
-Ces libertés impliquent qu'il peut être nécessaire que les opérations soient livrées au \ac{CRDT} en respectant un ordre donné et en garantissant leur livraison en exactement une fois pour garantir la convergence.
+Ces libertés impliquent qu'il peut être nécessaire que les opérations soient livrées au \ac{CRDT} en respectant un ordre donné et en garantissant leur livraison en exactement une fois pour garantir la convergence \cite{2018-crdts-overview-preguica}.
 Ainsi, un intergiciel chargé de la diffusion et de la livraison des opérations est usuellement associé aux \acp{CRDT} synchronisés par opérations pour respecter ces contraintes.
 Il s'agit de la couche de livraison de messages que nous avons introduit dans le cadre de notre modèle du système \cf{sec:system-model}.
 
@@ -41,7 +41,7 @@ Généralement, les \acp{CRDT} synchronisés par opérations sont présentés da
   Le modèle de livraison causale définit que, pour toute paire de messages $m_1$ et $m_2$ d'une exécution, si $m_1 \to m_2$, alors la couche de livraison de l'ensemble des noeuds doit livrer le message $m_1$ à l'application avant de livrer le message $m_2$.
 \end{definition}
 
-Ce modèle de livraison permet de respecter le modèle de cohérence causale et ainsi de simplifier le raisonnement sur les exécutions.
+Ce modèle de livraison permet de respecter le modèle de cohérence causale.
 
 Ce modèle de livraison introduit néanmoins plusieurs effets négatifs.
 Tout d'abord, ce modèle peut provoquer un délai dans l'intégration des modifications.
@@ -55,7 +55,7 @@ Les métadonnées de causalité peuvent ainsi représenter la majorité des donn
   La relation de causalité étant transitive, les opérations et leurs relations de causalité forment un DAG.
   \cite{1997-causal-barrier} propose d'ajouter en dépendances causales d'une opération seulement les opérations correspondant aux extremités du DAG au moment de sa génération.
   Ce mécanisme plus complexe permet de réduire la consommation réseau, mais induit un surcoût en calculs et en mémoire utilisée.
-}.
+} \cite{enes2019}.
 Cependant, nous observons que la livraison dans l'ordre causal de toutes les opérations n'est pas toujours nécessaire pour la convergence.
 Par exemple, l'ordre d'intégration de deux opérations d'ajout d'éléments différents dans un Ensemble n'a aucun impact sur le résultat obtenu.
 Nous pouvons alors nous affranchir du modèle de livraison causale pour accélérer la vitesse d'intégration des modifications et pour réduire les métadonnées envoyées.
@@ -130,7 +130,7 @@ Le noeud A diffuse donc les opérations $\trm{add}(b)$ et $\trm{add}(c)$.
 Il reçoit ensuite l'opération $\trm{add}(d)$ de B, qu'il intègre à sa copie.
 Il obtient alors l'état $\set{a,b,c,d,e}$.
 
-De son côté, le noeud B ne reçoit initialement pas l'opération $\trm{add}(b)$ suite à une défaillance réseau.
+De son côté, le noeud B ne reçoit initialement pas l'opération $\trm{add}(b)$ suite à une perte de message.
 Il génère et diffuse $\trm{add}(d)$ puis reçoit l'opération $\trm{add}(c)$.
 Comme indiqué précédemment, nous considérons que la livraison causale des opérations $\trm{add}$ n'est pas obligatoire dans cet exemple, cette opération est alors intégrée sans attendre.
 Le noeud B obtient alors l'état $\set{a,c,d,e}$.

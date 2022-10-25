@@ -214,10 +214,10 @@ Cependant, bien que de nombreuses fonctions de transformations pour le type Séq
 De plus, les algorithmes de contrôle compatibles reposent sur une livraison causale des modifications, et donc l'utilisation de vecteurs d'horloges.
 Cette approche est donc inadaptée aux systèmes \ac{P2P} dynamiques.
 
-Néanmoins, une contribution importante de l'approche \ac{OT} fut la définition d'un modèle de cohérence que doivent respecter les systèmes d'édition collaboratif : le modèle \ac{CCI} \cite{1998-cci-sun}.
+Néanmoins, une contribution importante de l'approche \ac{OT} fut la définition d'un modèle de cohérence que doivent respecter les systèmes d'édition collaboratif : le modèle \acf{CCI} \cite{1998-cci-sun}.
 
-\begin{definition}[Modèle \ac{CCI}]
-  Le modèle de cohérence \ac{CCI} définit qu'un système d'édition collaboratif doit respecter les critères suivants :
+\begin{definition}[Modèle \acl{CCI}]
+  Le modèle de cohérence \acl{CCI} définit qu'un système d'édition collaboratif doit respecter les critères suivants :
   \begin{subdefinition}[Convergence]
     Le critère de \emph{Convergence} indique que des noeuds ayant intégrés le même ensemble de modifications convergent à un état équivalent.
   \end{subdefinition}
@@ -230,17 +230,18 @@ Néanmoins, une contribution importante de l'approche \ac{OT} fut la définition
   \end{subdefinition}
 \end{definition}
 
-De manière similaire à \cite{2009-logoot-weiss}, nous ajoutons le critère de \emph{Passage à l'échelle} à ces critères :
+De manière similaire à \cite{2009-logoot-weiss}, nous considérons qu'un système collaboratif doit, en plus du modèle \ac{CCI}, assurer sa \emph{capacité de passage à l'échelle} \cf{def:scalability-intro}.
+Nous précisons notre définition de cette propriété ci-dessous :
 
-\begin{definition}[Passage à l'échelle]
+\begin{definition}[Capacité de passage à l'échelle]
   \label{def:scalability}
-  Le critère de \emph{Passage à l'échelle} indique que le nombre de noeuds du système ne doit avoir qu'un impact sous-linéaire sur les complexités en temps, en espace et sur le nombre et la taille des messages.
+  Le capacité d'un passage à l'échelle d'un système indique que son nombre de noeuds n'a qu'un impact limité, \ie idéalement constant ou logarithmique, sur sa complexité en temps, en espace et sur le nombre et la taille des messages.
 \end{definition}
 
-Nous constatons cependant que les critères \ref{def:causality} et \ref{def:scalability} peuvent être contraires.
+Nous constatons cependant que le critère \ref{def:causality} et la propriété \ref{def:scalability} peuvent être contradictoires.
 En effet, pour respecter le modèle de cohérence causale, un système peut nécessiter une livraison causale des modifications, \eg un \ac{CRDT} synchronisé par opérations dont seules les opérations concurrentes sont commutatives.
 La livraison causale implique un surcoût computationnel, en métadonnées et en taille des messages qui est fonction du nombre de participants du système \cite{1991-concerning-size-logical-clocks-charron-bost}.
-Ainsi, dans le cadre de nos travaux, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
+Ainsi, dans le cadre de nos travaux sur la conception de systèmes collaboratifs \ac{P2P} à large échelle, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
 
 C'est dans une optique similaire que fut proposé WOOT \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
 Depuis, plusieurs \acp{CRDT} pour Séquence furent définies \cite{ROH2011354, 2009-treedoc-preguica, 2009-logoot-weiss}.

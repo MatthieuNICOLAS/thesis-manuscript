@@ -86,7 +86,7 @@ Le noeud B reçoit ces opérations et les livre à son \ac{CRDT}.
 Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et livrée par A.
 Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
 
-De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une défaillance réseau.
+De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une perte de message du réseau.
 Néanmoins, cela ne l'empêche pas de livrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
 
 Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
@@ -100,7 +100,7 @@ B les récupère depuis son journal des opérations et les envoie à C par le bi
 À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
 Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.\\
 
-Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les défaillances du réseau.
+Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les pertes de message.
 Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
 Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de version vide pour récupérer l'intégralité des opérations.
 
