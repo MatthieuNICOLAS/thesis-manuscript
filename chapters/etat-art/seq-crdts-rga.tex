@@ -220,7 +220,7 @@ Les auteurs souhaitent donc réduire la complexité en temps des modifications l
 
 Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour le type Séquence.
 Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
-Les auteurs combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
+Les auteurs combinent cette structure de données à un mécanisme d'aggrégation des éléments en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
 Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour le type Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
 
 Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, les auteurs mettent en lumière un problème récurrent des \acp{CRDT} pour le type Séquence : lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.

@@ -1,18 +1,18 @@
-Pour ce faire, LogootSplit associe aux éléments des identifiants définis de la manière suivante :
+LogootSplit associe aux éléments des identifiants définis de la manière suivante :
 
 \begin{definition}[Identifiant LogootSplit]
   Un identifiant LogootSplit est une liste de tuples LogootSplit.
-  Les tuples LogootSplit sont définis de la manière suivante :
-  \begin{subdefinition}[Tuple LogootSplit]
-    Un tuple LogootSplit est un quadruplet $\langle \trm{pos},\trm{nodeId},$ \\
-    $\trm{nodeSeq},\trm{offset} \rangle$ avec :
-    \begin{enumerate}
-      \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense,
-      \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément,
-      \item $\trm{nodeSeq}$, le numéro de séquence courant du noeud auteur de l'élément.
-      \item $\trm{offset}$, la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
-    \end{enumerate}
-  \end{subdefinition}
+\end{definition}
+avec les tuples LogootSplit définis de la manière suivante :
+\begin{definition}[Tuple LogootSplit]
+  Un tuple LogootSplit est un quadruplet $\langle \trm{pos},\trm{nodeId},$ \\
+  $\trm{nodeSeq},\trm{offset} \rangle$ avec :
+  \begin{enumerate}
+    \item $\trm{pos}$, un entier représentant la position relative du tuple dans l'espace dense,
+    \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'élément,
+    \item $\trm{nodeSeq}$, le numéro de séquence courant du noeud auteur de l'élément.
+    \item $\trm{offset}$, la position de l'élément au sein d'un bloc. Nous reviendrons plus en détails sur ce composant dans la \autoref{sec:blocs}.
+  \end{enumerate}
 \end{definition}
 
 Dans ce manuscrit, nous représentons les tuples LogootSplit par le biais de la notation suivante : $\betterid{position}{nodeId~nodeSeq}{offset}$.
@@ -31,24 +31,24 @@ Cette relation repose sur l'ordre lexicographique.
                                             & (\exists j \leq m \cdot \forall i < j \cdot t_i = t'_i \land t_j \ltuple t'_j) \\
     \end{split}
   \end{equation*}
-  avec $\ltuple$ défini de la manière suivante :
-  \begin{subdefinition}[Relation $\ltuple$]
-    Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{nodeSeq'},\trm{offset'} \rangle$, nous avons :
-    \begin{equation*}
-      \begin{split}
-        t \ltuple t' \quad \trm{iff} \quad  & (\trm{pos} < \trm{pos}') \quad \lor \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}) \quad \lor \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} < \trm{nodeSeq'}) \\
-                                            & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} = \trm{nodeSeq'} \land \trm{offset} < \trm{offset'}) \\
-      \end{split}
-    \end{equation*}
-  \end{subdefinition}
+\end{definition}
+avec la relation d'ordre strict total les tuples $\ltuple$ définie de la manière suivante :
+\begin{definition}[Relation $\ltuple$]
+  Étant donné deux tuples $t = \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ et $t' = \langle \trm{pos'},\trm{nodeId'},\trm{nodeSeq'},\trm{offset'} \rangle$, nous avons :
+  \begin{equation*}
+    \begin{split}
+      t \ltuple t' \quad \trm{iff} \quad  & (\trm{pos} < \trm{pos}') \quad \lor \\
+                                          & (\trm{pos} = \trm{pos'} \land \trm{nodeId} < \trm{nodeId'}) \quad \lor \\
+                                          & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} < \trm{nodeSeq'}) \\
+                                          & (\trm{pos} = \trm{pos'} \land \trm{nodeId} = \trm{nodeId'} \land \trm{nodeSeq} = \trm{nodeSeq'} \land \trm{offset} < \trm{offset'}) \\
+    \end{split}
+  \end{equation*}
 \end{definition}
 
 Par exemple, nous avons :
 \begin{enumerate}
-  \item  \id{i}{A1}{1} $\lid$ \id{i}{B1}{1} car le tuple composant le premier est inférieur au tuple composant le second, \ie \id{i}{A1}{0} $\ltuple$ \id{i}{B0}{0}.
-  \item \id{i}{B0}{0} $\lid$ \id{i}{B0}{0}\id{f}{A0}{0} car le premier est un préfixe du second.
+  \item  \id{i}{A1}{1} $\lid$ \id{i}{B1}{1} car le tuple composant le premier identifiant est inférieur au tuple composant le second identifiant, \ie \id{i}{A1}{1} $\ltuple$ \id{i}{B1}{1}.
+  \item \id{i}{B1}{1} $\lid$ \id{i}{B1}{1}\id{f}{A1}{1} car le premier identifiant est un préfixe du second identifiant.
 \end{enumerate}
 
 Il est intéressant de noter que le triplet $\langle \trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ du dernier tuple d'un identifiant permet de l'identifier de manière unique.

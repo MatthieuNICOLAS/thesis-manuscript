@@ -2,7 +2,7 @@ WOOT \cite{2006-woot-oster} est considéré a posteriori comme le premier \ac{CR
 Conçu pour l'édition collaborative \ac{P2P}, son but est de surpasser les limites de l'approche \ac{OT} évoquées précédemment, \ie le coût du mécanisme de livraison causale.
 
 L'intuition de WOOT est la suivante : WOOT modifie la sémantique de la modification $\trm{ins}$ pour qu'elle corresponde à l'insertion d'un nouvel élément entre deux autres, et non plus à l'insertion d'un nouvel élément à une position donnée.
-Par exemple, l'insertion de l'élément "M" dans la séquence "MR" pour obtenir l'état "MER", \ie $\trm{ins}(1, E)$, devient $\trm{ins}(M \prec E \prec R)$, où $\prec$ représente l'ordre créé entre ces éléments.
+Par exemple, l'insertion de l'élément "E" dans la séquence "SA" pour obtenir l'état "SEA", \ie $\trm{ins}(1, E)$, devient $\trm{ins}(S \prec E \prec A)$, où $\prec$ représente l'ordre créé entre ces éléments.
 
 Afin de préciser quels éléments correspondent aux prédécesseur et successeur de l'élément inséré, WOOT repose sur un système d'identifiants.
 WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
@@ -20,16 +20,16 @@ Dans le cadre de ce manuscrit, nous utiliserons pour former les identifiants WOO
 Nous les représenterons de la manière suivante $\trm{nodeId}~\trm{nodeSeq}$, \eg $A1$\footnote{Notons qu'un identifiant WOOT est bel et bien unique, deux noeuds ne pouvant utiliser le même $\trm{nodeId}$ et un noeud n'utilisant jamais deux fois le même $\trm{nodeSeq}$.}.
 
 Les modifications $\trm{ins}$ et $\trm{rmv}$ génèrent dès lors des opérations tirant profit des identifiants.
-Par exemple, considérons une séquence WOOT représentant "MR" et qui associe respectivement les identifiants $A1$ et $A2$ aux éléments "M" et "R".
-L'insertion de l'élement de l'élement "E" dans cette séquence pour obtenir l'état "MER", \ie $\trm{ins}(A \prec B \prec C)$, produit par exemple l'opération $\trm{ins}(A1 \prec \langle B1,E \rangle \prec A2)$.
-De manière similaire, la suppression de l'élément "E" dans cette séquence pour obtenir l'état "MR", \ie $\trm{rmv}(1)$, produit $\trm{rmv}(B1)$.
+Par exemple, considérons une séquence WOOT représentant "MR" et qui associe respectivement les identifiants $A1$ et $A2$ aux éléments "S" et "A".
+L'insertion de l'élément "E" dans cette séquence pour obtenir l'état "SEA", \ie $\trm{ins}(S \prec E \prec A)$, produit par exemple l'opération $\trm{ins}(A1 \prec \langle B1,E \rangle \prec A2)$.
+De manière similaire, la suppression de l'élément "E" dans cette séquence pour obtenir l'état "SA", \ie $\trm{rmv}(1)$, produit $\trm{rmv}(B1)$.
 
 WOOT utilise des pierres tombales pour que les opérations $\trm{ins}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, et $\trm{rmv}$ commutent.
 Ainsi, lorsqu'un élément est retiré, une pierre tombale est conservée dans la séquence pour indiquer sa présence passée.
 Les données de l'élément sont elles supprimées.
 
 Finalement, WOOT définit $\lid$, un ordre strict total sur les identifiants associés aux éléments.
-En effet, la relation $\prec$ n'est pas définie pour deux éléments insérés en concurrence et qui possèdent les mêmes prédecesseur et successeur, \eg $\trm{ins}(M \prec E \prec R)$ et $\trm{ins}(M \prec U \prec R)$.
+En effet, la relation $\prec$ n'est pas définie pour deux éléments insérés en concurrence et qui possèdent les mêmes prédecesseur et successeur, \eg $\trm{ins}(S \prec E \prec A)$ et $\trm{ins}(S \prec K \prec A)$.
 Pour que tous les noeuds convergent, ils doivent choisir comment ordonner ces éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
 Ils utilisent pour cela $\lid$.
 \begin{definition}[Relation $\lid$]

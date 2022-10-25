@@ -8,12 +8,12 @@ Pour cela, LogootSplit introduit la notion d'intervalle d'identifiants :
     Un intervalle d'identifiants est un couple $\langle \trm{idBegin},\trm{offsetEnd} \rangle$ avec :
     \begin{enumerate}
       \item $\trm{idBegin}$, l'identifiant du premier élément de l'intervalle.
-      \item $\trm{offsetEnd}$, l'offset du dernier identifiant de l'intervalle.
+      \item $\trm{offsetEnd}$, l'offset du dernier tuple du dernier identifiant de l'intervalle.
     \end{enumerate}
   \end{definition}
 }
 
-Les intervalles d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant de manière effective que l'identifiant de son premier élément et le dernier offset de son dernier élément.
+Les intervalles d'identifiants permettent à LogootSplit d'assigner logiquement un identifiant à un ensemble d'éléments, tout en ne stockant de manière effective que l'identifiant de son premier élément et l'offset du dernier tuple de l'identifiant de son dernier élément.
 
 LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans un intervalle.
 \begin{definition}[Identifiants contigus]
@@ -22,12 +22,11 @@ LogootSplit regroupe les éléments avec des identifiants \emph{contigus} dans u
   De manière plus formelle, étant donné deux identifiants $\trm{id} = t_1 \oplus t_2 \oplus \cdots \oplus t_{n-1} \oplus \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ et $\trm{id'} = t^\prime_1 \oplus t^\prime_2 \oplus \cdots \oplus t^\prime_{n-1} \oplus \langle \trm{pos}',\trm{nodeId}',\trm{nodeSeq}',\trm{offset}' \rangle$, nous avons :
   \begin{equation*}
     \begin{split}
-      \trm{contigus}(id,id') \quad \trm{iff} \quad     & (\forall i \in [1,n[ \cdot t_i = t'_i) \quad \land \\
+      \trm{contigus}(id,id') \quad = \quad     & (\forall i \in [1,n[ \cdot t_i = t'_i) \quad \land \\
                                             & (\trm{pos} = \trm{pos}' \land \trm{nodeId} = \trm{nodeId}' \land \trm{nodeSeq} = \trm{nodeSeq}') \quad \land \\
                                             & (\trm{offset} + 1 = \trm{offset}' \lor \trm{offset} - 1 = \trm{offset}') \\
     \end{split}
   \end{equation*}
-
 \end{definition}
 
 \withmathbreak{
@@ -89,7 +88,8 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
   \label{fig:logootsplit-seq}
 \end{figure}
 
-Cette fonctionnalité permet d'améliorer les performances de la structure de données sur plusieurs aspects :
+Au lieu de stocker les éléments directement, une séquence LogootSplit stocke les blocs les contenant\footnote{Par abus de notation, nous représenterons les blocs de taille 1, \ie ne contenant qu'un seul élément, par des éléments dans nos schémas.}.
+Ce changement de granularité permet d'améliorer les performances de la structure de données sur plusieurs aspects :
 \begin{enumerate}
   \item Elle réduit le nombre d'identifiants stockés au sein de la structure de données.
     En effet, les identifiants sont désormais conservés à l'échelle des blocs plutôt qu'à l'échelle de chaque élément.
