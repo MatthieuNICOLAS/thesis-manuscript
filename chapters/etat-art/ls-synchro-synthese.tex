@@ -10,7 +10,7 @@ Pour résumer, la couche de livraison des opérations associée à LogootSplit d
   \end{enumerate}
 \end{definition}
 
-Il est à noter que \textcite{2021-these-vic} a récemment proposé dans ses travaux de thèse Dotted LogootSplit, un nouveau \ac{CRDT} pour Séquence dont la synchronisation est basée sur les différences d'états.
+Il est à noter que \textcite{2021-these-vic} a récemment proposé dans ses travaux de thèse Dotted LogootSplit, un nouveau \ac{CRDT} pour le type Séquence dont la synchronisation est basée sur les différences d'états.
 Inspiré de Logoot et LogootSplit, ce nouveau \ac{CRDT} associe une séquence à identifiants densément ordonnés à un contexte causal.
 Le contexte causal est une structure de données permettant à Dotted LogootSplit de représenter et de maintenir efficacement les informations des modifications déjà intégrées à l'état courant.
 Cette association permet à Dotted LogootSplit de fonctionner de manière autonome, sans imposer de contraintes particulières à la couche livraison autres que la livraison à terme.

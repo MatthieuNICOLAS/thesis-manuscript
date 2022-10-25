@@ -6,9 +6,9 @@ La Séquence, aussi appelée \emph{Liste}, est un type abstrait de données repr
 Dans une séquence, un même élément peut apparaître à de multiples reprises.
 Chacune des occurrences de cet élément est alors considérée comme distincte.
 
-Dans le cadre de ce manuscrit, nous travaillons sur des séquences de caractères.
-Cette restriction du domaine se fait sans perte en généralité.
-Nous illustrons par la \autoref{fig:seq} notre représentation des séquences.
+Dans le cadre de ce manuscrit, nous représentons des séquences de caractères.
+Cette restriction du domaine se fait sans perte de généralité.
+Nous illustrons par la \autoref{fig:seq} notre représentation des séquences que nous utiliserons dans nos exemples.
 
 \begin{figure}[!ht]
 
@@ -195,11 +195,11 @@ Les deux noeuds diffusent ensuite leur opération respective puis intègre celle
 Nous constatons alors une divergence.
 En effet, l'intégration de la modification $\trm{ins}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD".
 
-Cette divergence est dûe à la non-commutativité de la modification $\trm{ins}$ avec elle-même.
+Cette divergence est dûe au fait que la modification $\trm{ins}$ ne commute pas avec elle-même.
 En effet, celle-ci se base sur un index pour déterminer où placer le nouvel élément.
 Cependant, les index sont eux-mêmes modifiés par $\trm{ins}$.
 Ainsi, l'intégration dans des ordres différents de modifications $\trm{ins}$ sur un même état initial résulte en des états différents.
-Plus généralement, nous observons que chaque paire possible de modifications du type Séquence, \ie $\langle \trm{ins},\trm{ins} \rangle$, $\langle \trm{ins},\trm{del} \rangle$ et $\langle \trm{del},\trm{del} \rangle$, n'est pas commutative.
+Plus généralement, nous observons que chaque paire possible de modifications du type Séquence, \ie $\langle \trm{ins},\trm{ins} \rangle$, $\langle \trm{ins},\trm{del} \rangle$ et $\langle \trm{del},\trm{del} \rangle$, ne commute pas.
 
 La non-commutativité des modifications du type Séquence fut l'objet de nombreux travaux de recherche dans le domaine de l'édition collaborative.
 Pour résoudre ce problème, l'approche \ac{OT} \cite{1989-grove-ellis-gibbs, 1998-ot-issues-algorithms-achievements-sun} fut initialement proposée.
@@ -244,9 +244,9 @@ La livraison causale implique un surcoût computationnel, en métadonnées et en
 Ainsi, dans le cadre de nos travaux sur la conception de systèmes collaboratifs \ac{P2P} à large échelle, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
 
 C'est dans une optique similaire que fut proposé WOOT \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
-Depuis, plusieurs \acp{CRDT} pour Séquence furent définies \cite{ROH2011354, 2009-treedoc-preguica, 2009-logoot-weiss}.
+Depuis, plusieurs \acp{CRDT} pour le type Séquence furent définies \cite{ROH2011354, 2009-treedoc-preguica, 2009-logoot-weiss}.
 Ces \acp{CRDT} peuvent être répartis en deux approches : l'approche à pierres tombales \cite{2006-woot-oster,ROH2011354} et l'approche à identifiants densément ordonnés \cite{2009-treedoc-preguica,2009-logoot-weiss}.
 L'état d'une séquence pouvant croître de manière infinie, ces \acp{CRDT} sont synchronisés par opérations pour limiter la taille des messages diffusés.
-À notre connaissance, seul \cite{2021-these-vic} propose un \ac{CRDT} pour Séquence synchronisé par différence d'états.
+À notre connaissance, seul \cite{2021-these-vic} propose un \ac{CRDT} pour le type Séquence synchronisé par différence d'états.
 
-Dans la suite de cette section, nous présentons les différents \acp{CRDT} pour Séquence de la littérature.
+Dans la suite de cette section, nous présentons les différents \acp{CRDT} pour le type Séquence de la littérature.

@@ -1,8 +1,8 @@
-\acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} pour Séquence appartenant à l'approche à pierres tombales.
+\acf{RGA} \cite{ROH2011354} est le second \ac{CRDT} pour le type Séquence appartenant à l'approche à pierres tombales.
 Il a été spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de \acp{RADT}.
 
-Dans cet article, les auteurs définissent et se basent sur 2 principes pour concevoir RADTs.
-Le premier d'entre eux est l'\ac{OC}.
+Dans cet article, les auteurs définissent et se basent sur 2 principes pour concevoir des \acp{RADT}.
+Le premier d'entre eux est la \ac{OC}.
 \begin{definition}[\acl{OC}]
   La \acf{OC} définit que toute paire possible d'opérations concurrentes du \ac{RADT} doit être commutative.
 \end{definition}
@@ -10,18 +10,19 @@ Ce principe permet de garantir que l'intégration par différents noeuds d'une m
 
 Le second principe sur lequel reposent les RADTs est la \ac{PT}.
 \begin{definition}[\acl{PT}]
-  La \acf{PT} se base sur une relation de précédence, notée $\dashrightarrow$.
-  \begin{subdefinition}[Relation de précédence]
-    La relation de précédence définit qu'étant donné deux opérations, $o_1$ et $o_2$, l'intention de $o_2$ doit être préservée par rapport à celle de $o_1$, noté $o_1 \dashrightarrow o_2$, si et seulement si :
+  La \acf{PT} définit qu'étant donné une relation de précédence, $\dashrightarrow$, et trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors nous avons $o_1 \dashrightarrow o_3$.
+\end{definition}
+
+avec la relation de précédence $\dashrightarrow$ définie de la manière suivante :
+\begin{definition}[Relation de précédence]
+    La relation de précédence, notée $\dashrightarrow$, définit qu'étant donné deux opérations, $o_1$ et $o_2$, l'intention de $o_2$ doit être préservée par rapport à celle de $o_1$, noté $o_1 \dashrightarrow o_2$, si et seulement si :
     \begin{enumerate}
       \item $o_1 \rightarrow o_2$ ou
-      \item $o_1 \parallel o_2$ et $o_2$ a une priorité supérieure à $o_1$.
+      \item $o_1 \parallel o_2$ et $o_2$ prend la précédence sur $o_1$.
     \end{enumerate}
-  \end{subdefinition}
-  \ac{PT} définit qu'étant donné trois opérations, $o_1$, $o_2$ et $o_3$, si $o_1 \dashrightarrow o_2$ et $o_2 \dashrightarrow o_3$, alors nous avons $o_1 \dashrightarrow o_3$.
 \end{definition}
 Ce second principe offre une méthode pour concevoir un ensemble d'opérations commutatives.
-Il permet aussi d'exprimer la priorité des opérations par rapport aux opérations dont elles dépendent causalement.
+Il permet aussi d'exprimer la précédence des opérations par rapport aux opérations dont elles dépendent causalement.
 
 À partir de ces principes, les auteurs proposent plusieurs \acp{RADT} : Replicated Fixed-Size Array (RFA), Replicated Hash Table (RFT) et \acf{RGA}, qui nous intéresse ici.
 
@@ -32,8 +33,8 @@ De fait, tout comme WOOT, \ac{RGA} repose sur un système d'identifiants qu'il a
 Les auteurs proposent le modèle de données suivant comme identifiants :
 
 \noindent\withmathbreak{
-  \begin{definition}[Identifiants S4Vector]
-    Les identifiants S4Vector sont de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
+  \begin{definition}[Identifiant S4Vector]
+    Un identifiant S4Vector est de la forme $\langle \trm{ssid},\trm{sum},\trm{ssn},\trm{seq} \rangle$ avec :
     \begin{enumerate}
       \item $\trm{ssid}$, l'identifiant de la session de collaboration.
       \item $\trm{sum}$, la somme du vecteur d'horloges courant du noeud auteur de l'élément.
@@ -48,8 +49,8 @@ Nous procédons donc ici à la même simplification, et abstrayons la structure 
 
 À l'aide des identifiants, \ac{RGA} redéfinit les modifications de la séquence de la manière suivante :
 \begin{enumerate}
-  \item $\trm{ins}$ devient $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$.
-  \item $\trm{rmv}$ devient $\trm{rmv}(\trm{id})$.
+  \item $\trm{ins}$ devient $\trm{ins}(\trm{predId} \prec \langle t,\trm{elt} \rangle)$.
+  \item $\trm{rmv}$ devient $\trm{rmv}(t)$.
 \end{enumerate}
 
 Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
@@ -198,7 +199,7 @@ Ce point est néanmoins laissé comme piste de recherche future.
 À notre connaissance, cette dernière n'a pas été explorée dans la littérature.
 Néanmoins \textcite{2021-these-vic} indique que \ac{RGA} pourrait adopter un modèle de livraison similaire à celui de WOOT.
 Ce modèle consisterait :
-\begin{definition}[Modèle livraison \ac{RGA}]
+\begin{definition}[Modèle de livraison \ac{RGA}]
   Le modèle de livraison \ac{RGA} définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
@@ -210,20 +211,19 @@ Nous secondons cette observation.
 
 Un des avantages de \ac{RGA} est son efficacité.
 En effet, son algorithme d'intégration des insertions offre une meilleure complexité en temps que celui de WOOT : \bigO{H}, avec $H$ le nombre de modifications ayant été effectuées sur le document \cite{2011-evaluation-crdts-ahmed-nacer}.
-De plus, \cite{2016-specification-complexity-collaborative-text-editing-attiya,2021-specification-complexity-collaborative-text-editing-attiya} montrent que le modèle de données de \ac{RGA} est optimal d'un point de vue complexité en espace comme \ac{CRDT} pour Séquence par élément sans mécanisme de \ac{GC}.
-\ac{RGA} est ainsi utilisé dans plusieurs implémentations \cite{automerge}.
+De plus, \cite{2016-specification-complexity-collaborative-text-editing-attiya,2021-specification-complexity-collaborative-text-editing-attiya} montrent que le modèle de données de \ac{RGA} est optimal d'un point de vue complexité en espace comme \ac{CRDT} pour le type Séquence par élément sans mécanisme de \ac{GC}.
 
 Plusieurs extensions de \ac{RGA} ont par la suite été proposées.
-\textcite{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour Séquence constituent une de leurs limites.
-Il s'agit en effet des performances impactant le plus l'expérience utilisateur, celleux-ci s'attendant à un retour immédiat de la part de l'application.
+\textcite{briot:hal-01343941} indiquent que les pauvres performances des modifications locales\footnote{Relativement par rapport aux algorithmes de l'approche \ac{OT}.} des \acp{CRDT} pour le type Séquence constituent une de leurs limites.
+Il s'agit en effet des performances impactant le plus l'expérience utilisateur, les utilisateur-rices s'attendant à un retour immédiat de la part de l'application.
 Les auteurs souhaitent donc réduire la complexité en temps des modifications locales à une complexité logarithmique.
 
-Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour Séquence.
+Pour cela, ils proposent l'\emph{identifier structure}, une structure de données auxiliaire utilisable par les \acp{CRDT} pour le type Séquence.
 Cette structure permet de retrouver plus efficacement l'identifiant d'un élément à partir de son index, au pris d'un surcoût en métadonnées.
 Les auteurs combinent cette structure de données à un mécanisme d'aggrégation des élements en blocs\footnote{Nous détaillerons ce mécanisme par la suite.} tels que proposés par \cite{2012-string-wise,2013-logootsplit}, qui permet de réduire la quantité de métadonnées stockées par la séquence répliquée.
-Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
+Cette combinaison aboutit à la définition d'un nouveau \ac{CRDT} pour le type Séquence, \emph{RGATreeSplit}, qui offre une meilleure complexité en temps et en espace.
 
-Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, les auteurs mettent en lumière un problème récurrent des \acp{CRDT} pour Séquence : lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
+Dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}, les auteurs mettent en lumière un problème récurrent des \acp{CRDT} pour le type Séquence : lorsque des séquences de modifications sont effectuées en concurrence par des noeuds, les \acp{CRDT} assurent la convergence des répliques mais pas la correction du résultat.
 Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés.
 La \autoref{fig:rga-interleaving} présente un tel cas de figure :
 

@@ -1,7 +1,7 @@
 \label{sec:seq-crdts-synth}
 
 Depuis l'introduction des \acp{CRDT}, deux approches différentes pour la résolution de conflits ont été proposées pour le type Séquence : l'\emph{approche basée sur des pierres tombales} et l'\emph{approche basée à identifiants densément ordonnés}.
-Chacune de ces approches visent à permettre l'édition concurrente tout en minimisant le surcoût du type répliqué, que ce soit d'un point de vue métadonnées, calculs et bande-passante.
+Chacune de ces approches visent à permettre l'édition concurrente tout en minimisant le surcoût du type de données répliquées, que ce soit d'un point de vue métadonnées, calculs et bande-passante.
 Au fil des années, chacune de ces approches a été raffinée avec de nouveaux \acp{CRDT} de plus en plus en efficaces.
 
 Cependant, une faiblesse de la littérature est à notre sens le couplage entre mécanismes de résolution de conflits et choix d'implémentations : plusieurs travaux \cite{2009-treedoc-preguica, 2009-logoot-weiss, 2013-logootsplit,briot:hal-01343941} ne séparent pas l'approche proposée pour rendre les modifications concurrentes commutatives des structures de données et algorithmes choisis pour représenter et manipuler la séquence et les identifiants, \eg tableau dynamique, liste chaînée, liste chaînée + table de hachage + arbre binaire de recherche...
@@ -9,7 +9,7 @@ Cependant, une faiblesse de la littérature est à notre sens le couplage entre 
 Il en découle que les évaluations proposées par la communautée comparent au final des efforts d'implémentations plutôt que les approches elles-mêmes.
 En conséquence, la littérature ne permet pas d'établir la supériorité d'une approche sur l'autre.
 
-Nous conjecturons que le surcoût des pierres tombales et le surcoût des identifiants densément ordonnés ne sont que les facettes d'une même pièce, \ie le surcoût inhérent à un mécanisme de résolution de conflits pour séquence répliquée.
+Nous conjecturons que le surcoût des pierres tombales et le surcoût des identifiants densément ordonnés ne sont que les facettes d'une même pièce, \ie le surcoût inhérent à un mécanisme de résolution de conflits pour le type Séquence répliquée.
 Ce surcoût s'exprime sous la forme de compromis différents selon l'approche choisie.
 Nous proposons donc une comparaison de ces approches se focalisant sur leurs différences pour indiquer plus clairement le compromis que chacune d'entre elle propose.
 
@@ -89,10 +89,11 @@ La présence de pierres tombales dans la séquence impacte aussi plusieurs aspec
 
 Pour compléter notre étude de ces approches, intéressons nous au modèle de livraison requis par ces dernières.
 Contrairement à ce qui peut être conjecturé après une lecture de la littérature, nous notons qu'aucune de ces approches ne requiert de manière intrinsèque une livraison causale de ses opérations.
-Ces deux approches sont donc adaptées aux systèmes distribués \ac{P2P}.
+Ces deux approches peuvent donc utiliser des modèles de livraison plus faible que la livraison causale et ne nécessitant pas de vecteurs de version pour chaque message.
+Elles sont donc adaptées aux systèmes collaboratifs \ac{P2P} à large échelle.
 
-Finalement, nous notons que l'ensemble des \acp{CRDT} pour Séquence proposés souffrent du problème de l'entrelacement présenté dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
-Nous conjecturons cependant que les \acp{CRDT} pour Séquence à pierres tombales sont moins sujets à ce problème.
+Finalement, nous notons que l'ensemble des \acp{CRDT} pour le type Séquence proposés souffrent du problème de l'entrelacement présenté dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann}.
+Nous conjecturons cependant que les \acp{CRDT} pour le type Séquence à pierres tombales sont moins sujets à ce problème.
 En effet, dans cette approche, l'algorithme d'intégration des nouveaux éléments repose généralement sur l'élément précédent.
 Ainsi, une séquence d'insertions séquentielles produit une sous-chaîne d'éléments.
 L'algorithme d'intégration permet ensuite d'intégrer sans entrelacement de telles sous-chaînes générées en concurrence, \eg dans le cadre de sessions de travail asynchrones.
@@ -103,7 +104,7 @@ Nous récapitulons cette discussion dans le \autoref{tab:sequence-crdts}.
 
 \begin{table}[!ht]
   \centering
-  \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour Séquence}
+  \caption{Récapitulatif comparatif des différents approches pour \acp{CRDT} pour le type Séquence}
   \label{tab:sequence-crdts}
   \resizebox{\columnwidth}{!}{
     \begin{tabular}{lcc}

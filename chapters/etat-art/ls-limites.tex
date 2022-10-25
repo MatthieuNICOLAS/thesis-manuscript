@@ -164,7 +164,7 @@ Sur cette figure, nous représentons l'évolution au fur et à mesure que des mo
 Nous constatons que le contenu représente à terme moins de 1\% de taille de la structure de données.
 Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée, \ie la taille des identifiants, les blocs composant la séquence LogootSplit, mais aussi la structure de données utilisée en interne pour représenter la séquence de manière efficace.
 
-Nous jugeons donc nécessaire de proposer des mécanismes et techniques afin de mitiger le surcoût des \acp{CRDT} pour Séquence et sa croissance.
+Nous jugeons donc nécessaire de proposer des mécanismes et techniques afin de mitiger le surcoût des \acp{CRDT} pour le type Séquence et sa croissance.
 
 \mnnote{
   TODO: Serait plus intéressant de proposer des stats sur la taille des ids, le nombre de blocs composant la séquence, le nombre d'éléments par blocs et la proportion de la taille du contenu sur la taille de la structure de données en fonction du nombre d'opérations jouées.

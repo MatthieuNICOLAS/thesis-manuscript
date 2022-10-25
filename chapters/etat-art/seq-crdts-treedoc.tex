@@ -1,5 +1,5 @@
-\cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour CRDTs pour Séquence.
-La particuliarité de cette approche est de se baser sur des identifiants de position, respectant un ensemble de propriétés :
+\cite{2007-crdt-shapiro, 2009-treedoc-preguica} proposent une nouvelle approche pour \acp{CRDT} pour le type Séquence.
+La particularité de cette approche est de se baser sur des identifiants de position, respectant un ensemble de propriétés :
 \begin{definition}[Propriétés des identifiants de position]
   \label{def:dense-ids}
   Les propriétés que les identifiants de position doivent respecter sont les suivantes :
@@ -27,9 +27,9 @@ L'utilisation d'identifiants de position permet de redéfinir les modifications 
   \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
   \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
 \end{enumerate}
-Ces redéfinitions permettent de proposer une spécification de la séquence avec des modifications commutatives.
+Ces redéfinitions permettent de proposer une spécification de la séquence avec des modifications concurrentes qui commutent.
 
-À partir de cette spécification, \citeauthor{2009-treedoc-preguica} propose un CRDT pour Séquence : \emph{Treedoc}
+À partir de cette spécification, \citeauthor{2009-treedoc-preguica} propose un CRDT pour le type Séquence : \emph{Treedoc}
 Ce dernier tire son nom de l'approche utilisée pour émuler un ensemble dense pour générer les identifiants de position : Treedoc utilise pour cela les chemins d'un arbre binaire.
 
 La \autoref{fig:treedoc-ids} illustre le fonctionnement de cette approche.
@@ -57,7 +57,7 @@ La \autoref{fig:treedoc-ids} illustre le fonctionnement de cette approche.
             };
     \end{tikzpicture}
   }
-  \caption{Identifiants de positions}
+  \caption{Arbre pour générer des identifiants de positions}
   \label{fig:treedoc-ids}
 \end{figure}
 La racine de l'arbre binaire, notée $\epsilon$, correspond à l'identifiant de position du premier élément inséré dans la séquence répliquée.
@@ -65,14 +65,14 @@ Pour générer les identifiants des éléments suivants, Treedoc utilise l'ident
 Par exemple, pour insérer un nouvel élément à la fin de la séquence dont les identifiants de position sont représentés par la \autoref{fig:treedoc-ids}, Treedoc lui associerait l'identifiant $\trm{id} = \epsilon \oplus 1 \oplus 1 \oplus 1$.
 Ainsi, Treedoc suit l'ordre du parcours infixe de l'arbre binaire pour ordonner les identifiants de position.
 
-Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du système peuvent associer un même identifiant à des éléments insérés en concurrence, contravenant alors à la propriété \ref{item:uniqueness}.
-Pour corriger cela, Treedoc ajoute à chaque noeud de l'arbre un désambiguateur par élément : un \emph{Dot} (cf. \autoref{def:dot}).
+Ce mécanisme souffre néanmoins d'un écueil : en l'état, plusieurs noeuds du système peuvent associer un même identifiant à des éléments insérés en concurrence, contrevenant alors à la propriété \ref{item:uniqueness}.
+Pour corriger cela, Treedoc ajoute à chaque noeud de l'arbre un désambiguateur par élément : une paire $\langle \trm{nodeId},\trm{nodeSeq} \rangle$.
 Nous représentons ces derniers avec la notation $d_i$.
 
 Ainsi, un noeud de l'arbre des identifiants peut correspondre à plusieurs éléments, ayant tous le même identifiant à l'exception de leur désambiguateur.
 Ces éléments sont alors ordonnés les uns par rapport aux autres en respectant l'ordre défini sur leur désambiguateur.
 
-Afin de réduire le surcoût des désambiguateurs, ces derniers ne sont ajoutés au chemin formant un identifiant qu'uniquement lorsqu'ils sont nécessaires, \ie :
+Afin de réduire le surcoût en métadonnée des désambiguateurs, ces derniers ne sont ajoutés au chemin formant un identifiant qu'uniquement lorsqu'ils sont nécessaires, \ie :
 \begin{enumerate}
   \item Le noeud courant est le noeud final de l'identifiant.
   \item Le noeud courant nécessite désambiguation, \ie plusieurs éléments utilisent l'identifiant correspondant à ce noeud.
@@ -335,7 +335,7 @@ Ainsi, les noeuds A et B convergent à l'état "HELLO".
 Intéressons-nous dorénavant au modèle de livraison requis par Treedoc.
 Dans \cite{2009-treedoc-preguica}, les auteurs indiquent reposer sur le modèle de livraison causal.
 En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expliqué dans \cite{2021-these-vic} :
-\begin{definition}[Modèle livraison Treedoc]
+\begin{definition}[Modèle de livraison Treedoc]
   Le modèle de livraison Treedoc définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
@@ -349,7 +349,7 @@ Tout d'abord, le mécanisme d'identifiants de positions proposé est couplé à 
 Cependant, les utilisateur-rices ont tendance à écrire de manière séquentielle, \ie dans le sens d'écriture de la langue utilisée.
 Les nouveaux identifiants forment donc généralement une liste chaînée, qui déséquilibre l'arbre.
 
-Ensuite, comme illustré dans la \autoref{fig:treedoc}, Treedoc doit conserver un noeud de l'arbre des identifiants malgré sa suppression lorsque ce dernier possède des enfants.
+Ensuite, comme illustré dans la \autoref{fig:treedoc}, Treedoc ne peut supprimer un noeud de l'arbre des identifiants lorsque ce dernier a des enfants.
 Ce noeud de l'arbre devient alors une pierre tombale.
 Comparé à l'approche à pierres tombales, Treedoc a pour avantage que son mécanisme de \ac{GC} ne repose pas sur la stabilité causale d'opérations.
 En effet, Treedoc peut supprimer définitivement un noeud de l'arbre binaire des identifiants dès lors que celui-ci est une pierre tombale et une feuille de l'arbre.

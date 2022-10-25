@@ -1,12 +1,8 @@
-WOOT \cite{2006-woot-oster} fait suite aux travaux présentés dans \cite{2006-tombstone-transformation-functions-oster}.
-Il est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour Séquence\footnote{\cite{2007-crdt-shapiro} n'ayant formalisé les \acp{CRDT} qu'en 2007.}.
+WOOT \cite{2006-woot-oster} est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour le type Séquence\footnote{\cite{2007-crdt-shapiro} n'ayant formalisé les \acp{CRDT} qu'en 2007.}.
 Conçu pour l'édition collaborative \ac{P2P}, son but est de surpasser les limites de l'approche \ac{OT} évoquées précédemment, \ie le coût du mécanisme de livraison causale.
 
 L'intuition de WOOT est la suivante : WOOT modifie la sémantique de la modification $\trm{ins}$ pour qu'elle corresponde à l'insertion d'un nouvel élément entre deux autres, et non plus à l'insertion d'un nouvel élément à une position donnée.
-Par exemple, l'insertion de l'élément "B" dans la séquence "AC" pour obtenir l'état "ABC", \ie $\trm{ins}(1, B)$, devient $\trm{ins}(A \prec B \prec C)$.
-
-Ce changement, qui est compatible avec l'intention des utilisateur-rices, n'est cependant pas anodin.
-En effet, il permet à WOOT de rendre $\trm{ins}$ commutative avec les modifications concurrentes, en exprimant la position du nouvel élément de manière relative à d'autres éléments et non plus via un index qui est spécifique à un état donné.
+Par exemple, l'insertion de l'élément "M" dans la séquence "MR" pour obtenir l'état "MER", \ie $\trm{ins}(1, E)$, devient $\trm{ins}(M \prec E \prec R)$, où $\prec$ représente l'ordre créé entre ces éléments.
 
 Afin de préciser quels éléments correspondent aux prédécesseur et successeur de l'élément inséré, WOOT repose sur un système d'identifiants.
 WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
@@ -15,30 +11,25 @@ WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
   Un identifiant WOOT est un couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ avec
   \begin{enumerate}
     \item $\trm{nodeId}$, l'identifiant du noeud qui génère cet identifiant WOOT.
-      Est supposé unique.
+      Il est supposé unique.
     \item $\trm{nodeSeq}$, un entier propre au noeud, servant d'horloge logique.
-      Est incrémenté à chaque génération d'identifiant WOOT.
+      Il est incrémenté à chaque génération d'identifiant WOOT.
   \end{enumerate}
 \end{definition}
-Dans le cadre de ce manuscrit, nous utiliserons pour former les identifiants WOOT le nom de du noeud (\eg $A$) comme $\trm{nodeId}$ et un entier naturel, en démarrant à 1, comme $\trm{nodeSeq}$.
-Nous les représenterons de la manière suivante $\trm{nodeId}~\trm{nodeSeq}$, \eg $A1$.
+Dans le cadre de ce manuscrit, nous utiliserons pour former les identifiants WOOT le nom du noeud (\eg $A$) comme $\trm{nodeId}$ et un entier naturel, en démarrant à 1, comme $\trm{nodeSeq}$.
+Nous les représenterons de la manière suivante $\trm{nodeId}~\trm{nodeSeq}$, \eg $A1$\footnote{Notons qu'un identifiant WOOT est bel et bien unique, deux noeuds ne pouvant utiliser le même $\trm{nodeId}$ et un noeud n'utilisant jamais deux fois le même $\trm{nodeSeq}$.}.
 
-Avant de continuer, notons qu'un identifiant WOOT est bel et bien unique, deux noeuds ne pouvant utiliser le même $\trm{nodeId}$ et un noeud n'utilisant jamais deux fois le même $\trm{nodeSeq}$.
-Finalement, précisons que cette structure d'identifiant et son usage possible pour le suivi de la causalité furent ensuite mis en évidence par \cite{2014-scalable-accurate-causality-tracking} sous le nom de \emph{Dot}.
+Les modifications $\trm{ins}$ et $\trm{rmv}$ génèrent dès lors des opérations tirant profit des identifiants.
+Par exemple, considérons une séquence WOOT représentant "MR" et qui associe respectivement les identifiants $A1$ et $A2$ aux éléments "M" et "R".
+L'insertion de l'élement de l'élement "E" dans cette séquence pour obtenir l'état "MER", \ie $\trm{ins}(A \prec B \prec C)$, produit par exemple l'opération $\trm{ins}(A1 \prec \langle B1,E \rangle \prec A2)$.
+De manière similaire, la suppression de l'élément "E" dans cette séquence pour obtenir l'état "MR", \ie $\trm{rmv}(1)$, produit $\trm{rmv}(B1)$.
 
-Les modifications $\trm{ins}$ et $\trm{rmv}$ sont dès lors redéfinies pour devenir des opérations en tirant profit des identifiants.
-Par exemple, considérons une séquence WOOT représentant "AC" et qui associe respectivement les identifiants $A1$ et $A2$ aux éléments "A" et "C".
-L'insertion de l'élement de l'élement "B" dans cette séquence pour obtenir l'état "ABC", \ie $\trm{ins}(A \prec B \prec C)$, devient par exemple $\trm{ins}(A1 \prec \langle B1,B \rangle \prec A2)$.
-De manière similaire, la suppression de l'élément "B" dans cette séquence pour obtenir l'état "AC", \ie $\trm{rmv}(1)$, devient $\trm{rmv}(B1)$.
-
-WOOT utilise des pierres tombales pour rendre commutative $\trm{ins}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, avec $\trm{rmv}$.
+WOOT utilise des pierres tombales pour que les opérations $\trm{ins}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, et $\trm{rmv}$ commutent.
 Ainsi, lorsqu'un élément est retiré, une pierre tombale est conservée dans la séquence pour indiquer sa présence passée.
 Les données de l'élément sont elles supprimées.
-Dans le cadre d'une Séquence WOOT, $\trm{rmv}$ a donc pour effet de masquer l'élément.
 
 Finalement, WOOT définit $\lid$, un ordre strict total sur les identifiants associés aux éléments.
-En effet, la relation $\prec$ n'est pas suffisante pour rendre les opérations $\trm{ins}$ commutatives, puisqu'elle ne spécifie qu'un ordre partiel entre les éléments.
-Plus précisément, $\prec$ ne permet pas d'ordonner les éléments insérés en concurrence et possédant les mêmes prédecesseur et successeur, \eg $\trm{ins}(a \prec 1 \prec b)$ et $\trm{ins}(a \prec 2 \prec b)$.
+En effet, la relation $\prec$ n'est pas définie pour deux éléments insérés en concurrence et qui possèdent les mêmes prédecesseur et successeur, \eg $\trm{ins}(M \prec E \prec R)$ et $\trm{ins}(M \prec U \prec R)$.
 Pour que tous les noeuds convergent, ils doivent choisir comment ordonner ces éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
 Ils utilisent pour cela $\lid$.
 \begin{definition}[Relation $\lid$]
@@ -52,7 +43,7 @@ Ils utilisent pour cela $\lid$.
 \end{definition}
 Notons que l'ordre définit par $\lid$ correspond à l'ordre lexicographique sur les composants des identifiants.
 
-De cette manière, WOOT offre une spécification de la Séquence dont les opérations sont commutatives, \ie ne génèrent pas de conflits.
+De cette manière, WOOT offre une spécification de la Séquence dont les opérations commutent.
 Nous récapitulons son fonctionnement à l'aide de la \autoref{fig:woot}.
 
 \begin{figure}[!ht]
@@ -181,10 +172,10 @@ WOOT souffre néanmoins de plusieurs limites.
 La première d'entre elles correspond à l'utilisation de pierres tombales dans la séquence répliquée.
 En effet, comme indiqué précédemment, la modification $\trm{rmv}$ ne supprime que les données de l'élément concerné.
 L'identifiant qui lui a été associé reste lui présent dans la séquence à son emplacement.
-Une séquence WOOT ne peut donc que croître, ce qui impacte négativement sa complexité en espace ainsi que ses complexités en temps.
+Une séquence WOOT ne peut donc que croître, ce qui impacte négativement sa complexité en espace ainsi qu'en temps.
 
 \textcite{2006-woot-oster} font cependant le choix de ne pas proposer de mécanisme pour purger les pierres tombales.
-En effet, leur motivation est d'utiliser ces pierres tombales pour proposer un mécanisme d'\emph{undo}, une fonctionnalité importante dans le domaine de l'édition collaborative.
+En effet, leur motivation est d'utiliser ces pierres tombales pour proposer un mécanisme d'annulation, une fonctionnalité importante dans le domaine de l'édition collaborative.
 \mnnote{TODO: Ajouter refs, celles utilisées dans \cite{2006-woot-oster}.}
 Cette piste de recherche est développée dans \cite{2009-undo-p2p-semantic-wikis-rahhal}.
 

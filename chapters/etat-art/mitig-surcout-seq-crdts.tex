@@ -1,4 +1,4 @@
-L'augmentation du surcoût des \acp{CRDT} pour Séquence, qu'il soit dû à des pierres tombales ou à des identifiants de taille non-bornée, est un problème bien identifié dans la littérature \cite{ROH2011354,2009-treedoc-preguica,letia:hal-01248270,zawirski:hal-01248197,lseq2013,lseq2017}.
+L'augmentation du surcoût des \acp{CRDT} pour le type Séquence, qu'il soit dû à des pierres tombales ou à des identifiants de taille non-bornée, est un problème bien identifié dans la littérature \cite{ROH2011354,2009-treedoc-preguica,letia:hal-01248270,zawirski:hal-01248197,lseq2013,lseq2017}.
 Plusieurs approches ont donc été proposées pour réduire sa croissance.
 
 \subsection{Mécanisme de \acl{GC} des pierres tombales}
@@ -67,19 +67,19 @@ Cette solution ne repose sur aucune coordination synchrone entre les noeuds.
 Sa complexité ne dépend pas non plus du nombre de noeuds du système.
 Elle nous apparaît donc adaptée aux systèmes \ac{P2P} dynamique à large échelle.
 
-Nous conjecturons cependant que cette approche perd ses bienfaits lorsqu'elle est couplée avec un \ac{CRDT} pour Séquence à granularité variable.
+Nous conjecturons cependant que cette approche perd ses bienfaits lorsqu'elle est couplée avec un \ac{CRDT} pour le type Séquence à granularité variable.
 En effet, comme évoqué précédemment, toute insertion au sein d'un bloc provoque une augmentation de la taille de l'identifiant résultant \cf{sec:growth-ids-split}.
 
 \subsection{Synthèse}
 
-Ainsi, plusieurs approches ont été proposées dans la littérature pour réduire le surcoût des \acp{CRDT} pour Séquence.
-Cependant, aucune de ces approches ne nous apparaît adaptée pour les \acp{CRDT} pour Séquence à granularité variable dans le contexte de systèmes \ac{P2P} dynamiques :
+Ainsi, plusieurs approches ont été proposées dans la littérature pour réduire le surcoût des \acp{CRDT} pour le type Séquence.
+Cependant, aucune de ces approches ne nous apparaît adaptée pour les \acp{CRDT} pour le type Séquence à granularité variable dans le contexte de systèmes \ac{P2P} dynamiques :
 
 \begin{enumerate}
     \item Les approches présentées dans \cite{ROH2011354,letia:hal-01248270,zawirski:hal-01248197} reposent chacune sur des contraintes fortes dans les systèmes \ac{P2P} dynamiques, \ie respectivement la stabilité causale des opérations et l'utilisation d'un protocole de consensus.
         Dans un système dans lequel nous n'avons aucun contrôle sur les noeuds et notamment leur disponibilité, ces contraintes nous apparaissent rédhibitoires.
-    \item L'approche présentée dans \cite{lseq2013,lseq2017} est conçue pour les \acp{CRDT} pour Séquence à identifiants densément ordonnés à granularité fixe.
+    \item L'approche présentée dans \cite{lseq2013,lseq2017} est conçue pour les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés à granularité fixe.
         L'introduction de mécanismes d'aggrégation dynamique des éléments en blocs comme ceux présentés dans \cite{2013-logootsplit,briot:hal-01343941}, avec les contraintes qu'ils introduisent, nous semble contrarier les efforts effectués pour réduire la croissance des identifiants de position.
 \end{enumerate}
 
-Nous considérons donc la problématique du surcoût des \acp{CRDT} pour Séquence à granularité variable toujours ouverte.
+Nous considérons donc la problématique du surcoût des \acp{CRDT} pour le type Séquence à granularité variable toujours ouverte.

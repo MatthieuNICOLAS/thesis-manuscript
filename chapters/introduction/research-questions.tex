@@ -9,7 +9,7 @@ Cependant, ces mécanimes induisent un surcoût, aussi bien en termes de métado
 Ces surcoûts sont néanmoins jugés acceptables par la communauté pour une variété de types de données, \eg le Registre ou l'Ensemble.
 Cependant, le surcoût des \acp{CRDT} pour le type Séquence constitue toujours une problématique de recherche.
 
-En effet, la particuliarité des \acp{CRDT} pour le type Séquence est que leur surcoût croît de manière monotone au cours de la durée de vie de la donnée, \ie au fur et à mesure des modifications effectuées.
+En effet, la particularité des \acp{CRDT} pour le type Séquence est que leur surcoût croît de manière monotone au cours de la durée de vie de la donnée, \ie au fur et à mesure des modifications effectuées.
 Le surcoût introduit par les \acp{CRDT} pour ce type de données se révèle donc handicapant dans le contexte de collaborations sur de longues durées ou à large échelle.
 
 De manière plus précise, le surcoût des \acp{CRDT} pour le type Séquence provient de la croissance des métadonnées utilisées par leur mécanisme de résolution de conflits automatique.
@@ -27,7 +27,7 @@ Ainsi, le mécanisme de ré-assignation des identifiants ne peut être déclench
 
 Comme nous l'avons évoqué précédemment, reposer sur un algorithme de consensus qui requiert une coordination synchrone entre une proportion de noeuds du système est une contrainte incompatible avec les systèmes \ac{P2P} à large échelle sujets au churn.\\
 
-Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour Séquence, \ie adapté aux applications \ac{LFS} ?}\\
+Notre problématique de recherche est donc la suivante : \emph{pouvons-nous proposer un mécanisme sans coordination synchrone de réduction du surcoût des \acp{CRDT} pour le type Séquence, \ie adapté aux applications \ac{LFS} ?}\\
 
 Pour répondre à cette problématique, nous proposons dans cette thèse RenamableLogootSplit, un nouveau \ac{CRDT} pour le type Séquence.
 Ce \ac{CRDT} intègre un mécanisme de ré-assignation des identifiants, dit de renommage, directement au sein de sa spécification.

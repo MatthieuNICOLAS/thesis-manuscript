@@ -38,7 +38,7 @@ Notre évaluation nous a aussi permis de valider que le mécanisme de renommage 
 L'évaluation expérimentale nous a aussi permis de prendre conscience d'effets additionnels du mécanisme de renommage que nous n'avions pas anticipé.
 Notamment, elle montre que le surcoût éventuel du mécanisme de renommage, notamment en termes de calculs, est toutefois contrebalancé par l'amélioration précisée précédemment, \ie la réduction de la taille de la séquence.\\
 
-Finalement, notons que le mécanisme que nous proposons est partiellement générique : il peut être adapté à d'autres \acp{CRDT} pour le type Séquence à granularité variable, \eg un \ac{CRDT} le type pour Séquence appartenant à l'approche à pierres tombales.
+Finalement, notons que le mécanisme que nous proposons est partiellement générique : il peut être adapté à d'autres \acp{CRDT} pour le type Séquence à granularité variable, \eg un \ac{CRDT} pour le type Séquence appartenant à l'approche à pierres tombales.
 Dans le cadre d'une telle démarche, nous pourrions réutiliser le système d'époques, la relation \emph{priority} et l'algorithme de contrôle qui identifie les transformations à effectuer.
 Pour compléter une telle adaptation, nous devrions cependant concevoir de nouveaux algorithmes \texttt{renameId} et \texttt{revertRenameId} spécifiques et adaptés au \ac{CRDT} choisi.\\
 

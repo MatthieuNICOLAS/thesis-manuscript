@@ -7,7 +7,7 @@ La proposition de ce modèle est nourrie par les observations suivantes :
   \item Les \acp{CRDT} synchronisés par états pâtissent du surcoût induit par la diffusion de leurs états complets, généralement croissant de manière monotone.
 \end{enumerate}
 
-Pour pallier aux faiblesses de chaque approche et allier le meilleur des deux mondes, les auteurs proposent les \acp{CRDT} synchronisés par différences d'états \cite{almeida2015delta,Almeida_2018, enes2019}.
+Pour pallier les faiblesses de chaque approche et allier le meilleur des deux mondes, les auteurs proposent les \acp{CRDT} synchronisés par différences d'états \cite{almeida2015delta,Almeida_2018, enes2019}.
 Il s'agit en fait d'une sous-famille des \acp{CRDT} synchronisés par états.
 Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} associative, commutative et idempotente qui permet de produire la \ac{LUB} de deux états, \ie l'état correspond à la borne supérieure de ces deux états.
 
