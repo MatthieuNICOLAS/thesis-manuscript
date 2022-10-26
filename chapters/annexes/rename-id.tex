@@ -1,8 +1,24 @@
 \Annex{Algorithmes \textsc{renameId}}
 \label{app:rename-id}
 
-\autoref{alg:appendix-rename-id} illustrates the remaining functions composing \textsc{renameId}.
-\textsc{renIdLessThanFirstId} (resp. \textsc{renIdGreaterThanLastId}) enables to rename identifiers with $\trm{id}$ such as $\trm{id} < \trm{firstId}$ (resp. $\trm{lastId} < \trm{id}$).
+Nous présentons dans cette annexe le reste des fonctions utilisées par la fonction \texttt{renameId} pour renommer un identifiant d'une époque parente à son époque enfant \cf{alg:renameId}.
+
+Pour rappel, \texttt{renameId} prend comme paramètres initiaux :
+\begin{enumerate}
+    \item $\trm{id}$, l'identifiant à renommer.
+    \item $\trm{renamedIds}$, une collection ordonnée des identifiants composant l'\emph{ancien état}, \ie l'état du noeud auteur de l'opération de renommage à sa génération \cf{def:former-state}.
+    \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'opération de renommage.
+    \item $\trm{nodeSeq}$, le numéro de séquence du noeud auteur de l'opération de renommage à sa génération.
+\end{enumerate}
+et repose sur des valeurs particulières :
+\begin{enumerate}
+    \item $\trm{firstId}$, le premier identifiant de $\trm{renamedIds}$.
+    \item $\trm{newFirstId}$, l'identifiant correspondant à $\trm{firstId}$ dans l'époque enfant.
+    \item $\trm{lastId}$, le dernier identifiant de $\trm{renamedIds}$.
+    \item $\trm{newLastId}$, l'identifiant correspondant à $\trm{lastId}$ dans l'époque enfant.
+\end{enumerate}
+
+La fonction \texttt{renIdLessThanFirstId} (resp. \texttt{renIdGreaterThanLastId}) permet de renommer un identifiant $\trm{id}$ tel que $\trm{id} \lid \trm{firstId}$ (resp. $\trm{lastId} \lid \trm{id}$).
 
 \begin{algorithm}[!ht]
   \footnotesize
@@ -14,13 +30,13 @@
       \If{$\text{id} \lid \text{newFirstId}$}
           \State \Return id
       \Else
-          \State \Return $\text{predNewFirstId} \oplus \text{id}$
+          \State \Return $\text{predNewFirstId} \oplus \text{id}$ \label{alg:appendix-rename-id-min}
         \EndIf
       \EndFunction
       \\
       \Function{renIdGreaterThanLastId}{id $\in \mathbb{I}$, newLastId $\in \mathbb{I}$}{: $\mathbb{I}$}
           \If{$\text{id} \lid \text{newLastId}$}
-              \State \Return $\text{newLastId} \oplus \text{id}$
+              \State \Return $\text{newLastId} \oplus \text{id}$ \label{alg:appendix-rename-id-max}
           \Else
               \State \Return id
           \EndIf
@@ -30,6 +46,14 @@
   \label{alg:appendix-rename-id}
 \end{algorithm}
 
-The main insight of these functions is that it is not necessary to modify identifiers out of the range of renamed identifiers and of resulting identifiers ($[\trm{min}(\trm{firstId}, \trm{predNewFirstId}), \trm{max}(\trm{lastId}, \trm{succNewLastId})]$)
-%
-In other cases, like \textsc{renIdFromPredId}, these functions prepend a suitable prefix to the given $\trm{id}$ to preserve the intended order (the predecessor of $\trm{newFirstId}$ for \textsc{renIdLessThanFirstId}, $\trm{newLastId}$ for \textsc{renIdGreaterThanLastId}).
+L'idée principale derrière ces fonctions est la suivante : \emph{il n'est pas nécessaire de modifier les identifiants qui ne sont pas compris dans l'intervalle affecté par le renommage}.
+L'intervalle affecté par le renommage est le suivant :
+\begin{equation*}
+    ]\trm{min}(\trm{firstId},\trm{predNewFirstId}\footnote{La borne inférieure des identifiants générés par \texttt{renameId} (cf. \autoref{alg:appendix-rename-id}, ligne \ref{alg:appendix-rename-id-min}).}),\trm{max}(\trm{lastId},\trm{succNewLastId}\footnote{La borne supérieure des identifiants générés par \texttt{renameId} (cf. \autoref{alg:appendix-rename-id}, ligne \ref{alg:appendix-rename-id-max}).})[
+\end{equation*}
+
+Dans le cas où l'identifiant à renommer appartient à cet intervalle, ces fonctions utilisent le même procédé que \texttt{renIdFromPredId} pour le renommer : elles ajoutent à ce dernier un préfixe adapté pour préserver l'ordre souhaité :
+\begin{enumerate}
+    \item \texttt{renIdLessThanFirstId} utilise $\trm{predNewFirstId}$, le prédecesseur de $\trm{newFirstId}$.
+    \item \texttt{renIdGreaterThanLastId} utilise $\trm{newLastId}$.
+\end{enumerate}
