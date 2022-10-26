@@ -83,8 +83,8 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 
 \begin{algorithm}[!ht]
   \footnotesize
-  \begin{algorithmic}
-      \Function {renameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I}\rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}
+  \begin{algorithmic}[1]
+      \Function {renameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I}\rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$} {: $\mathbb{I}$}
           \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
           % \State \Comment{$id$ is the id to rename}
           % \State \Comment{$renamedIds$ is the list of ids of the \emph{former state}}
@@ -108,7 +108,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
           \EndIf
       \EndFunction
       \\
-      \Function {renIdFromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr} \langle \mathbb{I} \rangle$, pos $\in \mathbb{N}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}
+      \Function {renIdFromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr} \langle \mathbb{I} \rangle$, pos $\in \mathbb{N}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$} {: $\mathbb{I}$}
           \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
           \State Find $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$
           \State $\text{newPredId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$

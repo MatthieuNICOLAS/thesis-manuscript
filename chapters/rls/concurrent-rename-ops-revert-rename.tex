@@ -69,7 +69,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
-      \Function{revertRenameId}{id, renamedIds, nId, nSeq}
+      \Function{revertRenameId}{id, renamedIds, nId, nSeq}{: $\mathbb{I}$}
           % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
           % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
           % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
@@ -97,7 +97,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
           \EndIf
       \EndFunction
       \\
-      \Function{revRenIdfromPredId}{id, renamedIds, index}
+      \Function{revRenIdfromPredId}{id, renamedIds, index}{: $\mathbb{I}$}
           \State predId $\gets$ renamedIds[index]
           \State succId $\gets$ renamedIds[index + 1]
           \State tail $\gets$ getTail(id, 1)

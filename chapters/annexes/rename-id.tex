@@ -7,7 +7,7 @@
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-      \Function{renIdLessThanFirstId}{id $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}
+      \Function{renIdLessThanFirstId}{id $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}{: $\mathbb{I}$}
       \Statex \Comment $\text{newFirstId} = \newFirstId$
       \Statex \Comment $\text{predNewFirstId} = \predNewFirstId$
 
@@ -18,7 +18,7 @@
         \EndIf
       \EndFunction
       \\
-      \Function{renIdGreaterThanLastId}{id $\in \mathbb{I}$, newLastId $\in \mathbb{I}$}
+      \Function{renIdGreaterThanLastId}{id $\in \mathbb{I}$, newLastId $\in \mathbb{I}$}{: $\mathbb{I}$}
           \If{$\text{id} \lid \text{newLastId}$}
               \State \Return $\text{newLastId} \oplus \text{id}$
           \Else

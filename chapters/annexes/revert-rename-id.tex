@@ -7,7 +7,7 @@
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-      \Function{revRenIdLessThanNewFirstId}{id $\in \mathbb{I}$, firstId $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}
+      \Function{revRenIdLessThanNewFirstId}{id $\in \mathbb{I}$, firstId $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}{: $\mathbb{I}$}
         \Statex \Comment $\text{newFirstId} = \newFirstId$
         \Statex \Comment $\text{predNewFirstId} = \predNewFirstId$
 
@@ -26,7 +26,7 @@
           \EndIf
       \EndFunction
       \\
-      \Function{revRenIdGreaterThanNewLastId}{id $\in \mathbb{I}$, lastId $\in \mathbb{I}$}
+      \Function{revRenIdGreaterThanNewLastId}{id $\in \mathbb{I}$, lastId $\in \mathbb{I}$}{: $\mathbb{I}$}
           \If{$\text{id} \lid \text{lastId}$}
               \Statex \Comment id has been inserted causally after the \emph{rename} op
               \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$

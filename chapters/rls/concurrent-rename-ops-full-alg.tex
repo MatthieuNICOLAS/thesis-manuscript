@@ -13,7 +13,7 @@ Dans l'\autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration 
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[5]
-      \Function{insRemote}{seq, epochTree, currentEpoch, insOp}
+      \Function{insRemote}{seq, epochTree, currentEpoch, insOp}{: \emph{void}}
           \If{currentEpoch $=$ opEpoch}
             \State insert(seq, getIdBegin(insertOp), getContent(insertOp)) \label{alg:insertRemote-insert-1}
           \Else
