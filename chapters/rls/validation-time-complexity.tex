@@ -20,7 +20,7 @@ Son intégration consiste toujours à déterminer entre quels identifiants se si
 D'après \textcite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.
 
 La complexité de l'intégration de l'opération \emph{insert} distante, elle, évolue par rapport à celle définie pour LogootSplit.
-Comme indiqué dans la \autoref{sec:integration-process-insert-remove-op}, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
+En effet, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
 
 Tout d'abord, il est nécessaire d'identifier l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante.
 L'algorithme correspondant consiste à déterminer la première intersection entre deux branches de l'\emph{arbre des époques}.
@@ -53,7 +53,7 @@ Ainsi, en reprenant l'ensemble des étapes composant l'intégration de l'opérat
 Le procédé de l'intégration de l'opération \emph{remove} étant similaire à celui de l'opération \emph{insert}, aussi bien en local qu'en distant, nous obtenons les mêmes complexités en temps.
 
 \subsubsection{Complexité en temps de l'opération \emph{rename}}
-
+\label{sec:validation-time-complexity-rename}
 Étudions à présent la complexité en temps de l'opération \emph{rename}.
 
 L'opération \emph{rename} locale se décompose en 2 étapes :
