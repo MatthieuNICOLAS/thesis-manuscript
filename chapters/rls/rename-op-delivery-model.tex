@@ -153,55 +153,112 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
   \centering
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
-        \path
-            node {\textbf{A}}
-            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0A-right) {D}
+      \newcommand\nodew[1]{
+          node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {W}
+      }
+      \newcommand\nodeo[1]{
+          node[letter, label=#1:{$\betterid{l}{C0}{0}$}] {O}
+      }
+      \newcommand\nodel[1]{
+          node[letter, label=#1:{$\betterid{t}{A0}{0}$}] {L}
+      }
+      \newcommand\noded[1]{
+          node[letter, label=#1:{$\betterid{y}{D0}{0}$}] {D}
+      }
+      \newcommand\noder[1]{
+          node[letter, label=#1:{$\betterid{m}{A1}{0}$}] {R}
+      }
+      \newcommand\renworld[1]{
+          node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {WORLD}
+      }
+      \newcommand\renwo[1]{
+          node[block, label=#1:{$\betterid{i}{A1}{0..1}$}] {WO}
+      }
+      \newcommand\renld[1]{
+          node[block, label=#1:{$\betterid{i}{A1}{2..3}$}] {LD}
+      }
 
-            ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            ++(0:\widthletter) node[letter, fill=mydarkorange,
-                    label=below:{\color{mydarkorange}\id{m}{A1}{0}}] {X}
-            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S1A-right) {D}
+      \newcommand\initialstate[3]{
+          \path
+              #1
+              ++#2
+              ++(0:0.5)
+              ++(#3:0.5) node[epoch] {\epoch{0}}
+              ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
+              ++(0:\widthletter) \nodeo{-#3}
+              ++(0:\widthletter) \nodel{-#3}
+              ++(0:\widthletter) \noded{-#3};
+      }
 
-            ++(0:5 * \widthletter) node[epoch] (S2A-left) {\epoch{A2}}
-            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
-                        ] (S2A-right) {ABXCD};
+      \newcommand\insr[3]{
+          \path
+              #1
+              ++#2
+              ++(0:0.5)
+              ++(#3:0.5) node[epoch] {\epoch{0}}
+              ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
+              ++(0:\widthletter) \nodeo{-#3}
+              ++(0:\widthletter) \noder{-#3}
+              ++(0:\widthletter) \nodel{-#3}
+              ++(0:\widthletter) \noded{-#3};
+      }
 
-        \path
-            ++(270:4) node {\textbf{B}}
-            ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-            ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{i}{B0}{0}}] {A}
-            ++(0:\widthletter) node[letter, label=below:{\id{l}{C0}{0}}] {B}
-            ++(0:\widthletter) node[letter, label=below:{\id{t}{A0}{0}}] {C}
-            ++(0:\widthletter) node[letter, label=below:{\id{y}{D0}{0}}] (S0B-right) {D}
+      \newcommand\finalstate[3]{
+          \path
+              #1
+              ++#2
+              ++(0:0.5)
+              ++(#3:0.5) node[epoch] {\epoch{A2}}
+              ++(0:1.3 * \widthepoch) \renworld{-#3};
+      }
 
-            ++(0:21 * \widthletter) node[epoch] (S1B-left) {\epoch{A2}}
-            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..1}} }
-                        ] {AB}
-            ++(0:\widthblock) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{3..4}} }
-                        ] (S1B-right) {CD}
+      \newcommand\renwold[3]{
+          \path
+              #1
+              ++#2
+              ++(0:0.5)
+              ++(#3:0.5) node[epoch] {\epoch{A2}}
+              ++(0:1.3 * \widthepoch) \renwo{-#3}
+              ++(0:\widthblock) \renld{-#3};
+      }
 
-            ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{A2}}
-            ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..4}} }
-                        ] (S2B-right) {ABXCD};
+      \newcommand\offseta{ (90:0.7) }
+      \newcommand\offsetb{ (-90:0.7) }
 
-        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{insert "X"}\\\emph{between}\\\emph{"B" and "C"}} (S1A-left);
-        \draw[->, thick] (S1A-right) -- node[above, align=center]{\emph{rename to \epoch{A2}}} (S2A-left);
-        \draw[dotted] (S0B-right) -- (S1B-left);
-        \draw[dotted] (S1B-right) -- (S2B-left);
-        \draw[dashed, ->, thick, shorten >= 3] (S2A-right.east) -- node[left, near end, align=center]{\emph{rename to \epoch{A2}}} (S1B-left.west);
-        \draw[dashed, ->, thick, shorten >= 3] (S1A-right.east) -- node[above right, near end, align=center]{\emph{insert "X" at} {\color{mydarkorange}\id{m}{A1}{0}}} (S2B-left.west);
+      \path
+          node {\textbf{A}}
+          ++(0:0.5) node (a) {}
+          +(0:32) node (a-end) {}
+          +(0:2) node[point] (a-initial) {}
+          +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{A1}, \betterid{m}{A1}{0})$}}] (a-ins-r) {}
+          +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren(\betterepoch{0}, A,2)}$}}] (a-ren-a2) {}
+          +(0:30) node (a-final) {};
 
+      \initialstate{(a-initial)}{\offseta}{90};
+      \insr{(a-ins-r)}{\offseta}{90};
+      \finalstate{(a-ren-a2)}{\offseta}{90};
+
+      \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+      \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-ren-a2) -- (a-final);
+
+      \path
+          ++(270:3) node {\textbf{B}}
+          ++(0:0.5) node (b) {}
+          +(0:32) node (b-end) {}
+          +(0:2) node[point] (b-initial) {}
+          +(0:22) node[point] (b-recv-ren-a2) {}
+          +(0:28) node[point] (b-recv-ins-r) {}
+          +(0:30) node (b-final) {};
+
+      \initialstate{(b-initial)}{\offsetb}{-90};
+      \renwold{(b-recv-ren-a2)}{\offsetb}{-90};
+      \finalstate{(b-recv-ins-r)}{\offsetb}{-90};
+
+      \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+      \draw[->, thick] (b-initial) -- (b-recv-ren-a2) -- (b-recv-ins-r) -- (b-final);
+
+      \draw[->, dashed, shorten >= 1] (a-ren-a2) -- (b-recv-ren-a2);
+      \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
     \end{tikzpicture}
   }
   \caption{Livraison désordonnée d'une opération \emph{rename} et de l'opération \emph{insert} qui la précède}
