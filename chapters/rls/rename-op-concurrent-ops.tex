@@ -7,37 +7,98 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
   \centering
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
+        \newcommand\nodeh[1]{
+            node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+        }
+        \newcommand\nodee[1]{
+            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+        }
+        \newcommand\nodelo[1]{
+            node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+        }
+        \newcommand\renhelo[1]{
+            node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {HELO}
+        }
+        \newcommand\nodel[1]{
+            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+        }
+        \newcommand\crossl[1]{
+            node[letter, cross, label=#1:{$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+        }
+
+        \newcommand\initialstate[3]{
+            \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \nodeh{-#3}
+                ++(0:\widthletter) \nodee{#3}
+                ++(0:\widthletter) \nodelo{-#3};
+        }
+
+        \newcommand\ren[3]{
+            \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \renhelo{-#3};
+        }
+
+        \newcommand\insl[3]{
+            \path
+            #1
+            ++#2
+            ++(0:0.5)
+            ++(#3:0.5) \nodeh{-#3}
+            ++(0:\widthletter) \nodee{#3}
+            ++(0:\widthletter) \nodel{-#3}
+            ++(0:\widthletter) \nodelo{#3};
+        }
+
+        \newcommand\finalstate[3]{
+            \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \renhelo{-#3}
+                ++(0:1.18 * \widthblock) \crossl{#3};
+        }
+
+        \newcommand\offseta{ (90:0.7) }
+        \newcommand\offsetb{ (-90:0.7) }
+
         \path
             node {\textbf{A}}
-            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0A-right) {LO}
-            ++(0:5 * \widthletter) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                        ] (S1A) {HELO}
-            ++(0:8 * \widthletter) node[block, fill=mydarkblue,
-                    label={below:{\color{mydarkblueid}\id{i}{A1}{0..3}} }
-                        ] (S2A-left) {HELO}
-            ++(0:1.18 * \widthblock) node[letter, fill=mylightorange, cross,
-                    label={above:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}} }
-                        ] {L};
+            ++(0:0.5) node (a) {}
+            +(0:20) node (a-end) {}
+            +(0:2) node[point] (a-initial) {}
+            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+            +(0:14) node[point] (a-recv-ins-l) {}
+            +(0:18) node (a-final) {};
+
+        \initialstate{(a-initial)}{\offseta}{90};
+        \ren{(a-ren-a1)}{\offseta}{90};
+        \finalstate{(a-recv-ins-l)}{\offseta}{90};
+
+        \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+        \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-recv-ins-l) -- (a-final);
 
         \path
-            ++(270:2) node {\textbf{B}}
-            ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (S0B-right) {LO}
-            ++(0:5 * \widthletter) node[letter, label=below:{\id{i}{B0}{0}}] (S1B-left) {H}
-            ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{\,A0}{0}}] {E}
-            ++(0:\widthletter) node[letter, fill=mylightorange, label=below:{\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}] {L}
-            ++(0:\widthletter) node[block, label=above:{\id{i}{B0}{1..2}}] (S1B-right) {LO};
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:20) node (b-end) {}
+            +(0:2) node[point] (b-initial) {}
+            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}(\betterid{i}{B0}{0}\betterid{m}{B1}{0},L)$}}] (b-ins-l) {}
+            +(0:18) node (b-final) {};
 
 
-        \draw[->, thick] (S0A-right) -- node[above, align=center]{\emph{rename}} (S1A);
-        \draw[dotted] (S1A) -- (S2A-left);
-        \draw[->, thick] (S0B-right) -- node[below, align=center]{\emph{insert "L"}\\\emph{between}\\\emph{"E" and "L"}} (S1B-left);
-        \draw[dashed, ->, thick, shorten >= 3] (S1B-right.east) -- node[below right, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{i}{B0}{0}\id{m}{B1}{0}}} (S2A-left.west);
+        \initialstate{(b-initial)}{\offsetb}{-90};
+        \insl{(b-ins-l)}{\offsetb}{-90};
 
+        \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+        \draw[->, thick] (b-initial) --  (b-ins-l) -- (b-final);
+
+        \draw[->, dashed, shorten >= 1] (b-ins-l) -- (a-recv-ins-l);
     \end{tikzpicture}
   }
   \caption{Modifications concurrentes menant à une anomalie}
