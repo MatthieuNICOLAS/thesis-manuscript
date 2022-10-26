@@ -3,7 +3,7 @@ Plusieurs approches ont donc été proposées pour réduire sa croissance.
 
 \subsection{Mécanisme de \acl{GC} des pierres tombales}
 
-Pour réduire l'impact des pierres tombales sur les performances de \ac{RGA}, \textcite{ROH2011354} proposent un mécanisme de \ac{GC} des pierres tombales.
+Pour réduire l'impact des pierres tombales sur les performances de \ac{RGA}, \cite{ROH2011354} propose un mécanisme de \acf{GC} des pierres tombales.
 Pour rappel, ce mécanisme nécessite qu'une pierre tombale ne puisse plus être utilisée comme prédecesseur par une opération $\trm{ins}$ reçue dans le futur pour pouvoir être supprimée définitivement.
 En d'autres termes, ce mécanisme repose sur la stabilité causale de l'opération de suppression pour supprimer la pierre tombale correspondante.
 
@@ -36,7 +36,7 @@ Cette approche nécessite d'empêcher la génération d'opérations $\trm{bal}$ 
 Pour cela, les auteurs proposent de reposer sur un protocole de consensus entre les noeuds pour la génération d'opérations $\trm{bal}$.
 
 De nouveau, l'utilisation d'un protocole de consensus est une contrainte forte, peu adaptée aux systèmes \ac{P2P} dynamique à large échelle.
-Pour pallier à ce point, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
+Pour pallier ce point, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
 
 Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
 Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
@@ -46,11 +46,11 @@ Ainsi, cette solution permet d'adapter l'utilisation d'un protocole de consensus
 Cependant, elle requiert de disposer de noeuds stables et bien connectés dans le système pour former le \emph{core}.
 Cette condition est un obstacle pour le déploiement et la pérennité de cette solution.
 
-\subsection{Réduction de la croissance des identifiants de position}
+\subsection{Ralentissement de la croissance des identifiants de position}
 \label{sec:etat-art-lseq}
 
-L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à réduire la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
-Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
+L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
+Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme coûteux de ré-équilibrage de l'arbre des identifiants de position \cite{zawirski:hal-01248197}, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
 
 Dans ces travaux, les auteurs notent que les stratégies d'allocation des identifiants proposées pour Logoot dans \cite{2009-logoot-weiss} et \cite{2010-logoot-undo-weiss} ne sont adaptées qu'à un seul comportement d'édition : l'édition séquentielle.
 Si les insertions sont effectuées en suivant d'autres comportements, les identifiants générés saturent rapidement l'espace des identifiants pour une taille donnée.

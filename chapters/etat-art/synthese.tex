@@ -2,14 +2,14 @@ Les systèmes distribués adoptent le modèle de la réplication optimiste \cite
 
 Dans ce modèle, chaque noeud du système possède une copie de la donnée et peut la modifier sans coordination avec les autres noeuds.
 Il en résulte des divergences temporaires entre les copies respectives des noeuds.
-Pour résoudre les potentiels conflits provoqués par des modifications concurrentes et assurer la convergence à terme des copies, les systèmes utilisent les \acp{CRDT} \cite{shapiro_2011_crdt} en place et lieu des types de données séquentiels.
+Pour résoudre les potentiels conflits provoqués par des modifications concurrentes et assurer la convergence à terme des copies, les systèmes ont tendance à utiliser les \acp{CRDT} \cite{shapiro_2011_crdt} en place et lieu des types de données séquentiels.
 
 Plusieurs \acp{CRDT} pour le type Séquence ont été proposés, notamment pour permettre la conception d'éditeurs collaboratifs pair-à-pair.
 Ces \acp{CRDT} peuvent être regroupés en deux catégories en fonction de leur mécanisme de résolution de conflits : l'approche à pierres tombales \cite{2006-woot-oster,2007-wooto-weiss,2011-evaluation-crdts-ahmed-nacer,ROH2011354,briot:hal-01343941,2019-interleaving-anomalies-collaborative-editors-kleppmann} et l'approche à identifiants densément ordonnées \cite{2009-treedoc-preguica,2009-logoot-weiss,2010-logoot-undo-weiss,2013-logootsplit,2021-these-vic}.
 
 Chacune de ces approches introduit néanmoins un surcoût croissant, au moins en termes de métadonnées et de calculs, pénalisant leurs performances à terme.
 Pour résoudre ce problème, plusieurs travaux ont été proposés, notamment \cite{letia:hal-01248270, zawirski:hal-01248197}.
-Cette approche présente un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour les \acp{CRDT} pour le type Séquence à sur identifiants densément ordonnés.
+Cette approche présente un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés.
 
 Cette approche requiert cependant un protocole de consensus, des renommages concurrents provoquant un nouveau conflit.
 Cette contrainte empêche son utilisation dans les systèmes \ac{P2P} ne disposant pas de noeuds suffisamment stables et bien connectés pour participer au protocole de consensus.
