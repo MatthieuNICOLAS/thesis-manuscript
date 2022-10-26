@@ -228,9 +228,12 @@
 \newcommand{\topt}{\top_\mathbb{T}}
 \newcommand{\logootuple}[1]{\langle \text{pos}_{#1},\text{nodeId}_{#1},\text{nodeSeq}_{#1} \rangle}
 \newcommand{\logootsplituple}[1]{\langle \text{pos}_{#1},\text{nodeId}_{#1},\text{nodeSeq}_{#1},\text{offset}_{#1} \rangle}
-\newcommand{\newFirstId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},0 \rangle}
 \newcommand{\predNewFirstId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},-1 \rangle}
-
+\newcommand{\newFirstId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},0 \rangle}
+\newcommand{\newLastId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},n-1 \rangle}
+\newcommand{\newlogootsplituple}[1]{\langle \text{pos},\text{nodeId},\text{nodeSeq},{#1} \rangle}
+\newcommand{\commentbott}{with $\bott$ the minimal tuple}
+\newcommand{\commenttopt}{with $\topt$ the maximal tuple}
 
 \newcommand{\bigO}[1]{$\mathcal{O}(#1)$}
 

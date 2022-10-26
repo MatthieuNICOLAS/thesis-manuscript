@@ -99,9 +99,9 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
               \State \Return renIdLessThanFirstId(id, newFirstId)
           \ElsIf{$\text{id} \in \text{renamedIds}$}
               \Statex \Comment $\text{id} = \text{id}_i$
-              \State \Return $\langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$
+              \State \Return $\langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$ \label{alg:rename-id-in-renamedids}
           \ElsIf{$\text{lastId} \lid \text{id}$}
-              \State $\text{newLastId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, n-1 \rangle$
+              \State $\text{newLastId} \gets \newLastId$
               \State \Return renIdGreaterThanLastId(id, newLastId)
           \Else
               \State \Return renIdFromPredId(id, renamedIds, pos, nodeId, nodeSeq)

@@ -68,52 +68,48 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 
 \begin{algorithm}[!ht]
   \footnotesize
-  \begin{algorithmic}
-      \Function{revertRenameId}{id, renamedIds, nId, nSeq}{: $\mathbb{I}$}
-          % \Statex \LeftComment{$id}$ is the identifier to reverse rename}
-          % \Statex \LeftComment{$renamedIds}$ is the former state shared by the \emph{rename} op}
-          % \Statex \LeftComment{$nId}$ is $node~id}$ of the node which issued the \emph{rename} op}
-          % \Statex \LeftComment{$nSeq}$ is $node~seq}$ of the node which issued the \emph{rename} op}
-          % \\
-          \State length $\gets$ renamedIds.length
-          \State firstId $\gets$ renamedIds[0]
-          \State lastId $\gets$ renamedIds[length - 1]
-          \State pos $\gets$ position(firstId)
-          \\
-          \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
-          \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
-          \\
-          \If{id < newFirstId}
-              \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
-          \ElsIf{isRenamedId(id, pos, nId, nSeq, length)}
-              \State index $\gets$ getFirstOffset(id)
-              \State \Return renamedIds[index]
-          \ElsIf{newLastId < id}
-              \State \Return revRenIdGreaterThanNewLastId(id, lastId)
-          \Else
-              % Ajouter commentaire sur cas
-              \State index $\gets$ getFirstOffset(id)
-              \State \Return revRenIdfromPredId(id, renamedIds, index)
-          \EndIf
-      \EndFunction
-      \\
-      \Function{revRenIdfromPredId}{id, renamedIds, index}{: $\mathbb{I}$}
-          \State predId $\gets$ renamedIds[index]
-          \State succId $\gets$ renamedIds[index + 1]
-          \State tail $\gets$ getTail(id, 1)
-          \\
-          \If{tail < predId}
-              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-              \State \Return concat(predId, MIN\_TUPLE, tail)
-          \ElsIf{succId < tail}
-              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-              \State offset $\gets$ getLastOffset(succId) - 1
-              \State predOfSuccId $\gets$ createIdFromBase(succId, offset)
-              \State \Return concat(predOfSuccId, MAX\_TUPLE, tail)
-          \Else
-              \State \Return tail
-          \EndIf
-      \EndFunction
+  \begin{algorithmic}[1]
+    \Function{revertRenameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I} \rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}{: $\mathbb{I}$}
+      \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
+
+        \State $\text{firstId} \gets \text{id}_0$
+        \State $\text{lastId} \gets \text{id}_{n - 1}$
+        \Statex \Comment $\text{firstId} = \langle \text{pos}, \_, \_, \_ \rangle \oplus \text{suffix}$
+        \State $\text{newFirstId} \gets \newFirstId$
+        \State $\text{newLastId} \gets \newLastId$
+
+        \If{$\text{id} \lid \text{newFirstId}$}
+          \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
+        \ElsIf{$\text{id} = \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$}
+            \Statex \Comment id obtained through \autoref{alg:renameId}, ligne \ref{alg:rename-id-in-renamedids}
+            \State \Return $\text{id}_i$
+        \ElsIf{$\text{newLastId} \lid \text{id}$}
+            \State \Return revRenIdGreaterThanNewLastId(id, lastId)
+        \Else
+            \Statex \Comment $\text{id} = \newlogootsplituple{i} \oplus \text{suffix}$
+            \State \Return revRenIdfromPredId(id, renamedIds, $i$)
+        \EndIf
+    \EndFunction
+    \\
+    \Function{revRenIdfromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I} \rangle$, index $\in \mathbb{N}$}{: $\mathbb{I}$}
+        \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
+        \Statex \Comment $\text{id} = \newlogootsplituple{\text{index}} \oplus \text{tail}$
+
+        \State $\text{predId} \gets \text{id}_{\text{index}}$
+        \State $\text{succId} \gets \text{id}_{\text{index}+1}$
+
+        \If{$\text{tail} \lid \text{predId}$}
+            \Statex \Comment id has been inserted causally after the \emph{rename} op
+            \State \Return $\text{predId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott
+        \ElsIf{$\text{succId} \lid \text{tail}$}
+            \Statex \Comment id has been inserted causally after the \emph{rename} op
+            \Statex \Comment $\text{succId} = \text{prefix} \oplus \logootsplituple{j}$
+            \State $\text{predOfSuccId} \gets \text{prefix} \oplus \langle \text{pos}_j,\text{nodeId}_j,\text{nodeSeq}_j,\text{offset}_{j} - 1 \rangle$
+            \State \Return $\text{predOfSuccId} \oplus \topt \oplus \text{tail}$ \Comment \commenttopt
+        \Else
+            \State \Return tail
+        \EndIf
+    \EndFunction
   \end{algorithmic}
   \caption{Fonctions principales pour annuler le renommage appliqué précèdemment à un identifiant}
   \label{alg:revertRenameId}

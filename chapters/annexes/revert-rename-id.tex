@@ -19,7 +19,7 @@
                   \Statex \Comment $\text{firstId} = \text{prefix} \oplus \logootsplituple{n}$
 
                   \State $\text{predFirstId} \gets \text{prefix} \oplus \langle \text{pos}_n,\text{nodeId}_n,\text{nodeSeq}_n,\text{offset}_n - 1 \rangle$
-                  \State \Return $\text{predFirstId} \oplus \topt \oplus tail$
+                  \State \Return $\text{predFirstId} \oplus \topt \oplus tail$ \Comment \commenttopt
               \EndIf
           \Else
               \State \Return id
@@ -29,11 +29,11 @@
       \Function{revRenIdGreaterThanNewLastId}{id $\in \mathbb{I}$, lastId $\in \mathbb{I}$}{: $\mathbb{I}$}
           \If{$\text{id} \lid \text{lastId}$}
               \Statex \Comment id has been inserted causally after the \emph{rename} op
-              \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$
+              \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$ \Comment \commentbott
           \ElsIf{$\text{id} = \text{newLastId} \oplus \text{tail}$}
               \If{$\text{tail} \lid \text{lastId}$}
                   \Statex \Comment id has been inserted causally after the \emph{rename} op
-                  \State \Return $\text{lastId} \oplus \bott \oplus \text{tail}$
+                  \State \Return $\text{lastId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott
               \ElsIf{$\text{tail} \lid \text{newLastId}$}
                   \State \Return tail
               \Else
