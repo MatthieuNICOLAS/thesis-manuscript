@@ -1,31 +1,35 @@
 \Annex{Algorithmes \textsc{renameId}}
-
 \label{app:rename-id}
+
+\autoref{alg:appendix-rename-id} illustrates the remaining functions composing \textsc{renameId}.
+\textsc{renIdLessThanFirstId} (resp. \textsc{renIdGreaterThanLastId}) enables to rename identifiers with $\trm{id}$ such as $\trm{id} < \trm{firstId}$ (resp. $\trm{lastId} < \trm{id}$).
 
 \begin{algorithm}[!ht]
   \footnotesize
-  \begin{algorithmic}
-      \Function{renIdLessThanFirstId}{id, newFirstId}
-      \If{id < newFirstId}
-          \State \Return id
+  \begin{algorithmic}[1]
+      \Function{renIdLessThanFirstId}{id $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}
+      \Statex \Comment $\text{newFirstId} = \newFirstId$
+      \Statex \Comment $\text{predNewFirstId} = \predNewFirstId$
+
+      \If{$\text{id} \lid \text{newFirstId}$}
+          \State \Return $\text{id}$
       \Else
-          \State pos $\gets$ position(newFirstId)
-          \State nId $\gets$ nodeId(newFirstId)
-          \State nSeq $\gets$ nodeSeq(newFirstId)
-          \State predNewFirstId $\gets$ \new~Id(pos, nId, nSeq, -1)
-          \\
-          \State \Return concat(predNewFirstId, id)
-          \EndIf
+          \State \Return $\text{predNewFirstId} \oplus \text{id}$
+        \EndIf
       \EndFunction
       \\
-      \Function{renIdGreaterThanLastId}{id, newLastId}
-          \If{id < newLastId}
-              \State \Return concat(newLastId, id)
+      \Function{renIdGreaterThanLastId}{id $\in \mathbb{I}$, newLastId $\in \mathbb{I}$}
+          \If{$\text{id} \lid \text{newLastId}$}
+              \State \Return $\text{newLastId} \oplus \text{id}$
           \Else
-              \State \Return id
+              \State \Return $\text{id}$
           \EndIf
       \EndFunction
   \end{algorithmic}
   \caption{Remaining functions to rename an identifier}
   \label{alg:appendix-rename-id}
 \end{algorithm}
+
+The main insight of these functions is that it is not necessary to modify identifiers out of the range of renamed identifiers and of resulting identifiers ($[\trm{min}(\trm{firstId}, \trm{predNewFirstId}), \trm{max}(\trm{lastId}, \trm{succNewLastId})]$)
+%
+In other cases, like \textsc{renIdFromPredId}, these functions prepend a suitable prefix to the given $\trm{id}$ to preserve the intended order (the predecessor of $\trm{newFirstId}$ for \textsc{renIdLessThanFirstId}, $\trm{newLastId}$ for \textsc{renIdGreaterThanLastId}).

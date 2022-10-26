@@ -225,6 +225,10 @@
 \newcommand{\botn}{\bot_\mathbb{N}}
 \newcommand{\topn}{\top_\mathbb{N}}
 \newcommand{\logootuple}[1]{\langle \text{pos}_{#1},\text{nodeId}_{#1},\text{nodeSeq}_{#1} \rangle}
+\newcommand{\logootsplituple}[1]{\langle \text{pos}_{#1},\text{nodeId}_{#1},\text{nodeSeq}_{#1},\text{offset}_{#1} \rangle}
+\newcommand{\newFirstId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},0 \rangle}
+\newcommand{\predNewFirstId}{\langle \text{pos},\text{nodeId},\text{nodeSeq},-1 \rangle}
+
 
 \newcommand{\bigO}[1]{$\mathcal{O}(#1)$}
 
@@ -495,7 +499,7 @@ WIP
 \import{chapters/rls/}{rls}
 % \import{chapters/mute/}{mute}
 % \import{chapters/conclusion/}{conclusion}
-% \import{chapters/annexes/}{annexes}
+\import{chapters/annexes/}{annexes}
 
 %
 %%-------------------------------------------------------------------

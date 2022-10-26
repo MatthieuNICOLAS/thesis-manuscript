@@ -55,7 +55,7 @@ Par souci de simplicité, nous présentons dans \autoref{alg:logoot-generateId} 
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-    \Function{generateId}{predId $\in \mathbb{I}$, succId $\in \mathbb{I}$, nodeId $\in \mathbb{N}$, seq $\in \mathbb{N^{*}}$}
+    \Function{generateId}{predId $\in \mathbb{I}$, succId $\in \mathbb{I}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N^{*}}$}
       \Statex \Comment \textbf{precondition:} $\text{predId} \lid \text{succId}$
       \If{$\text{succId} = \text{predId} \oplus \logootuple{j} \oplus \cdots$} \label{alg:logoot-generateId-if-start}
         \Statex \Comment predId is a prefix of succId

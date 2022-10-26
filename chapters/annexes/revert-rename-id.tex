@@ -1,10 +1,12 @@
 \Annex{Algorithmes \textsc{revertRenameId}}
-
 \label{app:revert-rename-id}
+
+\autoref{alg:appendix-revert-rename-id} features the remaining functions composing \textsc{revertRenameId}.
+\textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) enables to revert the effects of a previously applied \emph{rename} operation on identifiers with $\trm{id}$ such as $\trm{id} < \trm{newFirstId}$ (resp. $\trm{newLastId}$ < $\trm{id}$).
 
 \begin{algorithm}[!ht]
   \footnotesize
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
       \Function{revRenIdLessThanNewFirstId}{id, firstId, newFirstId}
           \State predNewFirstId $\gets$ createIdFromBase(newFirstId, -1)
           \If{isPrefix(predNewFirstId, id)}
@@ -45,3 +47,10 @@
   \caption{Remaining functions to revert an identifier renaming}
   \label{alg:appendix-revert-rename-id}
 \end{algorithm}
+
+Like \textsc{renIdLessThanFirstId} and \textsc{renIdGreaterThanFirstId}, these functions do not modify identifiers out of the range of renamed identifiers and of resulting identifiers.
+%
+To process other cases, the functions study the pattern of the given identifier.
+If \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) infers from the value of the identifier that it may come from a concurrent \emph{insert} operation to the \emph{rename} one, \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) simply removes the prefix added by \textsc{renIdLessThanFirstId} (resp. \textsc{renIdGreaterThanLastId}).
+%
+If the value of an identifier instead indicates that it was inserted causally after the \emph{rename} operation, \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) generates a corresponding identifier at the parent epoch preserving the intended order using $\trm{predFirstId}$ and $\trm{MAX\_TUPLE}$ (resp. $\trm{lastId}$ and $\trm{MIN\_TUPLE}$).
