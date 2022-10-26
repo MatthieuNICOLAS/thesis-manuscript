@@ -84,35 +84,35 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}
-      \Function {renameId}{id, renamedIds, nId, nSeq}
+      \Function {renameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I}\rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}
+          \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
           % \State \Comment{$id$ is the id to rename}
           % \State \Comment{$renamedIds$ is the list of ids of the \emph{former state}}
           % \State \Comment{$nId$ is $node~id$ of the node that issued the \emph{rename} op}
           % \State \Comment{$nSeq$ is $node~seq$ of the node that issued the \emph{rename} op}
-          \State length $\gets$ renamedIds.length
-          \State firstId $\gets$ renamedIds[0]
-          \State lastId $\gets$ renamedIds[length - 1]
-          \State pos $\gets$ position(firstId)
+          \State $\text{firstId} \gets \text{id}_0$
+          \State $\text{lastId} \gets \text{id}_{n - 1}$
+          \Statex \Comment $\text{firstId} = \langle \text{pos}, \_, \_, \_ \rangle \oplus \text{suffix}$
           \\
-          \If{id < firstId}
-              \State newFirstId $\gets$ \new~Id(pos, nId, nSeq, 0)
+          \If{$\text{id} \lid \text{firstId}$}
+              \State $\text{newFirstId} \gets \newFirstId$
               \State \Return renIdLessThanFirstId(id, newFirstId)
-          \ElsIf{id $\in$ renameIds}
-              \State index $\gets$ findIndex(id, renamedIds)
-              \State \Return \new~Id(pos, nId, nSeq, index)
-          \ElsIf{lastId < id}
-              \State newLastId $\gets$ \new~Id(pos, nId, nSeq, length - 1)
+          \ElsIf{$\text{id} \in \text{renamedIds}$}
+              \Statex \Comment $\text{id} = \text{id}_i$
+              \State \Return $\langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$
+          \ElsIf{$\text{lastId} \lid \text{id}$}
+              \State $\text{newLastId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, n-1 \rangle$
               \State \Return renIdGreaterThanLastId(id, newLastId)
           \Else
-              \State \Return renIdFromPredId(id, renamedIds, pos, nId, nSeq)
+              \State \Return renIdFromPredId(id, renamedIds, pos, nodeId, nodeSeq)
           \EndIf
       \EndFunction
       \\
-      \Function {renIdFromPredId}{id, renamedIds, pos, nId, nSeq}
-          \State index $\gets$ findIndexOfPred(id, renamedIds)
-          \State newPredId $\gets$ \new~Id(pos, nId, nSeq, index)
-          \\
-          \State \Return concat(newPredId, id)
+      \Function {renIdFromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr} \langle \mathbb{I} \rangle$, pos $\in \mathbb{N}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}
+          \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
+          \State Find $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$
+          \State $\text{newPredId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$
+          \State \Return $\text{newPredId} \oplus \text{id}$
       \EndFunction
   \end{algorithmic}
   \caption{Fonctions principales pour renommer un identifiant}
