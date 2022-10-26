@@ -1,8 +1,25 @@
 \Annex{Algorithmes \textsc{revertRenameId}}
 \label{app:revert-rename-id}
 
-\autoref{alg:appendix-revert-rename-id} features the remaining functions composing \textsc{revertRenameId}.
-\textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) enables to revert the effects of a previously applied \emph{rename} operation on identifiers with $\trm{id}$ such as $\trm{id} < \trm{newFirstId}$ (resp. $\trm{newLastId}$ < $\trm{id}$).
+Nous présentons dans cette annexe le reste des fonctions utilisées par la fonction \texttt{revertRenameId} pour annuler l'effet sur un identifiant d'une opération de renommage appliquée précédemment \cf{alg:revertRenameId}.
+
+Pour rappel, \texttt{revertRenameId} prend comme paramètres initiaux :
+\begin{enumerate}
+    \item $\trm{id}$, l'identifiant à renommer.
+    \item $\trm{renamedIds}$, une collection ordonnée des identifiants composant l'\emph{ancien état}, \ie l'état du noeud auteur de l'opération de renommage à sa génération \cf{def:former-state}.
+    \item $\trm{nodeId}$, l'identifiant du noeud auteur de l'opération de renommage.
+    \item $\trm{nodeSeq}$, le numéro de séquence du noeud auteur de l'opération de renommage à sa génération.
+\end{enumerate}
+et repose sur des valeurs particulières :
+\begin{enumerate}
+    \item $\trm{firstId}$, le premier identifiant de $\trm{renamedIds}$.
+    \item $\trm{newFirstId}$, l'identifiant correspondant à $\trm{firstId}$ dans l'époque enfant.
+    \item $\trm{lastId}$, le dernier identifiant de $\trm{renamedIds}$.
+    \item $\trm{newLastId}$, l'identifiant correspondant à $\trm{lastId}$ dans l'époque enfant.
+    \item $\bott$ (resp. $\topt$), le tuple LogootSplit minimal (resp. maximal). Son utilisation est réservé au mécanisme de renommage.
+\end{enumerate}
+
+La fonction \texttt{revRenIdLessThanNewFirstId} (resp. \texttt{revRendIdGreaterThanNewLastId}) permet de renommer un identifiant $\trm{id}$ tel que $\trm{id} \lid \trm{newFirstId}$ (resp. $\trm{newLastId} < \trm{id}$).
 
 \begin{algorithm}[!ht]
   \footnotesize
@@ -13,35 +30,35 @@
 
           \If{$\text{id} = \text{predNewId} \oplus \text{tail}$}
               \If{$\text{tail} \lid \text{firstId}$}
-                  \State \Return tail
+                  \State \Return tail \label{appendix-revert-rename-id-concurrent-1}
               \Else
                   \Statex \Comment id has been inserted causally after the \emph{rename} op
                   \Statex \Comment $\text{firstId} = \text{prefix} \oplus \logootsplituple{n}$
 
                   \State $\text{predFirstId} \gets \text{prefix} \oplus \langle \text{pos}_n,\text{nodeId}_n,\text{nodeSeq}_n,\text{offset}_n - 1 \rangle$
-                  \State \Return $\text{predFirstId} \oplus \topt \oplus tail$ \Comment \commenttopt
+                  \State \Return $\text{predFirstId} \oplus \topt \oplus tail$ \Comment \commenttopt \label{appendix-revert-rename-id-causally-after-1}
               \EndIf
           \Else
-              \State \Return id
+              \State \Return id \label{appendix-revert-rename-id-simple-1}
           \EndIf
       \EndFunction
       \\
       \Function{revRenIdGreaterThanNewLastId}{id $\in \mathbb{I}$, lastId $\in \mathbb{I}$}{: $\mathbb{I}$}
           \If{$\text{id} \lid \text{lastId}$}
               \Statex \Comment id has been inserted causally after the \emph{rename} op
-              \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$ \Comment \commentbott
+              \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$ \Comment \commentbott \label{appendix-revert-rename-id-causally-after-2}
           \ElsIf{$\text{id} = \text{newLastId} \oplus \text{tail}$}
               \If{$\text{tail} \lid \text{lastId}$}
                   \Statex \Comment id has been inserted causally after the \emph{rename} op
-                  \State \Return $\text{lastId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott
+                  \State \Return $\text{lastId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott \label{appendix-revert-rename-id-causally-after-3}
               \ElsIf{$\text{tail} \lid \text{newLastId}$}
-                  \State \Return tail
+                  \State \Return tail \label{appendix-revert-rename-id-concurrent-2}
               \Else
                   \Statex \Comment id has been inserted causally after the \emph{rename} op
-                  \State \Return id
+                  \State \Return id \label{appendix-revert-rename-id-simple-2}
               \EndIf
           \Else
-              \State \Return id
+              \State \Return id \label{appendix-revert-rename-id-simple-3}
           \EndIf
       \EndFunction
   \end{algorithmic}
@@ -49,9 +66,11 @@
   \label{alg:appendix-revert-rename-id}
 \end{algorithm}
 
-Like \textsc{renIdLessThanFirstId} and \textsc{renIdGreaterThanFirstId}, these functions do not modify identifiers out of the range of renamed identifiers and of resulting identifiers.
-%
-To process other cases, the functions study the pattern of the given identifier.
-If \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) infers from the value of the identifier that it may come from a concurrent \emph{insert} operation to the \emph{rename} one, \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) simply removes the prefix added by \textsc{renIdLessThanFirstId} (resp. \textsc{renIdGreaterThanLastId}).
-%
-If the value of an identifier instead indicates that it was inserted causally after the \emph{rename} operation, \textsc{revRenIdLessThanNewFirstId} (resp. \textsc{revRenIdGreaterThanNewLastId}) generates a corresponding identifier at the parent epoch preserving the intended order using $\trm{predFirstId}$ and $\trm{MAX\_TUPLE}$ (resp. $\trm{lastId}$ and $\trm{MIN\_TUPLE}$).
+Comme les fonctions présentées dans l'\autoref{app:rename-id}, ces fonctions ne modifient pas les identifiants n'étant pas compris dans l'intervalle affecté par le renommage (lignes \ref{appendix-revert-rename-id-simple-1}, \ref{appendix-revert-rename-id-simple-2} et \ref{appendix-revert-rename-id-simple-3}).
+
+Pour traiter les cas restants, ces fonctions utilisent des stratégies différentes en fonction du motif formant $\trm{id}$.
+Si \texttt{revRenIdLessThanNewFirstId} (resp. \texttt{revRenIdGreaterThanNewLastId}) infère de la valeur de l'identifiant que ce dernier a potentiellement été obtenu en renommant un identifiant généré en concurrence de l'opération de renommage à l'aide de \texttt{renIdLessThanFirstId} (resp. \texttt{renGreaterThanLastId}), elle retire simplement le préfixe ajouté (ligne \ref{appendix-revert-rename-id-concurrent-1} (resp. ligne \ref{appendix-revert-rename-id-concurrent-2})).
+
+
+Si à la place la valeur de l'identifiant indique qu'il a été inséré après l'opération de renommage\footnote{D'après la relation \hb.}, \texttt{revRenIdLessThanNewFirstId} (resp. \texttt{revRenIdGreaterThanNewLastId}) génère l'identifiant correspondant à l'époque parent qui préserve l'ordre souhaité en utilisant $\trm{predFirstId}$ et le tuple exclusif au mécanisme de renommage $\topt$ (resp. $\trm{lastId}$ et le tuple exclusif au mécanisme de renommage $\bott$) (ligne \ref{appendix-revert-rename-id-causally-after-1} (resp. ligne \ref{appendix-revert-rename-id-causally-after-2} et \ref{appendix-revert-rename-id-causally-after-3})).
+
