@@ -15,7 +15,11 @@ Dans le contexte de l'opération \emph{rename}, cela implique que tous les noeud
   Il s'agit d'un sous-ensemble de l'ensemble des époques, composé de l'époque maximale introduite par une opération \emph{rename} causalement stable et de toutes les époques plus grande que cette dernière d'après la relation \emph{priority}.
 \end{definition}
 
-Pour traiter les prochaines opérations, les noeuds doivent maintenir les chemins entre toutes les époques de l'ensemble des \emph{potentielles époques courantes}.
+Les prochaines opérations livrées seront donc générées à partir de ces époques seulement\footnote{
+    Nous considérons ici que l'ordre de livraison des opérations satisfait le modèle de livraison FIFO, \ie que les messages d'un noeud sont livrés aux autres noeuds dans le même ordre qu'ils ont été envoyés, et le modèle de livraison RenamableLogootSplit \cf{def:rls-delivery-model}
+    Ainsi, une opération de renommage ne peut être causalement stable pour un noeud que si ce dernier a reçu toutes les opérations ayant eu lieu avant d'après la relation \hb et toutes les opérations concurrentes.
+}.
+Pour traiter ces prochaines opérations, les noeuds doivent maintenir les chemins entre toutes les époques de l'ensemble des \emph{potentielles époques courantes}.
 Nous appelons \emph{époques requises} l'ensemble des époques correspondant.
 
 \begin{definition}[Époques requises]
