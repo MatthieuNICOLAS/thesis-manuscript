@@ -5,51 +5,185 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
   \subfloat[Choix du nouvel identifiant pour le premier élément]{
       \begin{minipage}{\linewidth}
           \centering
+          \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
-              \path
-                  node {\textbf{A}}
-                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
+            \newcommand\nodeh[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            }
+            \newcommand\nodee[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            }
+            \newcommand\nodelo[1]{
+                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            }
+            \newcommand\renh[1]{
+                node[letter, label=#1:{$\betterid{i}{A1}{0}$}] {H}
+            }
 
-              \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
-          \end{tikzpicture}
+            \newcommand\initialstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \nodeh{-#3}
+                ++(0:\widthletter) \nodee{#3}
+                ++(0:\widthletter) \nodelo{-#3};
+            }
+
+            \newcommand\finalstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \renh{-#3};
+            }
+
+            \newcommand\offseta{ (90:0.7) }
+
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:14) node (a-end) {}
+                +(0:2) node[point] (a-initial) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:12) node (a-final) {};
+
+            \initialstate{(a-initial)}{\offseta}{90};
+            \finalstate{(a-ren-a1)}{\offseta}{90};
+
+            \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-final);
+            %   \path
+            %       node {\textbf{A}}
+            %       ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
+            %       ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
+            %       ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
+            %       ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
+
+            %   \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
+          \end{tikzpicture}}
           \label{fig:renaming-first-id}
       \end{minipage}}
   \hfil
   \subfloat[Choix des nouveaux identifiants pour les éléments restants]{
       \begin{minipage}{\linewidth}
           \centering
+          \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
-              \path
-                  node {\textbf{A}}
-                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H}
-                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{1}}] {E}
-                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{2}}] {L}
-                  ++(0:\widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{3}}] {O};
+            \newcommand\nodeh[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            }
+            \newcommand\nodee[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            }
+            \newcommand\nodelo[1]{
+                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            }
+            \newcommand\renh[1]{
+                node[letter, label=#1:{$\betterid{i}{A1}{0}$}] {H}
+            }
+            \newcommand\rene[1]{
+                node[letter, label=#1:{$\betterid{i}{A1}{1}$}] {E}
+            }
+            \newcommand\renl[1]{
+                node[letter, label=#1:{$\betterid{i}{A1}{2}$}] {L}
+            }
+            \newcommand\reno[1]{
+                node[letter, label=#1:{$\betterid{i}{A1}{3}$}] {O}
+            }
 
-                  \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
-              \end{tikzpicture}
+            \newcommand\initialstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \nodeh{-#3}
+                ++(0:\widthletter) \nodee{#3}
+                ++(0:\widthletter) \nodelo{-#3};
+            }
+
+            \newcommand\finalstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \renh{-#3}
+                ++(0:\widthletter) \rene{-#3}
+                ++(0:\widthletter) \renl{-#3}
+                ++(0:\widthletter) \reno{-#3};
+            }
+
+            \newcommand\offseta{ (90:0.7) }
+
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:14) node (a-end) {}
+                +(0:2) node[point] (a-initial) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:12) node (a-final) {};
+
+            \initialstate{(a-initial)}{\offseta}{90};
+            \finalstate{(a-ren-a1)}{\offseta}{90};
+
+            \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-final);
+          \end{tikzpicture}}
           \label{fig:renaming-second-id}
       \end{minipage}}
   \hfil
   \subfloat[État final obtenu]{
       \begin{minipage}{\linewidth}
           \centering
+          \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
-              \path
-                  node {\textbf{A}}
-                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-                  ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-                  ++(0:4 * \widthletter) node[block, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0..3}}] (HELO) {HELO};
+            \newcommand\nodeh[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            }
+            \newcommand\nodee[1]{
+                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            }
+            \newcommand\nodelo[1]{
+                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            }
+            \newcommand\renhelo[1]{
+                node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {HELO}
+            }
 
-              \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (HELO);
-          \end{tikzpicture}
+            \newcommand\initialstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \nodeh{-#3}
+                ++(0:\widthletter) \nodee{#3}
+                ++(0:\widthletter) \nodelo{-#3};
+            }
+
+            \newcommand\finalstate[3]{
+                \path
+                #1
+                ++#2
+                ++(0:0.5)
+                ++(#3:0.5) \renhelo{-#3};
+            }
+
+            \newcommand\offseta{ (90:0.7) }
+
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:14) node (a-end) {}
+                +(0:2) node[point] (a-initial) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:12) node (a-final) {};
+
+            \initialstate{(a-initial)}{\offseta}{90};
+            \finalstate{(a-ren-a1)}{\offseta}{90};
+
+            \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-final);
+          \end{tikzpicture}}
           \label{fig:renaming-final-state}
       \end{minipage}}
   \caption{Renommage de la séquence sur le noeud \emph{A}}
