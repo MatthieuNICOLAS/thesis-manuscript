@@ -7,36 +7,37 @@
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-      \Function{revRenIdLessThanNewFirstId}{id, firstId, newFirstId}
-          \State predNewFirstId $\gets$ createIdFromBase(newFirstId, -1)
-          \If{isPrefix(predNewFirstId, id)}
-              \State tail $\gets$ getTail(id, 1)
-              \If{tail < firstId}
+      \Function{revRenIdLessThanNewFirstId}{id $\in \mathbb{I}$, firstId $\in \mathbb{I}$, newFirstId $\in \mathbb{I}$}
+        \Statex \Comment $\text{newFirstId} = \newFirstId$
+        \Statex \Comment $\text{predNewFirstId} = \predNewFirstId$
+
+          \If{$\text{id} = \text{predNewId} \oplus \text{tail}$}
+              \If{$\text{tail} \lid \text{firstId}$}
                   \State \Return tail
               \Else
-                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-                  \State offset $\gets$ getLastOffset(firstId)
-                  \State predFirstId $\gets$ createIdFromBase(firstId, offset)
-                  \State \Return concat(predFirstId, MAX\_TUPLE, tail)
+                  \Statex \Comment id has been inserted causally after the \emph{rename} op
+                  \Statex \Comment $\text{firstId} = \text{prefix} \oplus \logootsplituple{n}$
+
+                  \State $\text{predFirstId} \gets \text{prefix} \oplus \langle \text{pos}_n,\text{nodeId}_n,\text{nodeSeq}_n,\text{offset}_n - 1 \rangle$
+                  \State \Return $\text{predFirstId} \oplus \topt \oplus tail$
               \EndIf
           \Else
               \State \Return id
           \EndIf
       \EndFunction
       \\
-      \Function{revRenIdGreaterThanNewLastId}{id, lastId}
-          \If{id < lastId}
-              \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-              \State \Return concat(lastId, MIN\_TUPLE, id)
-          \ElsIf{isPrefix(newLastId, id)}
-              \State tail $\gets$ getTail(id, 1)
-              \If{tail < lastId}
-                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
-                  \State \Return concat(lastId, MIN\_TUPLE, tail)
-              \ElsIf{tail < newLastId}
+      \Function{revRenIdGreaterThanNewLastId}{id $\in \mathbb{I}$, lastId $\in \mathbb{I}$}
+          \If{$\text{id} \lid \text{lastId}$}
+              \Statex \Comment id has been inserted causally after the \emph{rename} op
+              \State \Return $\text{lastId} \oplus \bott \oplus \text{id}$
+          \ElsIf{$\text{id} = \text{newLastId} \oplus \text{tail}$}
+              \If{$\text{tail} \lid \text{lastId}$}
+                  \Statex \Comment id has been inserted causally after the \emph{rename} op
+                  \State \Return $\text{lastId} \oplus \bott \oplus \text{tail}$
+              \ElsIf{$\text{tail} \lid \text{newLastId}$}
                   \State \Return tail
               \Else
-                  \State \Comment{$id$ has been inserted causally after the \emph{rename} op}
+                  \Statex \Comment id has been inserted causally after the \emph{rename} op
                   \State \Return id
               \EndIf
           \Else
