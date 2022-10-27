@@ -38,7 +38,7 @@ Concernant les opérations provenant d'époques \emph{soeurs}, nous observons de
 
 Pour récapituler, les fonctions de transformation ajoutent un surcoût aux temps d'intégration des opérations concurrentes aux opérations $\trm{rename}$.
 Malgré ce surcoût, RenamableLogootSplit offre de meilleures performances que LogootSplit pour intégrer ces opérations grâce aux réductions de la taille de l'état effectuées par les opérations $\trm{rename}$.
-Cependant, cette affirmation n'est vraie que tant que la distance entre l'époque de génération de l'opération et l'époque courante du noeud reste limitée, puisque les performances de RenamableLogootSplit dépendent linéairement de cette dernière (cf. \autoref{tab:time-complexity-operations}).
+Cependant, cette affirmation n'est vraie que tant que la distance entre l'époque de génération de l'opération et l'époque courante du noeud reste limitée, puisque les performances de RenamableLogootSplit dépendent linéairement de cette dernière \cf{tab:time-complexity-operations}.
 Néanmoins, ce surcoût ne concerne que les opérations concurrentes aux opérations $\trm{rename}$.
 Il ne concerne pas la majorité des opérations, \ie les opérations générées entre deux séries d'opérations $\trm{rename}$.
 Ces opérations, elles, ne souffrent d'aucun surcoût tout en bénéficiant des réductions de taille de l'état.

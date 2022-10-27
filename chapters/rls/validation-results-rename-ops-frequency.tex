@@ -1,44 +1,74 @@
 Pour évaluer l'impact de la fréquence de l'opération $\trm{rename}$ sur les performances, nous avons réalisé un benchmark supplémentaire.
 Ce benchmark consiste à rejouer les logs d'opérations des simulations en utilisant divers \acp{CRDT} et configurations : LogootSplit, RenamableLogootSplit effectuant des opérations $\trm{rename}$ toutes les 30k opérations, RenamableLogootSplit effectuant des opérations $\trm{rename}$ toutes les 7.5k opérations.
 Au fur et à mesure que le benchmark rejoue le journal des opérations, il mesure le temps d'intégration des opérations ainsi que leur taille.
-Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-frequency}.
+Nous présentons les résultats obtenus dans le \autoref{tab:impact-frequency-time} et le \autoref{tab:impact-frequency-memory}.
 
 \begin{table}[!ht]
   \centering
-  \resizebox{\linewidth}{!}{
-    \begin{tabular}{llrrrrrrrrrr}
+  \resizebox{0.8\linewidth}{!}{
+    \begin{tabular}{llrrrrr}
       \toprule
-      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration ($\trm{\mu}$s)}  & \multicolumn{5}{c}{Taille (o)} \\
-      \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
-      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration ($\trm{\mu}$s)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
       \midrule
-      insert & LS &  471 &    460 &  130 &        224 &         768 &    593 &    584 & 184 &        216 &        1136 \\
-      & RLS - 30k &  397 &    323 & 66.7 &        171 &         587 &    442 &    378 &  92 &        314 &         958 \\
-      & RLS - 7.5k &  393 &    265 & 54.5 &        133 &         381 &    389 &    378 &   0 &        314 &         590 \\
-      remove & LS &  280 &    270 & 71.4 &        140 &         435 &    632 &    618 & 184 &        250 &        1170 \\
-      & RLS - 30k &  247 &    181 &   39 &       97.9 &         308 &    434 &    412 &   0 &        320 &         900 \\
-      & RLS - 7.5k &  296 &    151 & 34.8 &       74.9 &         214 &    401 &    412 &   0 &        320 &         596 \\
+      insert & LS &  471 &    460 &  130 &        224 &         768 \\
+      & RLS - 30k &  397 &    323 & 66.7 &        171 &         587 \\
+      & RLS - 7.5k &  393 &    265 & 54.5 &        133 &         381 \\
+      remove & LS &  280 &    270 & 71.4 &        140 &         435 \\
+      & RLS - 30k &  247 &    181 &   39 &       97.9 &         308 \\
+      & RLS - 7.5k &  296 &    151 & 34.8 &       74.9 &         214 \\
       \midrule
-      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)}  & \multicolumn{5}{c}{Taille (Ko)} \\
-      \cmidrule(lr){1-2} \cmidrule(lr){3-7} \cmidrule(lr){8-12}
-      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Temps d'intégration (ms)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
       \midrule
-      rename & RLS - 30k & 1022 &   1188 &  425 &        540 &        1276 &   1366 &   1258 & 514 &        635 &        3373 \\
-      & RLS - 7.5k &  861 &    974 &  669 &        123 &        1445 &    273 &    302 & 132 &        159 &         542 \\
+      rename & RLS - 30k & 1022 &   1188 &  425 &        540 &        1276 \\
+      & RLS - 7.5k &  861 &    974 &  669 &        123 &        1445 \\
       \bottomrule
     \end{tabular}
   }
-  \caption{Temps d'intégration et taille des opérations par type et par fréquence d'opérations $\trm{rename}$}
-  \label{tab:impact-frequency}
+  \caption{Temps d'intégration par type et par fréquence d'opérations $\trm{rename}$}
+  \label{tab:impact-frequency-time}
 \end{table}
 
-Concernant les temps d'intégration, nous observons des opérations $\trm{rename}$ plus fréquentes permettent d'améliorer les temps d'intégration des opérations $\trm{insert}$ et $\trm{remove}$.
+D'après les résultats du \autoref{tab:impact-frequency-time}, nous observons que des opérations $\trm{rename}$ plus fréquentes permettent d'améliorer les temps d'intégration des opérations $\trm{insert}$ et $\trm{remove}$.
 Cela confirme les résultats attendus puisque l'opération $\trm{rename}$ réduit la taille des identifiants de la structure ainsi que le nombre de blocs composant la séquence.
 
 Nous remarquons aussi que la fréquence n'a aucun impact significatif sur le temps d'intégration des opérations $\trm{rename}$.
 Il s'agit là aussi d'un résultat attendu puisque la complexité en temps de l'implémentation de l'opération $\trm{rename}$ dépend du nombre d'éléments dans la séquence, un facteur qui n'est pas impacté par les opérations $\trm{rename}$.
 
-Concernant la taille des opérations, nous observons que les opérations $\trm{insert}$ et $\trm{remove}$ de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit, notamment car elles intègrent leur époque de génération comme donnée additionnelle.
+\begin{table}[!ht]
+  \centering
+  \resizebox{0.8\linewidth}{!}{
+    \begin{tabular}{llrrrrr}
+      \toprule
+      \multicolumn{2}{c}{Paramètres} & \multicolumn{5}{c}{Taille (o)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
+      \midrule
+      insert & LS &  593 &    584 & 184 &        216 &        1136 \\
+      & RLS - 30k &  442 &    378 &  92 &        314 &         958 \\
+      & RLS - 7.5k &  389 &    378 &   0 &        314 &         590 \\
+      remove & LS &   632 &     618 & 184 &        250 &        1170 \\
+      & RLS - 30k &    434 &    412 &   0 &        320 &         900 \\
+      & RLS - 7.5k &   401 &    412 &   0 &        320 &         596 \\
+      \midrule
+      \multicolumn{2}{c}{Paramètres}  & \multicolumn{5}{c}{Taille (Ko)} \\
+      \cmidrule(lr){1-2} \cmidrule(lr){3-7}
+      Type & CRDT & Moyenne & Médiane &  IQR & 1\textsuperscript{er} Percent. & 99\textsuperscript{ème} Percent. \\
+      \midrule
+      rename & RLS - 30k &   1366 &   1258 & 514 &        635 &        3373 \\
+      & RLS - 7.5k &      273 &    302 & 132 &        159 &         542 \\
+      \bottomrule
+    \end{tabular}
+  }
+  \caption{Taille des opérations par type et par fréquence d'opérations $\trm{rename}$}
+  \label{tab:impact-frequency-memory}
+\end{table}
+
+Le \autoref{tab:impact-frequency-memory} permet d'observer que les opérations $\trm{insert}$ et $\trm{remove}$ de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit.
+Ce résultat s'explique de part le fait qu'elles intègrent leur époque de génération comme donnée additionnelle.
 Mais alors que la taille des opérations de LogootSplit augmentent indéfiniment, celle des opérations de RenamableLogootSplit est bornée.
 La valeur de cette borne est définie par la fréquence de l'opération $\trm{rename}$.
 Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.
