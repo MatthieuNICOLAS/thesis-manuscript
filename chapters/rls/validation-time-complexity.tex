@@ -1,9 +1,10 @@
-Afin d'évaluer RenamableLogootSplit, nous analysons tout d'abord la complexité en temps de ses opérations.
-Ces complexités dépendent de plusieurs paramètres : nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants, structures de données utilisées...
+\label{sec:validation-time-complexity}
 
 \subsubsection{Hypothèses}
 
+Les complexités en temps des opérations de RenamableLogootSplit dépendent de plusieurs paramètres, \eg nombre d'identifiants et de blocs stockés au sein de la structure, taille des identifiants ou encore structures de données utilisées.
 Afin d'établir les valeurs de complexité des différentes opérations, nous prenons les hypothèses suivantes vis-à-vis des paramètres.
+
 Nous supposons que le nombre $n$ d'identifiants présents dans la séquence a tendance à croître, \ie que plus d'insertions sont effectuées que de suppressions.
 Nous considérons que la taille des identifiants, qui elle croît avec le nombre d'insertions mais qui est réinitialisée à chaque renommage, devient négligeable par rapport au nombre d'identifiants.
 Nous ne prenons donc pas en considération ce paramètre dans nos complexités et considérons que les manipulations d'identifiants (comparaison, génération) s'effectuent en temps constant.
