@@ -56,7 +56,7 @@ Finalement, cette approche implique aussi de parcourir le journal des opération
 Comme dit précédemment, la taille du journal croît de façon monotone au fur et à mesure que les noeuds émettent des opérations.
 Cette étape du nouvel algorithme d'intégration de l'opération $\trm{rename}$ devient donc de plus en plus coûteuse.
 Des méthodes permettent néanmoins de réduire son coût computationnel.
-Notamment, chaque noeud traquent les informations de progression des autres noeuds afin de supprimer les métadonnées du mécanisme de renommage (cf. \autoref{sec:gc-mechanism}).
+Notamment, chaque noeud traquent les informations de progression des autres noeuds afin de supprimer les métadonnées du mécanisme de renommage \cf{sec:gc-mechanism}.
 Ces informations permettent de déterminer la stabilité causale des opérations et donc d'identifier les opérations qui ne peuvent plus être concurrentes à une nouvelle opération $\trm{rename}$.
 Les noeuds peuvent ainsi maintenir, en plus du journal complet des opérations, un journal composé uniquement des opérations non stables causalement.
 Lors du traitement d'une nouvelle opération $\trm{rename}$, les noeuds peuvent alors parcourir ce journal réduit à la recherche des opérations concurrentes.

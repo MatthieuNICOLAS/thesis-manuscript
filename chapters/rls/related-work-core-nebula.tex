@@ -1,4 +1,4 @@
-L'approche \emph{core-nebula}\cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{2009-treedoc-preguica}.
+L'approche \emph{core-nebula} \cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{2009-treedoc-preguica}.
 Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
 Cependant, cette opération \emph{rebalance} n'est ni commutative avec les opérations $\trm{insert}$ et $\trm{remove}$, ni avec elle-même.
 Pour assurer la convergence à terme \cite{10.1145/224057.224070}, l'approche \emph{core-nebula} empêche la génération d'opérations \emph{rebalance} concurrentes.
@@ -21,4 +21,4 @@ Dans les systèmes disposant d'un \emph{core}, nous pouvons donc combiner Renama
 Cette approche offre plusieurs avantages.
 Elle permet de se passer de tout ce qui à attrait au support d'opérations $\trm{rename}$ concurrentes, \ie la définition d'une relation \emph{priority} et l'implémentation de \textsc{revertRenameId}.
 Elle permet aussi de simplifier l'implémentation du mécanisme de récupération de mémoire des époques et \emph{anciens états} pour reposer seulement sur la stabilité causale des opérations.
-Concernant ses performances, cette approche se comporte de manière similaire à RenamableLogootSplit avec un seul \emph{renaming bot} (cf. \autoref{sec:evaluation-results}), mais avec un surcoût correspondant au coût du protocole de consensus sélectionné.
+Concernant ses performances, cette approche se comporte de manière similaire à RenamableLogootSplit avec un seul \emph{renaming bot} \cf{sec:evaluation-results}, mais avec un surcoût correspondant au coût du protocole de consensus sélectionné.

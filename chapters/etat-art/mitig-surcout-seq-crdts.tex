@@ -24,16 +24,16 @@ Pour rappel, Treedoc souffre des problèmes suivants :
 \end{enumerate}
 
 Pour répondre à ces problèmes, les auteurs présentent un mécanisme de ré-équilibrage de l'arbre supprimant par la même occasion les pierres tombales existantes, \ie un mécanisme réattribuant de nouveaux identifiants de position aux éléments encore présents.
-Ce mécanisme prend la forme d'une nouvelle opération, que nous notons $\trm{bal}$.
+Ce mécanisme prend la forme d'une nouvelle opération, que nous notons $\trm{rebalance}$.
 
-Notons que l'opération $\trm{bal}$ contrevient à une des propriétés des identifiants de position densément ordonnés : leur \emph{immutabilité} \cf{def:id-prop}.
-L'opération $\trm{bal}$ est donc intrinséquement non-commutative avec les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
+Notons que l'opération $\trm{rebalance}$ contrevient à une des propriétés des identifiants de position densément ordonnés : leur \emph{immutabilité} \cf{def:id-prop}.
+L'opération $\trm{rebalance}$ est donc intrinséquement non-commutative avec les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
 Pour assurer la convergence à terme des copies, les auteurs mettent en place un mécanisme de \emph{catch-up}.
-Ce mécanisme consiste à transformer les opérations concurrentes aux opérations $\trm{bal}$ avant de les intégrer, de façon à prendre en compte les effets des ré-équilibrages.
+Ce mécanisme consiste à transformer les opérations concurrentes aux opérations $\trm{rebalance}$ avant de les intégrer, de façon à prendre en compte les effets des ré-équilibrages.
 
-Toutefois, l'opération $\trm{bal}$ n'est pas non plus commutative avec elle-même.
-Cette approche nécessite d'empêcher la génération d'opérations $\trm{bal}$ concurrentes.
-Pour cela, les auteurs proposent de reposer sur un protocole de consensus entre les noeuds pour la génération d'opérations $\trm{bal}$.
+Toutefois, l'opération $\trm{rebalance}$ n'est pas non plus commutative avec elle-même.
+Cette approche nécessite d'empêcher la génération d'opérations $\trm{rebalance}$ concurrentes.
+Pour cela, les auteurs proposent de reposer sur un protocole de consensus entre les noeuds pour la génération d'opérations $\trm{rebalance}$.
 
 De nouveau, l'utilisation d'un protocole de consensus est une contrainte forte, peu adaptée aux systèmes \ac{P2P} dynamique à large échelle.
 Pour pallier ce point, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.

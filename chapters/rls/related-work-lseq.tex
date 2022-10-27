@@ -1,5 +1,5 @@
-L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à réduire la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
-Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
+L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
+Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour ralentir leur vitesse de croissance.
 Dans ces travaux, les auteurs notent que la stratégie d'allocation des identifiants proposée dans Logoot \cite{2009-logoot-weiss} n'est adaptée qu'à un seul comportement d'édition : de gauche à droite, de haut en bas.
 Si les insertions sont effectuées en suivant d'autres comportements, les identifiants générés saturent rapidement l'espace des identifiants pour une taille donnée.
 Les insertions suivantes déclenchent alors une augmentation de la taille des identifiants.
@@ -11,11 +11,11 @@ De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifi
 Cela permet à LSEQ de choisir avec soin la taille des identifiants et la stratégie d'allocation en fonction des besoins.
 En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.
 
-Bien que l'approche LSEQ réduise la vitesse de croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés, le surcoût de la séquence reste proportionnel à son nombre d'éléments.
+Bien que l'approche LSEQ ralentisse la vitesse de croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés, le surcoût de la séquence reste proportionnel à son nombre d'éléments.
 À l'inverse, le mécanisme de renommage de RenamableLogootSplit permet de réduire les métadonnées à une quantité fixe, indépendamment du nombre d'éléments.
 
 Ces deux approches sont néanmoins orthogonales et peuvent, comme avec l'approche précédente, être combinées.
-Le système résultant réinitialiserait périodiquement les métadonnées de la séquence répliquée à l'aide de l'opération $\trm{rename}$ tandis que les stratégies d'allocation d'identifiants de LSEQ réduiraient leur croissance entretemps.
+Le système résultant réinitialiserait périodiquement les métadonnées de la séquence répliquée à l'aide de l'opération $\trm{rename}$ tandis que les stratégies d'allocation d'identifiants de LSEQ ralentiraient leur croissance entretemps.
 Cela permettrait aussi de réduire la fréquence de l'opération $\trm{rename}$, réduisant ainsi les calculs effectués par le système de manière globale.
 
 % \mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}
