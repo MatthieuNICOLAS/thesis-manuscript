@@ -1,4 +1,4 @@
-L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
+L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants dans les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés.
 Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme de renommage coûteux, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour ralentir leur vitesse de croissance.
 Dans ces travaux, les auteurs notent que la stratégie d'allocation des identifiants proposée dans Logoot \cite{2009-logoot-weiss} n'est adaptée qu'à un seul comportement d'édition : de gauche à droite, de haut en bas.
 Si les insertions sont effectuées en suivant d'autres comportements, les identifiants générés saturent rapidement l'espace des identifiants pour une taille donnée.

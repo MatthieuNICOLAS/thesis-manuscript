@@ -55,14 +55,14 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 
 Celle-ci définit deux modifications :
 \begin{enumerate}
-  \item $\trm{insert}(s,i,e)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{insert}(s,i,e)$, abrégée en $\trm{ins}$ dans nos figures, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
       \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{length}(s),
       s = \langle e_0, \cdots, e_{i-1}, e_{i}, \cdots, e_{m-1} \rangle~\cdot \\
       \trm{insert}(s,i,e) = \langle e_0, \cdots, e_{i-1}, e, e_{i}, \cdots, e_{m-1}  \rangle
     \end{multline*}
-  \item $\trm{remove}(s,i)$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{remove}(s,i)$, abrégée en $\trm{rmv}$ dans nos figures, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
       \forall s \in S, e \in E, i \in [0,m[~|~m = \trm{length}(s),

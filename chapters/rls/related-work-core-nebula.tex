@@ -1,19 +1,19 @@
-L'approche \emph{core-nebula} \cite{letia:hal-01248270,zawirski:hal-01248197} a été proposée pour réduire la taille des identifiants dans Treedoc \cite{2009-treedoc-preguica}.
-Dans ces travaux, les auteurs définissent l'opération \emph{rebalance} qui permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
-Cependant, cette opération \emph{rebalance} n'est ni commutative avec les opérations $\trm{insert}$ et $\trm{remove}$, ni avec elle-même.
-Pour assurer la convergence à terme \cite{10.1145/224057.224070}, l'approche \emph{core-nebula} empêche la génération d'opérations \emph{rebalance} concurrentes.
-Pour ce faire, l'approche requiert un consensus entre les noeuds pour générer les opérations \emph{rebalance}.
-Des opérations $\trm{insert}$ et $\trm{remove}$ sont elles toujours générées sans coordination entre les noeuds et peuvent donc être concurrentes aux opérations \emph{rebalance}.
-Pour gérer les opérations concurrentes aux opérations \emph{rebalance}, les auteurs proposent de transformer les opérations concernées par rapport aux effets des opérations \emph{rebalance}, à l'aide un mécanisme de \emph{catch-up}, avant de les appliquer.
+\cite{letia:hal-01248270} puis \cite{zawirski:hal-01248197} définissent un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour Treedoc \cite{2009-treedoc-preguica}.
+Ce mécanisme, qui prend la forme d'une nouvelle opération $\trm{rebalance}$, permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
+Cependant, cette nouvelle opération n'est ni commutative avec les opérations $\trm{insert}$ et $\trm{remove}$, ni avec elle-même.
+Pour assurer la convergence à terme \cite{10.1145/224057.224070} du système, \cite{zawirski:hal-01248197} fait le choix d'empêcher la génération d'opérations $\trm{rebalance}$ concurrentes.
+Pour cela, cette approche requiert un consensus entre les noeuds pour générer les opérations $\trm{rebalance}$.
+Les opérations $\trm{insert}$ et $\trm{remove}$ sont elles toujours générées sans coordination entre les noeuds et peuvent donc être concurrentes aux opérations $\trm{rebalance}$.
+Pour gérer les opérations concurrentes aux opérations $\trm{rebalance}$, les auteurs proposent de transformer les opérations concernées par rapport aux effets des opérations$\trm{rebalance}$, à l'aide un mécanisme de \emph{catch-up}, avant de les appliquer.
 
 Cependant, les protocoles de consensus ne passent pas à l'échelle et ne sont pas adaptés aux systèmes distribués à large échelle.
-Pour pallier ce problème, l'approche \emph{core-nebula} propose de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
+Pour pallier ce problème, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
 Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
 Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
 Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{insert}$ et $\trm{remove}$.
 
-Notre travail peut être vu comme une extension de celui présenté dans \emph{core-nebula}.
-Avec RenamableLogootSplit, nous adaptons l'opération \emph{rebalance} et le mécanisme de \emph{catch-up} à LogootSplit pour tirer partie de la fonctionnalité offerte par les blocs.
+Notre travail peut être vu comme une extension des travaux.
+Avec RenamableLogootSplit, nous adaptons l'opération $\trm{rebalance}$ et le mécanisme de \emph{catch-up} à LogootSplit pour tirer partie de la fonctionnalité offerte par les blocs.
 De plus, nous proposons un mécanisme pour supporter les opérations $\trm{rename}$ concurrentes, ce qui supprime la nécessité de l'utilisation d'un protocole de consensus.
 Notre contribution est donc une approche plus générique puisque RenamableLogootSplit est utilisable dans des systèmes composés d'un \emph{core} et d'une \emph{nebula}, ainsi que dans les systèmes ne disposant pas de noeuds stables pour former un \emph{core}.
 
