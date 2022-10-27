@@ -3,25 +3,21 @@
 \minitoc
 \label{chap:renamablelogootsplit}
 
-\section{Présentation de l'approche}
 \input{chapters/rls/approche-intro}
 
-\subsection{Définition de l'opération de renommage}
-\input{chapters/rls/approche-def}
-
-\section{Introduction de l'opération $\trm{rename}$}
+\section{Introduction de l'opération de renommage}
 \label{sec:centralised-rls}
 
 \subsection{Opération de renommage proposée}
 \input{chapters/rls/rename-op-proposition}
 
-\subsection{Gestion des opérations concurrentes au renommage}
+\subsection{Gestion des opérations d'insertion et de suppression concurrentes au renommage}
 \input{chapters/rls/rename-op-concurrent-ops}
 
 \subsection{Évolution du modèle de livraison des opérations}
 \input{chapters/rls/rename-op-delivery-model}
 
-\section{Gestion des opérations $\trm{rename}$ concurrentes}
+\section{Gestion des opérations de renommage concurrentes}
 \label{sec:distributed-rls}
 
 \subsection{Conflits en cas de renommages concurrents}
@@ -40,7 +36,7 @@
 \input{chapters/rls/concurrent-rename-ops-gc}
 
 \section{Validation}
-
+\label{sec:evaluation}
 % \subsection{Preuve de correction de \textsc{renameId}}
 
 \subsection{Complexité en temps des opérations}
@@ -77,19 +73,19 @@
 \input{chapters/rls/validation-results-rename-ops-frequency}
 
 \section{Discussion}
-
+\label{sec:discussion}
 \mnnote{TODO:
   Ajouter une partie sur la discussion qu'on a pu avoir avec les reviewers sur la présence de pierres tombales dans RenamableLogootSplit, et comment ces pierres tombales diffèrent de celles présentent dans WOOT et RGA.
 }
 
-\subsection{Stratégie de génération des opérations $\trm{rename}$}
+\subsection{Stratégie de génération des opérations de renommage}
 \input{chapters/rls/discussion-strategies-rename-ops}
 
 \subsection{Stockage des états précédents sur disque}
 \label{sec:offloading-former-states}
 \input{chapters/rls/discussion-offload-former-states}
 
-\subsection{Compression et limitation de la taille de l'opération $\trm{rename}$}
+\subsection{Compression et limitation de la taille de l'opération de renommage}
 \label{sec:compression-rename}
 \input{chapters/rls/discussion-rename-op-compression}
 
@@ -105,14 +101,14 @@
 \label{sec:rename-as-compression-mechanism}
 \input{chapters/rls/discussion-rename-op-as-snapshot}
 
-\subsection{Implémentation alternative de l'intégration de l'opération $\trm{rename}$ basée sur le journal des opérations}
+\subsection{Implémentation alternative de l'intégration de l'opération de renommage basée sur le journal des opérations}
 \label{sec:log-based-rename-mechanism}
 \input{chapters/rls/discussion-log-based-implem}
 
 \mnnote{TODO: Ajouter conclusion à cette sous-section}
 
 \section{Comparaison avec les approches existantes}
-
+\label{sec:rls-related-work}
 \subsection{Core-Nebula}
 \input{chapters/rls/related-work-core-nebula}
 

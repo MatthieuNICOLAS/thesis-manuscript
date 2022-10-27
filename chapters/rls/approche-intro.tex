@@ -1,8 +1,69 @@
 Nous proposons un nouveau \ac{CRDT} pour le type Séquence appartenant à l'approche à identifiants densément ordonnés et à granularité variable : RenamableLogootSplit \cite{2020-rls-papoc-nicolas,2022-rls-tpds-nicolas}.
 Cette structure de données permet aux noeuds d'insérer et de supprimer des éléments au sein d'une séquence répliquée.
-Nous introduisons une opération de renommage, l'opération $\trm{rename}$, qui permet de :
+Elle incorpore un mécanisme de renommage qui se déclenche par le biais d'une nouvelle opération : l'opération $\trm{rename}$.
+Cette dernière permet de :
 \begin{enumerate}
   \item Réassigner des identifiants plus courts aux différents éléments de la séquence.
   \item Fusionner les blocs composant la séquence.
 \end{enumerate}
-Ces deux actions permettent à l'opération de renommage de produire un nouvel état minimisant son surcoût en termes de métadonnées et de calculs des modifications suivantes.
+Ces deux actions permettent au mécanisme de renommage de produire un nouvel état minimisant le surcoût du \ac{CRDT} en termes de métadonnées et de calculs pour les modifications suivantes.\\
+
+Une particuliarité de l'opération $\trm{rename}$ est qu'elle ne modifie pas le contenu de la séquence répliquée, mais uniquement ses identifiants.
+Puisque les identifiants sont des métadonnées utilisées par la structure de données uniquement afin de résoudre les conflits, les utilisateurs ignorent leur existence.
+Les opérations $\trm{rename}$ sont donc des opérations systèmes : elles sont émises et appliquées par les noeuds en coulisses, sans aucune intervention des utilisateurs.
+
+Afin de garantir le respect du modèle de cohérence \ac{SEC}, nous définissons plusieurs propriétés de sécurité que l'opération $\trm{rename}$ doit respecter.
+Ces propriétés sont inspirées principalement par celles proposées dans \cite{zawirski:hal-01248197}.
+
+\begin{property}(Déterminisme)
+  Les opérations $\trm{rename}$ sont intégrées par les noeuds sans aucune coordination.
+  Pour assurer que l'ensemble des noeuds atteigne un état équivalent à terme, une opération $\trm{rename}$ donnée doit toujours générer le même nouvel identifiant à partir de l'identifiant courant.
+\end{property}
+
+\begin{property}(Préservation de l'intention de l'utilisateur)
+  \label{prop:rename-op-intention-preservation}
+  Bien que l'opération $\trm{rename}$ n'incarne pas elle-même une intention de l'utilisateur, elle ne doit pas entrer en conflit avec les modifications des utilisateurs.
+  Notamment, les opérations $\trm{rename}$ ne doivent pas annuler ou altérer le résultat d'opérations $\trm{insert}$ et $\trm{remove}$ du point de vue des utilisateurs.
+\end{property}
+
+\begin{property}(Séquence bien formée)
+  La séquence répliquée doit être bien formée.
+  Appliquée une opération $\trm{rename}$ sur une séquence bien formée doit produire une nouvelle séquence bien formée.
+  Une séquence bien formée doit respecter les propriétés suivantes :
+  \begin{itemize}[noitemsep]
+    \item[~]
+    \begin{subproperty}(Préservation de l'unicité)
+      Chaque identifiant doit être unique.
+      Donc, pour une opération $\trm{rename}$ donnée, chaque identifiant doit être associé à un nouvel identifiant unique.
+    \end{subproperty}
+    \item[~]
+    \begin{subproperty}(Préservation de l'ordre)
+      \label{prop:order}
+      Les éléments de la séquence doivent être ordonnés en fonction de leur identifiants.
+      L'ordre existant entre les identifiants initiaux doit donc être préservé par l'opération $\trm{rename}$.
+    \end{subproperty}
+  \end{itemize}
+\end{property}
+
+\begin{property}(Commutativité avec les opérations concurrentes)
+  \label{prop:commutativity}
+  Les opérations concurrentes peuvent être livrées dans des ordres différents à chaque noeud.
+  Afin de garantir la convergence des réplicas, l'ordre d'application d'un ensemble d'opérations concurrentes ne doit pas avoir d'impact sur l'état obtenu.
+  L'opération $\trm{rename}$ doit donc être commutative avec n'importe quelle opération concurrente.
+\end{property}
+
+La \autoref{prop:commutativity} est particulièrement difficile à assurer.
+Cette difficulté est dûe au fait que les opérations $\trm{rename}$ modifient les identifiants assignés aux éléments.
+Cependant, les autres opérations telles que les opérations $\trm{insert}$ et $\trm{remove}$ reposent sur ces identifiants pour spécifier où insérer les éléments ou lesquels supprimer.
+Les opérations $\trm{rename}$ sont donc intrinséquement incompatibles avec les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
+De la même manière, des opérations $\trm{rename}$ concurrentes peuvent réassigner des identifiants différents à des mêmes éléments.
+Les opérations $\trm{rename}$ concurrentes ne sont donc pas commutatives.
+Par conséquent, il est nécessaire de concevoir et d'utiliser des méthodes de résolution de conflits pour assurer la \autoref{prop:commutativity}.\\
+
+Dans ce chapitre, nous présentons donc le mécanisme de renommage intégré à RenamableLogootSplit et le mécanisme de résolution de conflits additionnel qu'il utilise.
+Dans la \autoref{sec:centralised-rls}, nous présentons l'opération $\trm{rename}$, \ie son fonctionnement et son impact sur le modèle de livraison du \ac{CRDT}, ainsi que le mécanisme de résolution de conflits pour gérer les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
+Ensuite, nous présentons le mécanisme de résolution de conflits pour gérer les opérations $\trm{rename}$ concurrentes dans la \autoref{sec:distributed-rls}.
+Dans la \autoref{sec:gc-mechanism}, nous présentons un mécanisme de \acf{GC} des métadonnées propres au mécanisme de renommage.
+Dans la \autoref{sec:evaluation}, nous présentons une validation de notre approche par le biais d'une analyse en complexité et d'une évaluation expérimentale.
+Nous présentons ensuite plusieurs limites et perspectives de notre approche dans la \autoref{sec:discussion}.
+Finalement, nous comparons notre contribution et ses résultats aux approches existantes dans la \autoref{sec:rls-related-work}.
