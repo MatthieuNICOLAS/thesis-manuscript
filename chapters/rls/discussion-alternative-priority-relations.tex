@@ -5,54 +5,55 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
   \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
-          \resizebox{.7\linewidth}{!}{
+          \resizebox{\linewidth}{!}{
             \begin{tikzpicture}
               \path
                 node {\textbf{A}}
-                ++(0:0.5) node (a0) {}
-                ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                ++(0:2) node (a-receives-b7) {}
-                ++(0:1) node [point, label=above:{rename to \epoch{A10}}] (a10) {}
-                ++(0:1) node (a11) {}
-                ++(0:1) node (a99) {}
-                ++(0:1) node[point, label=above:{rename to \epoch{A100}}] (a100) {}
-                ++(0:1.5) node (a-receives-c1) {}
-                ++(0:1.5) node (a-end) {};
+                ++(0:0.5) node (a) {}
+                +(0:22) node (a-end) {}
+                +(0:1) node (a-initial) {}
+                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,1)$}] (a-ren-a1) {}
+                +(0:9) node[point] (a-recv-ren-b7) {}
+                +(0:11) node[point, label=above:{$\trm{ren}(\betterepoch{B7}, A,10)$}] (a-ren-a8) {}
+                +(0:13) node (a-ellipse-debut) {}
+                +(0:15) node (a-ellipse-fin) {}
+                +(0:17) node[point, label=above:{$\trm{ren}(\betterepoch{A80}, A,100)$}] (a-ren-a100) {}
+                +(0:19) node[point] (a-recv-ren-c1) {}
+                +(0:21) node (a-final) {};
 
-              \draw[thick] (a0) --  (a1) -- (a10) -- (a11);
-              \draw[dotted] (a11) -- (a99);
-              \draw[->, thick] (a99) -- (a100) -- (a-end);
+              \draw[dotted] (a) -- (a-initial) (a-ellipse-debut) -- (a-ellipse-fin) (a-final) -- (a-end);
+              \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-recv-ren-b7) --  (a-ren-a8) -- (a-ellipse-debut) (a-ellipse-fin) -- (a-ren-a100) -- (a-recv-ren-c1) -- (a-final);
 
               \path
                   ++(270:2) node {\textbf{B}}
-                  ++(0:0.5) node (b0) {}
-                  ++(0:2) node (b-receives-a1) {}
-                  ++(0:0.5) node[point, label=below:{rename to \epoch{B2}}] (b7) {}
-                  ++(0:2.5) node (b8) {}
-                  ++(0:1) node (b99) {}
-                  ++(0:2.5) node (b-receives-a100) {}
-                  ++(0:1.5) node (b-end) {};
+                  ++(0:0.5) node (b) {}
+                  +(0:22) node (b-end) {}
+                  +(0:1) node (b-initial) {}
+                  +(0:5) node[point] (b-recv-ren-a1) {}
+                  +(0:7) node[point, label=below:{$\trm{ren}(\betterepoch{A1},B,7)$}] (b-ren-b7) {}
+                  +(0:13) node (b-ellipse-debut) {}
+                  +(0:15) node (b-ellipse-fin) {}
+                  +(0:21) node (b-final) {};
 
-              \draw[thick] (b0) -- (b7) -- (b8);
-              \draw[dotted] (b8) -- (b99);
-              \draw[->, thick] (b99) -- (b-end);
+              \draw[dotted] (b) -- (b-initial) (b-ellipse-debut) -- (b-ellipse-fin) (b-final) -- (b-end);
+              \draw[->, thick] (b-initial) --  (b-recv-ren-a1) -- (b-ren-b7) -- (b-ellipse-debut) (b-ellipse-fin) -- (b-final);
 
               \path
                   ++(270:4) node {\textbf{C}}
-                  ++(0:0.5) node (c0) {}
-                  ++(0:2) node[point, label=below:{rename to \epoch{C1}}] (c1) {}
-                  ++(0:3) node (c2) {}
-                  ++(0:1) node (c99) {}
-                  ++(0:4) node (c-end) {};
+                  ++(0:0.5) node (c) {}
+                  +(0:22) node (c-end) {}
+                  +(0:1) node (c-initial) {}
+                  +(0:5) node[point, label=below:{$\trm{ren}(\betterepoch{0},C,1)$}] (c-ren-c1) {}
+                  +(0:13) node (c-ellipse-debut) {}
+                  +(0:15) node (c-ellipse-fin) {}
+                  +(0:21) node (c-final) {};
 
-                \draw[thick] (c0) -- (c1) -- (c2);
-                \draw[dotted] (c2) -- (c99);
-                \draw[->, thick] (c99) -- (c-end);
+              \draw[dotted] (c) -- (c-initial) (c-ellipse-debut) -- (c-ellipse-fin) (c-final) -- (c-end);
+              \draw[->, thick] (c-initial) --  (c-ren-c1) -- (c-ellipse-debut) (c-ellipse-fin) -- (c-final);
 
-              \draw[->, dashed, shorten >= 1] (a1) -- (b-receives-a1);
-              \draw[->, dashed, shorten >= 1] (b7) -- (a-receives-b7);
-              % \draw[->, dashed, shorten >= 1] (a100) -- (b-receives-a100);
-              \draw[->, dashed, shorten >= 1] (c1) -- (a-receives-c1);
+              \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (b-recv-ren-a1);
+              \draw[->, dashed, shorten >= 1] (b-ren-b7) -- (a-recv-ren-b7);
+              \draw[->, dashed, shorten >= 1] (c-ren-c1) -- (a-recv-ren-c1);
             \end{tikzpicture}
           }
           \label{fig:worst-case-priority-execution}
