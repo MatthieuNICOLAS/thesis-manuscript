@@ -6,35 +6,35 @@ Pour rappel, cet algorithme se compose principalement des étapes suivantes :
   \item La création d'une nouvelle séquence à partir des identifiants calculés et du contenu courant.
 \end{enumerate}
 
-Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération \emph{rename}.
+Dans cette section, nous abordons une implémentation alternative de l'intégration de l'opération $\trm{rename}$.
 Cette implémentation repose sur le journal des opérations.
 
 Cette implémentation se base sur les observations suivantes :
 \begin{enumerate}
   \item L'état courant est obtenu en intégrant successivement l'ensemble des opérations.
-  \item L'opération \emph{rename} est une opération subsumant les opérations passées : elle prend un état donné (l'\emph{ancien état}), somme des opérations précédentes, et génère un nouvel état équivalent compacté.
+  \item L'opération $\trm{rename}$ est une opération subsumant les opérations passées : elle prend un état donné (l'\emph{ancien état}), somme des opérations précédentes, et génère un nouvel état équivalent compacté.
   \item L'ordre d'intégration des opérations concurrentes n'a pas d'importance sur l'état final obtenu.
 \end{enumerate}
 
-Ainsi, pour intégrer une opération \emph{rename} distante, un noeud peut :
+Ainsi, pour intégrer une opération $\trm{rename}$ distante, un noeud peut :
 \begin{enumerate}
   \item Générer l'état correspondant au renommage de l'\emph{ancien état}.
   \item Identifier le chemin entre l'époque courante et l'époque cible.
-  \item Identifier les opérations concurrentes à l'opération \emph{rename} présentes dans son journal des opérations.
-  \item Transformer et intégrer successivement les opérations concurrentes à l'opération \emph{rename} à ce nouvel état.
+  \item Identifier les opérations concurrentes à l'opération $\trm{rename}$ présentes dans son journal des opérations.
+  \item Transformer et intégrer successivement les opérations concurrentes à l'opération $\trm{rename}$ à ce nouvel état.
 \end{enumerate}
 
-Cet algorithme est équivalent à ré-ordonner le journal des opérations de façon à intégrer les opérations précédant l'opération \emph{rename}, puis à intégrer l'opération \emph{rename} elle-même, puis à intégrer les opérations concurrentes à cette dernière.
+Cet algorithme est équivalent à ré-ordonner le journal des opérations de façon à intégrer les opérations précédant l'opération $\trm{rename}$, puis à intégrer l'opération $\trm{rename}$ elle-même, puis à intégrer les opérations concurrentes à cette dernière.
 
 Cette approche présente plusieurs avantages par rapport à l'implémentation décrite précédemment.
 Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
 La version précédente transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si nous disposons de \textsc{renameBlock}) de l'état courant.
-La version présentée ici effectue une transformation pour chaque opération concurrente à l'opération \emph{rename} à intégrer présente dans le journal des opérations.
+La version présentée ici effectue une transformation pour chaque opération concurrente à l'opération $\trm{rename}$ à intégrer présente dans le journal des opérations.
 Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
 
 Un autre avantage de cette approche est qu'elle permet de récupérer et de réutiliser les identifiants originaux des opérations.
 Lorsqu'une suite de transformations est appliquée sur les identifiants d'une opération, elle est appliquée sur les identifiants originaux et non plus sur leur équivalents présents dans l'état courant.
-Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans la \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération \emph{rename} sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération \emph{rename}.
+Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans la \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération $\trm{rename}$ sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération $\trm{rename}$.
 Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \textsc{renameId} et \textsc{revertRenameId}.
 
 Cette implémentation dispose néanmoins de plusieurs limites.
@@ -45,18 +45,18 @@ En effet, les noeuds doivent déjà maintenir le journal des opérations pour le
 Plus globalement, les noeuds doivent aussi conserver le journal des opérations pour permettre à un nouveau noeud de rejoindre la collaboration et de calculer l'état courant en rejouant l'ensemble des opérations.
 Il s'agit donc d'une contrainte déjà imposée aux noeuds pour d'autres fonctionnalités du système.
 
-Un autre défaut de cette implémentation est qu'elle nécessite de détecter les opérations concurrentes à l'opération \emph{rename} à intégrer.
-Cela implique d'ajouter des informations de causalité à l'opération \emph{rename}, tel qu'un vecteur de version.
+Un autre défaut de cette implémentation est qu'elle nécessite de détecter les opérations concurrentes à l'opération $\trm{rename}$ à intégrer.
+Cela implique d'ajouter des informations de causalité à l'opération $\trm{rename}$, tel qu'un vecteur de version.
 Cependant, la taille des vecteurs de version croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
 Diffuser cette information à l'ensemble des noeuds peut donc représenter un coût significatif dans les collaborations à large échelle.
 Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
-Les opérations \emph{rename} étant rares en comparaison, ce surcoût nous paraît acceptable.
+Les opérations $\trm{rename}$ étant rares en comparaison, ce surcoût nous paraît acceptable.
 
 Finalement, cette approche implique aussi de parcourir le journal des opérations à la recherche d'opérations concurrentes.
 Comme dit précédemment, la taille du journal croît de façon monotone au fur et à mesure que les noeuds émettent des opérations.
-Cette étape du nouvel algorithme d'intégration de l'opération \emph{rename} devient donc de plus en plus coûteuse.
+Cette étape du nouvel algorithme d'intégration de l'opération $\trm{rename}$ devient donc de plus en plus coûteuse.
 Des méthodes permettent néanmoins de réduire son coût computationnel.
 Notamment, chaque noeud traquent les informations de progression des autres noeuds afin de supprimer les métadonnées du mécanisme de renommage (cf. \autoref{sec:gc-mechanism}).
-Ces informations permettent de déterminer la stabilité causale des opérations et donc d'identifier les opérations qui ne peuvent plus être concurrentes à une nouvelle opération \emph{rename}.
+Ces informations permettent de déterminer la stabilité causale des opérations et donc d'identifier les opérations qui ne peuvent plus être concurrentes à une nouvelle opération $\trm{rename}$.
 Les noeuds peuvent ainsi maintenir, en plus du journal complet des opérations, un journal composé uniquement des opérations non stables causalement.
-Lors du traitement d'une nouvelle opération \emph{rename}, les noeuds peuvent alors parcourir ce journal réduit à la recherche des opérations concurrentes.
+Lors du traitement d'une nouvelle opération $\trm{rename}$, les noeuds peuvent alors parcourir ce journal réduit à la recherche des opérations concurrentes.

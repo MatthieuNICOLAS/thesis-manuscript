@@ -15,7 +15,7 @@ Bien que l'approche LSEQ réduise la vitesse de croissance des identifiants dans
 À l'inverse, le mécanisme de renommage de RenamableLogootSplit permet de réduire les métadonnées à une quantité fixe, indépendamment du nombre d'éléments.
 
 Ces deux approches sont néanmoins orthogonales et peuvent, comme avec l'approche précédente, être combinées.
-Le système résultant réinitialiserait périodiquement les métadonnées de la séquence répliquée à l'aide de l'opération \emph{rename} tandis que les stratégies d'allocation d'identifiants de LSEQ réduiraient leur croissance entretemps.
-Cela permettrait aussi de réduire la fréquence de l'opération \emph{rename}, réduisant ainsi les calculs effectués par le système de manière globale.
+Le système résultant réinitialiserait périodiquement les métadonnées de la séquence répliquée à l'aide de l'opération $\trm{rename}$ tandis que les stratégies d'allocation d'identifiants de LSEQ réduiraient leur croissance entretemps.
+Cela permettrait aussi de réduire la fréquence de l'opération $\trm{rename}$, réduisant ainsi les calculs effectués par le système de manière globale.
 
 % \mnnote{Serait intéressant d'avoir une implémentation combinant LogootSplit et LSEQ pour vérifier si les contraintes sur la création de blocs dans LogootSplit ne "sabotent" pas la croissance polylogarithmique des identifiants de LSEQ}

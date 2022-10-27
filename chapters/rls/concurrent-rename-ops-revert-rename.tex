@@ -1,11 +1,11 @@
 \label{sec:reverting-rename-ops}
 
 À présent, nous développons le scénario présenté dans la \autoref{fig:conflicting-rename-operations}.
-Dans la \autoref{fig:revertRenameId}, le noeud A reçoit l'opération \emph{rename} du noeud B.
-Cette opération est concurrente à l'opération \emph{rename} que le noeud A a appliqué précédemment.
+Dans la \autoref{fig:revertRenameId}, le noeud A reçoit l'opération $\trm{rename}$ du noeud B.
+Cette opération est concurrente à l'opération $\trm{rename}$ que le noeud A a appliqué précédemment.
 D'après la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
 Mais pour pouvoir renommer son état vers l'époque \epoch{B2}, il doit au préalable faire revenir son état courant de l'époque \epoch{A1} à un état équivalent à l'époque \epoch{0}.
-Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'une opération \emph{rename} appliquée précédemment.
+Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'une opération $\trm{rename}$ appliquée précédemment.
 
 \begin{figure}[!ht]
   \centering
@@ -101,7 +101,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 ++(0:1.3 * \widthepoch) \renhello{#3};
 
                 \draw[->, loosely dash dot, shorten >= 1] (ea1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
-                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{\emph{rename}\\ \emph{to} \epoch{B2}} (eb2-left);
+                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{B2}} (eb2-left);
         }
         \newcommand\finalstateb[3]{
             \path
@@ -150,7 +150,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
         \draw[->, dashed, shorten >= 1] (b-ren-b2) -- (a-recv-ren-b2);
     \end{tikzpicture}
   }
-  \caption{Annulation d'une opération \emph{rename} intégrée précèdemment en présence d'un identifiant inséré en concurrence}
+  \caption{Annulation d'une opération $\trm{rename}$ intégrée précèdemment en présence d'un identifiant inséré en concurrence}
   \label{fig:revertRenameId}
 \end{figure}
 
@@ -160,7 +160,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-    \Function{revertRenameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I} \rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}{: $\mathbb{I}$}
+    \Function{revertRenameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}{: $\mathbb{I}$}
       \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
 
         \State $\text{firstId} \gets \text{id}_0$
@@ -182,7 +182,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
         \EndIf
     \EndFunction
     \\
-    \Function{revRenIdfromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Arr}\langle \mathbb{I} \rangle$, index $\in \mathbb{N}$}{: $\mathbb{I}$}
+    \Function{revRenIdfromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, index $\in \mathbb{N}$}{: $\mathbb{I}$}
         \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
         \Statex \Comment $\text{id} = \newlogootsplituple{\text{index}} \oplus \text{tail}$
 
@@ -190,10 +190,10 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
         \State $\text{succId} \gets \text{id}_{\text{index}+1}$
 
         \If{$\text{tail} \lid \text{predId}$}
-            \Statex \Comment id has been inserted causally after the \emph{rename} op
+            \Statex \Comment id has been inserted causally after the $\trm{rename}$ op
             \State \Return $\text{predId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott
         \ElsIf{$\text{succId} \lid \text{tail}$}
-            \Statex \Comment id has been inserted causally after the \emph{rename} op
+            \Statex \Comment id has been inserted causally after the $\trm{rename}$ op
             \Statex \Comment $\text{succId} = \text{prefix} \oplus \logootsplituple{j}$
             \State $\text{predOfSuccId} \gets \text{prefix} \oplus \langle \text{pos}_j,\text{nodeId}_j,\text{nodeSeq}_j,\text{offset}_{j} - 1 \rangle$
             \State \Return $\text{predOfSuccId} \oplus \topt \oplus \text{tail}$ \Comment \commenttopt
@@ -209,15 +209,15 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 Les objectifs de \textsc{revertRenameId} sont les suivants :
 \begin{enumerate}
   \item \label{item:revert-rename-1}
-    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération \emph{rename} annulée.
+    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération $\trm{rename}$ annulée.
   \item \label{item:revert-rename-2}
-    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération \emph{rename} annulée.
+    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération $\trm{rename}$ annulée.
   \item \label{item:revert-rename-3}
-    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération \emph{rename} annulée.
+    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération $\trm{rename}$ annulée.
 \end{enumerate}
 
 Le cas \ref{item:revert-rename-1} est le plus trivial.
-Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération \emph{rename}, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
+Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
 En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
 Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A1}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B0}{0}.
 
@@ -230,7 +230,7 @@ et nous devons obtenir :
 \[\trm{id} \in ]\trm{predId}, \trm{succId}[\]
 
 Le premier sous-cas se produit quand nous avons $\trm{tail} \in ]\trm{predId}, \trm{succId}[$.
-Dans ce cas, $\trm{newId}$ peut résulter d'une opération \emph{insert} concurrent à l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-2}).
+Dans ce cas, $\trm{newId}$ peut résulter d'une opération $\trm{insert}$ concurrent à l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-2}).
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
 Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
@@ -249,17 +249,17 @@ Renvoyer cette valeur nous permet ainsi de conserver l'ordre entre les identifia
 \[i^{B0}_{0}f^{A0}_{0} <_{id} i^{B0}_{0}m^{B1}_{0} <_{id} i^{B0}_{1}\]
 
 Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
-$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération \emph{rename} (\ie le cas \ref{item:revert-rename-3}).
+$\trm{newId}$ ne peut avoir été inséré que causalement après l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-3}).
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[\]
-Puisque $\trm{newId}$ a été inséré causalement après l'opération \emph{rename}, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
+Puisque $\trm{newId}$ a été inséré causalement après l'opération $\trm{rename}$, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
 Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{MIN\_TUPLE}$ et $\trm{MAX\_TUPLE}$, notés respectivement $\bot$ et $\top$.
 Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
 En utilisant $\trm{MIN\_TUPLE}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bot~tail}$).
 Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mintuple}.
 
 \begin{figure}[!ht]
-  \subfloat[Génération d'une opération \emph{insert} dépendante causalement d'une opération \emph{rename}]{
+  \subfloat[Génération d'une opération $\trm{insert}$ dépendante causalement d'une opération $\trm{rename}$]{
     \begin{minipage}{\linewidth}
       \centering
       \resizebox{\columnwidth}{!}{
@@ -402,7 +402,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
         \label{fig:revertRenameId-mintuple-setup}
     \end{minipage}}
   \hfil
-  \subfloat[Annulation de l'opération \emph{rename} précédente au profit d'une opération \emph{rename} concurrente]{
+  \subfloat[Annulation de l'opération $\trm{rename}$ précédente au profit d'une opération $\trm{rename}$ concurrente]{
     \begin{minipage}{\linewidth}
       \centering
       \resizebox{\columnwidth}{!}{
@@ -499,7 +499,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     ++(0:\widthletter) \rendld{-#3};
 
                     \draw[->, loosely dash dot, shorten >= 1] (ec1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
-                    \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{\emph{rename}\\ \emph{to} \epoch{D3}} (ed3-left);
+                    \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{D3}} (ed3-left);
             }
 
             \newcommand\rendwold[3]{
@@ -545,23 +545,23 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
         }
         \label{fig:revertRenameId-mintuple-revert}
     \end{minipage}}
-  \caption{Annulation d'une opération \emph{rename} intégrée précèdemment en présence d'un identifiant inséré causalement après}
+  \caption{Annulation d'une opération $\trm{rename}$ intégrée précèdemment en présence d'un identifiant inséré causalement après}
   \label{fig:revertRenameId-mintuple}
 \end{figure}
 
 Dans la \autoref{fig:revertRenameId-mintuple}, les noeuds C et D répliquent une même séquence contenant les éléments "WOD".
 Dans la \autoref{fig:revertRenameId-mintuple-setup}, le noeud C commence par renommer son état.
 En concurrence, le noeud D insère l'élément "L" entre les éléments "O" et "D".
-L'opération \emph{insert} correspondante est livrée au noeud C, qui l'intègre en suivant le comportement défini en \autoref{sec:ops-concurrent-to-rename}.
+L'opération $\trm{insert}$ correspondante est livrée au noeud C, qui l'intègre en suivant le comportement défini en \autoref{sec:ops-concurrent-to-rename}.
 Le noeud C procède ensuite à l'insertion de l'élément "R" entre les éléments "O" et "L".
-Cette insertion dépend donc causalement de l'opération \emph{rename} effectuée précédemment par C.
+Cette insertion dépend donc causalement de l'opération $\trm{rename}$ effectuée précédemment par C.
 En parallèle, le noeud D effectue un renommage de son état.
-Cette opération \emph{rename} est donc concurrente à l'opération \emph{rename} générée précédemment par C.
+Cette opération $\trm{rename}$ est donc concurrente à l'opération $\trm{rename}$ générée précédemment par C.
 
-Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération \emph{rename} de D est livrée au noeud C.
-L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C1} \lepoch \epoch{D3}), le noeud C procède à l'annulation de son opération \emph{rename}.
+Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération $\trm{rename}$ de D est livrée au noeud C.
+L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C1} \lepoch \epoch{D3}), le noeud C procède à l'annulation de son opération $\trm{rename}$.
 
-L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération \emph{rename} annulée : \id{k}{C1}{1}\id{i}{C2}{0}.
+L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération $\trm{rename}$ annulée : \id{k}{C1}{1}\id{i}{C2}{0}.
 Cet identifiant est compris entre les identifiants suivants :
 \[k^{C1}_{1} <_{id} k^{C1}_{1}i^{C2}_{0} <_{id} k^{C1}_{1}n^{C0}_{0}e^{D2}_{0}\]
 D'après les règles présentées précédemment :
@@ -596,11 +596,11 @@ Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des i
 Les fonctions pour gérer les cas restants sont présentées dans l'\autoref{app:revert-rename-id}.
 
 Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
-\textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération \emph{rename}.
-Par contre, \textsc{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération \emph{rename}.
-Rejouer une opération \emph{rename} précédemment annulée altère donc ces identifiants.
+\textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération $\trm{rename}$.
+Par contre, \textsc{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération $\trm{rename}$.
+Rejouer une opération $\trm{rename}$ précédemment annulée altère donc ces identifiants.
 Cette modification peut entraîner une divergence entre les noeuds, puis qu'un même élément sera désigné par des identifiants différents.
 
 Ce problème est toutefois évité dans notre système grâce à la relation \emph{priority} utilisée.
 Puisque la relation \emph{priority} est définie en utilisant l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, les noeuds se déplacent seulement vers l'époque la plus à droite de l'\emph{arbre des époques} lorsqu'ils changent d'époque.
-Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations \emph{rename} correspondantes.
+Les noeuds évitent donc d'aller et revenir entre deux mêmes époques, et donc d'annuler et rejouer les opérations $\trm{rename}$ correspondantes.

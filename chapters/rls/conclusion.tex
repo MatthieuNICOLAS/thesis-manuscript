@@ -2,24 +2,24 @@
 Dans ce chapitre, nous avons présenté un nouvel Sequence \ac{CRDT} : RenamableLogootSplit.
 Ce nouveau type de données répliquées associe à LogootSplit un mécanisme de renommage optimiste permettant de réduire périodiquemment les métadonnées stockées et d'optimiser l'état interne de la structure de données.
 
-Ce mécanisme prend la forme d'une nouvelle opération, l'opération \emph{rename}, qui peut être émise à tout moment par n'importe quel noeud.
+Ce mécanisme prend la forme d'une nouvelle opération, l'opération $\trm{rename}$, qui peut être émise à tout moment par n'importe quel noeud.
 Cette opération génère une nouvelle séquence LogootSplit, équivalente à l'état précédent, avec une empreinte minimale en métadonnées.
-L'opération \emph{rename} transporte aussi suffisamment d'informations pour que les noeuds puissent intégrer les opérations concurrentes à l'opération \emph{rename} dans le nouvel état.
+L'opération $\trm{rename}$ transporte aussi suffisamment d'informations pour que les noeuds puissent intégrer les opérations concurrentes à l'opération $\trm{rename}$ dans le nouvel état.
 
-En cas d'opérations \emph{rename} concurrentes, la relation d'ordre strict total \lepoch permet aux noeuds de décider quelle opération \emph{rename} utiliser, sans coordination.
-Les autres opérations \emph{rename} sont quant à elles ignorées.
+En cas d'opérations $\trm{rename}$ concurrentes, la relation d'ordre strict total \lepoch permet aux noeuds de décider quelle opération $\trm{rename}$ utiliser, sans coordination.
+Les autres opérations $\trm{rename}$ sont quant à elles ignorées.
 Seules leurs informations sont stockées par RenamableLogootSplit, afin de gérer les opérations concurrentes potentielles.
 
-Une fois qu'une opération \emph{rename} a été propagée à l'ensemble des noeuds, elle devient causalement stable.
+Une fois qu'une opération $\trm{rename}$ a été propagée à l'ensemble des noeuds, elle devient causalement stable.
 À partir de ce point, il n'est plus possible qu'un noeud émette une opération concurrente à cette dernière.
-Les informations incluses dans l'opération \emph{rename} pour intégrer les opérations concurrentes potentielles peuvent donc être supprimées par l'ensemble des noeuds.
+Les informations incluses dans l'opération $\trm{rename}$ pour intégrer les opérations concurrentes potentielles peuvent donc être supprimées par l'ensemble des noeuds.
 
 Ainsi, le mécanisme de renommage permet à RenamableLogootSplit d'offrir de meilleures performances que LogootSplit.
 La génération du nouvel état minimal et la suppression à terme des métadonnées du mécanisme de renommage divisent par 100 la taille de la structure de données répliquée.
-L'optimisation de l'état interne représentant la séquence réduit aussi le coût d'intégration des opérations suivantes, amortissant ainsi le coût de transformation et d'intégration des opérations concurrentes à l'opération \emph{rename}.
+L'optimisation de l'état interne représentant la séquence réduit aussi le coût d'intégration des opérations suivantes, amortissant ainsi le coût de transformation et d'intégration des opérations concurrentes à l'opération $\trm{rename}$.
 
 RenamableLogootSplit souffre néanmoins de plusieurs limitations.
-La première d'entre elles est le besoin d'observer la stabilité causale des opérations \emph{rename} pour supprimer de manière définitive les métadonnées associées.
+La première d'entre elles est le besoin d'observer la stabilité causale des opérations $\trm{rename}$ pour supprimer de manière définitive les métadonnées associées.
 Il s'agit d'une contrainte forte, notamment dans les systèmes dynamiques à grande échelle dans lesquels nous n'avons aucune garantie et aucun contrôle sur les noeuds.
 Il est donc possible qu'un noeud déconnecté ne se reconnecte jamais, bloquant ainsi la progression de la stabilité causale pour l'ensemble des opérations.
 Il s'agit toutefois d'une limite partagée avec les autres mécanismes de réduction des métadonnées pour Sequence \acp{CRDT} proposés dans la littérature \cite{ROH2011354, zawirski:hal-01248197}, à l'exception de l'approche LSEQ \cite{lseq2017}.
@@ -35,9 +35,9 @@ En pratique, il serait intéressant d'étudier la mise en place d'un mécanisme 
 % La collaboration poursuivrait alors uniquement avec les noeuds
 % Cette solution est néanmoins imparfaite, car elle peut conduire à des forks,
 
-La seconde limitation de RenamableLogootSplit concerne la génération d'opérations \emph{rename} concurrentes.
-Chaque opération \emph{rename} est coûteuse, aussi bien en terme de métadonnées à stocker et diffuser qu'en terme de traitements à effectuer.
-Il est donc important de chercher à minimiser le nombre d'opérations \emph{rename} concurrentes émises par les noeuds.
+La seconde limitation de RenamableLogootSplit concerne la génération d'opérations $\trm{rename}$ concurrentes.
+Chaque opération $\trm{rename}$ est coûteuse, aussi bien en terme de métadonnées à stocker et diffuser qu'en terme de traitements à effectuer.
+Il est donc important de chercher à minimiser le nombre d'opérations $\trm{rename}$ concurrentes émises par les noeuds.
 Une approche possible est d'adopter une architecture du type \emph{core-nebula}\cite{zawirski:hal-01248197}.
 Mais pour les systèmes incompatibles avec ce type d'architecture système, il serait intéressant de proposer d'autres approches ne nécessitant aucune coordination entre les noeuds.
 Mais par définition, ces approches ne pourraient offrir de garanties fortes sur le nombre d'opérations concurrentes possibles.

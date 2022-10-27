@@ -2,8 +2,8 @@ Une nouvelle sémantique pour l'Ensemble fut proposée \cite{2020-cl-set-weihai}
 Cette sémantique se base sur les observations suivantes :
 
 \begin{enumerate}
-  \item $\trm{add}$ et $\trm{rmv}$ d'un élément prennent place à tour de rôle, chaque modification invalidant la précédente.
-  \item $\trm{add}$ (resp. $\trm{rmv}$) concurrents d'un même élément représentent la même intention.
+  \item $\trm{add}$ et $\trm{remove}$ d'un élément prennent place à tour de rôle, chaque modification invalidant la précédente.
+  \item $\trm{add}$ (resp. $\trm{remove}$) concurrents d'un même élément représentent la même intention.
     Prendre en compte une de ces modifications concurrentes revient à prendre en compte leur ensemble.
 \end{enumerate}
 
@@ -47,12 +47,12 @@ La \autoref{fig:set-cl} illustre son fonctionnement.
   \label{fig:set-cl}
 \end{figure}
 
-Dans notre exemple, la modification $\trm{rmv(a)}$ effectuée par B est en concurrence avec une modification identique effectuée par A.
+Dans notre exemple, la modification $\trm{rmv}(a)$ effectuée par B est en concurrence avec une modification identique effectuée par A.
 La sémantique \ac{CL} définit que ces deux modifications partagent la même intention.
 Ainsi, A ayant déjà appliqué sa propre modification préalablement, il ne prend pas en compte \emph{de nouveau} cette modification lorsqu'il la reçoit de B.
 Son état reste donc inchangé.
 
-À l'inverse, la modification $\trm{add(a)}$ effectuée par A fait suite à sa modification $\trm{rmv}(a)$.
-La sémantique \ac{CL} définit alors qu'elle fait suite à toute autre modification $\trm{rmv}(a)$ concurrente.
+À l'inverse, la modification $\trm{add(a)}$ effectuée par A fait suite à sa modification $\trm{remove}(a)$.
+La sémantique \ac{CL} définit alors qu'elle fait suite à toute autre modification $\trm{remove}(a)$ concurrente.
 Ainsi, B intègre cette modification lorsqu'il la reçoit de A.
 Son état évolue donc pour devenir $\{a\}$.

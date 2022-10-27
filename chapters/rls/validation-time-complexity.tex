@@ -10,16 +10,16 @@ Nous ne prenons donc pas en considération ce paramètre dans nos complexités e
 Afin de simplifier les complexités, nous considérons que les \emph{anciens états} associés aux époques contiennent aussi $n$ identifiants.
 Finalement, nous considérons que nous utilisons comme structures de données un arbre AVL pour représenter l'état interne de la séquence, des tableaux pour les \emph{anciens états} et une table de hachage pour l'\emph{arbre des époques}.
 
-\subsubsection{Complexité en temps des opérations \emph{insert} et \emph{remove}}
+\subsubsection{Complexité en temps des opérations $\trm{insert}$ et $\trm{remove}$}
 
 À partir de ces hypothèses, nous établissons les complexités en temps des opérations.
 Pour chaque opération, nous distinguons deux complexités : une complexité pour l'intégration de l'opération locale, une pour l'intégration de l'opération distante.
 
-La complexité de l'intégration de l'opération \emph{insert} locale est inchangée par rapport à celle obtenue pour LogootSplit.
+La complexité de l'intégration de l'opération $\trm{insert}$ locale est inchangée par rapport à celle obtenue pour LogootSplit.
 Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre souhaité puis à insérer le bloc dans l'arbre AVL.
 D'après \textcite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.
 
-La complexité de l'intégration de l'opération \emph{insert} distante, elle, évolue par rapport à celle définie pour LogootSplit.
+La complexité de l'intégration de l'opération $\trm{insert}$ distante, elle, évolue par rapport à celle définie pour LogootSplit.
 En effet, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
 
 Tout d'abord, il est nécessaire d'identifier l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante.
@@ -45,18 +45,18 @@ Cela permet de trouver le prédecesseur en \bigO{\log{}n}, où $n$ correspond ic
 Comme pour \textsc{revertRenameId}, les instructions restantes consistent en des comparaisons et manipulations d'identifiants.
 La complexité de \textsc{renameId} est donc de \bigO{\log{}n}.
 
-Une fois les identifiants introduits par l'opération \emph{insert} renommés pour l'époque courante, il ne reste plus qu'à les insérer dans la séquence.
+Une fois les identifiants introduits par l'opération $\trm{insert}$ renommés pour l'époque courante, il ne reste plus qu'à les insérer dans la séquence.
 Cette étape se réalise en \bigO{\log{}b} pour chaque identifiant, le temps nécessaire pour trouver son emplacement dans l'arbre AVL.
 
-Ainsi, en reprenant l'ensemble des étapes composant l'intégration de l'opération \emph{insert} distante, nous obtenons la complexité suivante : \bigO{h + s (k + l \cdot \log{}n + \log{}b)}.
+Ainsi, en reprenant l'ensemble des étapes composant l'intégration de l'opération $\trm{insert}$ distante, nous obtenons la complexité suivante : \bigO{h + s (k + l \cdot \log{}n + \log{}b)}.
 
-Le procédé de l'intégration de l'opération \emph{remove} étant similaire à celui de l'opération \emph{insert}, aussi bien en local qu'en distant, nous obtenons les mêmes complexités en temps.
+Le procédé de l'intégration de l'opération $\trm{remove}$ étant similaire à celui de l'opération $\trm{insert}$, aussi bien en local qu'en distant, nous obtenons les mêmes complexités en temps.
 
-\subsubsection{Complexité en temps de l'opération \emph{rename}}
+\subsubsection{Complexité en temps de l'opération $\trm{rename}$}
 \label{sec:validation-time-complexity-rename}
-Étudions à présent la complexité en temps de l'opération \emph{rename}.
+Étudions à présent la complexité en temps de l'opération $\trm{rename}$.
 
-L'opération \emph{rename} locale se décompose en 2 étapes :
+L'opération $\trm{rename}$ locale se décompose en 2 étapes :
 \begin{enumerate}
   \item La génération de l'\emph{ancien état} à intégrer au message de l'opération (cf. \autoref{def:rename-op}).
   \item Le remplacement de la séquence courante par une séquence équivalente, renommée.
@@ -65,24 +65,24 @@ La première étape consiste à parcourir et à linéariser la séquence actuell
 Elle s'effectue donc en \bigO{b}.
 La seconde consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
 Cette seconde étape s'effectue en \bigO{1}.
-L'opération \emph{rename} locale a donc une complexité de \bigO{b}.
+L'opération $\trm{rename}$ locale a donc une complexité de \bigO{b}.
 
-L'intégration de l'opération \emph{rename} se décompose en les étapes suivantes :
+L'intégration de l'opération $\trm{rename}$ se décompose en les étapes suivantes :
 \begin{enumerate}
   \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}.
   \item La récupération des $n$ identifiants formant l'état courant.
   \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible.
-  \item L'identification des $k$ opérations \emph{rename} à inverser et des $l$ opérations \emph{rename} à jouer.
+  \item L'identification des $k$ opérations $\trm{rename}$ à inverser et des $l$ opérations $\trm{rename}$ à jouer.
   \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}.
   \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence.
 \end{enumerate}
 L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
 La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaque intervalle d'identifiants en liste d'identifiants, ce qui nécessite \bigO{n} instructions.
 
-Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations \emph{insert} distantes analysé précédemment.
+Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations $\trm{insert}$ distantes analysé précédemment.
 Ces étapes s'effectuent donc en \bigO{n(k + l \cdot \log{}n + \log{}b)}.
 
-Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération \emph{rename} distante.
+Nous obtenons donc une complexité en temps de \bigO{h + n(k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération $\trm{rename}$ distante.
 
 Nous pouvons néanmoins améliorer ce premier résultat.
 Notamment, nous pouvons tirer parti des faits suivants :
@@ -96,7 +96,7 @@ Ensuite, plutôt que d'insérer les identifiants un à un dans la nouvelle séqu
 Il ne reste plus qu'à constituer la nouvelle séquence à partir des blocs obtenus.
 Ces actions s'effectuent respectivement en \bigO{n} et \bigO{b} instructions.
 
-Ainsi, ces améliorations nous permettent d'obtenir une complexité en temps en \bigO{h + n (k + l) + b} pour le traitement de l'opération \emph{rename} distante.
+Ainsi, ces améliorations nous permettent d'obtenir une complexité en temps en \bigO{h + n (k + l) + b} pour le traitement de l'opération $\trm{rename}$ distante.
 
 \subsubsection{Récapitulatif}
 
@@ -113,10 +113,10 @@ Nous récapitulons les complexités en temps présentées précédemment dans le
       \cmidrule(lr){2-3}
         & Locale &   Distante \\
       \midrule
-      \emph{insert} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
-      \emph{remove} & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
+      $\trm{insert}$ & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
+      $\trm{remove}$ & $\log{}b$ & $h + s (k + l \cdot \log{}n + \log{}b)$ \\
       \emph{naive rename} & $b$ & $h + n (k + l \cdot \log{}n + \log{}b)$ \\
-      \emph{rename} & $b$ & $h + n (k + l) + b$ \\
+      $\trm{rename}$ & $b$ & $h + n (k + l) + b$ \\
       \bottomrule
   \end{tabular}
   \caption*{$b$ : nombre de blocs, $n$ : nombre d'éléments de l'état courant et des \emph{anciens états}, $h$ : hauteur de l'\emph{arbre des époques}, $k$ : nombre de renommages à inverser, $l$ : nombre de renommages à appliquer, $s$ : nombre d'éléments insérés/supprimés par l'opération}
@@ -134,7 +134,7 @@ L'algorithme génère le vecteur de version des opérations causalement stable e
 Cette étape correspond à fusionner $n$ vecteurs de version contenant $n$ entrées, elle s'exécute donc en \bigO{n^2} instructions.
 
 La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre défini par la relation \emph{priority}.
-Ce parcours s'effectue jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération \emph{rename} associée est causalement stable.
+Ce parcours s'effectue jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération $\trm{rename}$ associée est causalement stable.
 Pour chaque époque parcourue, le mécanisme de récupération de mémoire calcule et stocke son chemin jusqu'à la racine.
 Cette étape s'exécute donc en \bigO{e \cdot h}, avec $e$ le nombre d'époques composant l'arbre des époques et $h$ la hauteur de l'arbre.
 

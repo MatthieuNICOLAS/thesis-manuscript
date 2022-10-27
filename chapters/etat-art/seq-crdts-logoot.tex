@@ -107,8 +107,8 @@ Pour illustrer cet algorithme, considérons son exécution avec :
 
 Comme pour Treedoc, l'utilisation d'identifiants de position permet de redéfinir les modifications :
 \begin{enumerate}
-  \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins(\trm{id}, \trm{elt})}$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
-  \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+  \item $\trm{insert}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{insert}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
+  \item $\trm{remove}(\trm{elt})$ devient $\trm{remove}(\trm{id})$.
 \end{enumerate}
 Les auteurs proposent ainsi une séquence répliquée avec des opérations concurrentes qui commutent.
 
@@ -232,18 +232,18 @@ Nous illustrons cela à l'aide de la \autoref{fig:logoot}.
 Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée Logoot.
 Les deux noeuds possèdent le même état initial : une séquence contenant les éléments "HEMLO", avec leur identifiants respectifs.
 
-Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{ins}(E \prec L \prec M)$.
+Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{insert}(E \prec L \prec M)$.
 Logoot doit alors associer à cet élément un identifiant $\trm{id}$ tel que $\betterid{m}{B1}{} \prec \trm{id} \prec \betterid{n}{B2}{}$.
 Dans cet exemple, Logoot choisit l'identifiant $\betterid{m}{B1}{}\betterid{o}{A3}{}$.
-L'opération correspondante à l'insertion, $\trm{ins}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$, est générée, intégrée à la copie locale et diffusée.
+L'opération correspondante à l'insertion, $\trm{insert}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$, est générée, intégrée à la copie locale et diffusée.
 
 En concurrence, le noeud B supprime l'élément "M" de la séquence.
-Logoot retrouve l'identifiant de cet élément, $\betterid{n}{B2}{}$ et produit l'opération $\trm{rmv}(\betterid{n}{B2}{})$.
+Logoot retrouve l'identifiant de cet élément, $\betterid{n}{B2}{}$ et produit l'opération $\trm{remove}(\betterid{n}{B2}{})$.
 Cette dernière est intégrée à sa copie locale et diffusée.
 
-À la réception de l'opération $\trm{rmv}(\betterid{n}{B2}{})$, le noeud A parcourt sa copie locale.
+À la réception de l'opération $\trm{remove}(\betterid{n}{B2}{})$, le noeud A parcourt sa copie locale.
 Il identifie l'élément possèdant cet identifiant, "M", et le supprime de sa séquence.
-De son côté, le noeud B reçoit l'opération $\trm{ins}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$.
+De son côté, le noeud B reçoit l'opération $\trm{insert}(\betterid{m}{B1}{}\betterid{o}{A3}{}, L)$.
 Il parcourt sa copie locale jusqu'à trouver un identifiant supérieur à celui de l'opération : $\betterid{s}{B2}{}$.
 Il insère alors l'élément reçu avant ce dernier.
 Les noeuds convergent alors à l'état "HELLO".
@@ -254,8 +254,8 @@ Nous constatons cependant que nous pouvons proposer un modèle de livraison moin
   Le modèle de livraison Logoot définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
-    \item L'opération $\trm{rmv}(\trm{id})$ ne peut être livrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \item Les opérations $\trm{insert}$ peuvent être livrées dans un ordre quelconque.
+    \item L'opération $\trm{remove}(\trm{id})$ ne peut être livrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
   \end{enumerate}
 \end{definition}
 Ainsi, Logoot peut adopter le même modèle de livraison que Treedoc, comme indiqué dans \cite{2021-these-vic}.
@@ -275,7 +275,7 @@ Un objectif de l'algorithme \texttt{generateId} est donc de limiter le plus poss
 
 Plusieurs extensions furent proposées pour Logoot.
 \textcite{2010-logoot-undo-weiss} proposent une nouvelle stratégie d'allocation des identifiants pour \texttt{generateId}.
-Cette stratégie consiste à limiter la distance entre deux identifiants insérés au cours de la même modification $\trm{ins}$, au lieu des les répartir de manière aléatoire entre $\trm{predId}$ et $\trm{succId}$.
+Cette stratégie consiste à limiter la distance entre deux identifiants insérés au cours de la même modification $\trm{insert}$, au lieu des les répartir de manière aléatoire entre $\trm{predId}$ et $\trm{succId}$.
 Ceci permet de regrouper les identifiants des éléments insérés par une même modification et de laisser plus d'espace pour les insertions suivantes.
 Les expérimentations présentées montrent que cette stratégie permet de ralentir la croissance des identifiants en fonction du nombre d'insertions.
 Ce résultat est confirmé par la suite dans \cite{2011-evaluation-crdts-ahmed-nacer}.
@@ -283,7 +283,7 @@ Ainsi, en réduisant la vitesse de croissance des identifiants, ce nouvel algori
 
 Toujours dans \cite{2010-logoot-undo-weiss}, les auteurs introduisent \emph{Logoot-Undo}, une version de Logoot dotée d'un mécanisme d'annulation des modifications.
 Ce mécanisme prend la forme d'une nouvelle modification, $\trm{undo}$, qui permet d'annuler l'effet d'une ou plusieurs modifications passées.
-Cette modification, et l'opération en résultant, est spécifiée de manière à être commutative avec toutes autres opérations concurrentes, \ie $\trm{ins}$, $\trm{rmv}$ et $\trm{undo}$ elle-même.
+Cette modification, et l'opération en résultant, est spécifiée de manière à être commutative avec toutes autres opérations concurrentes, \ie $\trm{insert}$, $\trm{remove}$ et $\trm{undo}$ elle-même.
 
 Pour définir $\trm{undo}$, une notion de \emph{degrée de visibilité} d'un élément est introduite.
 Elle permet à Logoot-Undo de déterminer si l'élément doit être affiché ou non.
@@ -291,7 +291,7 @@ Pour cela, Logoot-Undo maintient une structure auxiliaire, le \emph{Cimetière},
 Ainsi, Logoot-Undo ne référence qu'un nombre réduit de pierres tombales.
 Qui plus est, ces pierres tombales sont stockées en dehors de la structure représentant la séquence et n'impactent donc pas les performances des modifications ultérieures.
 
-De plus, il convient de noter que l'ajout du degrée de visibilité des éléments permet de rendre commutatives l'opération $\trm{ins}$ avec l'opération $\trm{rmv}$ d'un même élément.
+De plus, il convient de noter que l'ajout du degrée de visibilité des éléments permet de rendre commutatives l'opération $\trm{insert}$ avec l'opération $\trm{remove}$ d'un même élément.
 Ainsi, Logoot-Undo ne nécessite pour son modèle de livraison qu'une \emph{livraison en exactement un exemplaire à chaque noeud}.
 
 Finalement, \textcite{2013-logootsplit} introduisent \emph{LogootSplit}.

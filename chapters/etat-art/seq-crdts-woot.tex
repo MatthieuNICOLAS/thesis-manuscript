@@ -1,8 +1,8 @@
 WOOT \cite{2006-woot-oster} est considéré a posteriori comme le premier \ac{CRDT} synchronisé par opérations pour le type Séquence\footnote{\cite{2007-crdt-shapiro} n'ayant formalisé les \acp{CRDT} qu'en 2007.}.
 Conçu pour l'édition collaborative \ac{P2P}, son but est de surpasser les limites de l'approche \ac{OT} évoquées précédemment, \ie le coût du mécanisme de livraison causale.
 
-L'intuition de WOOT est la suivante : WOOT modifie la sémantique de la modification $\trm{ins}$ pour qu'elle corresponde à l'insertion d'un nouvel élément entre deux autres, et non plus à l'insertion d'un nouvel élément à une position donnée.
-Par exemple, l'insertion de l'élément "K" dans la séquence "SY" pour obtenir l'état "SKY", \ie $\trm{ins}(1, K)$, devient $\trm{ins}(S \prec K \prec Y)$, où $\prec$ représente l'ordre créé entre ces éléments.
+L'intuition de WOOT est la suivante : WOOT modifie la sémantique de la modification $\trm{insert}$ pour qu'elle corresponde à l'insertion d'un nouvel élément entre deux autres, et non plus à l'insertion d'un nouvel élément à une position donnée.
+Par exemple, l'insertion de l'élément "K" dans la séquence "SY" pour obtenir l'état "SKY", \ie $\trm{insert}(1, K)$, devient $\trm{insert}(S \prec K \prec Y)$, où $\prec$ représente l'ordre créé entre ces éléments.
 
 Afin de préciser quels éléments correspondent aux prédécesseur et successeur de l'élément inséré, WOOT repose sur un système d'identifiants.
 WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
@@ -18,17 +18,17 @@ WOOT associe ainsi un identifiant unique à chaque élément de la séquence.
 Dans le cadre de ce manuscrit, nous utiliserons pour former les identifiants WOOT le nom du noeud (\eg $A$) comme $\trm{nodeId}$ et un entier naturel, en démarrant à 1, comme $\trm{nodeSeq}$.
 Nous les représenterons de la manière suivante $\trm{nodeId}~\trm{nodeSeq}$, \eg $A1$\footnote{Notons qu'un identifiant WOOT est bel et bien unique, deux noeuds ne pouvant utiliser le même $\trm{nodeId}$ et un noeud n'utilisant jamais deux fois le même $\trm{nodeSeq}$.}.
 
-Les modifications $\trm{ins}$ et $\trm{rmv}$ génèrent dès lors des opérations tirant profit des identifiants.
+Les modifications $\trm{insert}$ et $\trm{remove}$ génèrent dès lors des opérations tirant profit des identifiants.
 Par exemple, considérons une séquence WOOT représentant "SY" et qui associe respectivement les identifiants $A1$ et $A2$ aux éléments "S" et "Y".
-L'insertion de l'élément "E" dans cette séquence pour obtenir l'état "SKY", \ie $\trm{ins}(S \prec K \prec Y)$, produit par exemple l'opération $\trm{ins}(A1 \prec \langle B1,K \rangle \prec A2)$.
-De manière similaire, la suppression de l'élément "K" dans cette séquence pour obtenir l'état "SA", \ie $\trm{rmv}(1)$, produit $\trm{rmv}(B1)$.
+L'insertion de l'élément "E" dans cette séquence pour obtenir l'état "SKY", \ie $\trm{insert}(S \prec K \prec Y)$, produit par exemple l'opération $\trm{insert}(A1 \prec \langle B1,K \rangle \prec A2)$.
+De manière similaire, la suppression de l'élément "K" dans cette séquence pour obtenir l'état "SA", \ie $\trm{remove}(1)$, produit $\trm{remove}(B1)$.
 
-WOOT utilise des pierres tombales pour que les opérations $\trm{ins}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, et $\trm{rmv}$ commutent.
+WOOT utilise des pierres tombales pour que les opérations $\trm{insert}$, qui nécessite la présence des deux éléments entre lesquels nous insérons un nouvel élément, et $\trm{remove}$ commutent.
 Ainsi, lorsqu'un élément est retiré, une pierre tombale est conservée dans la séquence pour indiquer sa présence passée.
 Les données de l'élément sont elles supprimées.
 
 Finalement, WOOT définit $\lid$, un ordre strict total sur les identifiants associés aux éléments.
-En effet, la relation $\prec$ n'est pas définie pour deux éléments insérés en concurrence et qui possèdent les mêmes prédecesseur et successeur, \eg $\trm{ins}(S \prec K \prec Y)$ et $\trm{ins}(S \prec L \prec Y)$.
+En effet, la relation $\prec$ n'est pas définie pour deux éléments insérés en concurrence et qui possèdent les mêmes prédecesseur et successeur, \eg $\trm{insert}(S \prec K \prec Y)$ et $\trm{insert}(S \prec L \prec Y)$.
 Pour que tous les noeuds convergent, ils doivent choisir comment ordonner ces éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
 Ils utilisent pour cela $\lid$.
 \begin{definition}[Relation $\lid$]
@@ -101,7 +101,7 @@ Nous récapitulons son fonctionnement à l'aide de la \autoref{fig:woot}.
           ++(0:0.5) node (a) {}
           +(0:30) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
-          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins(A2 \prec \langle A5,L \rangle \prec B1)}$}}] (a-ins-l) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=45pt]-10:{$\trm{ins}(A2 \prec \langle A5,L \rangle \prec B1)$}}] (a-ins-l) {}
           +(0:20) node[point] (a-recv-rmv-m) {}
           +(0:28) node (a-final) {};
 
@@ -117,7 +117,7 @@ Nous récapitulons son fonctionnement à l'aide de la \autoref{fig:woot}.
           ++(0:0.5) node (b) {}
           +(0:30) node (b-end) {}
           +(0:2) node[point] (b-initial) {}
-          +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=45pt]10:{$\trm{rmv(B1)}$}}] (b-rmv-m) {}
+          +(0:12) node[point, label=170:{$\trm{rmv}(M)$}, label={[xshift=45pt]10:{$\trm{rmv}(B1)$}}] (b-rmv-m) {}
           +(0:20) node[point] (b-recv-ins-l) {}
           +(0:28) node (b-final) {};
 
@@ -139,17 +139,17 @@ Nous récapitulons son fonctionnement à l'aide de la \autoref{fig:woot}.
 Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée WOOT.
 Initialement, ils possèdent le même état : la séquence contient les éléments "HEMLO", et à chaque élément est associé un identifiant, \eg $A1$, $B1$, $A2$...
 
-Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{ins}(E \prec L \prec M)$.
-WOOT convertit cette modification en opération $\trm{ins}(A2 \prec \langle A5,L \rangle \prec B1)$.
+Le noeud A insère l'élément "L" entre les éléments "E" et "M", \ie $\trm{insert}(E \prec L \prec M)$.
+WOOT convertit cette modification en opération $\trm{insert}(A2 \prec \langle A5,L \rangle \prec B1)$.
 L'opération est intégrée à la copie locale, ce qui produit l'état "HELMLO", puis diffusée sur le réseau.
 
-En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{rmv}(M)$.
-De la même manière, WOOT génère l'opération correspondante $\trm{rmv}(B1)$.
+En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{remove}(M)$.
+De la même manière, WOOT génère l'opération correspondante $\trm{remove}(B1)$.
 Comme expliqué précédemment, l'intégration de cette opération ne supprime pas l'élément "M" de l'état mais se contente de le masquer.
 L'état produit est donc "HE\cancel{M}LO".
 L'opération est ensuite diffusée.
 
-A (resp. B) reçoit ensuite l'opération de B, $\trm{rmv}(B1)$ (resp. A, $\trm{ins}(A2 \prec \langle A5,L \rangle \prec B1)$), et l'intègre à sa copie.
+A (resp. B) reçoit ensuite l'opération de B, $\trm{remove}(B1)$ (resp. A, $\trm{insert}(A2 \prec \langle A5,L \rangle \prec B1)$), et l'intègre à sa copie.
 Les opérations de WOOT étant commutatives, les noeuds obtiennent le même état final : "HEL\cancel{M}LO".
 
 Grâce à la commutativité de ses opérations, WOOT s'affranchit du modèle de livraison causale nécessitant l'utilisation coûteuse de vecteurs d'horloges.
@@ -158,10 +158,10 @@ WOOT met en place un modèle de livraison sur-mesure basé sur les pré-conditio
   Le modèle de livraison WOOT définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud\footnotemark.
-      \footnotetext{Néanmoins, les algorithmes d'intégration des opérations, notamment celui pour l'opération $\trm{ins}$, pourraient être aisément modifiés pour être idempotents.
+      \footnotetext{Néanmoins, les algorithmes d'intégration des opérations, notamment celui pour l'opération $\trm{insert}$, pourraient être aisément modifiés pour être idempotents.
       Ainsi, la livraison répétée d'une même opération deviendrait possible, ce qui permettrait de relaxer cette contrainte en \emph{une livraison au moins une fois}.}
-    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle \prec \trm{succId})$ ne peut être livrée à un noeud qu'après la livraison des opérations d'insertion des éléments associés à $\trm{predId}$ et $\trm{succId}$.
-    \item L'opération $\trm{rmv}(id)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
+    \item Une opération $\trm{insert}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle \prec \trm{succId})$ ne peut être livrée à un noeud qu'après la livraison des opérations d'insertion des éléments associés à $\trm{predId}$ et $\trm{succId}$.
+    \item L'opération $\trm{remove}(id)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $id$.
   \end{enumerate}
 \end{definition}
 Ce modèle de livraison ne requiert qu'une quantité fixe de métadonnées associées à chaque opération pour être respecté.
@@ -169,7 +169,7 @@ WOOT est donc adapté aux systèmes \ac{P2P} dynamiques.
 
 WOOT souffre néanmoins de plusieurs limites.
 La première d'entre elles correspond à l'utilisation de pierres tombales dans la séquence répliquée.
-En effet, comme indiqué précédemment, la modification $\trm{rmv}$ ne supprime que les données de l'élément concerné.
+En effet, comme indiqué précédemment, la modification $\trm{remove}$ ne supprime que les données de l'élément concerné.
 L'identifiant qui lui a été associé reste lui présent dans la séquence à son emplacement.
 Une séquence WOOT ne peut donc que croître, ce qui impacte négativement sa complexité en espace ainsi qu'en temps.
 
@@ -183,9 +183,9 @@ En effet, celle-ci est en \bigO{H^3} avec $H$ le nombre de modifications ayant �
 Plusieurs évolutions de WOOT sont proposées pour mitiger cette limite : WOOTO \cite{2007-wooto-weiss} et WOOTH \cite{2011-evaluation-crdts-ahmed-nacer}.
 
 \textcite{2007-wooto-weiss} remanient la structure des identifiants associés aux éléments.
-Cette modification permet un algorithme d'intégration des opérations $\trm{ins}$ avec une meilleure complexité en temps, \bigO{H^2}.
+Cette modification permet un algorithme d'intégration des opérations $\trm{insert}$ avec une meilleure complexité en temps, \bigO{H^2}.
 \textcite{2011-evaluation-crdts-ahmed-nacer} se basent sur WOOTO et proposent l'utilisation de structures de données améliorant la complexité des algorithmes d'intégration des opérations, au détriment des métadonnées stockées localement par chaque noeud.
-Cependant, cette évolution ne permet ici pas de réduire l'ordre de grandeur des opérations $\trm{ins}$.
+Cependant, cette évolution ne permet ici pas de réduire l'ordre de grandeur des opérations $\trm{insert}$.
 
 Néanmoins, l'évaluation expérimentale des différentes approches pour l'édition collaborative \ac{P2P} en temps réel menée dans \cite{2011-evaluation-crdts-ahmed-nacer} a montré que les \acp{CRDT} de la famille WOOT n'étaient pas assez efficaces.
 Dans le cadre de cette expérience, des utilisateur-rices effectuaient des tâches d'édition collaborative données.

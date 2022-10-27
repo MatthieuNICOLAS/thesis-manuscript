@@ -24,8 +24,8 @@ Cette propriété garantit donc qu'il sera toujours possible de générer un nou
 
 L'utilisation d'identifiants de position permet de redéfinir les modifications de la séquence :
 \begin{enumerate}
-  \item $\trm{ins}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{ins}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
-  \item $\trm{rmv}(\trm{elt})$ devient $\trm{rmv}(\trm{id})$.
+  \item $\trm{insert}(\trm{pred} \prec \trm{elt} \prec \trm{succ})$ devient alors $\trm{insert}(\trm{id}, \trm{elt})$, avec $\trm{predId} \lid \trm{id} \lid \trm{succId}$.
+  \item $\trm{remove}(\trm{elt})$ devient $\trm{remove}(\trm{id})$.
 \end{enumerate}
 Ces redéfinitions permettent de proposer une spécification de la séquence avec des modifications concurrentes qui commutent.
 
@@ -312,22 +312,22 @@ Nous omettons aussi le chemin vide $\epsilon$ dans la représentation des identi
 Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée Treedoc.
 Initialement, ils possèdent le même état : la séquence contient les éléments "HEM".
 
-Le noeud A insère l'élément "L" en fin de séquence, \ie $\trm{ins}(M \prec L)$.
-Treedoc génère l'opération correspondante, $\trm{ins}(\langle 1,d_4 \rangle, L)$, et l'intègre à sa copie locale.
+Le noeud A insère l'élément "L" en fin de séquence, \ie $\trm{insert}(M \prec L)$.
+Treedoc génère l'opération correspondante, $\trm{insert}(\langle 1,d_4 \rangle, L)$, et l'intègre à sa copie locale.
 Puis A insère l'élément "O", toujours en fin de séquence.
-La modification $\trm{ins}(L \prec O)$ est convertie en opération $\trm{ins}(1 \oplus \langle 1,d_6 \rangle, O)$ et intégrée.
+La modification $\trm{insert}(L \prec O)$ est convertie en opération $\trm{insert}(1 \oplus \langle 1,d_6 \rangle, O)$ et intégrée.
 
 En concurrence, le noeud B insère aussi un élément "L" en fin de séquence.
-Cette modification résulte en l'opération $\trm{ins}(\langle 1,d_5 \rangle, L)$, qui est intégrée.
-Le noeud B supprime ensuite l'élément "M" de la séquence, ce qui produit l'opération $\trm{rmv}(\langle \epsilon,d_1 \rangle)$.
+Cette modification résulte en l'opération $\trm{insert}(\langle 1,d_5 \rangle, L)$, qui est intégrée.
+Le noeud B supprime ensuite l'élément "M" de la séquence, ce qui produit l'opération $\trm{remove}(\langle \epsilon,d_1 \rangle)$.
 Cette dernière est intégrée à sa copie locale.
 Notons ici que le noeud de l'arbre des identifiants n'est pas supprimé suite à cette opération : l'élément associé est supprimé mais le noeud est conservé et devient une pierre tombale.
 Nous détaillons ci-après le fonctionnement des pierres tombales dans Treedoc.
 
 Les deux noeuds procèdent ensuite à une synchronisation, échangeant leurs opérations respectives.
-Lorsque A (resp. B) intègre $\trm{ins}(\langle 1,d_5 \rangle, L)$ (resp. $\trm{ins}(\langle 1,d_4 \rangle, L)$), il ajoute cet élément avec son désambiguateur dans son noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_4 < d_5$).
+Lorsque A (resp. B) intègre $\trm{insert}(\langle 1,d_5 \rangle, L)$ (resp. $\trm{insert}(\langle 1,d_4 \rangle, L)$), il ajoute cet élément avec son désambiguateur dans son noeud de chemin $1$, après (resp. avant) l'élément existant (on considère que $d_4 < d_5$).
 
-B intègre ensuite $\trm{ins}(1 \oplus \langle 1,d_6 \rangle, O)$.
+B intègre ensuite $\trm{insert}(1 \oplus \langle 1,d_6 \rangle, O)$.
 Il existe cependant une ambiguité sur la position de "O" : cet élément doit-il être placé après l'élément "L" ayant pour identifiant $\langle 1,d_4 \rangle$, ou l'élément "L" ayant pour identifiant $\langle 1,d_5 \rangle$ ?
 Treedoc résout de manière déterministe cette ambiguité en insérant l'élément en tant qu'enfant droit du noeud $1$ et de ses éléments.
 Ainsi, les noeuds A et B convergent à l'état "HELLO".
@@ -339,8 +339,8 @@ En pratique, nous pouvons néanmoins relaxer le modèle de livraison comme expli
   Le modèle de livraison Treedoc définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
-    \item L'opération $\trm{rmv}(\trm{id})$ ne peut être livrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \item Les opérations $\trm{insert}$ peuvent être livrées dans un ordre quelconque.
+    \item L'opération $\trm{remove}(\trm{id})$ ne peut être livrée qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
   \end{enumerate}
 \end{definition}
 

@@ -10,8 +10,8 @@ Pour rappel, le modèle de livraison de RenamableLogootSplit est le suivant :
 \begin{enumerate}
     \item Une opération doit être livrée à l'ensemble des noeuds à terme.
     \item Une opération doit être livrée qu'une seule et unique fois aux noeuds.
-    \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
-    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération \emph{rename} qui a introduit son époque de génération a été délivrée à ce même noeud.
+    \item Une opération $\trm{remove}$ doit être livrée à un noeud une fois que les opérations $\trm{insert}$ des éléments concernés par la suppression ont été livrées à ce dernier.
+    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération $\trm{rename}$ qui a introduit son époque de génération a été délivrée à ce même noeud.
 \end{enumerate}
 
 Nous décrivons ci-dessous comment nous assurons chacune de ces contraintes.

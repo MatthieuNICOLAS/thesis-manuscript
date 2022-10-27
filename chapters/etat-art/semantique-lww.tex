@@ -41,14 +41,14 @@ La \autoref{fig:set-lww} illustre son application à l'Ensemble pour résoudre l
   \label{fig:set-lww}
 \end{figure}
 
-Comme indiqué précédemment, le scénario illustré dans la \autoref{fig:set-lww} présente un conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{rmv}(a)$ générées de manière concurrente respectivement par les noeuds A et B.
+Comme indiqué précédemment, le scénario illustré dans la \autoref{fig:set-lww} présente un conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{remove}(a)$ générées de manière concurrente respectivement par les noeuds A et B.
 Pour le résoudre, la sémantique \ac{LWW} associe à chaque modification une estampille.
 L'ordre créé entre les modifications par ces dernières permet de déterminer quelle modification désigner comme prioritaire.
-Ici, nous considérons que $\trm{add}(a)$ a eu lieu plus tôt que $\trm{rmv}(a)$.
-La sémantique \ac{LWW} désigne donc $\trm{rmv}(a)$ comme prioritaire et ignore $\trm{add}(a)$.
+Ici, nous considérons que $\trm{add}(a)$ a eu lieu plus tôt que $\trm{remove}(a)$.
+La sémantique \ac{LWW} désigne donc $\trm{remove}(a)$ comme prioritaire et ignore $\trm{add}(a)$.
 L'état obtenu à l'issue de cet exemple par chaque noeud est donc $\{\}$.
 
-Il est à noter que si la modification $\trm{rmv}(a)$ du noeud B avait eu lieu plus tôt que la modification $\trm{add}(a)$ du noeud A dans notre exemple, l'état final obtenu aurait été $\{a\}$.
+Il est à noter que si la modification $\trm{remove}(a)$ du noeud B avait eu lieu plus tôt que la modification $\trm{add}(a)$ du noeud A dans notre exemple, l'état final obtenu aurait été $\{a\}$.
 Ainsi, des exécutions reproduisant le même ensemble de modifications produiront des résultats différents en fonction de l'ordre créé par les estampilles associées à chaque modification.
 Ces estampilles étant des métadonnées du mécanisme de résolution de conflits, elles sont dissimulées aux utilisateur-rices.
 Le comportement de cette sémantique peut donc être perçu comme aléatoire et s'avérer perturbant pour les utilisateur-rices.

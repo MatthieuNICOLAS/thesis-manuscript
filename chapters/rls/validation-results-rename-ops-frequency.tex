@@ -1,5 +1,5 @@
-Pour évaluer l'impact de la fréquence de l'opération \emph{rename} sur les performances, nous avons réalisé un benchmark supplémentaire.
-Ce benchmark consiste à rejouer les logs d'opérations des simulations en utilisant divers \acp{CRDT} et configurations : LogootSplit, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 30k opérations, RenamableLogootSplit effectuant des opérations \emph{rename} toutes les 7.5k opérations.
+Pour évaluer l'impact de la fréquence de l'opération $\trm{rename}$ sur les performances, nous avons réalisé un benchmark supplémentaire.
+Ce benchmark consiste à rejouer les logs d'opérations des simulations en utilisant divers \acp{CRDT} et configurations : LogootSplit, RenamableLogootSplit effectuant des opérations $\trm{rename}$ toutes les 30k opérations, RenamableLogootSplit effectuant des opérations $\trm{rename}$ toutes les 7.5k opérations.
 Au fur et à mesure que le benchmark rejoue le journal des opérations, il mesure le temps d'intégration des opérations ainsi que leur taille.
 Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-frequency}.
 
@@ -28,25 +28,25 @@ Les résultats de ce benchmark sont présentés dans le \autoref{tab:impact-freq
       \bottomrule
     \end{tabular}
   }
-  \caption{Temps d'intégration et taille des opérations par type et par fréquence d'opérations \emph{rename}}
+  \caption{Temps d'intégration et taille des opérations par type et par fréquence d'opérations $\trm{rename}$}
   \label{tab:impact-frequency}
 \end{table}
 
-Concernant les temps d'intégration, nous observons des opérations \emph{rename} plus fréquentes permettent d'améliorer les temps d'intégration des opérations \emph{insert} et \emph{remove}.
-Cela confirme les résultats attendus puisque l'opération \emph{rename} réduit la taille des identifiants de la structure ainsi que le nombre de blocs composant la séquence.
+Concernant les temps d'intégration, nous observons des opérations $\trm{rename}$ plus fréquentes permettent d'améliorer les temps d'intégration des opérations $\trm{insert}$ et $\trm{remove}$.
+Cela confirme les résultats attendus puisque l'opération $\trm{rename}$ réduit la taille des identifiants de la structure ainsi que le nombre de blocs composant la séquence.
 
-Nous remarquons aussi que la fréquence n'a aucun impact significatif sur le temps d'intégration des opérations \emph{rename}.
-Il s'agit là aussi d'un résultat attendu puisque la complexité en temps de l'implémentation de l'opération \emph{rename} dépend du nombre d'éléments dans la séquence, un facteur qui n'est pas impacté par les opérations \emph{rename}.
+Nous remarquons aussi que la fréquence n'a aucun impact significatif sur le temps d'intégration des opérations $\trm{rename}$.
+Il s'agit là aussi d'un résultat attendu puisque la complexité en temps de l'implémentation de l'opération $\trm{rename}$ dépend du nombre d'éléments dans la séquence, un facteur qui n'est pas impacté par les opérations $\trm{rename}$.
 
-Concernant la taille des opérations, nous observons que les opérations \emph{insert} et \emph{remove} de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit, notamment car elles intègrent leur époque de génération comme donnée additionnelle.
+Concernant la taille des opérations, nous observons que les opérations $\trm{insert}$ et $\trm{remove}$ de RenamableLogootSplit sont initialement plus lourdes que les opérations correspondantes de LogootSplit, notamment car elles intègrent leur époque de génération comme donnée additionnelle.
 Mais alors que la taille des opérations de LogootSplit augmentent indéfiniment, celle des opérations de RenamableLogootSplit est bornée.
-La valeur de cette borne est définie par la fréquence de l'opération \emph{rename}.
+La valeur de cette borne est définie par la fréquence de l'opération $\trm{rename}$.
 Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.
 
-D'un autre côté, le coût des opérations \emph{rename} est bien plus important (1000x) que celui des autres types d'opérations.
-Ceci s'explique par le fait que l'opération \emph{rename} intègre l'\emph{ancien état}, \ie la liste de tous les blocs composant l'état de la séquence au moment de la génération de l'opération.
-Cependant, nous observons le même phénomène pour les opérations \emph{rename} que pour les autres opérations : la fréquence des opérations \emph{rename} permet d'établir une borne pour la taille des opérations \emph{rename}.
-Nous pouvons donc choisir d'émettre fréquemment des opérations \emph{rename} pour limiter leur taille respective.
-Ceci implique néanmoins un surcoût en calculs pour chaque opération \emph{rename} dans l'implémentation actuelle.
-Nous présentons une autre approche possible pour limiter la taille des opérations \emph{rename} dans la \autoref{sec:compression-rename}.
-Cette approche consiste à implémenter un mécanisme de compression pour les opérations \emph{rename} pour ne transmettre que les composants nécessaires à l'identifiant de chaque bloc de l'\emph{ancien état}.
+D'un autre côté, le coût des opérations $\trm{rename}$ est bien plus important (1000x) que celui des autres types d'opérations.
+Ceci s'explique par le fait que l'opération $\trm{rename}$ intègre l'\emph{ancien état}, \ie la liste de tous les blocs composant l'état de la séquence au moment de la génération de l'opération.
+Cependant, nous observons le même phénomène pour les opérations $\trm{rename}$ que pour les autres opérations : la fréquence des opérations $\trm{rename}$ permet d'établir une borne pour la taille des opérations $\trm{rename}$.
+Nous pouvons donc choisir d'émettre fréquemment des opérations $\trm{rename}$ pour limiter leur taille respective.
+Ceci implique néanmoins un surcoût en calculs pour chaque opération $\trm{rename}$ dans l'implémentation actuelle.
+Nous présentons une autre approche possible pour limiter la taille des opérations $\trm{rename}$ dans la \autoref{sec:compression-rename}.
+Cette approche consiste à implémenter un mécanisme de compression pour les opérations $\trm{rename}$ pour ne transmettre que les composants nécessaires à l'identifiant de chaque bloc de l'\emph{ancien état}.

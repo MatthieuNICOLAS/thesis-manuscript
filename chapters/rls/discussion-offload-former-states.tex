@@ -1,7 +1,7 @@
-Les noeuds doivent conserver les \emph{anciens états} associés aux opérations \emph{rename} pour transformer les opérations issues d'époques précédentes ou concurrentes.
+Les noeuds doivent conserver les \emph{anciens états} associés aux opérations $\trm{rename}$ pour transformer les opérations issues d'époques précédentes ou concurrentes.
 Les noeuds peuvent recevoir de telles opérations dans deux cas précis :
 \begin{enumerate}
-  \item Des noeuds ont émis récemment des opérations \emph{rename}.
+  \item Des noeuds ont émis récemment des opérations $\trm{rename}$.
   \item Des noeuds se sont récemment reconnectés.
 \end{enumerate}
 Entre deux de ces évènements spécifiques, les \emph{anciens états} ne sont pas nécessaires pour traiter les opérations.

@@ -9,7 +9,7 @@
 \subsection{Définition de l'opération de renommage}
 \input{chapters/rls/approche-def}
 
-\section{Introduction de l'opération \emph{rename}}
+\section{Introduction de l'opération $\trm{rename}$}
 \label{sec:centralised-rls}
 
 \subsection{Opération de renommage proposée}
@@ -21,7 +21,7 @@
 \subsection{Évolution du modèle de livraison des opérations}
 \input{chapters/rls/rename-op-delivery-model}
 
-\section{Gestion des opérations \emph{rename} concurrentes}
+\section{Gestion des opérations $\trm{rename}$ concurrentes}
 \label{sec:distributed-rls}
 
 \subsection{Conflits en cas de renommages concurrents}
@@ -73,7 +73,7 @@
 \subsubsection{Temps pour rejouer le journal des opérations}
 \input{chapters/rls/validation-results-time-replay-log}
 
-\subsubsection{Impact de la fréquence de l'opération \emph{rename} sur les performances}
+\subsubsection{Impact de la fréquence de l'opération $\trm{rename}$ sur les performances}
 \input{chapters/rls/validation-results-rename-ops-frequency}
 
 \section{Discussion}
@@ -82,14 +82,14 @@
   Ajouter une partie sur la discussion qu'on a pu avoir avec les reviewers sur la présence de pierres tombales dans RenamableLogootSplit, et comment ces pierres tombales diffèrent de celles présentent dans WOOT et RGA.
 }
 
-\subsection{Stratégie de génération des opérations \emph{rename}}
+\subsection{Stratégie de génération des opérations $\trm{rename}$}
 \input{chapters/rls/discussion-strategies-rename-ops}
 
 \subsection{Stockage des états précédents sur disque}
 \label{sec:offloading-former-states}
 \input{chapters/rls/discussion-offload-former-states}
 
-\subsection{Compression et limitation de la taille de l'opération \emph{rename}}
+\subsection{Compression et limitation de la taille de l'opération $\trm{rename}$}
 \label{sec:compression-rename}
 \input{chapters/rls/discussion-rename-op-compression}
 
@@ -105,7 +105,7 @@
 \label{sec:rename-as-compression-mechanism}
 \input{chapters/rls/discussion-rename-op-as-snapshot}
 
-\subsection{Implémentation alternative de l'intégration de l'opération \emph{rename} basée sur le journal des opérations}
+\subsection{Implémentation alternative de l'intégration de l'opération $\trm{rename}$ basée sur le journal des opérations}
 \label{sec:log-based-rename-mechanism}
 \input{chapters/rls/discussion-log-based-implem}
 

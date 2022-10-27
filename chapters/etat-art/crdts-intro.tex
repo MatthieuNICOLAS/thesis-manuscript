@@ -44,15 +44,15 @@ Avant d'illustrer notre propos avec un exemple, nous introduisons la spécificat
       $S \in \trm{Set}\langle \elt \rangle$ & & & \\
       \\
       \textbf{constructor} \\
-      $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
+      $\trm{empty}$ & : &                       & $\longrightarrow S$   \\
       \\
       \textbf{mutators} \\
       $\trm{add}$ & : & $S \times \elt$ & $\longrightarrow S$   \\
-      $\trm{rmv}$ & : & $S \times \elt$          & $\longrightarrow S$   \\
+      $\trm{remove}$ & : & $S \times \elt$          & $\longrightarrow S$   \\
       \\
       \textbf{queries} \\
-      $\trm{len}$ & : & $S$                   & $\longrightarrow \nat$   \\
-      $\trm{rd}$  & : & $S$                   & $\longrightarrow S$ \\
+      $\trm{length}$ & : & $S$                   & $\longrightarrow \nat$   \\
+      $\trm{read}$  & : & $S$                   & $\longrightarrow S$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait usuel Ensemble}
@@ -60,7 +60,7 @@ Avant d'illustrer notre propos avec un exemple, nous introduisons la spécificat
 \end{figure}
 
 Un Ensemble est une collection dynamique non-ordonnée d'éléments de type $E$.
-Cette spécification définit que ce type dispose d'un constructeur, $\trm{emp}$, permettant de générer un ensemble vide.
+Cette spécification définit que ce type dispose d'un constructeur, $\trm{empty}$, permettant de générer un ensemble vide.
 
 La spécification définit deux modifications sur l'ensemble :
 \begin{enumerate}
@@ -69,18 +69,18 @@ La spécification définit deux modifications sur l'ensemble :
     \begin{equation*}
       \trm{add}(s,e) = s \cup \set{e}
     \end{equation*}
-  \item $\trm{rmv}(s,e)$, qui permet de retirer un élément donné $e$ d'un ensemble $s$.
+  \item $\trm{remove}(s,e)$, abrégée en $\trm{rmv}$ dans nos figures, qui permet de retirer un élément donné $e$ d'un ensemble $s$.
     Cette modification renvoie un nouvel ensemble construit de la manière suivante :
     \begin{equation*}
-      \trm{rmv}(s,e) = s~\backslash \set{e}
+      \trm{remove}(s,e) = s~\backslash \set{e}
     \end{equation*}
 \end{enumerate}
 
 Elle définit aussi deux observateurs :
 \begin{enumerate}
-  \item $\trm{len}(s)$, qui permet de récupérer le nombre d'éléments présents dans un ensemble $s$.
-  \item $\trm{rd}(s)$, qui permet de consulter l'état d'ensemble $s$.
-    Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{rd}$ après chaque modification.
+  \item $\trm{length}(s)$, qui permet de récupérer le nombre d'éléments présents dans un ensemble $s$.
+  \item $\trm{read}(s)$, qui permet de consulter l'état d'ensemble $s$.
+    Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{read}$ après chaque modification.
 \end{enumerate}
 
 Dans le cadre de ce manuscrit, nous travaillons sur des ensembles de caractères.
@@ -125,7 +125,7 @@ En se basant sur cette spécification, nous présentons dans la \autoref{fig:set
 
 Dans cet exemple, deux noeuds A et B répliquent et partagent une même structure de données de type Ensemble.
 Les deux noeuds possèdent le même état initial : $\{a\}$.
-Le noeud A retire l'élément $a$ de l'ensemble, en procédant à la modification $\trm{rmv}(a)$.
+Le noeud A retire l'élément $a$ de l'ensemble, en procédant à la modification $\trm{remove}(a)$.
 Puis, le noeud A ré-ajoute l'élément $a$ dans l'ensemble via la modification $\trm{add}(a)$.
 En concurrence, le noeud B retire lui aussi l'élément $a$ de l'ensemble.
 Les deux noeuds se synchronisent ensuite.

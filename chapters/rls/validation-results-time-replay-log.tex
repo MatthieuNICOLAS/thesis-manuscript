@@ -8,9 +8,9 @@ Nous présentons les résultats obtenus dans la \autoref{fig:time-to-replay-log}
   \label{fig:time-to-replay-log}
 \end{figure}
 
-Nous observons que le gain sur le temps d'intégration des opérations \emph{insert} et \emph{remove} permet initialement de contrebalancer le surcoût des opérations \emph{rename}.
-Mais au fur et à mesure que la collaboration progresse, le temps nécessaire pour intégrer les opérations \emph{rename} augmente car plus d'éléments sont impliqués.
-Cette tendance est accentuée dans les scénarios avec des opérations \emph{rename} concurrentes.
+Nous observons que le gain sur le temps d'intégration des opérations $\trm{insert}$ et $\trm{remove}$ permet initialement de contrebalancer le surcoût des opérations $\trm{rename}$.
+Mais au fur et à mesure que la collaboration progresse, le temps nécessaire pour intégrer les opérations $\trm{rename}$ augmente car plus d'éléments sont impliqués.
+Cette tendance est accentuée dans les scénarios avec des opérations $\trm{rename}$ concurrentes.
 
 Dans un cas réel d'utilisation, ce scénario (\ie rejouer l'entièreté du log) ne correspond pas au scénario principal et peut être mitigé, par exemple en utilisant un mécanisme de compression du journal des opérations.
-Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur les possibilités offertes par l'opération \emph{rename}.
+Dans la \autoref{sec:rename-as-compression-mechanism}, nous présentons comment mettre en place un tel mécanisme en se basant justement sur les possibilités offertes par l'opération $\trm{rename}$.

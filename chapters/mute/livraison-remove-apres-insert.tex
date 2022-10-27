@@ -1,16 +1,16 @@
-La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération \emph{remove} doit être livrée après les opérations \emph{insert} insérant les éléments concernés.
+La seconde contrainte que le modèle de livraison doit respecter spécifie qu'une opération $\trm{remove}$ doit être livrée après les opérations $\trm{insert}$ insérant les éléments concernés.
 
-Pour cela, le module de livraison ajoute un ensemble \emph{Deps} à chaque opération \emph{remove} avant de la diffuser :
+Pour cela, le module de livraison ajoute un ensemble \emph{Deps} à chaque opération $\trm{remove}$ avant de la diffuser :
 
 \begin{definition}[Deps]
   \emph{Deps} est un ensemble d'opérations.
-  Il représente l'ensemble des opérations dont dépend l'opération \emph{remove} et qui doivent donc être livrées au préalable.
+  Il représente l'ensemble des opérations dont dépend l'opération $\trm{remove}$ et qui doivent donc être livrées au préalable.
 \end{definition}
 
-Plusieurs structures de données sont adaptées pour représenter les dépendances de l'opération \emph{remove}.
-Dans le cadre de MUTE, nous avons choisi d'utiliser un ensemble de dots : pour chaque élément supprimé par l'opération \emph{remove}, nous identifions le noeud l'ayant inséré et nous ajoutons le dot correspondant à l'opération la plus récente de ce noeud à l'ensemble des dépendances.
+Plusieurs structures de données sont adaptées pour représenter les dépendances de l'opération $\trm{remove}$.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un ensemble de dots : pour chaque élément supprimé par l'opération $\trm{remove}$, nous identifions le noeud l'ayant inséré et nous ajoutons le dot correspondant à l'opération la plus récente de ce noeud à l'ensemble des dépendances.
 Cette approche nous permet de limiter à un dot par élément supprimé le surcoût en métadonnées des dépendances et de les calculer en un temps linéaire par rapport au nombre d'éléments supprimés.
-Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emph{remove} à l'aide de la \autoref{fig:causal-remove-delivery}.\\
+Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\trm{remove}$ à l'aide de la \autoref{fig:causal-remove-delivery}.\\
 
 \begin{figure}[!ht]
   \subfloat[Exécution avec livraison dans le désordre d'une insertion et de sa suppression]{
@@ -75,8 +75,8 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emp
               \draw[dashed, ->, thick, shorten >= 3]
                 (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
                 (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
-                (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
-                (S2B-right.east) edge node[pos=0.80, right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
+                (S2B-right.east) edge node[below right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
+                (S2B-right.east) edge node[pos=0.80, right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
 
               \draw[->, dashed, thick, shorten >= 3] (S1C.east) edge[bend left] (S3C-left.west);
             \end{tikzpicture}
@@ -138,7 +138,7 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération \emp
       }
       \end{minipage}
     }
-  \caption{Gestion de la livraison des opérations \emph{remove} après les opérations \emph{insert} correspondantes}
+  \caption{Gestion de la livraison des opérations $\trm{remove}$ après les opérations $\trm{insert}$ correspondantes}
   \label{fig:causal-remove-delivery}
 \end{figure}
 
@@ -151,7 +151,7 @@ Cet élément se voit attribué l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
 L'opération correspondante \emph{a6} est diffusée aux autres noeuds.
 
 À la réception de cette dernière, le noeud B supprime l'élément "I" nouvellement inséré et génère l'opération \emph{b1} correspondante.
-Comme indiqué précédemment, l'opération \emph{b1} étant une opération \emph{remove}, le module de livraison calcule ses dépendances avant de la diffuser.
+Comme indiqué précédemment, l'opération \emph{b1} étant une opération $\trm{remove}$, le module de livraison calcule ses dépendances avant de la diffuser.
 Pour chaque élément supprimé ("I"), le module de livraison récupère l'identifiant de l'élément (\id{p}{A0}{0}\id{m}{A1}{0}) et en extrait l'identifiant du noeud qui l'a inséré (A).
 Le module ajoute alors le dot de l'opération la plus récente reçue de ce noeud ($\langle A:6 \rangle$) à l'ensemble des dépendances de l'opération.
 L'opération est ensuite diffusée.
@@ -167,7 +167,7 @@ Le module de livraison ré-évalue alors le cas de l'opération \emph{b1} et dé
 Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
 En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
 Nous n'ajoutons pas les dots des opérations qui ont spécifiquement inséré les éléments supprimés.
-Pour cela, il serait nécessaire de parcourir le journal des opérations à la recherche des opérations \emph{insert} correspondantes.
+Pour cela, il serait nécessaire de parcourir le journal des opérations à la recherche des opérations $\trm{insert}$ correspondantes.
 Cette méthode serait plus coûteuse, sa complexité dépendant du nombre d'opérations dans le journal des opérations, et incompatible avec un mécanisme tronquant le journal des opérations en utilisant la stabilité causale.
-Notre approche introduit un potentiel délai dans la livraison d'une opération \emph{remove} par rapport à une livraison utilisant ses dépendances exactes, puisqu'elle va reposer sur des opérations plus récentes et potentiellement encore inconnues par le noeud.
+Notre approche introduit un potentiel délai dans la livraison d'une opération $\trm{remove}$ par rapport à une livraison utilisant ses dépendances exactes, puisqu'elle va reposer sur des opérations plus récentes et potentiellement encore inconnues par le noeud.
 Mais il s'agit là aussi d'un compromis que nous jugeons acceptable entre le surcoût du mécanisme de livraison et l'expérience utilisateur.

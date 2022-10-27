@@ -4,7 +4,7 @@ Plusieurs approches ont donc été proposées pour réduire sa croissance.
 \subsection{Mécanisme de \acl{GC} des pierres tombales}
 
 Pour réduire l'impact des pierres tombales sur les performances de \ac{RGA}, \cite{ROH2011354} propose un mécanisme de \acf{GC} des pierres tombales.
-Pour rappel, ce mécanisme nécessite qu'une pierre tombale ne puisse plus être utilisée comme prédecesseur par une opération $\trm{ins}$ reçue dans le futur pour pouvoir être supprimée définitivement.
+Pour rappel, ce mécanisme nécessite qu'une pierre tombale ne puisse plus être utilisée comme prédecesseur par une opération $\trm{insert}$ reçue dans le futur pour pouvoir être supprimée définitivement.
 En d'autres termes, ce mécanisme repose sur la stabilité causale de l'opération de suppression pour supprimer la pierre tombale correspondante.
 
 La stabilité causale est une contrainte forte, peu adaptée aux systèmes \ac{P2P} dynamiques à large échelle.
@@ -27,7 +27,7 @@ Pour répondre à ces problèmes, les auteurs présentent un mécanisme de ré-�
 Ce mécanisme prend la forme d'une nouvelle opération, que nous notons $\trm{bal}$.
 
 Notons que l'opération $\trm{bal}$ contrevient à une des propriétés des identifiants de position densément ordonnés : leur \emph{immutabilité} \cf{def:id-prop}.
-L'opération $\trm{bal}$ est donc intrinséquement non-commutative avec les opérations $\trm{ins}$ et $\trm{rmv}$ concurrentes.
+L'opération $\trm{bal}$ est donc intrinséquement non-commutative avec les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
 Pour assurer la convergence à terme des copies, les auteurs mettent en place un mécanisme de \emph{catch-up}.
 Ce mécanisme consiste à transformer les opérations concurrentes aux opérations $\trm{bal}$ avant de les intégrer, de façon à prendre en compte les effets des ré-équilibrages.
 
@@ -40,7 +40,7 @@ Pour pallier ce point, les auteurs proposent de répartir les noeuds dans deux g
 
 Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
 Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
-Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{ins}$ et $\trm{rmv}$.
+Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{insert}$ et $\trm{remove}$.
 
 Ainsi, cette solution permet d'adapter l'utilisation d'un protocole de consensus à un système \ac{P2P} dynamique.
 Cependant, elle requiert de disposer de noeuds stables et bien connectés dans le système pour former le \emph{core}.

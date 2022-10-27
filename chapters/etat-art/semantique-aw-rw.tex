@@ -1,13 +1,13 @@
 Comme évoqué précédemment, d'autres sémantiques sont spécifiques au type de données concerné.
 Ainsi, nous abordons à présent des sémantiques spécifiques au type de l'Ensemble.
 
-Dans le cadre de l'Ensemble, un conflit est provoqué lorsque des modifications $\trm{add}$ et $\trm{rmv}$ d'un même élément sont effectuées en concurrence.
+Dans le cadre de l'Ensemble, un conflit est provoqué lorsque des modifications $\trm{add}$ et $\trm{remove}$ d'un même élément sont effectuées en concurrence.
 Ainsi, deux approches peuvent être proposées pour résoudre le conflit :
 
 \begin{enumerate}
-  \item Une sémantique où la modification $\trm{add}$ d'une élément prend la précédence sur les modifications concurrentes $\trm{rmv}$ du même élément, nommée \acf{AW}.
+  \item Une sémantique où la modification $\trm{add}$ d'une élément prend la précédence sur les modifications concurrentes $\trm{remove}$ du même élément, nommée \acf{AW}.
     L'élément est alors présent dans l'état obtenu à l'issue de la résolution du conflit.
-  \item Une sémantique où la modification $\trm{rmv}$ d'une élément prend la précédence sur les opérations concurrentes $\trm{add}$ du même élément, nommée \acf{RW}.
+  \item Une sémantique où la modification $\trm{remove}$ d'une élément prend la précédence sur les opérations concurrentes $\trm{add}$ du même élément, nommée \acf{RW}.
     L'élément est alors absent de l'état obtenu à l'issue de la résolution du conflit.
 \end{enumerate}
 

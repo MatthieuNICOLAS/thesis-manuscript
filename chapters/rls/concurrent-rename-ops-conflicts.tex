@@ -1,4 +1,4 @@
-Nous considérons à présent les scénarios avec des opérations \emph{rename} concurrentes.
+Nous considérons à présent les scénarios avec des opérations $\trm{rename}$ concurrentes.
 \autoref{fig:conflicting-rename-operations} développe le scénario décrit précédemment dans la \autoref{fig:concurrent-insert-rename-fixed}.
 
 \begin{figure}[!ht]
@@ -124,14 +124,14 @@ Nous considérons à présent les scénarios avec des opérations \emph{rename} 
 
     \end{tikzpicture}
   }
-  \caption{Opérations \emph{rename} concurrentes menant à des états divergents}
+  \caption{Opérations $\trm{rename}$ concurrentes menant à des états divergents}
   \label{fig:conflicting-rename-operations}
 \end{figure}
 
-Après avoir diffusé son opération \emph{insert}, le noeud B effectue une opération \emph{rename} sur son état.
+Après avoir diffusé son opération $\trm{insert}$, le noeud B effectue une opération $\trm{rename}$ sur son état.
 Cette opération réassigne à chaque élément un nouvel identifiant à partir de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}), de l'identifiant du noeud (\textbf{B}) et de son numéro de séquence courant (2).
 Cette opération introduit aussi une nouvelle époque : \epoch{B2}.
-Puisque l'opération \emph{rename} de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations \emph{rename} sont concurrentes.
+Puisque l'opération $\trm{rename}$ de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations $\trm{rename}$ sont concurrentes.
 
 Puisque des époques concurrentes sont générées, les époques forment désormais un \emph{arbre des époques}.
 Nous représentons dans la \autoref{fig:epoch-tree} l'\emph{arbre des époques} que les noeuds obtiennent une fois qu'ils se sont synchronisés à terme.
@@ -169,5 +169,5 @@ Ensuite, les noeuds doivent se déplacer à travers l'\emph{arbre des époques} 
 La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre.
 Les cas restants à gérer sont ceux où les noeuds se trouvent actuellement à une époque \emph{soeur} ou \emph{cousine} de l'époque cible.
 Dans ces cas, les noeuds doivent être capable de remonter dans l'\emph{arbre des époques} pour retourner au \ac{LCA} de l'époque courante et l'époque cible.
-Ce déplacement est en fait similaire à l'annulation de l'effet des opérations \emph{rename} précédemment appliquées.
+Ce déplacement est en fait similaire à l'annulation de l'effet des opérations $\trm{rename}$ précédemment appliquées.
 Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.

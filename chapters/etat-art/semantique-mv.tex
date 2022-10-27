@@ -38,14 +38,14 @@ Nous présentons son application à l'Ensemble dans la \autoref{fig:set-mv}.
   \label{fig:set-mv}
 \end{figure}
 
-La \autoref{fig:set-mv} présente la gestion du conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{rmv}(a)$ par la sémantique \ac{MV}.
+La \autoref{fig:set-mv} présente la gestion du conflit entre les modifications concurrentes $\trm{add}(a)$ et $\trm{remove}(a)$ par la sémantique \ac{MV}.
 Devant ces modifications contraires, chaque noeud calcule chaque état possible, \ie un état sans l'élément $a$, $\{\}$, et un état avec ce dernier, $\{a\}$.
 Le \ac{CRDT} maintient alors l'ensemble de ces états en parallèle.
 L'état obtenu est donc $\{\{\},\{a\}\}$.
 
 Ainsi, la sémantique \ac{MV} expose les conflits aux utilisateur-rices lors de leur prochaine consultation de l'état du \ac{CRDT}.
 Les utilisateur-rices peuvent alors prendre connaissance des intentions de chacun-e et résoudre le conflit manuellement.
-Dans la \autoref{fig:set-mv}, résoudre le conflit revient à re-effectuer une modification $\trm{add}(a)$ ou $\trm{rmv}(a)$ selon l'état choisi.
+Dans la \autoref{fig:set-mv}, résoudre le conflit revient à re-effectuer une modification $\trm{add}(a)$ ou $\trm{remove}(a)$ selon l'état choisi.
 Ainsi, si plusieurs personnes résolvent en concurrence le conflit de manière contraire, la sémantique \ac{MV} exposera de nouveau les différents états proposés sous la forme d'un conflit.
 
 Il est intéressant de noter que cette sémantique mène à un changement du domaine du \ac{CRDT} considéré : en cas de conflit, la valeur retournée par le \ac{CRDT} correspond à un Ensemble de valeurs du type initialement considéré.

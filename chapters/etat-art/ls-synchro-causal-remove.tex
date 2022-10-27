@@ -1,4 +1,4 @@
-La \autoref{fig:why-causal-remove} présente un second exemple illustrant la nécessité de la contrainte de livraison d'une opération $\trm{rmv}$ qu'après la livraison des opérations $\trm{ins}$ correspondantes.
+La \autoref{fig:why-causal-remove} présente un second exemple illustrant la nécessité de la contrainte de livraison d'une opération $\trm{remove}$ qu'après la livraison des opérations $\trm{insert}$ correspondantes.
 
 \begin{figure}[!ht]
 
@@ -88,7 +88,7 @@ La \autoref{fig:why-causal-remove} présente un second exemple illustrant la né
       \draw[->, dashed, shorten >= 1] (b-rmv-r) -- (c-recv-rmv-r);
     \end{tikzpicture}
   }
-  \caption{Non-effet de l'opération $\trm{rmv}$ car reçue avant l'opération $\trm{ins}$ correspondante}
+  \caption{Non-effet de l'opération $\trm{remove}$ car reçue avant l'opération $\trm{insert}$ correspondante}
   \label{fig:why-causal-remove}
 \end{figure}
 
@@ -96,19 +96,19 @@ Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativeme
 La séquence répliquée contient initialement les éléments "WOLD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{0..3}$.
 
 Le noeud A commence par insérer l'élément "R" dans la séquence entre les éléments "O" et "L".
-A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{1}\betterid{m}{A2}{0},R)$ puis la diffuse.
+A intègre l'opération résultante, $\trm{insert}(\betterid{p}{A1}{1}\betterid{m}{A2}{0},R)$ puis la diffuse.
 
-À la réception de l'opération $\trm{ins}$, le noeud B l'intègre à son état.
+À la réception de l'opération $\trm{insert}$, le noeud B l'intègre à son état.
 Puis il supprime dans la foulée l'élément "R" nouvellement inséré.
-B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{1}\betterid{m}{A2}{0})$ puis la diffuse.
+B intègre l'opération $\trm{remove}(\betterid{p}{A1}{1}\betterid{m}{A2}{0})$ puis la diffuse.
 
-Toutefois, suite à un aléa du réseau, l'opération $\trm{rmv}$ supprimant l'élément "R" est reçue par le noeud C en première.
+Toutefois, suite à un aléa du réseau, l'opération $\trm{remove}$ supprimant l'élément "R" est reçue par le noeud C en première.
 Ainsi, le noeud C intègre cette opération : il parcourt son état à la recherche de l'élément "R" pour le supprimer.
 Celui-ci n'est pas présent dans son état courant, l'intégration de l'opération s'achève sans effectuer de modification.
 
-Le noeud C reçoit ensuite l'opération $\trm{ins}$.
+Le noeud C reçoit ensuite l'opération $\trm{insert}$.
 Le noeud C intègre ce nouvel élément dans la séquence en utilisant son identifiant.
 
 Nous constatons alors que l'état à terme du noeud C diverge de celui des noeuds A et B, et cela malgré que les noeuds A, B et C aient intégré le même ensemble d'opérations.
 Ce résultat transgresse la propriété \ac{SEC} \cite{shapiro_2011_crdt} que doivent assurer les \acp{CRDT}.
-Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations $\trm{rmv}$ par rapport aux opérations $\trm{ins}$ correspondantes.
+Afin d'empêcher ce scénario de se produire, LogootSplit impose donc la livraison causale des opérations $\trm{remove}$ par rapport aux opérations $\trm{insert}$ correspondantes.

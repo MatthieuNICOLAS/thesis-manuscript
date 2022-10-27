@@ -5,22 +5,22 @@ En nous basant sur \textcite{2013-logootsplit}, nous proposons une définition d
   % \resizebox{0.35\columnwidth}{!}{
     \begin{tabular}{llll}
       \textbf{payload} \\
-      $S \in \trm{Seq}\langle \trm{IdInterval},\trm{Arr}\langle E \rangle, \trm{Bool} \rangle$ \\
+      $S \in \trm{Seq}\langle \trm{IdInterval},\trm{Array}\langle E \rangle, \trm{Bool} \rangle$ \\
       \\
       \textbf{constructor} \\
-      $\trm{emp}$ & : &                                                 & $\longrightarrow S$   \\
+      $\trm{empty}$ & : &                                                 & $\longrightarrow S$   \\
       \\
       \textbf{prepare} \\
-      $\trm{ins}$ & : & $S \times \nat \times \trm{Arr}\langle \elt \rangle \times \mathbb{I} \times \nat^*$   & $\longrightarrow \trm{Id} \times \trm{Arr}\langle \elt \rangle$   \\
-      $\trm{rmv}$ & : & $S \times \nat \times \nat$                           & $\longrightarrow \trm{Arr}\langle \trm{IdInterval} \rangle$ \\
+      $\trm{insert}$ & : & $S \times \nat \times \trm{Array}\langle \elt \rangle \times \mathbb{I} \times \nat^*$   & $\longrightarrow \trm{Id} \times \trm{Array}\langle \elt \rangle$   \\
+      $\trm{remove}$ & : & $S \times \nat \times \nat$                           & $\longrightarrow \trm{Array}\langle \trm{IdInterval} \rangle$ \\
       \\
       \textbf{effect} \\
-      $\trm{ins}$ & : & $S \times \trm{Id} \times \trm{Arr}\langle \elt \rangle$ & $\longrightarrow S$ \\
-      $\trm{rmv}$ & : & $S \times \trm{Arr}\langle \trm{IdInterval} \rangle$  & $\longrightarrow S$ \\
+      $\trm{insert}$ & : & $S \times \trm{Id} \times \trm{Array}\langle \elt \rangle$ & $\longrightarrow S$ \\
+      $\trm{remove}$ & : & $S \times \trm{Array}\langle \trm{IdInterval} \rangle$  & $\longrightarrow S$ \\
       \\
       \textbf{queries} \\
-      $\trm{len}$ & : & $S$                                             & $\longrightarrow \nat$   \\
-      $\trm{rd}$  & : & $S$                                             & $\longrightarrow \trm{Arr}\langle \elt \rangle$ \\
+      $\trm{length}$ & : & $S$                                             & $\longrightarrow \nat$   \\
+      $\trm{read}$  & : & $S$                                             & $\longrightarrow \trm{Array}\langle \elt \rangle$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait LogootSplit}
@@ -38,13 +38,13 @@ Concernant les modifications définies sur le type, nous nous inspirons de \cite
 
 La séquence LogootSplit autorise deux types de modifications :
 \begin{enumerate}
-  \item $\trm{ins}(s, i, \trm{elts}, \trm{nodeId}, \trm{nodeSeq})$, qui génère l'opération permettant d'insérer les éléments $\trm{elts}$ dans la séquence $s$ à l'index $i$.
+  \item $\trm{insert}(s, i, \trm{elts}, \trm{nodeId}, \trm{nodeSeq})$, abrégée en $\trm{ins}$ dans nos figures, qui génère l'opération permettant d'insérer les éléments $\trm{elts}$ dans la séquence $s$ à l'index $i$.
     Cette fonction génère et associe un intervalle d'identifiants aux éléments à insérer en utilisant les valeurs pour $\trm{nodeId}$ et $\trm{nodeSeq}$ fournies.
-    Elle retourne les données nécessaires pour l'opération $\trm{ins}$, \ie le premier identifiant de l'intervalle d'identifiants alloué et les éléments.
-    Par souci de simplicité, nous noterons cette modification $\trm{ins}(\trm{pred} \prec \trm{elts} \prec \trm{succ})$ et utiliserons l'état courant de la séquence comme valeur pour $s$, l'identifiant du noeud auteur de la modification comme valeur pour $\trm{nodeId}$ et le nombre de blocs que le noeud a créé comme valeur pour $\trm{nodeSeq}$ dans nos exemples.
-  \item  \emph{rmv(s, i, nbElts)}, qui génère l'opération permettant de supprimer $\trm{nbElts}$ dans la séquence $s$ à partir de l'index $i$.
-    Elle retourne les données nécessaires pour l'opération $\trm{rmv}$, \ie les intervalles d'identifiants supprimés.
-    Par souci de simplicité, nous noterons cette modifications $\trm{rmv}(\trm{elts})$ dans nos exemples.
+    Elle retourne les données nécessaires pour l'opération $\trm{insert}$, \ie le premier identifiant de l'intervalle d'identifiants alloué et les éléments.
+    Par souci de simplicité, nous noterons cette modification $\trm{insert}(\trm{pred} \prec \trm{elts} \prec \trm{succ})$ et utiliserons l'état courant de la séquence comme valeur pour $s$, l'identifiant du noeud auteur de la modification comme valeur pour $\trm{nodeId}$ et le nombre de blocs que le noeud a créé comme valeur pour $\trm{nodeSeq}$ dans nos exemples.
+  \item  $\trm{rmv}(s, i, \trm{nbElts})$, abrégée en $\trm{rmv}$ dans nos figures, qui génère l'opération permettant de supprimer $\trm{nbElts}$ dans la séquence $s$ à partir de l'index $i$.
+    Elle retourne les données nécessaires pour l'opération $\trm{remove}$, \ie les intervalles d'identifiants supprimés.
+    Par souci de simplicité, nous noterons cette modifications $\trm{remove}(\trm{elts})$ dans nos exemples.
 \end{enumerate}
 
 Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de cette séquence répliquée.
@@ -168,7 +168,7 @@ Ils partagent initialement le même état : une séquence composée d'un seul bl
 Les noeuds se mettent ensuite à éditer le document.
 
 Le noeud A commence par supprimer l'élément "R" de la séquence.
-LogootSplit génère l'opération $\trm{rmv}$ correspondante en utilisant l'identifiant de l'élément supprimé : $\betterid{i}{B1}{1}$.
+LogootSplit génère l'opération $\trm{remove}$ correspondante en utilisant l'identifiant de l'élément supprimé : $\betterid{i}{B1}{1}$.
 Cette opération est intégrée à sa copie locale et envoyée au noeud B pour qu'il intègre cette modification à son tour.
 
 Le noeud A insère ensuite l'élément "E" dans la séquence entre les éléments "H" et "L".
@@ -177,23 +177,23 @@ Le noeud A doit alors générer un identifiant $\trm{id}$ à associer à ce nouv
   \betterid{i}{B1}{0} \lid \trm{id} \lid \betterid{i}{B1}{2}
 \end{equation*}
 L'espace des identifiants de taille 1 étant saturé entre ces deux identifiants, A génère $\trm{id}$ en reprenant le premier tuple de l'identifiant du prédecesseur et en y concaténant un nouveau tuple : $\trm{id} = \betterid{i}{B1}{0} \oplus \betterid{f}{A1}{0}$.
-LogootSplit génère l'opération $\trm{ins}$ correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
+LogootSplit génère l'opération $\trm{insert}$ correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
 Il intègre cette opération et la diffuse sur le réseau.
 
 En parallèle, le noeud B insère l'élément "!" en fin de la séquence.
 Comme le noeud B est l'auteur du bloc $\betterid{i}{B1}{0..3}$, il peut y ajouter de nouveaux éléments.
 B associe donc l'identifiant $\betterid{i}{B1}{4}$ à l'élément "!" pour l'ajouter au bloc existant.
-Il génère l'opération $\trm{ins}$ correspondante, l'intègre puis la diffuse.
+Il génère l'opération $\trm{insert}$ correspondante, l'intègre puis la diffuse.
 
 Les noeuds se synchronisent ensuite.
-Le noeud A reçoit l'opération $\trm{ins}(\betterid{i}{B1}{4},L)$.
+Le noeud A reçoit l'opération $\trm{insert}(\betterid{i}{B1}{4},L)$.
 Le noeud A détermine que cet élément doit être inséré à la fin de la séquence, puisque $\betterid{i}{B1}{3} \lid \betterid{i}{B1}{4}$.
 Ces deux identifiants étant contigus, il ajoute cet élément au bloc existant.
 
-De son côté, le noeud B reçoit tout d'abord l'opération $\trm{rmv}(\betterid{i}{B1}{1})$.
+De son côté, le noeud B reçoit tout d'abord l'opération $\trm{remove}(\betterid{i}{B1}{1})$.
 Le noeud B supprime donc l'élément correspondant de son état, "R".
 
-Il reçoit ensuite l'opération $\trm{ins}(\betterid{i}{B1}{0}\betterid{f}{A1}{0},E)$.
+Il reçoit ensuite l'opération $\trm{insert}(\betterid{i}{B1}{0}\betterid{f}{A1}{0},E)$.
 Le noeud B insère cet élément entre les éléments "H" et "L", puisqu'on a :
 \begin{equation*}
   \betterid{i}{B1}{1} \lid \betterid{i}{B1}{0}\betterid{f}{A1}{0} \lid \betterid{i}{B1}{2}

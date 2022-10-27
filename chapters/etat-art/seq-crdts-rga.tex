@@ -49,8 +49,8 @@ Nous procédons donc ici à la même simplification, et abstrayons la structure 
 
 À l'aide des identifiants, \ac{RGA} redéfinit les modifications de la séquence de la manière suivante :
 \begin{enumerate}
-  \item $\trm{ins}$ devient $\trm{ins}(\trm{predId} \prec \langle t,\trm{elt} \rangle)$.
-  \item $\trm{rmv}$ devient $\trm{rmv}(t)$.
+  \item $\trm{insert}$ devient $\trm{insert}(\trm{predId} \prec \langle t,\trm{elt} \rangle)$.
+  \item $\trm{remove}$ devient $\trm{remove}(t)$.
 \end{enumerate}
 
 Puisque plusieurs éléments peuvent être insérés en concurrence à la même position, \ie avec le même prédecesseur, il est nécessaire de définir une relation d'ordre strict total pour ordonner les éléments de manière déterministe et indépendante de l'ordre de réception des modifications.
@@ -67,10 +67,10 @@ Pour cela, \ac{RGA} définit $\lid$ :
     \end{split}
   \end{equation*}
 \end{definition}
-L'utilisation de $\lid$ comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{ins}$ concurrentes.
+L'utilisation de $\lid$ comme stratégie de résolution de conflits permet de rendre commutative les modifications $\trm{insert}$ concurrentes.
 
 Concernant les suppressions, \ac{RGA} se comporte de manière similaire à WOOT : la séquence conserve une pierre tombale pour chaque élément supprimé, de façon à pouvoir insérer à la bonne position un élément dont le prédecesseur a été supprimé en concurrence.
-Cette stratégie rend commutative les modifications $\trm{ins}$ et $\trm{rmv}$.
+Cette stratégie rend commutative les modifications $\trm{insert}$ et $\trm{remove}$.
 
 Nous récapitulons le fonctionnement de \ac{RGA} à l'aide de la \autoref{fig:rga}.
 \begin{figure}[!ht]
@@ -167,17 +167,17 @@ Nous récapitulons le fonctionnement de \ac{RGA} à l'aide de la \autoref{fig:rg
 Dans cet exemple, deux noeuds A et B partagent et éditent collaborativement une séquence répliquée \ac{RGA}.
 Initialement, ils possèdent le même état : la séquence contient les éléments "HEMLO", et à chaque élément est associé un identifiant, \eg $t_1$, $t_2$, $t_3$...
 
-Le noeud A insère l'élément "L" après l'élément et "M", \ie $\trm{ins}(M \prec L)$.
-RGA convertit cette modification en opération $\trm{ins}(t_3 \prec \langle t_6,L \rangle)$.
+Le noeud A insère l'élément "L" après l'élément et "M", \ie $\trm{insert}(M \prec L)$.
+RGA convertit cette modification en opération $\trm{insert}(t_3 \prec \langle t_6,L \rangle)$.
 L'opération est intégrée à la copie locale, ce qui produit l'état "HEMLLO", puis diffusée sur le réseau.
 
-En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{rmv}(M)$.
-De la même manière, \ac{RGA} génère l'opération correspondante $\trm{rmv}(t_3)$.
+En concurrence, le noeud B supprime l'élément "M" de la séquence, \ie $\trm{remove}(M)$.
+De la même manière, \ac{RGA} génère l'opération correspondante $\trm{remove}(t_3)$.
 Comme expliqué précédemment, l'intégration de cette opération ne supprime pas l'élément "M" de l'état mais se contente de le masquer.
 L'état produit est donc "HE\cancel{M}LO".
 L'opération est ensuite diffusée.
 
-A (resp. B) reçoit ensuite l'opération de B, $\trm{rmv}(t_3)$ (resp. A, $\trm{ins}(t_3 \prec \langle t_6,L \rangle)$), et l'intègre à sa copie.
+A (resp. B) reçoit ensuite l'opération de B, $\trm{remove}(t_3)$ (resp. A, $\trm{insert}(t_3 \prec \langle t_6,L \rangle)$), et l'intègre à sa copie.
 Les opérations de \ac{RGA} étant commutatives, les noeuds obtiennent le même état final : "HE\cancel{M}LLO".
 
 À la différence des auteurs de WOOT, \textcite{ROH2011354} jugent le coût des pierres tombales trop élévé.
@@ -186,12 +186,12 @@ Ce mécanisme repose sur deux conditions :
 \label{sec:gc-rga}
 \begin{enumerate}
   \item \label{item:gc-rga-1}
-    La stabilité causale de l'opération $\trm{rmv}$, \ie l'ensemble des noeuds a intégré la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
+    La stabilité causale de l'opération $\trm{remove}$, \ie l'ensemble des noeuds a intégré la suppression de l'élément et ne peut émettre d'opérations utilisant l'élément supprimé comme prédecesseur.
   \item \label{item:gc-rga-2}
     L'impossibilité pour l'ensemble des noeuds de générer un identifiant inférieur à celui de l'élément suivant la pierre tombale d'après $\lid$.
 \end{enumerate}
-L'intuition de la condition \ref{item:gc-rga-1} est de s'assurer qu'aucune opération $\trm{ins}$ concurrente à l'exécution du mécanisme ne peut utiliser la pierre tombale comme prédecesseur, les opérations $\trm{ins}$ ne pouvant reposer que sur les éléments.
-L'intuition de la condition \ref{item:gc-rga-2} est de s'assurer que l'intégration d'une opération $\trm{ins}$, concurrente à l'exécution du mécanisme et devant résulter en l'insertion de l'élément avant la pierre tombale, ne sera altérée par la suppression de cette dernière.
+L'intuition de la condition \ref{item:gc-rga-1} est de s'assurer qu'aucune opération $\trm{insert}$ concurrente à l'exécution du mécanisme ne peut utiliser la pierre tombale comme prédecesseur, les opérations $\trm{insert}$ ne pouvant reposer que sur les éléments.
+L'intuition de la condition \ref{item:gc-rga-2} est de s'assurer que l'intégration d'une opération $\trm{insert}$, concurrente à l'exécution du mécanisme et devant résulter en l'insertion de l'élément avant la pierre tombale, ne sera altérée par la suppression de cette dernière.
 
 Concernant le modèle de livraison adopté, \ac{RGA} repose sur une livraison causale des opérations.
 Cependant, \cite{ROH2011354} indique que ce modèle de livraison pourrait être relaxé, de façon à ne plus dépendre de vecteurs d'horloges.
@@ -203,8 +203,8 @@ Ce modèle consisterait :
   Le modèle de livraison \ac{RGA} définit que :
   \begin{enumerate}
     \item Une opération doit être livrée exactement une fois à chaque noeud.
-    \item Une opération $\trm{ins}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
-    \item Une opération $\trm{rmv}(\trm{id})$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
+    \item Une opération $\trm{insert}(\trm{predId} \prec \langle \trm{id},\trm{elt} \rangle)$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{predId}$.
+    \item Une opération $\trm{remove}(\trm{id})$ ne peut être livrée à un noeud qu'après la livraison de l'opération d'insertion de l'élément associé à $\trm{id}$.
   \end{enumerate}
 \end{definition}
 Nous secondons cette observation.
@@ -307,9 +307,9 @@ La \autoref{fig:rga-interleaving} présente un tel cas de figure :
               ++(0:0.5) node (a) {}
               +(0:33) node (a-end) {}
               +(0:2) node[point] (a-initial) {}
-              +(0:8) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_5,E \rangle)}$}}] (a-ins-e) {}
-              +(0:16) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_5 \prec \langle t_6,F \rangle)}$}}] (a-ins-f) {}
-              +(0:24) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins(t_3 \prec \langle t_9,D \rangle)}$}}] (a-ins-d) {}
+              +(0:8) node[point, label=-170:{$\trm{ins}(C \prec E)$}, label={[xshift=0.3em]-10:{$\trm{ins}(t_3 \prec \langle t_5,E \rangle)$}}] (a-ins-e) {}
+              +(0:16) node[point, label=-170:{$\trm{ins}(E \prec F)$}, label={[xshift=0.3em]-10:{$\trm{ins}(t_5 \prec \langle t_6,F \rangle)$}}] (a-ins-f) {}
+              +(0:24) node[point, label=-170:{$\trm{ins}(C \prec D)$}, label={[xshift=0.3em]-10:{$\trm{ins}(t_3 \prec \langle t_9,D \rangle)$}}] (a-ins-d) {}
               +(0:31) node (a-final) {};
 
           \initialstate{(a-initial)}{90};
@@ -432,14 +432,14 @@ Dans la \autoref{fig:rga-interleaving-setup}, deux noeuds A et B partagent et é
 Initialement, ils possèdent le même état : la séquence contient les éléments "ABC!", et à chaque élément est associé un identifiant, \eg $t_1$, $t_2$, $t_3$ et $t_4$.
 
 Le noeud A insère après l'élément "C" les éléments "E" et F.
-RGA génère les opérations $\trm{ins}(t_3 \prec \langle t_5,E \rangle)$ et $\trm{ins}(t_5 \prec \langle t_6,F \rangle)$.
-En concurrence, le noeud B insère les éléments "G" et "H" de manière similaire, produisant les opérations  $\trm{ins}(t_3 \prec \langle t_7,G \rangle)$ et $\trm{ins}(t_7 \prec \langle t_8,H \rangle)$.
-Finalement, toujours en concurrence, le noeud A insère un nouvel élément après l'élément "C", l'élément "D", ce qui résulte en l'opération $\trm{ins}(t_9 \prec \langle t_3,D \rangle)$.
+RGA génère les opérations $\trm{insert}(t_3 \prec \langle t_5,E \rangle)$ et $\trm{insert}(t_5 \prec \langle t_6,F \rangle)$.
+En concurrence, le noeud B insère les éléments "G" et "H" de manière similaire, produisant les opérations  $\trm{insert}(t_3 \prec \langle t_7,G \rangle)$ et $\trm{insert}(t_7 \prec \langle t_8,H \rangle)$.
+Finalement, toujours en concurrence, le noeud A insère un nouvel élément après l'élément "C", l'élément "D", ce qui résulte en l'opération $\trm{insert}(t_9 \prec \langle t_3,D \rangle)$.
 Pour la suite de notre exemple, nous supposons que $t_5 \lid t_6 \lid t_7 \lid t_8 \lid t_9$.
 
 Nous poursuivons notre exemple dans la \autoref{fig:rga-interleaving-done}.
 Dans cette figure, les noeuds A et B se synchronisent et échangent leurs opérations respectives.
-À la réception de l'opération de B $\trm{ins}(t_3 \prec \langle t_7,G \rangle)$, le noeud A compare $t_7$ avec les identifiants des éléments se trouvant après $t_3$.
+À la réception de l'opération de B $\trm{insert}(t_3 \prec \langle t_7,G \rangle)$, le noeud A compare $t_7$ avec les identifiants des éléments se trouvant après $t_3$.
 Il place l'élément "G" qu'après les éléments ayant des identifiants supérieurs à $t_7$.
 Ainsi, il insère "G" après "D" ($t_9$), mais avant "E" ($t_5$).
 L'élément "H" ($t_7$) est inséré de manière similaire avant "E" ($t_5$).
@@ -452,6 +452,6 @@ Pour remédier à ce problème, les auteurs définissent une nouvelle spécifica
 Basée sur la spécification forte des séquences répliquées spécifiée dans \cite{2016-specification-complexity-collaborative-text-editing-attiya, 2021-specification-complexity-collaborative-text-editing-attiya}, cette nouvelle spécification précise que les éléments insérés en concurrence ne doivent pas s'entrelacer dans l'état final.
 \textcite{2019-interleaving-anomalies-collaborative-editors-kleppmann} proposent ensuite une évolution de \ac{RGA} respectant cette spécification.
 
-Pour cela, les auteurs ajoutent à l'opération $\trm{ins}$ un paramètre, $\trm{samePredIds}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
-En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{ins}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
+Pour cela, les auteurs ajoutent à l'opération $\trm{insert}$ un paramètre, $\trm{samePredIds}$, un ensemble correspondant à l'ensemble des identifiants connus utilisant le même $\trm{predId}$ que l'élément inséré.
+En maintenant en plus un exemplaire de cet ensemble pour chaque élément de la séquence, il est possible de déterminer si deux opérations $\trm{insert}$ sont concurrentes ou causalement liées et ainsi déterminer comment ordonner leurs éléments.
 Cependant, les auteurs ne prouvent pas dans \cite{2019-interleaving-anomalies-collaborative-editors-kleppmann} que cette extension empêche tout entrelacement\footnote{Un travail en cours \cite{2022-no-doubly-non-interleaving-crdts-weidner} indique en effet qu'une séquence répliquée empêchant tout entrelacement est impossible.}.

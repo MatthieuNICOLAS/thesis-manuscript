@@ -1,6 +1,6 @@
 \label{sec:renamablelogootsplit-delivery-model}
 
-L'introduction de l'opération \emph{rename} nécessite de faire évoluer le modèle de livraison des opérations associé à RenamableLogootSplit.
+L'introduction de l'opération $\trm{rename}$ nécessite de faire évoluer le modèle de livraison des opérations associé à RenamableLogootSplit.
 Afin d'illustrer cette nécessité, considérons l'exemple suivant :
 
 \begin{figure}[!ht]
@@ -72,7 +72,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
             ++(0:0.5) node (a) {}
             +(0:24) node (a-end) {}
             +(0:2) node[point] (a-initial) {}
-            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren(\betterepoch{0}, A,1)}$}}] (a-ren-a1) {}
+            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,1)$}}] (a-ren-a1) {}
             +(0:16) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=20pt]-10:{$\trm{ins}(\betterepoch{A1}, \betterid{i}{A1}{1}\betterid{f}{A2}{0},R)$}}] (a-ins-r) {}
             +(0:22) node (a-final) {};
 
@@ -103,7 +103,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
         \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
     \end{tikzpicture}
   }
-  \caption{Livraison d'une opération \emph{insert} sans avoir reçu l'opération \emph{rename} précédente}
+  \caption{Livraison d'une opération $\trm{insert}$ sans avoir reçu l'opération $\trm{rename}$ précédente}
   \label{fig:rls-invalid-delivery-order}
 \end{figure}
 
@@ -112,14 +112,14 @@ Tout d'abord, le noeud A procède au renommage de cet état.
 Puis il insère un nouvel élément, "X", entre "B" et "C".
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
-Cependant, l'opération \emph{rename} n'est pas livrée au noeud B, par exemple suite à un problème réseau.
-L'opération \emph{insert} est quant à elle correctement livrée à ce dernier.
+Cependant, l'opération $\trm{rename}$ n'est pas livrée au noeud B, par exemple suite à un problème réseau.
+L'opération $\trm{insert}$ est quant à elle correctement livrée à ce dernier.
 Le noeud B doit alors intégrer dans son état un élément et l'identifiant qui lui est attaché.
 Mais cet identifiant est issu d'une époque (\epoch{A1}) différente de son époque actuelle (\epoch{0}) et dont le noeud n'avait pas encore connaissance.
 Il convient de s'interroger sur l'état à produire dans cette situation.
 
 Comme nous l'avions déjà illustré par la \autoref{fig:concurrent-insert-rename-inconsistent}, les identifiants d'une époque ne peuvent être comparés qu'aux identifiants de la même époque.
-Tenter d'intégrer une opération \emph{insert} ou \emph{remove} provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur \cf{prop:rename-op-intention-preservation}.
+Tenter d'intégrer une opération $\trm{insert}$ ou $\trm{remove}$ provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur \cf{prop:rename-op-intention-preservation}.
 Il est donc nécessaire d'empêcher ce scénario de se produire.
 
 Pour cela, nous proposons de faire évoluer le modèle de livraison des opérations de RenamableLogootSplit.
@@ -127,11 +127,11 @@ Celui-ci repose sur celui de LogootSplit \cf{def:ls-delivery-model}.
 Pour rappel, ce modèle requiert que
 \begin{enumerate}
   \item Une opération doit être livrée exactement une fois à chaque noeud.
-  \item Les opérations $\trm{ins}$ peuvent être livrées dans un ordre quelconque.
-  \item L'opération $\trm{rmv}(\trm{idIntervals})$ ne peut être livrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
+  \item Les opérations $\trm{insert}$ peuvent être livrées dans un ordre quelconque.
+  \item L'opération $\trm{remove}(\trm{idIntervals})$ ne peut être livrée qu'après la livraison des opération d'insertions des éléments formant les $\trm{idIntervals}$.
 \end{enumerate}
 
-Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations \emph{rename} doivent être livrées à la structure de données avant les opérations qui ont une dépendance causale vers ces dernières.
+Pour prévenir les scénarios tels que celui illustré par la \autoref{fig:rls-invalid-delivery-order} nous y ajoutons la règle suivante : les opérations $\trm{rename}$ doivent être livrées à la structure de données avant les opérations qui ont une dépendance causale vers ces dernières.
 Nous obtenons donc le modèle de livraison suivant :
 
 \begin{definition}[Modèle de livraison RenamableLogootSplit]
@@ -140,13 +140,13 @@ Nous obtenons donc le modèle de livraison suivant :
   \begin{enumerate}
     \item Une opération doit être livrée à l'ensemble des noeuds à terme.
     \item Une opération doit être livrée qu'une seule et unique fois aux noeuds.
-    \item Une opération \emph{remove} doit être livrée à un noeud une fois que les opérations \emph{insert} des éléments concernés par la suppression ont été livrées à ce dernier.
-    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération \emph{rename} qui a introduit son époque de génération a été délivrée à ce même noeud.
+    \item Une opération $\trm{remove}$ doit être livrée à un noeud une fois que les opérations $\trm{insert}$ des éléments concernés par la suppression ont été livrées à ce dernier.
+    \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération $\trm{rename}$ qui a introduit son époque de génération a été délivrée à ce même noeud.
   \end{enumerate}
 \end{definition}
 
-Il est cependant intéressant de noter que la livraison de l'opération \emph{rename} ne requiert pas de contraintes supplémentaires.
-Notamment, une opération \emph{rename} peut être livrée dans le désordre par rapport aux opérations \emph{insert} et \emph{remove} dont elle dépend causalement.
+Il est cependant intéressant de noter que la livraison de l'opération $\trm{rename}$ ne requiert pas de contraintes supplémentaires.
+Notamment, une opération $\trm{rename}$ peut être livrée dans le désordre par rapport aux opérations $\trm{insert}$ et $\trm{remove}$ dont elle dépend causalement.
 La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
 
 \begin{figure}[!ht]
@@ -231,7 +231,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
           +(0:32) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
           +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{A1}, \betterid{m}{A1}{0})$}}] (a-ins-r) {}
-          +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren(\betterepoch{0}, A,2)}$}}] (a-ren-a2) {}
+          +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,2)$}}] (a-ren-a2) {}
           +(0:30) node (a-final) {};
 
       \initialstate{(a-initial)}{\offseta}{90};
@@ -261,7 +261,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
       \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
     \end{tikzpicture}
   }
-  \caption{Livraison désordonnée d'une opération \emph{rename} et de l'opération \emph{insert} qui la précède}
+  \caption{Livraison désordonnée d'une opération $\trm{rename}$ et de l'opération $\trm{insert}$ qui la précède}
   \label{fig:rls-out-of-order-rename}
 \end{figure}
 
@@ -270,11 +270,11 @@ Le noeud A commence par insérer un nouvel élément, "X", entre les éléments 
 Puis il procède au renommage de son état.
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
-Cependant, suite à un aléa du réseau, le noeud B reçoit les deux opérations \emph{insert} et \emph{rename} dans le désordre.
-L'opération \emph{rename} est donc livrée en première au noeud B.
+Cependant, suite à un aléa du réseau, le noeud B reçoit les deux opérations $\trm{insert}$ et $\trm{rename}$ dans le désordre.
+L'opération $\trm{rename}$ est donc livrée en première au noeud B.
 En utilisant les informations contenues dans l'opération, le noeud B renomme chaque identifiant composant son état.
 
-Ensuite, le noeud B reçoit l'opération \emph{insert}.
-Comme l'époque de génération de l'opération \emph{insert} (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
+Ensuite, le noeud B reçoit l'opération $\trm{insert}$.
+Comme l'époque de génération de l'opération $\trm{insert}$ (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
 \id{m}{A1}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A2} (\id{i}{A2}{2}).
 Le noeud B insère l'élément "X" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.

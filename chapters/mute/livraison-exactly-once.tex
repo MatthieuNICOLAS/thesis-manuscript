@@ -27,7 +27,7 @@ Cette structure permet aussi de vérifier en temps constant si une opération es
 La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
 
 \begin{figure}[!ht]
-  \subfloat[Exécution avec livraison multiple d'une opération \emph{insert}]{
+  \subfloat[Exécution avec livraison multiple d'une opération $\trm{insert}$]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\columnwidth}{!}{
@@ -72,7 +72,7 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
                 \draw[dashed, ->, thick, shorten >= 3]
                   (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
                   (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
-                  (S2B-right.east) edge node[below right, align=center]{\emph{remove} {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
+                  (S2B-right.east) edge node[below right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
             \end{tikzpicture}
             \label{fig:exactly-once-delivery-rls}
           }

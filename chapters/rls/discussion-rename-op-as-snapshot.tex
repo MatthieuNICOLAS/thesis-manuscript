@@ -4,57 +4,57 @@ Puis il reconstruit l'état courant en appliquant successivement chacune des op�
 Ce processus peut néanmoins s'avérer coûteux pour les documents comprenant des milliers d'opérations.
 
 Pour pallier ce problème, des mécanismes de compression du journal ont été proposés dans la littérature.
-Les approches présentées dans \cite{2002-log-compression-op-based-vcs-shen-sun, 2006-these-claudia} consistent à remplacer un sous-ensemble des opérations du journal par une opération équivalente, par exemple en aggrégeant les opérations \emph{insert} adjacentes.
+Les approches présentées dans \cite{2002-log-compression-op-based-vcs-shen-sun, 2006-these-claudia} consistent à remplacer un sous-ensemble des opérations du journal par une opération équivalente, par exemple en aggrégeant les opérations $\trm{insert}$ adjacentes.
 Une autre approche, présentée dans \cite{2014-making-op-based-crdts-op-based}, définie une relation \emph{obsolete} sur les opérations.
 La relation \emph{obsolete} permet de spécifier qu'une nouvelle opération rend obsolètes des opérations précédentes et permet de les retirer du log.
 Pour donner un exemple, une opération d'ajout d'un élément donné dans un OR-Set \ac{CRDT} rend obsolètes toutes les opérations précédentes d'ajout et de suppression de cet élément.
 
-Dans notre contexte, il est intéressant de noter que l'opération \emph{rename} peut endosser un rôle comparable à ces mécanismes de compression du log.
-En effet, l'opération \emph{rename} prend un état donné, somme des opérations passées, et génère en retour un nouvel état équivalent et compacté.
-Une opération \emph{rename} rend donc obsolète l'ensemble des opérations dont elle dépend causalement, et peut être utilisée pour les remplacer.
+Dans notre contexte, il est intéressant de noter que l'opération $\trm{rename}$ peut endosser un rôle comparable à ces mécanismes de compression du log.
+En effet, l'opération $\trm{rename}$ prend un état donné, somme des opérations passées, et génère en retour un nouvel état équivalent et compacté.
+Une opération $\trm{rename}$ rend donc obsolète l'ensemble des opérations dont elle dépend causalement, et peut être utilisée pour les remplacer.
 En partant de cette observation, nous proposons le mécanisme de compression du journal suivant.
 
-Le mécanisme consiste à réduire le nombre d'opérations transmises à un nouveau pair rejoignant la collaboration grâce à l'opération \emph{rename} de l'époque courante.
-L'opération \emph{rename} ayant introduite l'époque courante fournit un état initial au nouveau pair.
-À partir de cet état initial, le nouveau pair peut obtenir l'état courant en intégrant les opérations \emph{insert} et \emph{remove} qui ont été générées de manière concurrente ou causale par rapport à l'opération \emph{rename}.
+Le mécanisme consiste à réduire le nombre d'opérations transmises à un nouveau pair rejoignant la collaboration grâce à l'opération $\trm{rename}$ de l'époque courante.
+L'opération $\trm{rename}$ ayant introduite l'époque courante fournit un état initial au nouveau pair.
+À partir de cet état initial, le nouveau pair peut obtenir l'état courant en intégrant les opérations $\trm{insert}$ et $\trm{remove}$ qui ont été générées de manière concurrente ou causale par rapport à l'opération $\trm{rename}$.
 En réponse à une demande de synchronisation d'un nouveau pair, un pair peut donc simplement lui envoyer un sous-ensemble de son journal composé de :
 \begin{enumerate}
-  \item L'opération \emph{rename} ayant introduite son époque courante.
-  \item Les opérations \emph{insert} et \emph{remove} dont l'opération \emph{rename} courante ne dépend pas causalement.
+  \item L'opération $\trm{rename}$ ayant introduite son époque courante.
+  \item Les opérations $\trm{insert}$ et $\trm{remove}$ dont l'opération $\trm{rename}$ courante ne dépend pas causalement.
 \end{enumerate}
 
-Notons que les données contenues dans l'opération \emph{rename} telle que nous l'avons définie précédemment (cf. \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
-En effet, les données incluses (\emph{ancien état} au moment du renommage, identifiant du noeud auteur de l'opération \emph{rename} et son numéro de séquence au moment de la génération) nous permettent seulement de recréer la structure de la séquence après le renommage.
-Mais le contenu de la séquence est omis, celui-ci n'étant jusqu'ici d'aucune utilité pour l'opération \emph{rename}.
-Afin de pouvoir utiliser l'opération \emph{rename} comme état initial, il est nécessaire d'y inclure cette information.
+Notons que les données contenues dans l'opération $\trm{rename}$ telle que nous l'avons définie précédemment (cf. \autoref{def:rename-op}) sont insuffisantes pour cette utilisation.
+En effet, les données incluses (\emph{ancien état} au moment du renommage, identifiant du noeud auteur de l'opération $\trm{rename}$ et son numéro de séquence au moment de la génération) nous permettent seulement de recréer la structure de la séquence après le renommage.
+Mais le contenu de la séquence est omis, celui-ci n'étant jusqu'ici d'aucune utilité pour l'opération $\trm{rename}$.
+Afin de pouvoir utiliser l'opération $\trm{rename}$ comme état initial, il est nécessaire d'y inclure cette information.
 
-De plus, des informations de causalité doivent être intégrées à l'opération \emph{rename}.
-Ces informations doivent permettre aux noeuds d'identifier les opérations supplémentaires nécessaires pour obtenir l'état courant, \ie toutes les opérations desquelles l'opération \emph{rename} ne dépend pas causalement.
-L'ajout à l'opération \emph{rename} d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations intégrées par l'auteur de l'opération \emph{rename} au moment de sa génération, permettrait cela.
+De plus, des informations de causalité doivent être intégrées à l'opération $\trm{rename}$.
+Ces informations doivent permettre aux noeuds d'identifier les opérations supplémentaires nécessaires pour obtenir l'état courant, \ie toutes les opérations desquelles l'opération $\trm{rename}$ ne dépend pas causalement.
+L'ajout à l'opération $\trm{rename}$ d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations intégrées par l'auteur de l'opération $\trm{rename}$ au moment de sa génération, permettrait cela.
 
-Nous définissons donc de la manière suivante l'opération \emph{rename} enrichie compatible avec ce mécanisme de compression du journal :
+Nous définissons donc de la manière suivante l'opération $\trm{rename}$ enrichie compatible avec ce mécanisme de compression du journal :
 
 \indent\withmathbreak{
   \begin{definition}[rename enrichie]
     \label{def:-rich-rename-op}
     Une opération \emph{rename enrichie} est un quintuplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{formerState}, \trm{versionVector}, \trm{content} \rangle$ où
-    \begin{itemize}
-      \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename}.
-      \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
+    \begin{enumerate}
+      \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération $\trm{rename}$.
+      \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération $\trm{rename}$.
       \item $\trm{formerState}$ est l'ancien état du noeud au moment du renommage.
       \item $\trm{versionVector}$ est le vecteur de version représentant l'ancien état du noeud au moment du renommage.
       \item $\trm{content}$ est le contenu du document au moment du renommage.
-    \end{itemize}
+    \end{enumerate}
   \end{definition}
 }
 Ce mécanisme de compression du journal introduit néanmoins le problème suivant.
 Un nouveau pair synchronisé de cette manière ne possède qu'un sous-ensemble du journal des opérations.
 Si ce pair reçoit ensuite une demande de synchronisation d'un second pair, il est possible qu'il ne puisse répondre à la requête.
-Par exemple, le pair ne peut pas fournir des opérations faisant partie des dépendances causales de l'opération \emph{rename} qui lui a servi d'état initial.
+Par exemple, le pair ne peut pas fournir des opérations faisant partie des dépendances causales de l'opération $\trm{rename}$ qui lui a servi d'état initial.
 
 Une solution possible dans ce cas de figure est de rediriger le second pair vers un troisième pour qu'il se synchronise avec lui.
 Cependant, cette solution pose des problèmes de latence/temps de réponse si le troisième pair s'avère indisponible à ce moment.
-Une autre approche possible est de généraliser le processus de synchronisation que nous avons présenté ici (opération \emph{rename} comme état initial puis application des autres opérations) à l'ensemble des pairs, et non plus seulement aux nouveaux pairs.
+Une autre approche possible est de généraliser le processus de synchronisation que nous avons présenté ici (opération $\trm{rename}$ comme état initial puis application des autres opérations) à l'ensemble des pairs, et non plus seulement aux nouveaux pairs.
 Nous présentons les avantages et inconvénients de cette approche dans la sous-section suivante.
 
 % \mnnote{TODO: Étudier si y a un intérêt à privilégier la synchronisation basée sur l'intégration successive de toutes les opérations quand on a cette méthode de synchronisation par snapshot/checkpoint de possible}

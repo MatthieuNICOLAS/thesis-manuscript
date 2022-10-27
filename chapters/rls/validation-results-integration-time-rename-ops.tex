@@ -1,18 +1,18 @@
 \label{sec:integration-time-rename}
 
-Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération \emph{rename} en fonction du nombre d'opérations émises précédemment, \ie en fonction de la taille de l'état.
+Finalement, nous avons mesuré l'évolution du temps d'intégration de l'opération $\trm{rename}$ en fonction du nombre d'opérations émises précédemment, \ie en fonction de la taille de l'état.
 Comme précédemment, nous distinguons les performances des modifications \emph{locales} et \emph{distantes}.
 
-Nous rappellons que le traitement d'une opération \emph{rename} dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
-Le cas des opérations \emph{rename} distantes se décompose donc en trois catégories.
-Les opérations \emph{distantes directes} désignent les opérations \emph{rename} distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
-Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désignent les opérations \emph{rename} qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
+Nous rappellons que le traitement d'une opération $\trm{rename}$ dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
+Le cas des opérations $\trm{rename}$ distantes se décompose donc en trois catégories.
+Les opérations \emph{distantes directes} désignent les opérations $\trm{rename}$ distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
+Les opérations \emph{concurrentes introduisant une plus grande} (resp. \emph{petite}) \emph{époque} désignent les opérations $\trm{rename}$ qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
 D'après la relation \emph{priority}, l'époque introduite est plus grande (resp. petite) que l'époque courante du noeud.
 Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
 
 \begin{table}[!ht]
   \centering
-  \caption{Temps d'intégration de l'opération \emph{rename}}
+  \caption{Temps d'intégration de l'opération $\trm{rename}$}
   \label{tab:evolution-integration-time-rename}
   \resizebox{.8\columnwidth}{!}{
     \begin{tabular}{lrrrrrr}
@@ -49,12 +49,12 @@ Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integrati
   }
 \end{table}
 
-Le principal résultat de ces mesures est que les opérations \emph{rename} sont particulièrement coûteuses quand comparées aux autres types d'opérations.
-Les opérations \emph{rename} locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse 40k éléments.
-Ces résultats s'expliquent facilement par la complexité en temps de l'opération \emph{rename} qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
+Le principal résultat de ces mesures est que les opérations $\trm{rename}$ sont particulièrement coûteuses quand comparées aux autres types d'opérations.
+Les opérations $\trm{rename}$ locales s'intègrent en centaines de millisecondes tandis que les opérations \emph{distantes directes} et \emph{concurrentes introduisant une plus grande époque} s'intègrent en secondes lorsque la taille du document dépasse 40k éléments.
+Ces résultats s'expliquent facilement par la complexité en temps de l'opération $\trm{rename}$ qui dépend supra-linéairement du nombre de blocs et d'éléments stockés dans l'état (cf. \autoref{tab:time-complexity-operations}).
 Il est donc nécessaire de prendre en compte ce résultat et de
 \begin{enumerate}
-  \item Concevoir des stratégies de génération des opérations \emph{rename} pour éviter d'impacter négativement l'expérience utilisateur.
+  \item Concevoir des stratégies de génération des opérations $\trm{rename}$ pour éviter d'impacter négativement l'expérience utilisateur.
   \item Proposer des versions améliorées des algorithmes \textsc{renameId} et \textsc{revertRenameId} pour réduire ces temps d'intégration.
 \end{enumerate}
 
@@ -62,7 +62,7 @@ Nous identifions plusieurs pistes d'amélioration de \textsc{renameId} et \texts
 \begin{itemize}
   \item Au lieu d'utiliser \textsc{renameId}, qui renomme l'état identifiant par identifiant, nous pourrions définir et utiliser \textsc{renameBlock}.
     Cette fonction permettrait de renommer l'état bloc par bloc, offrant ainsi une meilleur complexité en temps.
-    De plus, puisque les opérations \emph{rename} fusionnent les blocs existants en un unique bloc, \textsc{renameBlock} permettrait de mettre en place un cercle vertueux où chaque opération \emph{rename} réduirait le temps d'exécution de la suivante.
+    De plus, puisque les opérations $\trm{rename}$ fusionnent les blocs existants en un unique bloc, \textsc{renameBlock} permettrait de mettre en place un cercle vertueux où chaque opération $\trm{rename}$ réduirait le temps d'exécution de la suivante.
   \item Puisque chaque appel à \textsc{revertRenameId} et \textsc{revertRenameId} est indépendant des autres, ces fonctions sont adaptées à la programmation parallèle.
     Au lieu de renommer les identifiants (ou blocs) de manière séquentielle, nous pourrions diviser la séquence en plusieurs parties et les renommer en parallèle.
 \end{itemize}
@@ -70,5 +70,5 @@ Nous identifions plusieurs pistes d'amélioration de \textsc{renameId} et \texts
 Un autre résultat intéressant de ces benchmarks est que les opérations \emph{concurrentes introduisant une plus petite époque} sont rapides à intégrer.
 Puisque ces opérations introduisent une époque qui n'est pas sélectionnée comme nouvelle époque cible, les noeuds ne procèdent pas au renommage de leur état.
 L'intégration des opérations \emph{concurrentes introduisant une plus petite époque} consiste simplement à ajouter l'époque introduite et l'\emph{ancien état} correspondant à l'\emph{arbre des époques}.
-Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations \emph{rename} concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
+Les noeuds peuvent donc réduire de manière significative le coût d'intégration d'un ensemble d'opérations $\trm{rename}$ concurrentes en les appliquant dans l'ordre le plus adapté en fonction du contexte.
 Nous développons ce sujet dans la \autoref{sec:report-transition-to-target-epoch}.

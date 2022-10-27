@@ -2,7 +2,7 @@ Bien que la relation \emph{priority} proposée dans la \autoref{sec:priority} so
 La \autoref{fig:worst-case-priority} présente un tel cas.
 
 \begin{figure}[!ht]
-  \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
+  \subfloat[Exécution d'opérations $\trm{rename}$ concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\linewidth}{!}{
@@ -82,23 +82,23 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
           }
           \label{fig:worst-case-priority-tree}
       \end{minipage}}
-  \caption{Livraison d'une opération \emph{rename} d'un noeud }
+  \caption{Livraison d'une opération $\trm{rename}$ d'un noeud }
   \label{fig:worst-case-priority}
 \end{figure}
 
 Dans cet exemple, les noeuds A et B éditent en collaboration un document.
-Au fur et à mesure de leur collaboration, ils effectuent plusieurs opérations \emph{rename}.
+Au fur et à mesure de leur collaboration, ils effectuent plusieurs opérations $\trm{rename}$.
 Cependant, après un nombre conséquent de modifications de leur part, un autre noeud C se reconnecte.
-Celui-ci leur transmet sa propre opération \emph{rename}, concurrente à toutes leurs opérations.
+Celui-ci leur transmet sa propre opération $\trm{rename}$, concurrente à toutes leurs opérations.
 D'après la relation \emph{priority}, nous avons \epoch{0}~\lepoch~\epoch{A1}~\lepoch~...~\lepoch~\epoch{A100}~\lepoch~\epoch{C1}.
-La nouvelle époque cible étant \epoch{C1}, les noeuds A et B doivent pour l'atteindre annuler successivement l'ensemble des opérations \emph{rename} composant leur branche de l'\emph{arbre des époques}.
+La nouvelle époque cible étant \epoch{C1}, les noeuds A et B doivent pour l'atteindre annuler successivement l'ensemble des opérations $\trm{rename}$ composant leur branche de l'\emph{arbre des époques}.
 Ainsi, un noeud isolé peut forcer l'ensemble des noeuds à effectuer un lourd calcul.
 Il serait plus efficace que, dans cette situation, ce soit seulement le noeud isolé qui doive se mettre à jour.
 
 La relation \emph{priority} devrait donc être conçue pour garantir la convergence des noeuds, mais aussi pour minimiser les calculs effectués globalement par les noeuds du système.
-Pour concevoir une relation \emph{priority} efficace, nous pourrions incorporer dans les opérations \emph{rename} des métriques qui représentent l'état du système et le travail accumulé sur le document (nombre de noeuds actuellement à l'époque \emph{parente}, nombre d'opérations générées depuis l'époque parente, taille du document...).
-De cette manière, nous pourrions favoriser la branche de l'\emph{arbre des époques} regroupant les collaborateur-rices les plus actifs et empêcher les noeuds isolés d'imposer leurs opérations \emph{rename}.
+Pour concevoir une relation \emph{priority} efficace, nous pourrions incorporer dans les opérations $\trm{rename}$ des métriques qui représentent l'état du système et le travail accumulé sur le document (nombre de noeuds actuellement à l'époque \emph{parente}, nombre d'opérations générées depuis l'époque parente, taille du document...).
+De cette manière, nous pourrions favoriser la branche de l'\emph{arbre des époques} regroupant les collaborateur-rices les plus actifs et empêcher les noeuds isolés d'imposer leurs opérations $\trm{rename}$.
 
-Afin d'offrir une plus grande flexibilité dans la conception de la relation \emph{priority}, il est nécessaire de retirer la contrainte interdisant aux noeuds de rejouer une opération \emph{rename}.
+Afin d'offrir une plus grande flexibilité dans la conception de la relation \emph{priority}, il est nécessaire de retirer la contrainte interdisant aux noeuds de rejouer une opération $\trm{rename}$.
 Pour cela, un couple de fonctions réciproques doit être proposée pour \textsc{renameId} et \textsc{revertRenameId}.
 Une solution alternative est de proposer une implémentation du mécanisme de renommage qui repose sur les identifiants originaux plutôt que sur ceux transformés, par exemple en utilisant le journal des opérations.

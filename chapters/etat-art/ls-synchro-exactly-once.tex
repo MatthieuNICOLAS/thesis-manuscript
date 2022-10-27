@@ -71,7 +71,7 @@ Ce premier exemple, représenté par la \autoref{fig:why-exactly-once-delivery},
       \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r-2);
     \end{tikzpicture}
   }
-  \caption{Résurgence d'un élément supprimé suite à la relivraison de son opération $\trm{ins}$}
+  \caption{Résurgence d'un élément supprimé suite à la relivraison de son opération $\trm{insert}$}
   \label{fig:why-exactly-once-delivery}
 \end{figure}
 
@@ -79,19 +79,19 @@ Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement u
 La séquence répliquée contient initialement les éléments "WOLD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{0..3}$.
 
 Le noeud A commence par insérer l'élément "R" dans la séquence entre les éléments "O" et "L".
-A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{1}\betterid{m}{A2}{0},R)$ puis la diffuse au noeud B.
+A intègre l'opération résultante, $\trm{insert}(\betterid{p}{A1}{1}\betterid{m}{A2}{0},R)$ puis la diffuse au noeud B.
 
-À la réception de l'opération $\trm{ins}$, le noeud B l'intègre à son état.
+À la réception de l'opération $\trm{insert}$, le noeud B l'intègre à son état.
 Puis il supprime dans la foulée l'élément "R" nouvellement inséré.
-B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{1}\betterid{m}{A2}{0})$ puis l'envoie au noeud A.
+B intègre l'opération $\trm{remove}(\betterid{p}{A1}{1}\betterid{m}{A2}{0})$ puis l'envoie au noeud A.
 
-Le noeud A intègre l'opération $\trm{rmv}$, ce qui a pour effet de supprimer l'élément "R" associé à l'identifiant $\betterid{p}{A1}{1}\betterid{m}{A2}{0}$.
+Le noeud A intègre l'opération $\trm{remove}$, ce qui a pour effet de supprimer l'élément "R" associé à l'identifiant $\betterid{p}{A1}{1}\betterid{m}{A2}{0}$.
 Il obtient alors un état équivalent à celui du noeud B.
 
-Cependant, l'opération $\trm{ins}$ insérant l'élément "R" à la position $\betterid{p}{A1}{1}\betterid{m}{A2}{0}$ est de nouveau envoyée au noeud B.
+Cependant, l'opération $\trm{insert}$ insérant l'élément "R" à la position $\betterid{p}{A1}{1}\betterid{m}{A2}{0}$ est de nouveau envoyée au noeud B.
 De multiples raisons peuvent être à l'origine de ce nouvel envoi : perte du message d'\emph{acknowledgment}, utilisation d'un protocole de diffusion épidémique des messages, déclenchement du mécanisme d'anti-entropie en concurrence...
-Le noeud B ré-intègre alors l'opération $\trm{ins}$, ce qui fait revenir l'élément "R" et l'identifiant associé.
+Le noeud B ré-intègre alors l'opération $\trm{insert}$, ce qui fait revenir l'élément "R" et l'identifiant associé.
 L'état du noeud B diverge désormais de celui-ci du noeud A.
 
 Pour se prémunir de ce type de scénarios, LogootSplit requiert que la couche de livraison des messages assure une livraison en exactement un exemplaire des opérations.
-Cette contrainte permet d'éviter que d'anciens éléments et identifiants ressurgissent après leur suppression chez certains noeuds uniquement à cause d'une livraison multiple de l'opération $\trm{ins}$ correspondante.
+Cette contrainte permet d'éviter que d'anciens éléments et identifiants ressurgissent après leur suppression chez certains noeuds uniquement à cause d'une livraison multiple de l'opération $\trm{insert}$ correspondante.

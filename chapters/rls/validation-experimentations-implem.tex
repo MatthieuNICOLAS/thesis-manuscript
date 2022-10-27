@@ -3,17 +3,17 @@ Chaque conteneur correspond à un processus Node.js mono-threadé et permet de s
 Les bots sont connectés entre eux par le biais d'un réseau P2P maillé entièrement connecté.
 Enfin, ils partagent et éditent le document de manière collaborative en utilisant soit LogootSplit soit RenamableLogootSplit en fonction des paramètres de la session.
 
-Toutes les 200 $\pm$ 50ms, chaque bot génère localement une opération \emph{insert} ou \emph{remove} et la diffuse immédiatement aux autres noeuds.
-Au cours de la première phase, la probabilité d'émettre une opération \emph{insert} (resp. \emph{remove}) est de 80\% (resp. 20\%).
+Toutes les 200 $\pm$ 50ms, chaque bot génère localement une opération $\trm{insert}$ ou $\trm{remove}$ et la diffuse immédiatement aux autres noeuds.
+Au cours de la première phase, la probabilité d'émettre une opération $\trm{insert}$ (resp. $\trm{remove}$) est de 80\% (resp. 20\%).
 Une fois que leur copie locale du document atteint 60k caractères (environ 15 pages), les bots basculent dans la seconde phase et redéfinissent chaque probabilité à 50\%.
 De plus, tout au long de la collaboration, les bots ont une probabilité de 5\% de déplacer leur curseur à une position aléatoire dans le document après chaque opération locale.
 
-Chaque bot doit générer 15k opérations \emph{insert} ou \emph{remove}, et s'arrête donc une fois qu'il a intégré les 150k opérations.
+Chaque bot doit générer 15k opérations $\trm{insert}$ ou $\trm{remove}$, et s'arrête donc une fois qu'il a intégré les 150k opérations.
 Pour chaque bot, nous enregistrons un instantané de son état toutes les 10k opérations intégrées.
 Nous enregistrons aussi son journal des opérations à l'issue de la simulation.
 
 De plus, dans le cas de RenamableLogootSplit, 1 à 4 bots sont désignés de façon arbitraire comme des \emph{renaming bots} en fonction de la session.
-Les \emph{renaming bots} génèrent des opérations \emph{rename} toutes les 7.5k ou toutes les 30k opérations qu'ils observent, en fonction des paramètres de la simulation.
-Ces opérations \emph{rename} sont générées de manière à assurer qu'elles soient concurrentes.
+Les \emph{renaming bots} génèrent des opérations $\trm{rename}$ toutes les 7.5k ou toutes les 30k opérations qu'ils observent, en fonction des paramètres de la simulation.
+Ces opérations $\trm{rename}$ sont générées de manière à assurer qu'elles soient concurrentes.
 
 Dans un but de reproductibilité, nous avons mis à disposition notre code, nos benchmarks et les résultats à l'adresse suivante : \url{https://github.com/coast-team/mute-bot-random/}.

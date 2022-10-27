@@ -38,15 +38,15 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
       $S \in \trm{Seq}\langle \elt \rangle$ & & & \\
       \\
       \textbf{constructor} \\
-      $\trm{emp}$ & : &                       & $\longrightarrow S$   \\
+      $\trm{empty}$ & : &                       & $\longrightarrow S$   \\
       \\
       \textbf{mutators} \\
-      $\trm{ins}$ & : & $S \times \nat \times \elt$ & $\longrightarrow S$   \\
-      $\trm{rmv}$ & : & $S \times \nat$          & $\longrightarrow S$   \\
+      $\trm{insert}$ & : & $S \times \nat \times \elt$ & $\longrightarrow S$   \\
+      $\trm{remove}$ & : & $S \times \nat$          & $\longrightarrow S$   \\
       \\
       \textbf{queries} \\
-      $\trm{len}$ & : & $S$                   & $\longrightarrow \nat$   \\
-      $\trm{rd}$  & : & $S$                   & $\longrightarrow \trm{Arr}\langle \elt \rangle$ \\
+      $\trm{length}$ & : & $S$                   & $\longrightarrow \nat$   \\
+      $\trm{read}$  & : & $S$                   & $\longrightarrow \trm{Array}\langle \elt \rangle$ \\
     \end{tabular}
   % }
   \caption{Spécification algébrique du type abstrait usuel Séquence}
@@ -55,30 +55,30 @@ Dans la \autoref{fig:spec-seq}, nous présentons la spécification algébrique d
 
 Celle-ci définit deux modifications :
 \begin{enumerate}
-  \item $\trm{ins}(s,i,e)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{insert}(s,i,e)$, qui permet d'insérer un élément donné $e$ à un index donné $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{len}(s),
+      \forall s \in S, e \in \elt, i \in [0,m]~|~m = \trm{length}(s),
       s = \langle e_0, \cdots, e_{i-1}, e_{i}, \cdots, e_{m-1} \rangle~\cdot \\
-      \trm{ins}(s,i,e) = \langle e_0, \cdots, e_{i-1}, e, e_{i}, \cdots, e_{m-1}  \rangle
+      \trm{insert}(s,i,e) = \langle e_0, \cdots, e_{i-1}, e, e_{i}, \cdots, e_{m-1}  \rangle
     \end{multline*}
-  \item $\trm{rmv}(s,i)$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
+  \item $\trm{remove}(s,i)$, qui permet de retirer l'élément situé à l'index $i$ dans une séquence $s$ de taille $m$.
     Cette modification renvoie une nouvelle séquence construite de la manière suivante :
     \begin{multline*}
-      \forall s \in S, e \in E, i \in [0,m[~|~m = \trm{len}(s),
+      \forall s \in S, e \in E, i \in [0,m[~|~m = \trm{length}(s),
       s = \langle e_0, \cdots, e_{i-1}, e_{i}, e{i+1}, \cdots, e_{m-1} \rangle~\cdot \\
-      \trm{rmv}(s,i) = \langle e_0, \cdots, e_{i-1}, e_{i+1}, \cdots, e_{m-1}  \rangle
+      \trm{remove}(s,i) = \langle e_0, \cdots, e_{i-1}, e_{i+1}, \cdots, e_{m-1}  \rangle
     \end{multline*}
 \end{enumerate}
-Les modifications définies dans la \autoref{fig:spec-seq}, $\trm{ins}$ et $\trm{rmv}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
+Les modifications définies dans la \autoref{fig:spec-seq}, $\trm{insert}$ et $\trm{remove}$, ne permettent respectivement que l'insertion ou la suppression d'un élément à la fois.
 Cette simplification du type se fait cependant sans perte de généralité, la spécification pouvant être étendue pour insérer successivement plusieurs éléments à partir d'un index donné ou retirer plusieurs éléments consécutifs.
 
 La spécification définit aussi deux observateurs :
 \begin{enumerate}
-  \item $\trm{len}(s)$, qui permet de récupérer le nombre d'éléments présents dans une séquence $s$.
-  \item $\trm{rd}(s)$, qui permet de consulter l'état d'une séquence $s$.
+  \item $\trm{length}(s)$, qui permet de récupérer le nombre d'éléments présents dans une séquence $s$.
+  \item $\trm{read}(s)$, qui permet de consulter l'état d'une séquence $s$.
     L'état de la séquence est retournée sous la forme d'un Tableau, \ie une collection ordonnée de taille fixe d'éléments.
-    Comme pour le type Ensemble, nous considérons que $\trm{rd}$ est utilisé de manière implicite après chaque modification dans nos exemples.
+    Comme pour le type Ensemble, nous considérons que $\trm{read}$ est utilisé de manière implicite après chaque modification dans nos exemples.
 \end{enumerate}
 
 Cette spécification du type Séquence est une spécification séquentielle.
@@ -193,13 +193,13 @@ En concurrence, le noeud B insère lui le caractère "L" à l'index 2 pour obten
 
 Les deux noeuds diffusent ensuite leur opération respective puis intègre celle de leur pair.
 Nous constatons alors une divergence.
-En effet, l'intégration de la modification $\trm{ins}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD".
+En effet, l'intégration de la modification $\trm{insert}(2,L)$ par le noeud A ne produit pas l'effet escompté, \ie produire la chaîne "WORLD", mais la chaîne "WOLRD".
 
-Cette divergence est dûe au fait que la modification $\trm{ins}$ ne commute pas avec elle-même.
+Cette divergence est dûe au fait que la modification $\trm{insert}$ ne commute pas avec elle-même.
 En effet, celle-ci se base sur un index pour déterminer où placer le nouvel élément.
-Cependant, les index sont eux-mêmes modifiés par $\trm{ins}$.
-Ainsi, l'intégration dans des ordres différents de modifications $\trm{ins}$ sur un même état initial résulte en des états différents.
-Plus généralement, nous observons que chaque paire possible de modifications du type Séquence, \ie $\langle \trm{ins},\trm{ins} \rangle$, $\langle \trm{ins},\trm{del} \rangle$ et $\langle \trm{del},\trm{del} \rangle$, ne commute pas.
+Cependant, les index sont eux-mêmes modifiés par $\trm{insert}$.
+Ainsi, l'intégration dans des ordres différents de modifications $\trm{insert}$ sur un même état initial résulte en des états différents.
+Plus généralement, nous observons que chaque paire possible de modifications du type Séquence, \ie $\langle \trm{insert},\trm{insert} \rangle$, $\langle \trm{insert},\trm{remove} \rangle$ et $\langle \trm{remove},\trm{remove} \rangle$, ne commute pas.
 
 La non-commutativité des modifications du type Séquence fut l'objet de nombreux travaux de recherche dans le domaine de l'édition collaborative.
 Pour résoudre ce problème, l'approche \ac{OT} \cite{1989-grove-ellis-gibbs, 1998-ot-issues-algorithms-achievements-sun} fut initialement proposée.

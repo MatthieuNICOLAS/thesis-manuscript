@@ -1,14 +1,14 @@
 Le processus d'intégration d'une opération distante distingue deux cas différents :
 \begin{enumerate}
-  \item Le cas de figure où l'opération reçue est une opération \emph{insert} ou \emph{remove}.
-  \item Le cas de figure où l'opération reçue est une opération \emph{rename}.
+  \item Le cas de figure où l'opération reçue est une opération $\trm{insert}$ ou $\trm{remove}$.
+  \item Le cas de figure où l'opération reçue est une opération $\trm{rename}$.
 \end{enumerate}
 
-\subsubsection{Intégration d'une opération \emph{insert} ou \emph{remove} distante}
+\subsubsection{Intégration d'une opération $\trm{insert}$ ou $\trm{remove}$ distante}
 
 \label{sec:integration-process-insert-remove-op}
 
-Dans l'\autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'une opération \emph{insert} distante dans RenamableLogootSplit.
+Dans l'\autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration d'une opération $\trm{insert}$ distante dans RenamableLogootSplit.
 
 \begin{algorithm}[!ht]
   \footnotesize
@@ -48,7 +48,7 @@ Dans l'\autoref{alg:insertRemote}, nous présentons l'algorithme d'intégration 
         \EndIf
       \EndFunction
   \end{algorithmic}
-  \caption{Algorithme d'intégration d'une opération \emph{insert} distante}
+  \caption{Algorithme d'intégration d'une opération $\trm{insert}$ distante}
   \label{alg:insertRemote}
 \end{algorithm}
 
@@ -56,7 +56,7 @@ Cet algorithme se décompose en de multiples étapes.
 Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté par la \autoref{fig:integration-process-insert-op}.
 
 \begin{figure}[t!]
-  \subfloat[Exécution nécessitant l'intégration d'une opération \emph{insert} provenant d'une époque concurrente]{
+  \subfloat[Exécution nécessitant l'intégration d'une opération $\trm{insert}$ provenant d'une époque concurrente]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\columnwidth}{!}{
@@ -124,7 +124,7 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
           \label{fig:integration-process-insert-op-execution}
       \end{minipage}}
   \hfil
-  \subfloat[Arbre des époques de B à la réception de l'opération \emph{insert}]{
+  \subfloat[Arbre des époques de B à la réception de l'opération $\trm{insert}$]{
     \begin{minipage}{\linewidth}
         \centering
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -139,27 +139,27 @@ Afin d'illustrer chacune d'entre elles, nous utilisons l'exemple représenté pa
         \end{tikzpicture}
         \label{fig:integration-process-insert-op-epoch-tree}
     \end{minipage}}
-  \caption{Intégration d'une opération \emph{insert} distante}
+  \caption{Intégration d'une opération $\trm{insert}$ distante}
   \label{fig:integration-process-insert-op}
 \end{figure}
 
-% \mnnote{TODO: Remplacer \autoref{fig:integration-process-insert-op} par un exemple avec plus d'opérations \emph{rename} pour mieux faire apparaître les calculs et manipulations effectués sur les chemins dans l'\emph{arbre des époques}}
+% \mnnote{TODO: Remplacer \autoref{fig:integration-process-insert-op} par un exemple avec plus d'opérations $\trm{rename}$ pour mieux faire apparaître les calculs et manipulations effectués sur les chemins dans l'\emph{arbre des époques}}
 
 Dans la \autoref{fig:integration-process-insert-op-execution}, deux noeuds A et B éditent une séquence répliquée via RenamableLogootSplit.
 Initialement, les deux noeuds possèdent des répliques identiques.
-Le noeud A commence par effectuer une opération \emph{rename}.
+Le noeud A commence par effectuer une opération $\trm{rename}$.
 Il génère alors l'état équivalent à son état précédent, à la nouvelle époque \epoch{A2}.
-Puis il effectue une opération \emph{insert}, insérant un nouvel élément "X" entre les éléments "B" et "C".
+Puis il effectue une opération $\trm{insert}$, insérant un nouvel élément "X" entre les éléments "B" et "C".
 L'identifiant \id{i}{A2}{1}\id{f}{A3}{0} est attribué à ce nouvel élément.
 Chacune des opérations du noeud A est diffusée sur le réseau.
 
-De son côté, le noeud B génère en concurrence sa propre opération \emph{rename} sur l'état initial.
+De son côté, le noeud B génère en concurrence sa propre opération $\trm{rename}$ sur l'état initial.
 Il obtient alors un état équivalent, à l'époque \epoch{B2}.
-Il reçoit ensuite l'opération \emph{rename} du noeud A, qu'il intègre.
+Il reçoit ensuite l'opération $\trm{rename}$ du noeud A, qu'il intègre.
 Puisque \epoch{A2} \lepoch \epoch{B2}, le noeud B ne modifie pas son époque courante (\epoch{B2}).
 Le noeud B obtient toutefois l'\emph{arbre des époques} représenté dans la \autoref{fig:integration-process-insert-op-epoch-tree}.
 
-Puis le noeud B reçoit l'opération \emph{insert} de l'élément "X" à la position \id{i}{A2}{1}\id{f}{A3}{0}.
+Puis le noeud B reçoit l'opération $\trm{insert}$ de l'élément "X" à la position \id{i}{A2}{1}\id{f}{A3}{0}.
 C'est le traitement de cette opération que nous allons détailler ici.
 
 Tout d'abord, le noeud B compare l'époque de l'opération avec l'époque courante de la séquence.
@@ -191,17 +191,17 @@ Il peut alors réutiliser la fonction \textsc{insert} pour les intégrer à son 
 Pour minimiser le nombre de parcours de la séquence, le noeud aggrège les identifiants en intervalles d'identifiants au préalable à l'aide de la fonction \textsc{aggregate} (ligne \ref{alg:insertRemote-aggregate}).
 Cette fonction regroupe simplement les identifiants contigus en intervalles d'identifiants et retourne la liste des intervalles obtenus.
 
-À partir des intervalles d'identifiants obtenus et du contenu initial de l'opération \emph{insert}, le noeud regénère une liste d'opérations \emph{insert}.
+À partir des intervalles d'identifiants obtenus et du contenu initial de l'opération $\trm{insert}$, le noeud regénère une liste d'opérations $\trm{insert}$.
 Ces opérations sont ensuite successivement intégrées à la séquence.
 
-L'algorithme d'intégration d'une opération \emph{remove} distante est très similaire à l'algorithme d'intégration d'une opération \emph{insert} que nous venons de présenter.
-Seules les lignes permettant de récupérer les identifiants supprimés (\ref{alg:insertRemote-get-ids}), de générer l'opération \emph{remove} transformée (\ref{alg:insertRemote-generate}) et de l'appliquer (\ref{alg:insertRemote-insert-1} et \ref{alg:insertRemote-insert-2}) diffèrent.
+L'algorithme d'intégration d'une opération $\trm{remove}$ distante est très similaire à l'algorithme d'intégration d'une opération $\trm{insert}$ que nous venons de présenter.
+Seules les lignes permettant de récupérer les identifiants supprimés (\ref{alg:insertRemote-get-ids}), de générer l'opération $\trm{remove}$ transformée (\ref{alg:insertRemote-generate}) et de l'appliquer (\ref{alg:insertRemote-insert-1} et \ref{alg:insertRemote-insert-2}) diffèrent.
 
-\subsubsection{Intégration d'une opération \emph{rename} distante}
+\subsubsection{Intégration d'une opération $\trm{rename}$ distante}
 
 \label{sec:integration-process-rename-op}
 
-L'autre cas de figure à gérer est l'intégration d'une opération \emph{rename} distante.
+L'autre cas de figure à gérer est l'intégration d'une opération $\trm{rename}$ distante.
 Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autoref{alg:renameRemote}.
 
 \begin{algorithm}[!ht]
@@ -249,14 +249,14 @@ Pour cela, RenamableLogootSplit repose sur l'algorithme présenté dans l'\autor
         \EndIf
       \EndFunction
   \end{algorithmic}
-  \caption{Algorithme d'intégration d'une opération \emph{rename} distante}
+  \caption{Algorithme d'intégration d'une opération $\trm{rename}$ distante}
   \label{alg:renameRemote}
 \end{algorithm}
 
 Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:integration-process-rename-op} pour présenter le fonctionnement de cet algorithme.
 
 \begin{figure}[t!]
-  \subfloat[Exécution nécessitant l'intégration d'opérations \emph{rename} concurrentes]{
+  \subfloat[Exécution nécessitant l'intégration d'opérations $\trm{rename}$ concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{\columnwidth}{!}{
@@ -336,7 +336,7 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
           \label{fig:integration-process-rename-op-execution}
       \end{minipage}}
   \hfil
-  \subfloat[Arbre des époques de A avant la réception de l'opération \emph{rename} vers l'époque \epoch{B2}]{
+  \subfloat[Arbre des époques de A avant la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2}]{
     \begin{minipage}{0.5 \linewidth}
         \centering
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -349,7 +349,7 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
         \end{tikzpicture}
         \label{fig:integration-process-rename-op-epoch-tree-before}
     \end{minipage}}
-  \subfloat[Arbre des époques de A après la réception de l'opération \emph{rename} vers l'époque \epoch{B2}]{
+  \subfloat[Arbre des époques de A après la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2}]{
     \begin{minipage}{0.5 \linewidth}
         \centering
         \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
@@ -364,16 +364,16 @@ Comme précédemment, nous utilisons l'exemple illustré dans la \autoref{fig:in
         \end{tikzpicture}
         \label{fig:integration-process-rename-op-epoch-tree-after}
     \end{minipage}}
-  \caption{Intégration d'une opération \emph{rename} distante}
+  \caption{Intégration d'une opération $\trm{rename}$ distante}
   \label{fig:integration-process-rename-op}
 \end{figure}
 
 La \autoref{fig:integration-process-rename-op} reprend le scénario décrit précédemment dans la \autoref{fig:integration-process-insert-op}.
-Elle complète ce dernier en faisant apparaître la réception de l'opération \emph{rename} vers l'époque \epoch{B2} par le noeud A.
+Elle complète ce dernier en faisant apparaître la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2} par le noeud A.
 C'est sur ce point que nous allons nous focaliser ici.
 
-À la réception de l'opération \emph{rename} vers l'époque \epoch{B2}, le noeud A utilise \textsc{renRemote} pour intégrer cette opération.
-Tout d'abord, le noeud A ajoute l'époque \epoch{B2} et les métadonnées associées (ancien état, auteur de l'opération \emph{rename}, numéro de séquence de l'auteur de l'opération \emph{rename}) à son propre arbre des époques (ligne \ref{alg:renameRemote-addEpoch}).
+À la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2}, le noeud A utilise \textsc{renRemote} pour intégrer cette opération.
+Tout d'abord, le noeud A ajoute l'époque \epoch{B2} et les métadonnées associées (ancien état, auteur de l'opération $\trm{rename}$, numéro de séquence de l'auteur de l'opération $\trm{rename}$) à son propre arbre des époques (ligne \ref{alg:renameRemote-addEpoch}).
 
 Le noeud compare ensuite l'époque introduite (\epoch{B2}) à son époque courante (\epoch{A2}) en utilisant la relation \lepoch.
 Si l'époque introduite était plus petite que l'époque courante, aucun traitement supplémentaire ne serait nécessaire.

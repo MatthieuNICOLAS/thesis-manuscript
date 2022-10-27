@@ -20,7 +20,7 @@ Dans le cadre de ce travail, nous utilisons l'ordre lexicographique sur le chemi
 La \autoref{fig:priority-example} fournit un exemple.
 
 \begin{figure}[!ht]
-  \subfloat[Exécution d'opérations \emph{rename} concurrentes]{
+  \subfloat[Exécution d'opérations $\trm{rename}$ concurrentes]{
       \begin{minipage}{\linewidth}
           \centering
           \resizebox{0.7\columnwidth}{!}{
@@ -82,15 +82,15 @@ La \autoref{fig:priority-example} fournit un exemple.
           \end{tikzpicture}
           \label{fig:priority-epoch-tree}
       \end{minipage}}
-  \caption{Sélectionner l'époque cible d'une exécution d'opérations \emph{rename} concurrentes}
+  \caption{Sélectionner l'époque cible d'une exécution d'opérations $\trm{rename}$ concurrentes}
   \label{fig:priority-example}
 \end{figure}
 
 La \autoref{fig:priority-execution} décrit une exécution dans laquelle trois noeuds A, B et C générent plusieurs opérations avant de se synchroniser à terme.
-Comme seules les opérations \emph{rename} sont pertinentes pour le problème qui nous occupe, nous représentons seulement ces opérations dans cette figure.
-Initialement, le noeud A génère une opération \emph{rename} qui introduit l'époque \epoch{A1}.
-Cette opération est livrée au noeud C, qui génère ensuite sa propre opération \emph{rename} qui introduit l'époque \epoch{C6}.
-De manière concurrente à ces opérations, le noeud B génère deux opérations \emph{rename}, introduisant \epoch{B2} et \epoch{B7}.
+Comme seules les opérations $\trm{rename}$ sont pertinentes pour le problème qui nous occupe, nous représentons seulement ces opérations dans cette figure.
+Initialement, le noeud A génère une opération $\trm{rename}$ qui introduit l'époque \epoch{A1}.
+Cette opération est livrée au noeud C, qui génère ensuite sa propre opération $\trm{rename}$ qui introduit l'époque \epoch{C6}.
+De manière concurrente à ces opérations, le noeud B génère deux opérations $\trm{rename}$, introduisant \epoch{B2} et \epoch{B7}.
 
 Une fois que les noeuds se sont synchronisés, ils obtiennent l'\emph{arbre des époques} représenté dans la \autoref{fig:priority-epoch-tree}.
 Dans cette figure, la flèche tireté rouge représente l'ordre entre les époques d'après la relation \emph{priority} tandis que l'époque cible choisie est représentée sous la forme d'un noeud rouge.
@@ -100,6 +100,6 @@ D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre d
 Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
 
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
-Par exemple, l'ordre proposé \emph{priority} pourrait se baser sur une représentation du travail effectué sur le document, à l'aide de métriques additionnelles intégrées au sein des opérations \emph{rename}.
+Par exemple, l'ordre proposé \emph{priority} pourrait se baser sur une représentation du travail effectué sur le document, à l'aide de métriques additionnelles intégrées au sein des opérations $\trm{rename}$.
 Cela permettrait de favoriser la branche de l'\emph{arbre des époques} avec le plus d'activité, que nous conjecturons corrélé avec le nombre de noeuds actifs, pour minimiser la quantité globale de calculs effectués par les noeuds du système.
 Nous approfondissons ce sujet dans la \autoref{sec:alt-priority-relation}.

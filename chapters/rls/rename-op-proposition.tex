@@ -1,4 +1,4 @@
-Notre opération de renommage réassigne des identifiants arbitraires aux éléments de la séquence de réduire son surcoût en métadonnées.
+L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassigne des identifiants arbitraires aux éléments de la séquence de réduire son surcoût en métadonnées.
 
 \begin{figure}[t!]
   \centering
@@ -45,7 +45,7 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -60,7 +60,7 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
             %       ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
             %       ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
 
-            %   \draw[->, thick] (LO) -- node[below, align=center]{\emph{rename}} (H);
+            %   \draw[->, thick] (LO) -- node[below, align=center]{$\trm{rename}$} (H);
           \end{tikzpicture}}
           \label{fig:renaming-first-id}
       \end{minipage}}
@@ -120,7 +120,7 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -175,7 +175,7 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren(A,1)}$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -191,7 +191,7 @@ Notre opération de renommage réassigne des identifiants arbitraires aux élém
 \end{figure}
 
 Son comportement est illustré dans la \autoref{fig:renaming}.
-Dans cet exemple, le noeud A initie une opération \emph{rename} sur son état local.
+Dans cet exemple, le noeud A initie une opération $\trm{rename}$ sur son état local.
 Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}).
 Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
 De plus, son offset est mis à 0.
@@ -203,24 +203,24 @@ Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs 
 Pour converger, les autres noeuds doivent renommer leur état de manière identique.
 Cependant, ils ne peuvent pas simplement remplacer leur état courant par l'état généré par le renommage.
 En effet, ils peuvent avoir modifié en concurrence leur état.
-Afin de ne pas perdre ces modifications, les noeuds doivent traiter l'opération \emph{rename} eux-mêmes.
-Pour ce faire, le noeud qui a généré l'opération \emph{rename} diffuse les données sur lesquelles il a basé son renommage aux autres, \ie son \emph{ancien état}.
+Afin de ne pas perdre ces modifications, les noeuds doivent traiter l'opération $\trm{rename}$ eux-mêmes.
+Pour ce faire, le noeud qui a généré l'opération $\trm{rename}$ diffuse les données sur lesquelles il a basé son renommage aux autres, \ie son \emph{ancien état}.
 
 \begin{definition}[Ancien état]
   \label{def:former-state}
   Un \emph{ancien état} est la liste des intervalles d'identifiants qui composent l'état courant de la séquence répliquée au moment du renommage.
 \end{definition}
 
-De ce fait, nous définissons l'opération \emph{rename} de la manière suivante :
+De ce fait, nous définissons l'opération $\trm{rename}$ de la manière suivante :
 
 \begin{definition}[rename]
   \label{def:rename-op}
-  Une opération \emph{rename} est un triplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{formerState} \rangle$ où
-  \begin{itemize}
-    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename}.
-    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération \emph{rename}.
+  Une opération $\trm{rename}$ est un triplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{formerState} \rangle$ où
+  \begin{enumerate}
+    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération $\trm{rename}$.
+    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération $\trm{rename}$.
     \item $\trm{formerState}$ est l'ancien état du noeud au moment du renommage.
-  \end{itemize}
+  \end{enumerate}
 \end{definition}
 
 En utilisant ces données, les autres noeuds calculent le nouvel identifiant de chaque identifiant renommé.
