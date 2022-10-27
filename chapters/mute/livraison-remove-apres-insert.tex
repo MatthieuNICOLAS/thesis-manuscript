@@ -18,67 +18,90 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\tr
           \centering
           \resizebox{\columnwidth}{!}{
             \begin{tikzpicture}
+              \newcommand\initialstate[3]{
+                \path
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..3}$}] {WOLD};
+              }
+
+              \newcommand\insr[3]{
+                \path
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+                  ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}$}] {R}
+                  ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
+              }
+
+              \newcommand\rmvr[3]{
+                \path
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+                  ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
+              }
+
+              \newcommand\offseta{ (90:1.2) }
+              \newcommand\offsetb{ (270:1.2) }
+
               \path
-                  node {\textbf{A}}
-                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-                  ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-                  ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-                  ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2A-right) {GNON}
-                  ++(0:19 * \widthletter) node (A-end) {};
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:24) node (a-end) {}
+                +(0:1) node[point] (a-initial) {}
+                +(0:6) node[point, label=-170:{$\trm{ins}(O \prec R \prec K)$}, label={[xshift=6em]-10:{$\trm{ins}(\betterepoch{0},{\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}},R)$}}] (a-ins-r) {}
+                +(0:16) node[point] (a-recv-rmv-r) {}
+                +(0:19) node (a-last-display) {}
+                +(0:23) node (a-final) {};
 
+              \initialstate{(a-initial)}{\offseta}{90};
+              \insr{(a-ins-r)}{\offseta}{90};
+              \rmvr{(a-last-display)}{\offseta}{90};
 
-              \path
-                  ++(270:4) node {\textbf{B}}
-                  ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-                  ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-                  ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-                  ++(0:29 * \widthletter) node (B-end) {};
+              \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+              \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-recv-rmv-r) -- (a-final);
 
               \path
-                  ++(270:8) node {\textbf{C}}
-                  ++(0:\widthletter) node[epoch] {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0C) {OGNON}
-                  ++(0:30 * \widthletter) node[point] (S1C) {}
-                  ++(0:8 * \widthletter) node[letter, label=below:{\id{p}{A0}{0}}] (S2C-left) {O}
-                  ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2C-right) {GNON}
-                  ++(0:5 * \widthletter) node[epoch] (S3C-left) {\epoch{0}}
-                  ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                  ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S3C-right) {GNON}
-                  ++(0:2 * \widthblock) node (C-end) {};
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:24) node (b-end) {}
+                +(0:1) node[point] (b-initial) {}
+                +(0:8) node[point] (b-recv-ins-r) {}
+                +(0:14) node[point, label=170:{$\trm{rmv}(R)$}, label={[xshift=1em]10:{$\trm{rmv}(\betterepoch{0},{\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}})$}}] (b-rmv-r) {}
+                +(0:19) node (b-last-display) {}
+                +(0:23) node (b-final) {};
 
-              \draw[->, thick]
-                (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
-                (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+              \initialstate{(b-initial)}{\offsetb}{-90};
+              \insr{(b-recv-ins-r)}{\offsetb}{-90};
+              \rmvr{(b-last-display)}{\offsetb}{-90};
 
-              \draw[dotted]
-                (S1A-right) -- (S2A-left)
-                (S2A-right) -- (A-end)
-                (S0B) -- (S1B-left)
-                (S2B-right) -- (B-end)
-                (S0C) -- (S1C)
-                (S1C) -- (S2C-left)
-                (S2C-right) -- (S3C-left)
-                (S3C-right) -- (C-end);
+              \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+              \draw[->, thick] (b-initial) --  (b-recv-ins-r) -- (b-rmv-r) -- (b-final);
 
-              \draw[dashed, ->, thick, shorten >= 3]
-                (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-                (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
-                (S2B-right.east) edge node[below right, align=center]{$\trm{remove}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
-                (S2B-right.east) edge node[pos=0.80, right, align=center]{$\trm{remove}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
+              \path
+                ++(270:6) node {\textbf{C}}
+                ++(0:0.5) node (c) {}
+                +(0:24) node (c-end) {}
+                +(0:1) node[point] (c-initial) {}
+                +(0:16) node[point] (c-recv-rmv-r) {}
+                +(0:19) node[point] (c-recv-ins-r) {}
+                +(0:23) node (c-final) {};
 
-              \draw[->, dashed, thick, shorten >= 3] (S1C.east) edge[bend left] (S3C-left.west);
+              \initialstate{(c-initial)}{\offsetb}{-90};
+              \initialstate{(c-recv-rmv-r)}{\offsetb}{-90};
+              \initialstate{(c-recv-ins-r)}{\offsetb}{-90};
+
+              \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+              \draw[->, thick] (c-initial) --  (c-recv-rmv-r) -- (c-recv-ins-r) -- (c-final);
+
+              \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
+              \draw[->, dashed, shorten >= 1] (a-ins-r) -- (c-recv-ins-r);
+              \draw[->, dashed, shorten >= 1] (b-rmv-r) -- (a-recv-rmv-r);
+              \draw[->, dashed, shorten >= 1] (b-rmv-r) -- (c-recv-rmv-r);
             \end{tikzpicture}
             \label{fig:causal-remove-delivery-rls}
           }
@@ -90,49 +113,51 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\tr
       \centering
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
-            \path
-                node {\textbf{A}}
-                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
-                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
-                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
-                ++(0:11) node (a-end) {};
+          \path
+            node {\textbf{A}}
+            ++(0:0.5) node (a) {}
+            +(0:24) node (a-end) {}
+            +(0:1) node[point, label=above right:{$\langle A:4 \rangle$}] (a-initial) {}
+            +(0:6) node[point, label=-170:{\emph{tag as} $a_5$}, label=10:{$\langle A:5 \rangle$}] (a-ins-r) {}
+            +(0:16) node[point,label={[xshift=-10pt]-170:{\emph{deliver} $b_1$}}, label=10:{$\langle A:5,B:1 \rangle$}] (a-recv-rmv-r) {}
+            +(0:19) node (a-last-display) {}
+            +(0:23) node (a-final) {};
 
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-recv-rmv-r) -- (a-final);
 
-            \path
-                ++(270:3) node {\textbf{B}}
-                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
-                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6) {}
-                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
-                ++(0:14) node (b-end) {};
+          \path
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:24) node (b-end) {}
+            +(0:1) node[point, label=-10:{$\langle A:4 \rangle$}] (b-initial) {}
+            +(0:8) node[point, label={[xshift=-10pt]170:{\emph{deliver} $a_5$}}, label=-10:{$\langle A:5 \rangle$}] (b-recv-ins-r) {}
+            +(0:14) node[point, label=170:{\emph{tag as} $b_1$}, label={[xshift=10pt]-10:{$\langle A:5,B:1 \rangle$}}] (b-rmv-r) {}
+            +(0:19) node (b-last-display) {}
+            +(0:23) node (b-final) {};
 
-            \path
-                ++(270:6) node {\textbf{C}}
-                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (c-start) {}
-                ++(0:10) node[point, label=below:{$\langle A:5 \rangle$}, label=above:{\emph{postpone}}] (c-b1-postpone) {}
-                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (c-a6) {}
-                ++ (0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{deliver}}] (c-b1-deliver) {}
-                ++(0:1) node (c-end) {};
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-recv-ins-r) -- (b-rmv-r) -- (b-final);
 
-            \draw[->, thick]
-              (a-start) edge (a-a6)
-              (b-a6) edge (b-b1);
+          \path
+            ++(270:6) node {\textbf{C}}
+            ++(0:0.5) node (c) {}
+            +(0:24) node (c-end) {}
+            +(0:1) node[point, label=-10:{$\langle A:4 \rangle$}] (c-initial) {}
+            +(0:16) node[point, label={[xshift=-10pt]170:{\emph{postpone} $b_1$}}, label=-90:{$\langle A:4 \rangle$}] (c-recv-rmv-r) {}
+            +(0:19) node[point,label={[xshift=0pt,yshift=10pt]90:{\emph{deliver} $a_5$}}, label=-10:{$\langle A:5 \rangle$}] (c-recv-ins-r) {}
+            +(0:22) node[point,label={[xshift=0pt]90:{\emph{deliver} $b_1$}}, label=-10:{$\langle A:5,B:1 \rangle$}] (c-recv-rmv-r-2) {}
+            +(0:23) node (c-final) {};
 
-            \draw[dotted]
-              (a-a6) -- (a-b1) -- (a-end)
-              (b-start) -- (b-a6)
-              (b-b1) -- (b-end)
-              (c-start) -- (c-b1-postpone)
-              (c-b1-postpone) -- (c-a6)
-              (c-a6) -- (c-b1-deliver)
-              (c-b1-deliver) -- (c-end);
+          \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+          \draw[->, thick] (c-initial) --  (c-recv-rmv-r) -- (c-recv-ins-r) -- (c-recv-rmv-r-2) -- (c-final);
 
-            \draw[dashed, ->, thick, shorten >= 3]
-              (a-a6.east) edge (b-a6.west)
-              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (a-b1.west)
-              (b-b1.east) edge node[right] {$\{\trm{deps}: \langle A:6 \rangle\}$} (c-b1-postpone.west)
-              (a-a6.east) edge (c-a6.west);
+          \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
+          \draw[->, dashed, shorten >= 1] (a-ins-r) -- (c-recv-ins-r);
+          \draw[->, dashed, shorten >= 1] (b-rmv-r) edge node[right] {$\{\trm{deps}: \langle A:5 \rangle\}$}  (a-recv-rmv-r);
+          \draw[->, dashed, shorten >= 1] (b-rmv-r) edge node[left] {$\{\trm{deps}: \langle A:5 \rangle\}$} (c-recv-rmv-r);
 
-            \draw[->, dashed, thick, shorten >= 3] (c-b1-postpone.east) edge[bend left] (c-b1-deliver.west);
+          \draw[->, dotted, thick, shorten >= 1] (c-recv-rmv-r) edge[bend right] (c-recv-rmv-r-2);
         \end{tikzpicture}
         \label{fig:causal-remove-sync}
       }
@@ -142,27 +167,26 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\tr
   \label{fig:causal-remove-delivery}
 \end{figure}
 
-Cet exemple reprend et complète celui de la \autoref{fig:why-causal-remove}.
-Trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
-Les trois noeuds partagent le même état initial : une séquence contenant les éléments "OGNON" et un vecteur de version $\langle A:5 \rangle$.
+Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
+Les trois noeuds partagent le même état initial : une séquence contenant les éléments "WOLD" et un vecteur de version $\langle A:4 \rangle$.
 
-Le noeud A insère l'élément "I" entre les éléments "O" et "G".
-Cet élément se voit attribué l'identifiant \id{p}{A0}{0}\id{m}{A1}{0}.
-L'opération correspondante \emph{a6} est diffusée aux autres noeuds.
+Le noeud A insère l'élément "L" entre les éléments "R" et "D".
+Cet élément se voit attribué l'identifiant \id{p}{A1}{1}\id{m}{A2}{0}.
+L'opération correspondante $a_5$ est diffusée aux autres noeuds.
 
-À la réception de cette dernière, le noeud B supprime l'élément "I" nouvellement inséré et génère l'opération \emph{b1} correspondante.
-Comme indiqué précédemment, l'opération \emph{b1} étant une opération $\trm{remove}$, le module de livraison calcule ses dépendances avant de la diffuser.
-Pour chaque élément supprimé ("I"), le module de livraison récupère l'identifiant de l'élément (\id{p}{A0}{0}\id{m}{A1}{0}) et en extrait l'identifiant du noeud qui l'a inséré (A).
-Le module ajoute alors le dot de l'opération la plus récente reçue de ce noeud ($\langle A:6 \rangle$) à l'ensemble des dépendances de l'opération.
+À la réception de cette dernière, le noeud B supprime l'élément "L" nouvellement inséré et génère l'opération $b_1$ correspondante.
+Comme indiqué précédemment, l'opération $b_1$ étant une opération $\trm{remove}$, le module de livraison calcule ses dépendances avant de la diffuser.
+Pour chaque élément supprimé ("L"), le module de livraison récupère l'identifiant de l'élément (\id{p}{A1}{1}\id{m}{A2}{0}) et en extrait l'identifiant du noeud qui l'a inséré (A).
+Le module ajoute alors le dot de l'opération la plus récente reçue de ce noeud ($\langle A:5 \rangle$) à l'ensemble des dépendances de l'opération.
 L'opération est ensuite diffusée.
 
-À la réception de l'opération \emph{b1}, le noeud A vérifie s'il possède l'ensemble des dépendances de l'opération.
-Le noeud A ayant déjà intégré l'opération \emph{a6}, le module de livraison livre l'opération \emph{b1} au \ac{CRDT}.
+À la réception de l'opération $b_1$, le noeud A vérifie s'il possède l'ensemble des dépendances de l'opération.
+Le noeud A ayant déjà intégré l'opération $a_5$, le module de livraison livre l'opération $b_1$ au \ac{CRDT}.
 
-À l'inverse, lorsque le noeud C reçoit l'opération \emph{b1}, il n'a pas encore reçu l'opération \emph{a6}.
-L'opération \emph{b1} est alors mise en attente.
-À la réception de l'opération \emph{a6}, celle-ci est livrée.
-Le module de livraison ré-évalue alors le cas de l'opération \emph{b1} et détermine qu'elle peut à présent être livrée.\\
+À l'inverse, lorsque le noeud C reçoit l'opération $b_1$, il n'a pas encore reçu l'opération $a_5$.
+L'opération $b_1$ est alors mise en attente.
+À la réception de l'opération $a_5$, celle-ci est livrée.
+Le module de livraison ré-évalue alors le cas de l'opération $b_1$ et détermine qu'elle peut à présent être livrée.\\
 
 Il est à noter que notre approche pour générer l'ensemble des dépendances est une approximation.
 En effet, nous ajoutons les dots des opérations les plus récentes des auteurs des éléments supprimés.
