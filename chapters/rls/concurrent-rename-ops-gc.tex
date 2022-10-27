@@ -34,39 +34,38 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
   \subfloat[Exécution d'opérations \emph{rename}]{
       \begin{minipage}{\linewidth}
           \centering
-          \begin{tikzpicture}[scale=0.8,every node/.style={scale=0.8}]
-              \path
-                  node {\textbf{A}}
-                  ++(0:0.5) node (a0) {}
-                  ++(0:1) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                  ++(0:1) node (a2) {}
-                  ++(0:1) node (a7) {}
-                  ++(0:1) node[point, label=above:{rename to \epoch{A8}}] (a8) {}
-                  ++(0:1.5) node (a-receives-b2) {}
-                  ++(0:1.5) node[point, label=above:{rename to \epoch{A9}}] (a9) {}
-                  ++(0:1.5) node (a-end) {};
+          \resizebox{0.7\columnwidth}{!}{
+          \begin{tikzpicture}
+            \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:14) node (a-end) {}
+                +(0:1) node (a-initial) {}
+                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,1)$}] (a-ren-a1) {}
+                +(0:7) node[point, label=above:{$\trm{ren}(\betterepoch{A1}, A,8)$}] (a-ren-a8) {}
+                +(0:9) node[point] (a-recv-ren-b2) {}
+                +(0:11) node[point, label=above:{$\trm{ren}(\betterepoch{B2}, A,9)$}] (a-ren-a9) {}
+                +(0:13) node (a-final) {};
 
-              \draw[->, thick] (a0) --  (a1) -- (a2);
-              \draw[dotted] (a2) -- (a7);
-              \draw[->, thick] (a7) -- (a8) -- (a9) -- (a-end);
+            \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+            \draw[->, thick] (a-initial) --  (a-ren-a1) --  (a-ren-a8) -- (a-recv-ren-b2) --  (a-ren-a9) -- (a-final);
 
-              \path
-                  ++(270:2) node {\textbf{B}}
-                  ++(0:0.5) node (b0) {}
-                  ++(0:1) node[point, label=below:{rename to \epoch{B2}}] (b2) {}
-                  ++(0:1.5) node (b-receives-a1) {}
-                  ++(0:1.5) node (b3) {}
-                  ++(0:1) node (b6) {}
-                  ++(0:1) node[point, label=below:{rename to \epoch{B7}}] (b7) {}
-                  ++(0:2.5) node (b-end) {};
+            \path
+                ++(270:2) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:14) node (b-end) {}
+                +(0:1) node (b-initial) {}
+                +(0:3) node[point, label=below:{$\trm{ren}(\betterepoch{0},B,2)$}] (b-ren-b2) {}
+                +(0:5) node[point] (b-recv-ren-a1) {}
+                +(0:11) node[point, label=below:{$\trm{ren}(\betterepoch{B2},B,7)$}] (b-ren-b7) {}
+                +(0:13) node (b-final) {};
 
-              \draw[->, thick] (b0) -- (b2) -- (b3);
-              \draw[dotted] (b3) -- (b6);
-              \draw[->, thick] (b6) -- (b7) -- (b-end);
+            \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+            \draw[->, thick] (b-initial) -- (b-ren-b2) -- (b-recv-ren-a1) -- (b-ren-b7) -- (b-final);
 
-              \draw[->, dashed, shorten >= 1] (a1) -- (b-receives-a1);
-              \draw[->, dashed, shorten >= 1] (b2) -- (a-receives-b2);
-          \end{tikzpicture}
+            \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (b-recv-ren-a1);
+            \draw[->, dashed, shorten >= 1] (b-ren-b2) -- (a-recv-ren-b2);
+          \end{tikzpicture}}
           \label{fig:GC-execution}
       \end{minipage}}
   \hfil
