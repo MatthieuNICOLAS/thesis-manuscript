@@ -171,9 +171,9 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
       \\
       \Function {renIdFromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array} \langle \mathbb{I} \rangle$, pos $\in \mathbb{N}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$} {: $\mathbb{I}$}
           \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
-          \State Find $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$
-          \State $\text{newPredId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$
-          \State \Return $\text{newPredId} \oplus \text{id}$
+          \State Find $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$ \label{alg:renameId-find-predecessor}
+          \State $\text{newPredId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$ \label{alg:renameId-rename-predecessor}
+          \State \Return $\text{newPredId} \oplus \text{id}$ \label{alg:renameId-concat-predecessor}
       \EndFunction
   \end{algorithmic}
   \caption{Fonctions principales pour renommer un identifiant}
@@ -294,9 +294,9 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 \end{figure}
 
 L'algorithme procède de la manière suivante.
-Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B0}{0}\id{m}{B1}{0} dans l'ancien état : \id{i}{B0}{0}\id{f}{A0}{0}.
-Ensuite, il calcule l'équivalent de \id{i}{B0}{0}\id{f}{A0}{0} dans l'état renommé : \id{i}{A1}{1}.
-Finalement, le noeud A concatène cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0}.
+Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B0}{0}\id{m}{B1}{0} dans l'ancien état : \id{i}{B0}{0}\id{f}{A0}{0} (ligne \ref{alg:renameId-find-predecessor}).
+Ensuite, il calcule l'équivalent de \id{i}{B0}{0}\id{f}{A0}{0} dans l'état renommé : \id{i}{A1}{1} (ligne \ref{alg:renameId-rename-predecessor}).
+Finalement, le noeud A concatène (noté $\oplus$) cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} (ligne \ref{alg:renameId-concat-predecessor}).
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
 
 \textsc{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
