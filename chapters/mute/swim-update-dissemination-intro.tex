@@ -14,9 +14,24 @@ Leur compteurs respectifs sont décrémentés.
 Une fois que le compteur d'une mise à jour atteint 0, celle-ci est retirée de la liste.
 
 À la réception d'un message, le noeud le traite comme définit précédemment en \autoref{sec:swim-failure-detection}.
-De manière additionnelle, il intègre dans sa liste des collaborateur-rices les mises à jour attachées au message en utilisant la règle suivante :
+De manière additionnelle, il intègre dans sa liste des collaborateur-rices les mises à jour attachées au message en utilisant les règles suivantes :
 
-\[\forall i,j,k \cdot i \leq j \cdot \langle \trm{Alive},i \rangle < \langle \trm{Suspect},j \rangle < \langle \trm{Confirm},k \rangle \]
+\begin{definition}[Relation $\lstatus$]
+  La relation $\lstatus$ est la relation d'ordre total strict sur les valeurs de $\trm{nodeStatus}$ suivante :
+  \begin{equation*}
+    \trm{Alive} \lstatus \trm{Suspect} \lstatus \trm{Confirm}
+  \end{equation*}
+\end{definition}
+
+\begin{definition}[Relation $\ltuple$]
+  Étant donné deux tuples $t = \langle \trm{nodeStatus},\trm{nodeIncarn} \rangle$ et $t' = \langle \trm{nodeStatus'},\trm{nodeIncarn'} \rangle$, nous avons :
+  \begin{equation*}
+    \begin{split}
+      t \ltuple t' \quad \trm{iff} \quad  & (\trm{nodeStatus} \lstatus \trm{nodeStatus'}) \quad \lor \\
+                                          & (\trm{nodeStatus} = \trm{nodeStatus'} \land \trm{nodeIncarn} < \trm{nodeIncarn'}) \\
+    \end{split}
+  \end{equation*}
+\end{definition}
 
 Ainsi, le mécanisme de dissémination des mises à jour du groupe réutilise les messages du mécanisme de détection des défaillances pour diffuser les modifications.
 Cela permet de propager les évolutions de la liste des collaborateur-rices sans ajouter de message supplémentaire.
