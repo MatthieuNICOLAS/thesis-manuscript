@@ -91,17 +91,17 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 ++(0:\widthblock) \renl{#3}
                 ++(0:\widthletter) \renlo{-#3}
                 ++(0:\widthblock) node (ea1-right) {}
-                ++(0:4) node[epoch] (e0-left) {\epoch{0}}
+                ++(0:1.5) node[epoch] (e0-left) {\epoch{0}}
                 ++(0:1.05 * \widthoriginepoch) \nodeh{-#3}
                 ++(0:\widthletter) \nodee{#3}
                 ++(0:\widthletter) \nodel{-#3}
                 ++(0:\widthletter) \nodelo{#3}
                 ++(0:\widthblock) node (e0-right) {}
-                ++(0:4) node[epoch] (eb2-left) {\epoch{B2}}
+                ++(0:1.5) node[epoch] (eb2-left) {\epoch{B2}}
                 ++(0:1.3 * \widthepoch) \renhello{#3};
 
-                \draw[->, loosely dash dot, shorten >= 1] (ea1-right) --  node[above, align=center]{\emph{revert to \epoch{0}}} (e0-left);
-                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{\emph{rename to \epoch{B2}}} (eb2-left);
+                \draw[->, loosely dash dot, shorten >= 1] (ea1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
+                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{\emph{rename}\\ \emph{to} \epoch{B2}} (eb2-left);
         }
         \newcommand\finalstateb[3]{
             \path
@@ -118,11 +118,11 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
         \path
             node {\textbf{A}}
             ++(0:0.5) node (a) {}
-            +(0:32) node (a-end) {}
-            +(0:2) node[point] (a-initial) {}
-            +(0:6) node[point] (a-recv-ins-l) {}
+            +(0:26) node (a-end) {}
+            +(0:1) node[point] (a-initial) {}
+            +(0:5) node[point] (a-recv-ins-l) {}
             +(0:12) node[point] (a-recv-ren-b2) {}
-            +(0:30) node (a-final) {};
+            +(0:25) node (a-final) {};
 
         \ren{(a-initial)}{\offseta}{90};
         \recvrenl{(a-recv-ins-l)}{\offseta}{90};
@@ -134,10 +134,10 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
         \path
             ++(270:3) node {\textbf{B}}
             ++(0:0.5) node (b) {}
-            +(0:32) node (b-end) {}
-            +(0:2) node[point] (b-initial) {}
-            +(0:8) node[point, label=170:{$\trm{ren}()$}, label={[xshift=30pt]10:{$\trm{ren(\betterepoch{0}, B,2)}$}}] (b-ren-b2) {}
-            +(0:30) node (b-final) {};
+            +(0:26) node (b-end) {}
+            +(0:1) node[point, label={[xshift=20pt]10:{$\trm{ins}(\betterepoch{0}, \betterid{i}{B0}{0}\betterid{m}{B1}{0},L)$}}] (b-initial) {}
+            +(0:8) node[point, label=170:{$\trm{ren}()$}, label={[xshift=30pt]10:{$\trm{ren}(\betterepoch{0}, B,2)$}}] (b-ren-b2) {}
+            +(0:25) node (b-final) {};
 
 
         \insl{(b-initial)}{\offsetb}{-90};
@@ -264,89 +264,139 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
       \centering
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
+            \newcommand\nodew[1]{
+                node[letter, label=#1:{$\betterid{k}{D0}{0}$}] {W}
+            }
+            \newcommand\nodeo[1]{
+                node[letter, label=#1:{$\betterid{n}{C0}{0}$}] {O}
+            }
+            \newcommand\noded[1]{
+                node[letter, label=#1:{$\betterid{o}{D1}{0}$}] {D}
+            }
+            \newcommand\renwod[1]{
+                node[block, label=#1:{$\betterid{k}{C1}{0..2}$}] {WOD}
+            }
+            \newcommand\renwo[1]{
+                node[block, label=#1:{$\betterid{k}{C1}{0..1}$}] {WO}
+            }
+            \newcommand\renl[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+            }
+            \newcommand\rend[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{2}$}] {D}
+            }
+            \newcommand\renr[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{i}{C2}{0}$}] {R}
+            }
+            \newcommand\nodel[1]{
+                node[letter, label=#1:{$\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+            }
+            \newcommand\renwold[1]{
+                node[block, label=#1:{$\betterid{k}{D3}{0..3}$}] {WOLD}
+            }
+
+            \newcommand\initialstate[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
+                    ++(0:\widthletter) \nodeo{#3}
+                    ++(0:\widthletter) \noded{-#3};
+            }
+
+            \newcommand\renc[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwod{-#3};
+            }
+
+            \newcommand\recvrenl[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwo{-#3}
+                    ++(0:\widthblock) \renl{#3}
+                    ++(0:\widthletter) \rend{-#3};
+            }
+
+            \newcommand\insr[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwo{-#3}
+                    ++(0:\widthblock) \renr{#3}
+                    ++(0:\widthletter) \renl{-#3}
+                    ++(0:\widthletter) \rend{#3};
+            }
+
+            \newcommand\insl[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
+                    ++(0:\widthletter) \nodeo{#3}
+                    ++(0:\widthletter) \nodel{-#3}
+                    ++(0:\widthletter) \noded{#3};
+            }
+
+            \newcommand\rendwold[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{D3}}
+                    ++(0:1.3 * \widthepoch) \renwold{-#3};
+            }
+
+            \newcommand\offsetc{ (90:0.7) }
+            \newcommand\offsetd{ (-90:0.7) }
+
             \path
                 node {\textbf{C}}
-                ++(0:0.5 * \widthletter) node[epoch] (S1C-left) {\epoch{0}}
-                ++(0:1.05 * \widthoriginepoch) node[letter,
-                          label={below:{\id{k}{D0}{0}} }
-                              ] {W}
-                ++(0:\widthletter) node[letter,
-                          label={below:{\id{n}{C0}{0}} }
-                              ] {O}
-                ++(0:\widthletter) node[letter,
-                          label={below:{\id{o}{D1}{0}} }
-                              ] (S1C-right) {D}
-                ++(0:3 * \widthblock) node[epoch] (S2C-left) {\epoch{C1}}
-                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..2}} }
-                              ] (S2C-right) {WOD}
-                ++(0:4 * \widthblock) node[epoch] (S3C-left) {\epoch{C1}}
-                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
-                              ] {WO}
-                ++(0:\widthblock) node[letter, fill=mylightblue,
-                          label={above:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
-                              ] {L}
-                ++(0:\widthletter) node[letter, fill=mydarkblue,
-                          label={below:{\color{mydarkblueid}\id{k}{C1}{2}} }
-                              ] (S3C-right) {D}
-                ++(0:3 * \widthblock) node[epoch] (S4C-left) {\epoch{C1}}
-                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
-                              ] {WO}
-                ++(0:\widthblock) node[letter,
-                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
-                              ] {R}
-                ++(0:\widthletter) node[letter, fill=mylightblue,
-                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
-                              ] {L}
-                ++(0:\widthletter) node[letter, fill=mydarkblue,
-                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
-                              ] (S4C-right) {D};
+                ++(0:0.5) node (c) {}
+                +(0:27) node (c-end) {}
+                +(0:1) node[point] (c-initial) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(\betterepoch{0}, C,1)$}}] (c-ren-c1) {}
+                +(0:13) node[point] (c-recv-ins-l) {}
+                +(0:21) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C1}, \betterid{k}{C1}{1}\betterid{i}{C2}{0},R)$}}] (c-ins-r) {}
+                +(0:26) node (c-final) {};
+
+            \initialstate{(c-initial)}{\offsetc}{90};
+            \renc{(c-ren-c1)}{\offsetc}{90};
+            \recvrenl{(c-recv-ins-l)}{\offsetc}{90};
+            \insr{(c-ins-r)}{\offsetc}{90};
+
+            \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+            \draw[->, thick] (c-initial) --  (c-ren-c1) -- (c-recv-ins-l) -- (c-ins-r) -- (c-final);
 
             \path
                 ++(270:3) node {\textbf{D}}
+                ++(0:0.5) node (d) {}
+                +(0:27) node (d-end) {}
+                +(0:1) node[point] (d-initial) {}
+                +(0:8) node[point, label=170:{$\trm{ins}(O \prec L \prec D)$}, label={[xshift=30pt]10:{$\trm{ins}(\betterepoch{0}, \betterid{n}{C0}{0}\betterid{e}{D2}{0},L)$}}] (d-ins-l) {}
+                +(0:21) node[point, label=170:{$\trm{ren}()$}, label={[xshift=0pt]10:{$\trm{ren}(\betterepoch{0}, D,3)$}}] (d-ren-d3) {}
+                +(0:26) node (d-final) {};
 
-                ++(0:0.5 * \widthletter) node[epoch] (S1D-left) {\epoch{0}}
-                ++(0:1.05 * \widthoriginepoch) node[letter,
-                          label={below:{\id{k}{D0}{0}} }
-                              ] {W}
-                ++(0:\widthletter) node[letter,
-                          label={below:{\id{n}{C0}{0}} }
-                              ] {O}
-                ++(0:\widthletter) node[letter,
-                          label={below:{\id{o}{D1}{0}} }
-                              ] (S1D-right) {D}
+            \initialstate{(d-initial)}{\offsetd}{-90};
+            \insl{(d-ins-l)}{\offsetd}{-90};
+            \rendwold{(d-ren-d3)}{\offsetd}{-90};
 
-                ++(0:3 * \widthblock) node[epoch] (S2D-left) {\epoch{0}}
-                ++(0:1.05 * \widthoriginepoch) node[letter,
-                          label={below:{\id{k}{D0}{0}} }
-                              ] {W}
-                ++(0:\widthletter) node[letter,
-                          label={above:{\id{n}{C0}{0}} }
-                              ] {O}
-                ++(0:\widthletter) node[letter, fill=mylightorange,
-                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
-                              ] {L}
-                ++(0:\widthletter) node[letter,
-                          label={above:{\id{o}{D1}{0}} }
-                              ] (S2D-right) {D}
+            \draw[dotted] (d) -- (d-initial) (d-final) -- (d-end);
+            \draw[->, thick] (d-initial) -- (d-ins-l) --  (d-ren-d3) -- (d-final);
 
-                ++(0:4 * \widthblock) node[epoch] (S3D-left) {\epoch{D3}}
-                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
-                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
-                              ] (S3D-right) {WOLD};
-
-
-            \draw[->, thick] (S1C-right) -- node[above, align=center]{\emph{rename to \epoch{C1}}} (S2C-left);
-            \draw[dotted] (S2C-right) -- (S3C-left);
-            \draw[->, thick] (S3C-right) -- node[above, align=center]{\emph{insert "R"}\\ \emph{between}\\ \emph{"O" and "L"}} (S4C-left);
-
-            \draw[->, thick] (S1D-right) -- node[below, align=center]{\emph{insert "L"}\\ \emph{between}\\ \emph{"O" and "D"}} (S2D-left);
-            \draw[->, thick] (S2D-right) -- node[below, align=center]{\emph{rename to \epoch{D3}}} (S3D-left);
-
-
-            \draw[dashed, ->, thick, shorten >= 3] (S2D-right.east) -- node[right, xshift=5pt, align=center]{\emph{insert "L" at} {\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}}} (S3C-left.west);
+            \draw[->, dashed, shorten >= 1] (d-ins-l) -- (c-recv-ins-l);
         \end{tikzpicture}
         }
         \label{fig:revertRenameId-mintuple-setup}
@@ -357,62 +407,140 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
       \centering
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
+            \newcommand\nodew[1]{
+                node[letter, label=#1:{$\betterid{k}{D0}{0}$}] {W}
+            }
+            \newcommand\nodeo[1]{
+                node[letter, label=#1:{$\betterid{n}{C0}{0}$}] {O}
+            }
+            \newcommand\noded[1]{
+                node[letter, label=#1:{$\betterid{o}{D1}{0}$}] {D}
+            }
+            \newcommand\renwod[1]{
+                node[block, label=#1:{$\betterid{k}{C1}{0..2}$}] {WOD}
+            }
+            \newcommand\renwo[1]{
+                node[block, label=#1:{$\betterid{k}{C1}{0..1}$}] {WO}
+            }
+            \newcommand\renl[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+            }
+            \newcommand\rend[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{2}$}] {D}
+            }
+            \newcommand\renr[1]{
+                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{i}{C2}{0}$}] {R}
+            }
+            \newcommand\nodel[1]{
+                node[letter, label=#1:{$\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+            }
+            \newcommand\renwold[1]{
+                node[block, label=#1:{$\betterid{k}{D3}{0..3}$}] {WOLD}
+            }
+            \newcommand\noder[1]{
+                node[letter, label=#1:{$\betterid{n}{C0}{0}\bott\betterid{i}{C2}{0}$}] {R}
+            }
+            \newcommand\rendwo[1]{
+                node[block, label=#1:{$\betterid{k}{D3}{0..1}$}] {WO}
+            }
+            \newcommand\rendr[1]{
+                node[letter, label=#1:{$\betterid{k}{D3}{1}\betterid{n}{C0}{0}\bott\betterid{i}{C2}{0}$}] {R}
+            }
+
+            \newcommand\rendld[1]{
+                node[block, label=#1:{$\betterid{k}{D3}{2..3}$}] {LD}
+            }
+
+            \newcommand\insr[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwo{-#3}
+                    ++(0:\widthblock) \renr{#3}
+                    ++(0:\widthletter) \nodel{-#3}
+                    ++(0:\widthletter) \noded{#3};
+            }
+
+            \newcommand\rencworld[3] {
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwo{-#3}
+                    ++(0:\widthblock) \renr{#3}
+                    ++(0:\widthletter) \renl{-#3}
+                    ++(0:\widthletter) \rend{#3};
+            }
+
+            \newcommand\rendworld[3] {
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(0:1.3 * \widthepoch) \renwo{-#3}
+                    ++(0:\widthblock) \renr{#3}
+                    ++(0:\widthletter) \renl{-#3}
+                    ++(0:\widthletter) \rend{#3}
+                    ++(0:\widthletter) node (ec1-right) {}
+                    ++(0:1.5) node[epoch] (e0-left) {\epoch{0}}
+                    ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
+                    ++(0:\widthletter) \nodeo{#3}
+                    ++(0:\widthletter) \noder{-#3}
+                    ++(0:\widthletter) \nodel{#3}
+                    ++(0:\widthletter) \noded{-#3}
+                    ++(0:\widthletter) node (e0-right) {}
+                    ++(0:1.5) node[epoch] (ed3-left) {\epoch{D3}}
+                    ++(0:1.3 * \widthepoch) \rendwo{-#3}
+                    ++(0:\widthblock) \rendr{#3}
+                    ++(0:\widthletter) \rendld{-#3};
+
+                    \draw[->, loosely dash dot, shorten >= 1] (ec1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
+                    \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{\emph{rename}\\ \emph{to} \epoch{D3}} (ed3-left);
+            }
+
+            \newcommand\rendwold[3]{
+                \path
+                    #1
+                    ++#2
+                    ++(0:0.5)
+                    ++(#3:0.5) node[epoch] {\epoch{D3}}
+                    ++(0:1.3 * \widthepoch) \renwold{-#3};
+            }
+
+            \newcommand\offsetc{ (90:0.7) }
+            \newcommand\offsetd{ (-90:0.7) }
+
             \path
                 node {\textbf{C}}
-                ++(0:0.5 * \widthletter) node[epoch] (S4C-left) {\epoch{C1}}
-                ++(0:1.3 * \widthepoch) node[block, fill=mydarkblue,
-                          label={below:{\color{mydarkblueid}\id{k}{C1}{0..1}} }
-                              ] {WO}
-                ++(0:\widthblock) node[letter,
-                          label={above:{\id{k}{C1}{1}\id{i}{C2}{0}} }
-                              ] {R}
-                ++(0:\widthletter) node[letter, fill=mylightblue,
-                          label={below:{\color{mylightblue!20!mydarkblueid}\id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0}} }
-                              ] {L}
-                ++(0:\widthletter) node[letter, fill=mydarkblue,
-                          label={above:{\color{mydarkblueid}\id{k}{C1}{2}} }
-                              ] (S4C-right) {D}
-                ++(0:2 * \widthblock) node[point] (between-S4C-S5C) {}
-                ++(0:3 * \widthletter) node[epoch] (S5C-left) {\epoch{0}}
-                ++(0:1.05 * \widthoriginepoch) node[letter,
-                          label={below:{\id{k}{D0}{0}} }
-                              ] {W}
-                ++(0:\widthletter) node[letter,
-                          label={below:{\id{n}{C0}{0}} }
-                              ] {O}
-                ++(0:\widthletter) node[letter, fill=mydarkorange,
-                          label={above:{\color{mydarkorange}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
-                              ] {R}
-                ++(0:\widthletter) node[letter, fill=mylightorange,
-                          label={below:{\color{mylightorange}\id{n}{C0}{0}\id{e}{D2}{0}} }
-                              ] {L}
-                ++(0:\widthletter) node[letter,
-                          label={above:{\id{o}{D1}{0}} }
-                              ] (S5C-right) {D}
-                ++(0:2 * \widthblock) node[epoch] (S6C-left) {\epoch{D3}}
-                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
-                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..1}} }
-                              ] {WO}
-                ++(0:\widthblock) node[letter,
-                          label={above:{\id{k}{D3}{1}\id{n}{C0}{0}$\bot$\id{i}{C2}{0}} }
-                              ] {R}
-                ++(0:\widthletter) node[block, fill=mydarkpurple,
-                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{2..3}} }
-                              ] {LD};
+                ++(0:0.5) node (c) {}
+                +(0:26) node (c-end) {}
+                +(0:1) node[point] (c-initial) {}
+                +(0:9) node[point] (c-recv-ren-d3) {}
+                +(0:25) node (c-final) {};
+
+            \rencworld{(c-initial)}{\offsetc}{90};
+            \rendworld{(c-recv-ren-d3)}{\offsetc}{90};
+
+            \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+            \draw[->, thick] (c-initial) -- (c-recv-ren-d3) -- (c-final);
 
             \path
                 ++(270:3) node {\textbf{D}}
+                ++(0:0.5) node (d) {}
+                +(0:26) node (d-end) {}
+                +(0:1) node[point, label={[xshift=45pt]10:{$\trm{ren}(\betterepoch{0}, D,3)$}}] (d-initial) {}
+                +(0:25) node (d-final) {};
 
-                ++(0:0.5 * \widthletter) node[epoch] (S3D-left) {\epoch{D3}}
-                ++(0:1.34 * \widthepoch) node[block, fill=mydarkpurple,
-                          label={below:{\color{mydarkpurpleid}\id{k}{D3}{0..3}} }
-                              ] (S3D-right) {WOLD};
+            \rendwold{(d-initial)}{\offsetd}{-90};
 
-            \draw[dotted] (S4C-right) -- (between-S4C-S5C) (S5C-right) -- (S6C-left);
-            \draw[->, loosely dash dot, thick, shorten >= 1] (between-S4C-S5C) -- node[above, align=center]{\emph{revert to \epoch{0}}} (S5C-left);
+            \draw[dotted] (d) -- (d-initial) (d-final) -- (d-end);
+            \draw[->, thick] (d-initial) -- (d-final);
 
-            \draw[->, dashed, thick] (S3D-right.east) -- node[right, xshift=5pt, align=center]{\emph{rename to \epoch{D3}}} (between-S4C-S5C);
-            \draw[->, dashed, thick, shorten >= 3] (between-S4C-S5C) edge[bend right] (S6C-left.west);
+            \draw[->, dashed, shorten >= 1] (d-initial) -- (c-recv-ren-d3);
         \end{tikzpicture}
         }
         \label{fig:revertRenameId-mintuple-revert}
