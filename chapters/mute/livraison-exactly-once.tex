@@ -4,6 +4,7 @@ Afin de respecter la contrainte de livraison en exactement un exemplaire, il est
 Pour cela, le module de livraison ajoute un \emph{Dot} \cite{2014-scalable-accurate-causality-tracking} à chaque opération :
 
 \begin{definition}[Dot]
+  \label{def:dot}
   Un \emph{Dot} est une paire $\langle \trm{nodeId}, \trm{nodeSyncSeq}\rangle$ où
   \begin{enumerate}
     \item $\trm{nodeId}$, l'identifiant unique du noeud qui a généré l'opération.
@@ -12,7 +13,7 @@ Pour cela, le module de livraison ajoute un \emph{Dot} \cite{2014-scalable-accur
 \end{definition}
 
 Il est à noter que \emph{nodeSyncSeq} est différent du \emph{nodeSeq} utilisé dans LogootSplit et RenamableLogootSplit \cf{sec:logootsplit}.
-En effet, \emph{nodeSyncSeq} se doit d'augmenter à chaque opération tandis que \emph{nodeSeq} n'augmente qu'à la création d'un nouveau bloc.
+En effet, \emph{nodeSyncSeq} se doit d'augmenter à chaque opération tandis que \emph{nodeSeq} n'augmente qu'à la création d'un nouveau bloc, \ie lors d'une insertion ou d'un renommage.
 Les contraintes étant différentes, il est nécessaire de distinguer ces deux données.\\
 
 Chaque noeud maintient une structure de données représentant l'ensemble des opérations reçues par le pair.

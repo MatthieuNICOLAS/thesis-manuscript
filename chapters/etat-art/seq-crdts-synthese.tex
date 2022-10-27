@@ -53,17 +53,13 @@ Nous les présentons ci-dessous.
 \end{definition}
 Les identifiants des deux approches partagent donc les propriétés \ref{def:id-prop-1}, \ref{def:id-prop-2} et \ref{def:id-prop-3}.
 
-Pour respecter les propriétés \ref{def:id-prop-1} et \ref{def:id-prop-2}, les \acp{CRDT} reposent généralement sur des dots \cite{2014-scalable-accurate-causality-tracking} :
-\begin{definition}[Dot]
-  \label{def:dot}
-  Un dot est un couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ avec
-  \begin{enumerate}
-    \item $\trm{nodeId}$, l'identifiant du noeud qui génère le dot.
-      Il est supposé unique.
-    \item $\trm{nodeSeq}$, un entier propre au noeud, servant d'horloge logique.
-      Il est incrémenté à chaque génération de dot.
-  \end{enumerate}
-\end{definition}
+Pour respecter les propriétés \ref{def:id-prop-1} et \ref{def:id-prop-2}, les \acp{CRDT} reposent généralement sur des paires $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ avec :
+\begin{enumerate}
+  \item $\trm{nodeId}$, l'identifiant du noeud qui génère le dot.
+    Il est supposé unique.
+  \item $\trm{nodeSeq}$, un entier propre au noeud, servant d'horloge logique.
+    Il est incrémenté à chaque génération de dot.
+\end{enumerate}
 Ainsi, un couple de taille fixe, $\langle \trm{nodeId},\trm{nodeSeq} \rangle$, permet de respecter la contrainte d'unicité des identifiants.
 
 Le rôle des identifiants diffère entre les approches au niveau des propriétés \ref{def:id-prop-4} et \ref{def:id-prop-5} : les identifiants dans l'approche à pierres tombales doivent permettre d'ordonner un élément par rapport aux éléments insérés en concurrence uniquement, tandis que ceux de la seconde approche doivent permettre d'ordonner un élément par rapport à l'ensemble des éléments insérés.
