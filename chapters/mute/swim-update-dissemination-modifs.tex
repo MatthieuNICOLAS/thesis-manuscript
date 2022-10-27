@@ -3,23 +3,24 @@ Notre première modification porte sur l'ordre de priorité entre les états d'u
 
 \textbf{Modification de l'ordre de précédence.}
 Dans la version originale, un pair désigné comme défaillant l'est de manière irrévocable.
-Ce comportement est dû à la règle de précédence suivante :
-
-\[\forall i,j \in \mathbb{N}, \forall s \in \{\trm{Alive}, \trm{Suspect}\} \cdot \langle s,i \rangle < \langle \trm{Confirm},j \rangle\]
-
-pour un noeud donné.
+Ce comportement est dû au fait que la relation d'ordre $\ltuple$ utilise d'abord les valeurs de $\trm{nodeStatus}$ pour ordonner deux états pour un noeud donné.
+Ce n'est seulement qu'en cas d'égalité que $\ltuple$ considère les valeurs de $\trm{nodeIncarn}$.
 Ainsi, un noeud déclaré comme défaillant par un autre noeud doit changer d'identité pour rejoindre de nouveau le groupe.
 
 Ce choix n'est cependant pas anodin : il implique que la taille de la liste des collaborateur-rices croît de manière linéaire avec le nombre de connexions.
 S'agissant du paramètre avec le plus grand ordre de grandeur de l'application, nous avons cherché à le diminuer.
 
-Nous avons donc modifié les règles de précédence de la manière suivante :
+Nous avons donc modifié la relation d'ordre $\ltuple$ de la manière suivante :
 
-\[\forall i,j \in \mathbb{N}, i < j, \forall s,t \in \{\trm{Alive}, \trm{Suspect}, \trm{Confirm}\} \cdot \langle i,s \rangle < \langle j,t \rangle\]
-
-et
-
-\[\forall i \in \mathbb{N} \cdot \langle i,\trm{Alive} \rangle < \langle i,\trm{Suspect} \rangle < \langle i,\trm{Confirm} \rangle\]
+\begin{definition}[Relation $\ltupleupdated$]
+    Étant donné deux tuples $t = \langle \trm{nodeStatus},\trm{nodeIncarn} \rangle$ et $t' = \langle \trm{nodeStatus'},\trm{nodeIncarn'} \rangle$, nous avons :
+    \begin{equation*}
+      \begin{split}
+        t \ltupleupdated t' \quad \trm{iff} \quad  & (\trm{nodeIncarn} < \trm{nodeIncarn'}) \quad \lor \\
+                                            & (\trm{nodeIncarn} = \trm{nodeIncarn'} \land \trm{nodeStatus'} \lstatus \trm{nodeStatus'}) \\
+      \end{split}
+    \end{equation*}
+  \end{definition}
 
 Ces modifications permettent de donner la précédence au numéro d'incarnation, et d'utiliser le statut du collaborateur pour trancher seulement en cas d'égalité par rapport au numéro d'incarnation actuel.
 Ceci permet à un noeud auparavant déclaré comme défaillant de revenir dans le groupe en incrémentant son numéro d'incarnation.
