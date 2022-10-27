@@ -75,8 +75,8 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\tr
               \draw[dashed, ->, thick, shorten >= 3]
                 (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
                 (S1A-right.east) edge node[pos=0.85, right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S2C-left.west)
-                (S2B-right.east) edge node[below right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
-                (S2B-right.east) edge node[pos=0.80, right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
+                (S2B-right.east) edge node[below right, align=center]{$\trm{remove}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west)
+                (S2B-right.east) edge node[pos=0.80, right, align=center]{$\trm{remove}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S1C.west);
 
               \draw[->, dashed, thick, shorten >= 3] (S1C.east) edge[bend left] (S3C-left.west);
             \end{tikzpicture}
@@ -115,7 +115,7 @@ Nous illustrons le calcul et l'utilisation des dépendances de l'opération $\tr
 
             \draw[->, thick]
               (a-start) edge (a-a6)
-              (b-a6-1) edge (b-b1);
+              (b-a6) edge (b-b1);
 
             \draw[dotted]
               (a-a6) -- (a-b1) -- (a-end)

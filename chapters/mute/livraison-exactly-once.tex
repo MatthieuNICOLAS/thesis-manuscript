@@ -33,47 +33,73 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
           \centering
           \resizebox{\columnwidth}{!}{
             \begin{tikzpicture}
+              \newcommand\initialstate[3]{
                 \path
-                    node {\textbf{A}}
-                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0A) {OGNON}
-                    ++(0:5 * \widthletter) node[epoch] (S1A-left) {\epoch{0}}
-                    ++(0:1.05* \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}]  {O}
-                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1A-right) {GNON}
-                    ++(0:21 * \widthletter) node[epoch] (S2A-left) {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..3}$}] {WOLD};
+              }
 
-
+              \newcommand\insr[3]{
                 \path
-                    ++(270:4) node {\textbf{B}}
-                    ++(0:0.5 * \widthletter) node[epoch] {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[block, label=below:{\id{p}{A0}{0..4}}] (S0B) {OGNON}
-                    ++(0:12 * \widthletter) node[epoch] (S1B-left) {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\id{p}{A0}{0}\id{m}{A1}{0}}] {I}
-                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S1B-right) {GNON}
-                    ++(0:5 * \widthletter) node[epoch] (S2B-left) {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] (S2B-right) {GNON}
-                    ++(0:8 * \widthletter) node[epoch] (S3B-left) {\epoch{0}}
-                    ++(0:1.05 * \widthoriginepoch) node[letter, label=below:{\id{p}{A0}{0}}] {O}
-                    ++(0:\widthletter) node[block, label=below:{\id{p}{A0}{1..4}}] {GNON};
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+                  ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}$}] {R}
+                  ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
+              }
 
-                \draw[->, thick]
-                  (S0A) edge node[above, align=center]{\emph{insert "I"}\\\emph{between}\\\emph{"O" and "G"}} (S1A-left)
-                  (S1B-right) edge node[above, align=center]{\emph{remove "I"}} (S2B-left);
+              \newcommand\rmvr[3]{
+                \path
+                  #1
+                  ++#2
+                  ++(0:0.5) node[epoch] {\epoch{0}}
+                  ++(0:1.05 * \widthoriginepoch) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+                  ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
+              }
 
-                \draw[dotted]
-                  (S1A-right) -- (S2A-left)
-                  (S0B) -- (S1B-left)
-                  (S2B-right) -- (S3B-left);
+              \newcommand\offseta{ (90:1.2) }
+              \newcommand\offsetb{ (270:1.2) }
 
-                \draw[dashed, ->, thick, shorten >= 3]
-                  (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S1B-left.west)
-                  (S1A-right.east) edge node[right, align=center]{\emph{insert "I" at} {\color{mydarkorange}\id{p}{A0}{0}\id{m}{A1}{0}}}  (S3B-left.west)
-                  (S2B-right.east) edge node[below right, align=center]{$\trm{rmv}$ {\color{mydarkorange}\id{i}{B0}{1..1}}} (S2A-left.west);
+              \path
+                node {\textbf{A}}
+                ++(0:0.5) node (a) {}
+                +(0:24) node (a-end) {}
+                +(0:1) node[point] (a-initial) {}
+                +(0:6) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=6em]-10:{$\trm{ins}(\betterepoch{0},{\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}},R)$}}] (a-ins-r) {}
+                +(0:16) node[point] (a-recv-rmv-r) {}
+                +(0:23) node (a-final) {};
+
+              \initialstate{(a-initial)}{\offseta}{90};
+              \insr{(a-ins-r)}{\offseta}{90};
+              \rmvr{(a-recv-rmv-r)}{\offseta}{90};
+
+              \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+              \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-recv-rmv-r) -- (a-final);
+
+              \path
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:24) node (b-end) {}
+                +(0:1) node[point] (b-initial) {}
+                +(0:8) node[point] (b-recv-ins-r) {}
+                +(0:14) node[point, label=170:{$\trm{rmv}(R)$}, label={[xshift=1em]10:{$\trm{rmv}(\betterepoch{0},{\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}})$}}] (b-rmv-r) {}
+                +(0:21) node[point] (b-recv-ins-r-2) {}
+                +(0:23) node (b-final) {};
+
+              \initialstate{(b-initial)}{\offsetb}{-90};
+              \insr{(b-recv-ins-r)}{\offsetb}{-90};
+              \rmvr{(b-rmv-r)}{\offsetb}{-90};
+              \rmvr{(b-recv-ins-r-2)}{\offsetb}{-90};
+
+              \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+              \draw[->, thick] (b-initial) --  (b-recv-ins-r) -- (b-rmv-r) -- (b-recv-ins-r-2) -- (b-final);
+
+              \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
+              \draw[->, dashed, shorten >= 1] (b-rmv-r) -- (a-recv-rmv-r);
+              \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r-2);
             \end{tikzpicture}
             \label{fig:exactly-once-delivery-rls}
           }
@@ -85,35 +111,34 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
       \centering
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
-            \path
-                node {\textbf{A}}
-                ++(0:1) node[point, label=above:{$\langle A:5 \rangle$}] (a-start) {}
-                ++(0:2) node[draw, circle, label=above:{$\langle A:6 \rangle$}] (a-a6) {a6}
-                ++(0:8) node[point, label=above:{$\langle A:6,B:1 \rangle$}, label=below:{\emph{deliver}}] (a-b1) {}
-                ++(0:3) node (a-end) {};
+          \path
+            node {\textbf{A}}
+            ++(0:0.5) node (a) {}
+            +(0:24) node (a-end) {}
+            +(0:1) node[point, label=above right:{$\langle A:4 \rangle$}] (a-initial) {}
+            +(0:6) node[point, label=-170:{\emph{tag as} $a_5$}, label=10:{$\langle A:5 \rangle$}] (a-ins-r) {}
+            +(0:16) node[point,label={[xshift=-10pt]-170:{\emph{deliver} $b_1$}}, label=10:{$\langle A:5,B:1 \rangle$}] (a-recv-rmv-r) {}
+            +(0:23) node (a-final) {};
 
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-recv-rmv-r) -- (a-final);
 
-            \path
-                ++(270:3) node {\textbf{B}}
-                ++(0:1) node[point, label=below:{$\langle A:5 \rangle$}] (b-start) {}
-                ++(0:5) node[point, label=below:{$\langle A:6 \rangle$}, label=above:{\emph{deliver}}] (b-a6-1) {}
-                ++(0:2) node[draw, circle, label=below:{$\langle A:6,B:1 \rangle$}] (b-b1) {b1}
-                ++(0:5) node[point, label=below:{$\langle A:6,B:1 \rangle$}, label=above:{\emph{discard}}] (b-a6-2) {}
-                ++(0:1) node (b-end) {};
+          \path
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:24) node (b-end) {}
+            +(0:1) node[point, label=-10:{$\langle A:4 \rangle$}] (b-initial) {}
+            +(0:8) node[point, label={[xshift=-10pt]170:{\emph{deliver} $a_5$}}, label=-10:{$\langle A:5 \rangle$}] (b-recv-ins-r) {}
+            +(0:14) node[point, label=170:{\emph{tag as} $b_1$}, label=-10:{$\langle A:5,B:1 \rangle$}] (b-rmv-r) {}
+            +(0:21) node[point, label={[xshift=50pt]170:{\emph{discard} $a_5$}}, label=-10:{$\langle A:5,B:1 \rangle$}] (b-recv-ins-r-2) {}
+            +(0:23) node (b-final) {};
 
-            \draw[->, thick]
-              (a-start) edge (a-a6)
-              (b-a6-1) edge (b-b1);
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) --  (b-recv-ins-r) -- (b-rmv-r) -- (b-recv-ins-r-2) -- (b-final);
 
-            \draw[dotted]
-              (a-a6) -- (a-b1) -- (a-end)
-              (b-start) -- (b-a6-1)
-              (b-b1) -- (b-end);
-
-            \draw[dashed, ->, thick, shorten >= 3]
-              (a-a6.east) edge (b-a6-1.west)
-              (a-a6.east) edge (b-a6-2.west)
-              (b-b1.east) edge (a-b1.west);
+          \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
+          \draw[->, dashed, shorten >= 1] (b-rmv-r) -- (a-recv-rmv-r);
+          \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r-2);
         \end{tikzpicture}
         \label{fig:exactly-once-delivery-sync}
       }
@@ -123,28 +148,28 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
   \label{fig:exactly-once-delivery}
 \end{figure}
 
-Dans cet exemple, qui reprend celui de la \autoref{fig:why-exactly-once-delivery}, deux noeuds A et B répliquent une séquence.
-Initialement, celle-ci contient les éléments "OGNON".
-Ces éléments ont été insérés un par un par le noeud A, donc par le biais des opérations \emph{a1} à \emph{a5}.
-Le module de livraison de chaque noeud maintient donc initialement le vecteur de version $\langle A:5 \rangle$.
+Dans cet exemple, deux noeuds A et B répliquent une séquence.
+Initialement, celle-ci contient les éléments "WOLD".
+Ces éléments ont été insérés un par un par le noeud A, donc par le biais des opérations $a_1$ à $a_4$.
+Le module de livraison de chaque noeud maintient donc initialement le vecteur de version $\langle A:4 \rangle$.
 
-Le noeud A insère l'élément "I" entre les éléments "O" et "G".
-Cette modification est alors labellisée \emph{a6} par son module de livraison et est envoyée au noeud B.
+Le noeud A insère l'élément "R" entre les éléments "O" et "L".
+Cette modification est alors labellisée $a_5$ par son module de livraison et est envoyée au noeud B.
 À la réception de cette opération, le module de B compare son dot avec son vecteur de version local.
-L'opération \emph{a6} étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors livrée au \ac{CRDT} et le vecteur de version est mis à jour.
+L'opération $a_5$ étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors livrée au \ac{CRDT} et le vecteur de version est mis à jour.
 
 Le noeud B supprime ensuite l'élément nouvellement inséré.
-S'agissant de la première modification de B, cette modification \emph{b1} ajoute l'entrée correspondante dans le vecteur de version $\langle A:6, B:1 \rangle$.
+S'agissant de la première modification de B, cette modification $b_1$ ajoute l'entrée correspondante dans le vecteur de version $\langle A:5, B:1 \rangle$.
 L'opération est envoyée au noeud A.
 Cette opération étant la prochaine opération attendue de B, elle est acceptée et livrée.
 
-Finalement, le noeud B reçoit de nouveau l'opération \emph{a6}.
-Son module de livraison détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:6, B:1 \rangle$.
-L'opération est donc ignorée, et la résurgence de l'élément "I" illustrée dans la \autoref{fig:why-exactly-once-delivery} est évitée.\\
+Finalement, le noeud B reçoit de nouveau l'opération $a_5$.
+Son module de livraison détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:5, B:1 \rangle$.
+L'opération est donc ignorée, et la résurgence de l'élément "I" empêchée.\\
 
-Il est à noter que dans le cas où un noeud reçoit une opération avec un dot plus élevé que celui attendu (\eg le noeud A reçoit une opération \emph{b3} à la fin de l'exemple), cette opération est mise en attente.
-En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:6,B:3 \rangle$ et masquerait le fait que l'opération \emph{b2} n'a jamais été reçue.
-L'opération \emph{b3} est donc mise en attente jusqu'à la livraison de l'opération \emph{b2}.
+Il est à noter que dans le cas où un noeud recevrait une opération avec un dot plus élevé que celui attendu (\eg le noeud A recevrait une opération $b_3$ à la fin de l'exemple), cette opération serait mise en attente.
+En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:5,B:3 \rangle$ et masquerait le fait que l'opération $b_2$ n'a jamais été reçue.
+L'opération $b_3$ est donc mise en attente jusqu'à la livraison de l'opération $b_2$.
 
 Ainsi, l'implémentation de livraison en exactement un exemplaire d'une opération avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
 Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
