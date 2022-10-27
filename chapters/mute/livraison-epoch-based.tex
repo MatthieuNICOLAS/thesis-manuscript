@@ -19,41 +19,48 @@ La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.\\
             \begin{tikzpicture}
               \path
                 node {\textbf{A}}
-                +(0:20) node (a-end) {}
-                ++(0:0.5) node (a0) {}
-                ++(0:3) node[point, label=above:{rename to \epoch{A1}}] (a1) {}
-                ++(0:3) node [point, label=above:{rename to \epoch{A7}}] (a7) {}
-                ++(0:10) node (a-receives-c1) {}
-                ++(0:2) node (a-receives-b3) {};
+                ++(0:0.5) node (a) {}
+                +(0:22) node (a-end) {}
+                +(0:1) node (a-initial) {}
+                +(0:2) node[point, label=90:{$\trm{ren}(\betterepoch{0},A,1)$}] (a-ren-a1) {}
+                +(0:5) node[point, label=90:{$\trm{ren}(\betterepoch{A1},A,7)$}] (a-ren-a7) {}
+                +(0:17) node[point] (a-recv-ins) {}
+                +(0:20) node[point] (a-recv-ren-b3) {}
+                +(0:21) node (a-final) {};
 
-
-              \draw[thick] (a0) --  (a1) -- (a7) edge (a-receives-c1) edge (a-receives-b3) edge (a-end);
-
-              \path
-                  ++(270:2) node {\textbf{B}}
-                  +(0:20) node (b-end) {}
-                  ++(0:0.5) node (b0) {}
-                  ++(0:3) node[point, label=above:{rename to \epoch{B3}}] (b3) {};
-
-              \draw[thick] (b0) -- (b3) -- (b-end);
+              \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+              \draw[->, thick] (a-initial) --  (a-ren-a1) --  (a-ren-a7) --  (a-recv-ins) --  (a-recv-ren-b3)-- (a-final);
 
               \path
-                  ++(270:4) node {\textbf{C}}
-                  +(0:20) node (c-end) {}
-                  ++(0:0.5) node (c0) {}
-                  ++(0:5.5) node (c-receives-b3) {}
-                  ++(0:2.5) node (c-receives-a1) {}
-                  ++(0:3) node (c-receives-a7) {}
-                  ++(0:3) node[point, label=below:{insert}] (c1) {};
+                ++(270:3) node {\textbf{B}}
+                ++(0:0.5) node (b) {}
+                +(0:22) node (b-end) {}
+                +(0:1) node (b-initial) {}
+                +(0:2) node[point, label=90:{$\trm{ren}(\betterepoch{0},B,3)$}] (b-ren-b3) {}
+                +(0:21) node (b-final) {};
 
-              \draw[thick] (c0) edge (c-receives-b3) edge (c-receives-a1) edge (c-receives-a7) -- (c1) -- (c-end);
+              \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+              \draw[->, thick] (b-initial) -- (b-ren-b3) -- (b-final);
 
-              \draw[->, dashed, shorten >= 1]
-                (a1) edge (c-receives-a1)
-                (a7) edge (c-receives-a7)
-                (b3) edge (a-receives-b3)
-                (b3) edge (c-receives-b3)
-                (c1) edge (a-receives-c1);
+              \path
+                ++(270:6) node {\textbf{C}}
+                ++(0:0.5) node (c) {}
+                +(0:22) node (c-end) {}
+                +(0:1) node (c-initial) {}
+                +(0:5) node[point] (c-recv-ren-b3) {}
+                +(0:8) node[point] (c-recv-ren-a1) {}
+                +(0:11) node[point] (c-recv-ren-a7) {}
+                +(0:14) node[point, label=-90:{$\trm{ins}(\betterepoch{B3}, \cdots)$}] (c-ins) {}
+                +(0:21) node (c-final) {};
+
+              \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+              \draw[->, thick] (c-initial) -- (c-recv-ren-b3) -- (c-recv-ren-a1) -- (c-recv-ren-a7) -- (c-ins) -- (c-final);
+
+              \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (c-recv-ren-a1);
+              \draw[->, dashed, shorten >= 1] (a-ren-a7) -- (c-recv-ren-a7);
+              \draw[->, dashed, shorten >= 1] (b-ren-b3) -- (c-recv-ren-b3);
+              \draw[->, dashed, shorten >= 1] (b-ren-b3) -- (a-recv-ren-b3);
+              \draw[->, dashed, shorten >= 1] (c-ins) -- (a-recv-ins);
             \end{tikzpicture}
             \label{fig:epoch-based-delivery-execution}
           }
@@ -67,44 +74,51 @@ La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.\\
         \begin{tikzpicture}
           \path
             node {\textbf{A}}
+            ++(0:0.5) node (a) {}
             +(0:25) node (a-end) {}
-            ++(0:0.5) node (a0) {}
-            ++(0:3) node[op, label=above:{$\langle A:1 \rangle$}] (a1) {a1}
-            ++(0:3) node [op, label=above:{$\langle A:7 \rangle$}] (a7) {a7}
-            ++(0:10) node[point, label=above:{$\langle A:7 \rangle$}, label=below:{\emph{postpone}}] (a-receives-c1-postpone) {}
-            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b3) {}
-            ++(0:3) node[point, label=above:{$\langle A:7,B:3 \rangle$}, label=below:{\emph{deliver}}] (a-receives-c1-deliver) {};
+            +(0:1) node (a-initial) {}
+            +(0:2) node[point, label=90:{$\langle A:1 \rangle$}, label={[xshift=-15pt]-90:{\emph{tag as} $a_1$}}] (a-ren-a1) {}
+            +(0:5) node[point, label=90:{$\langle A:7 \rangle$}, label={[xshift=-15pt]-90:{\emph{tag as} $a_7$}}] (a-ren-a7) {}
+            +(0:17) node[point, label={[yshift=15pt]90:{$\langle A:7 \rangle$}}, label={90:{\emph{postpone} $c_{9}$}}] (a-recv-ins) {}
+            +(0:20) node[point, label=90:{$\langle A:7,B:3 \rangle$}, label=-90:{\emph{deliver} $b_3$}] (a-recv-ren-b3) {}
+            +(0:23) node[point, label=90:{$\langle A:7,B:3 \rangle$}, label={[yshift=-10pt]-90:{\emph{deliver} $c_9$}}] (a-recv-ins-2) {}
+            +(0:24) node (a-final) {};
 
-
-          \draw[thick] (a0) --  (a1) -- (a7) -- (a-receives-c1-postpone) -- (a-receives-b3) -- (a-receives-c1-deliver) -- (a-end);
-
-          \path
-              ++(270:2) node {\textbf{B}}
-              +(0:25) node (b-end) {}
-              ++(0:0.5) node (b0) {}
-              ++(0:3) node[op, label=above:{$\langle B:3 \rangle$}] (b3) {b3};
-
-          \draw[thick] (b0) -- (b3) -- (b-end);
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-ren-a1) --  (a-ren-a7) --  (a-recv-ins) --  (a-recv-ren-b3) -- (a-recv-ins-2) -- (a-final);
 
           \path
-              ++(270:4) node {\textbf{C}}
-              +(0:25) node (c-end) {}
-              ++(0:0.5) node (c0) {}
-              ++(0:5.5) node[point, label=below:{$\langle B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b3) {}
-              ++(0:2.5) node[point, label=below:{$\langle A:1,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a1) {}
-              ++(0:3) node[point, label=below:{$\langle A:7,B:3 \rangle$}, label=above:{\emph{deliver}}] (c-receives-a7) {}
-              ++(0:3) node[op, label=below:{$\langle B:3 \rangle$}] (c1) {c1};
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:25) node (b-end) {}
+            +(0:1) node (b-initial) {}
+            +(0:2) node[point, label=90:{$\langle B:3 \rangle$}, label={[xshift=-15pt]-90:{\emph{tag as} $b_3$}}] (b-ren-b3) {}
+            +(0:24) node (b-final) {};
 
-          \draw[thick] (c0) -- (c-receives-b3) -- (c-receives-a1) -- (c-receives-a7) -- (c1) -- (c-end);
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) -- (b-ren-b3) -- (b-final);
 
-          \draw[->, dashed, shorten >= 1]
-            (a1.east) edge (c-receives-a1.west)
-            (a7.east) edge node[near end, above right] {$\{\trm{deps}: \{\langle A:1 \rangle\}\}$} (c-receives-a7.west)
-            (b3.east) edge (a-receives-b3.west)
-            (b3.east) edge (c-receives-b3.west)
-            (c1.east) edge node[near start, right] {$\{\trm{deps}: \{\langle B:3 \rangle\}\}$} (a-receives-c1-postpone.west);
+          \path
+            ++(270:6) node {\textbf{C}}
+            ++(0:0.5) node (c) {}
+            +(0:25) node (c-end) {}
+            +(0:1) node (c-initial) {}
+            +(0:5) node[point, label=-90:{$\langle B:3 \rangle$}, label={[xshift=-45pt]90:{\emph{deliver} $b_3$}}] (c-recv-ren-b3) {}
+            +(0:8) node[point, label=-90:{$\langle A:1,B:3 \rangle$}, label={[xshift=-45pt]90:{\emph{deliver} $a_1$}}] (c-recv-ren-a1) {}
+            +(0:11) node[point, label=-90:{$\langle A:7,B:3 \rangle$}, label={[xshift=-45pt]90:{\emph{deliver} $a_7$}}] (c-recv-ren-a7) {}
+            +(0:14) node[point, label=-90:{$\langle C:9 \rangle$}, label={[xshift=-30pt]90:{\emph{tag as} $c_9$}}] (c-ins) {}
+            +(0:24) node (c-final) {};
 
-          \draw[->, dashed, thick, shorten >= 3] (a-receives-c1-postpone.east) edge[bend right] (a-receives-c1-deliver.west);
+          \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+          \draw[->, thick] (c-initial) -- (c-recv-ren-b3) -- (c-recv-ren-a1) -- (c-recv-ren-a7) -- (c-ins) -- (c-final);
+
+          \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (c-recv-ren-a1);
+          \draw[->, dashed, shorten >= 1] (a-ren-a7) -- node[near end, above right] {$\{\trm{deps}: \{\langle A:1 \rangle\}\}$} (c-recv-ren-a7);
+          \draw[->, dashed, shorten >= 1] (b-ren-b3) -- (c-recv-ren-b3);
+          \draw[->, dashed, shorten >= 1] (b-ren-b3) -- (a-recv-ren-b3);
+          \draw[->, dashed, shorten >= 1] (c-ins) -- node[near start, right] {$\{\trm{deps}: \{\langle B:3 \rangle\}\}$} (a-recv-ins);
+
+          \draw[->, dotted, thick, shorten >= 1] (a-recv-ins) edge[bend right] (a-recv-ins-2);
         \end{tikzpicture}
         \label{fig:epoch-based-delivery-sync}
       }
@@ -117,37 +131,37 @@ La \autoref{fig:epoch-based-delivery} illustre ce fonctionnement.\\
 Dans la \autoref{fig:epoch-based-delivery-execution}, nous décrivons une exécution suivante en ne faisant apparaître que les opérations importantes : les opérations $\trm{rename}$ et une opération $\trm{insert}$ finale.
 Dans cette exécution, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
 Initialement, aucune opération $\trm{rename}$ n'a encore eu lieu.
-Le noeud A effectue une première opération $\trm{rename}$ (\emph{a1}) puis une seconde opération $\trm{rename}$ (\emph{a7}), et les diffuse.
-En concurrence, le noeud B génère et propage sa propre opération $\trm{rename}$ (\emph{b3}).
-De son côté, le noeud C reçoit les opérations \emph{b3}, puis \emph{a1} et \emph{a7}.
-Il émet ensuite une opération $\trm{insert}$ (\emph{c1}).
-Le noeud A reçoit cette opération avant de finalement recevoir l'opération \emph{b3}.
+Le noeud A effectue une première opération $\trm{rename}$ ($a_1$) puis une seconde opération $\trm{rename}$ ($a_7$), et les diffuse.
+En concurrence, le noeud B génère et propage sa propre opération $\trm{rename}$ ($b_3$).
+De son côté, le noeud C reçoit les opérations $b_3$, puis $a_1$ et $a_7$.
+Il émet ensuite une opération $\trm{insert}$ $c_9$.
+Le noeud A reçoit cette opération avant de finalement recevoir l'opération $c_9$.
 
 Dans la \autoref{fig:epoch-based-delivery-sync}, nous faisons apparaître l'état du module de livraison et les décisions prises par ce dernier au cours de l'exécution.
 Initialement, le vecteur des dots des opérations $\trm{rename}$ connues est vide.
-Ainsi, lorsque A génère l'opération \emph{a1}, celle-ci ne se voit ajouter aucune dépendance (nous ne représentons pas les dépendances des opérations qui correspondent à l'ensemble vide).
+Ainsi, lorsque A génère l'opération $a_1$, celle-ci ne se voit ajouter aucune dépendance (nous ne représentons pas les dépendances des opérations qui correspondent à l'ensemble vide).
 A met ensuite à jour son vecteur des dots des opérations $\trm{rename}$ avec le dot $\langle A:1 \rangle$.
-B procède de manière similaire avec l'opération \emph{b3}.
+B procède de manière similaire avec l'opération $b_3$.
 
-Quand A génère l'opération \emph{a7}, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
+Quand A génère l'opération $a_7$, le dot $\langle A:1 \rangle$ est ajouté en tant que dépendance.
 Le dot $\langle A:7 \rangle$ remplace ensuite ce dernier dans le vecteur des dots des opérations $\trm{rename}$.
 
-À la réception de l'opération \emph{b3}, le module de livraison de C peut la livrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
+À la réception de l'opération $b_3$, le module de livraison de C peut la livrer au \ac{CRDT}, l'ensemble de ses dépendances étant vérifié.
 Le noeud C ajoute alors à son vecteur des dots des opérations $\trm{rename}$ le dot $\langle B:3 \rangle$.
-Il procède de même pour l'opération \emph{a1} : il la livre et ajoute le dot $\langle A:1 \rangle$.
+Il procède de même pour l'opération $a_1$ : il la livre et ajoute le dot $\langle A:1 \rangle$.
 Le module de livraison ne connaissant pas l'époque courante de la séquence répliquée, il maintient les deux dots localement.
 
-Lorsque le noeud C reçoit l'opération \emph{a7}, l'ensemble de ses contraintes est vérifié : l'opération \emph{a1} a été livrée précédemment.
+Lorsque le noeud C reçoit l'opération $a_7$, l'ensemble de ses contraintes est vérifié : l'opération $a_1$ a été livrée précédemment.
 L'opération est donc livrée et le vecteur de dots des opérations $\trm{rename}$ mis à jour avec $\langle A:7 \rangle$.
 
-Quand le noeud C effectue l'opération locale \emph{c1}, le module de livraison obtient l'information de l'époque courante de la séquence : \epoch{b3}.
+Quand le noeud C effectue l'opération locale $c_9$, le module de livraison obtient l'information de l'époque courante de la séquence : $b_3$.
 C met à jour son vecteur de dots des opérations $\trm{rename}$ pour ne conserver que l'entrée du noeud B : $\langle B:3 \rangle$.
-Ce dot est ajouté en tant que dépendance de l'opération \emph{c1} avant sa diffusion.
+Ce dot est ajouté en tant que dépendance de l'opération $c_9$ avant sa diffusion.
 
-À la réception de l'opération \emph{c1} par le noeud A, cette opération est mise en attente par le module de livraison, l'opération \emph{b3} n'ayant pas encore été livrée.
-Le noeud reçoit ensuite l'opération \emph{b3}.
+À la réception de l'opération $c_9$ par le noeud A, cette opération est mise en attente par le module de livraison, l'opération $b_3$ n'ayant pas encore été livrée.
+Le noeud reçoit ensuite l'opération $b_3$.
 Son vecteur des dots des opérations $\trm{rename}$ est mis à jour et l'opération livrée.
-Les conditions pour l'opération \emph{c1} étant désormais remplies, l'opération est alors livrée.\\
+Les conditions pour l'opération $c_9$ étant désormais remplies, l'opération est alors livrée.\\
 
 Cette implémentation de la contrainte de la livraison \emph{epoch-based} dispose de plusieurs avantages : sa complexité spatiale dépend linéairement du nombre de noeuds et les opérations de mise à jour du vecteur des dots des opérations $\trm{rename}$ s'effectuent en temps constant.
 De plus, seul un dot est ajouté en tant que dépendance des opérations, la taille du vecteur des dots étant ramené à 1 au préalable.
