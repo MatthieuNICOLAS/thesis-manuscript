@@ -9,24 +9,24 @@ La \autoref{fig:why-causal-remove} présente un second exemple illustrant la né
         \path
           #1
           ++#2
-          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..4}$}] {WOLD};
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{0..3}$}] {WOLD};
       }
 
       \newcommand\insr[3]{
         \path
           #1
           ++#2
-          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {WO}
-          ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}$}] {R}
-          ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {LD};
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+          ++(0:\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}$}] {R}
+          ++(0:\widthletter)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
       }
 
       \newcommand\rmvr[3]{
         \path
           #1
           ++#2
-          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{1..2}$}] {WO}
-          ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{3..4}$}] {LD};
+          ++(0:0.5) node[block, label=#3:{$\betterid{p}{A1}{0..1}$}] {WO}
+          ++(0:\widthblock)  node[block, label=#3:{$\betterid{p}{A1}{2..3}$}] {LD};
       }
 
       \newcommand\offseta{ (90:1.2) }
@@ -37,7 +37,7 @@ La \autoref{fig:why-causal-remove} présente un second exemple illustrant la né
         ++(0:0.5) node (a) {}
         +(0:24) node (a-end) {}
         +(0:1) node[point] (a-initial) {}
-        +(0:6) node[point, label=-170:{$\trm{ins}(O \prec R \prec K)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}},R)$}}] (a-ins-r) {}
+        +(0:6) node[point, label=-170:{$\trm{ins}(O \prec R \prec K)$}, label={[xshift=6em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}},R)$}}] (a-ins-r) {}
         +(0:16) node[point] (a-recv-rmv-r) {}
         +(0:19) node (a-last-display) {}
         +(0:23) node (a-final) {};
@@ -55,7 +55,7 @@ La \autoref{fig:why-causal-remove} présente un second exemple illustrant la né
         +(0:24) node (b-end) {}
         +(0:1) node[point] (b-initial) {}
         +(0:8) node[point] (b-recv-ins-r) {}
-        +(0:14) node[point, label=170:{$\trm{rmv}(R)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{2}\betterid{m}{A2}{1}})$}}] (b-rmv-r) {}
+        +(0:14) node[point, label=170:{$\trm{rmv}(R)$}, label={[xshift=1em]10:{$\trm{rmv}({\color{ucl1orange}\betterid{p}{A1}{1}\betterid{m}{A2}{0}})$}}] (b-rmv-r) {}
         +(0:19) node (b-last-display) {}
         +(0:23) node (b-final) {};
 
@@ -93,14 +93,14 @@ La \autoref{fig:why-causal-remove} présente un second exemple illustrant la né
 \end{figure}
 
 Dans cet exemple, trois noeuds A, B et C répliquent et éditent collaborativement une séquence.
-La séquence répliquée contient initialement les éléments "WOLD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{1..4}$.
+La séquence répliquée contient initialement les éléments "WOLD", qui sont associés à l'intervalle d'identifiants $\betterid{p}{A1}{0..3}$.
 
 Le noeud A commence par insérer l'élément "R" dans la séquence entre les éléments "O" et "L".
-A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{2}\betterid{m}{A2}{1},R)$ puis la diffuse.
+A intègre l'opération résultante, $\trm{ins}(\betterid{p}{A1}{1}\betterid{m}{A2}{0},R)$ puis la diffuse.
 
 À la réception de l'opération $\trm{ins}$, le noeud B l'intègre à son état.
 Puis il supprime dans la foulée l'élément "R" nouvellement inséré.
-B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{2}\betterid{m}{A2}{1})$ puis la diffuse.
+B intègre l'opération $\trm{rmv}(\betterid{p}{A1}{1}\betterid{m}{A2}{0})$ puis la diffuse.
 
 Toutefois, suite à un aléa du réseau, l'opération $\trm{rmv}$ supprimant l'élément "R" est reçue par le noeud C en première.
 Ainsi, le noeud C intègre cette opération : il parcourt son état à la recherche de l'élément "R" pour le supprimer.

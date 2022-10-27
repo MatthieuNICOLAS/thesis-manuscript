@@ -58,20 +58,20 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         \path
           #1
           ++#2
-          ++(0:0.5) node[block, label=#3:{$\betterid{i}{B1}{1..4}$}] {HRLO};
+          ++(0:0.5) node[block, label=#3:{$\betterid{i}{B1}{0..3}$}] {HRLO};
       }
 
       \newcommand\nodeh[1]{
-        node[letter, label=#1:{$\betterid{i}{B1}{1}$}] {H}
+        node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
       }
       \newcommand\blocklo[1]{
-        node[block, label=#1:{$\betterid{i}{B1}{3..4}$}] {LO}
+        node[block, label=#1:{$\betterid{i}{B1}{2..3}$}] {LO}
       }
       \newcommand\nodee[1]{
-        node[letter, fill=ucl2orange, label=#1:{\color{ucl1orange}$\betterid{i}{B1}{1}\betterid{f}{A1}{1}$}] {E}
+        node[letter, fill=ucl2orange, label=#1:{\color{ucl1orange}$\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
       }
       \newcommand\blockloexclam[1]{
-        node[block, label=#1:{$\betterid{i}{B1}{3..5}$}] {LO!}
+        node[block, label=#1:{$\betterid{i}{B1}{2..4}$}] {LO!}
       }
 
       \newcommand\rmvr[3]{
@@ -86,7 +86,7 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         \path
           #1
           ++#2
-          ++(0:0.5) node[block, label=#3:{$\betterid{i}{B1}{1..5}$}] {HRLO!};
+          ++(0:0.5) node[block, label=#3:{$\betterid{i}{B1}{0..4}$}] {HRLO!};
       }
 
       \newcommand\inse[3]{
@@ -123,8 +123,8 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         ++(0:0.5) node (a) {}
         +(0:25) node (a-end) {}
         +(0:2) node[point] (a-initial) {}
-        +(0:5) node[point, label=-170:{$\trm{rmv}(R)$}, label={[xshift=3em]-10:{$\trm{rmv}(\betterid{i}{B1}{2})$}}] (a-rmv-r) {}
-        +(0:12) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={[xshift=2em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{i}{B1}{1}\betterid{f}{A1}{1}},E)$}}] (a-ins-e) {}
+        +(0:5) node[point, label=-170:{$\trm{rmv}(R)$}, label={[xshift=3em]-10:{$\trm{rmv}(\betterid{i}{B1}{1})$}}] (a-rmv-r) {}
+        +(0:12) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={[xshift=2em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{i}{B1}{0}\betterid{f}{A1}{0}},E)$}}] (a-ins-e) {}
         +(0:18) node[point] (a-recv-ins-exc) {}
         +(0:23) node (a-final) {};
 
@@ -141,7 +141,7 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         ++(0:0.5) node (b) {}
         +(0:25) node (b-end) {}
         +(0:2) node[point] (b-initial) {}
-        +(0:5) node[point, label=170:{$\trm{ins}(O \prec !)$}, label={[xshift=5em]10:{$\trm{ins}(\betterid{i}{B1}{5},!)$}}] (b-ins-exc) {}
+        +(0:5) node[point, label=170:{$\trm{ins}(O \prec !)$}, label={[xshift=5em]10:{$\trm{ins}(\betterid{i}{B1}{4},!)$}}] (b-ins-exc) {}
         +(0:12) node[point] (b-recv-rmv-r) {}
         +(0:18) node[point] (b-recv-ins-e) {}
         +(0:23) node (b-final) {};
@@ -164,39 +164,39 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
 \end{figure}
 
 Dans cet exemple, deux noeuds A et B répliquent et éditent collaborativement un document texte en utilisant LogootSplit.
-Ils partagent initialement le même état : une séquence composée d'un seul bloc associant les identifiants $\betterid{i}{B1}{1..4}$ aux éléments "HRLO".
+Ils partagent initialement le même état : une séquence composée d'un seul bloc associant les identifiants $\betterid{i}{B1}{0..3}$ aux éléments "HRLO".
 Les noeuds se mettent ensuite à éditer le document.
 
 Le noeud A commence par supprimer l'élément "R" de la séquence.
-LogootSplit génère l'opération $\trm{rmv}$ correspondante en utilisant l'identifiant de l'élément supprimé : $\betterid{i}{B1}{2}$.
+LogootSplit génère l'opération $\trm{rmv}$ correspondante en utilisant l'identifiant de l'élément supprimé : $\betterid{i}{B1}{1}$.
 Cette opération est intégrée à sa copie locale et envoyée au noeud B pour qu'il intègre cette modification à son tour.
 
 Le noeud A insère ensuite l'élément "E" dans la séquence entre les éléments "H" et "L".
 Le noeud A doit alors générer un identifiant $\trm{id}$ à associer à ce nouvel élément respectant la contrainte suivante :
 \begin{equation*}
-  \betterid{i}{B1}{1} \lid \trm{id} \lid \betterid{i}{B1}{3}
+  \betterid{i}{B1}{0} \lid \trm{id} \lid \betterid{i}{B1}{2}
 \end{equation*}
-L'espace des identifiants de taille 1 étant saturé entre ces deux identifiants, A génère $\trm{id}$ en reprenant le premier tuple de l'identifiant du prédecesseur et en y concaténant un nouveau tuple : $\trm{id} = \betterid{i}{B1}{1} \oplus \betterid{f}{A1}{1}$.
+L'espace des identifiants de taille 1 étant saturé entre ces deux identifiants, A génère $\trm{id}$ en reprenant le premier tuple de l'identifiant du prédecesseur et en y concaténant un nouveau tuple : $\trm{id} = \betterid{i}{B1}{0} \oplus \betterid{f}{A1}{0}$.
 LogootSplit génère l'opération $\trm{ins}$ correspondante, indiquant l'élément à insérer et sa position grâce à son identifiant.
 Il intègre cette opération et la diffuse sur le réseau.
 
 En parallèle, le noeud B insère l'élément "!" en fin de la séquence.
-Comme le noeud B est l'auteur du bloc $\betterid{i}{B1}{1..4}$, il peut y ajouter de nouveaux éléments.
-B associe donc l'identifiant $\betterid{i}{B1}{5}$ à l'élément "!" pour l'ajouter au bloc existant.
+Comme le noeud B est l'auteur du bloc $\betterid{i}{B1}{0..3}$, il peut y ajouter de nouveaux éléments.
+B associe donc l'identifiant $\betterid{i}{B1}{4}$ à l'élément "!" pour l'ajouter au bloc existant.
 Il génère l'opération $\trm{ins}$ correspondante, l'intègre puis la diffuse.
 
 Les noeuds se synchronisent ensuite.
-Le noeud A reçoit l'opération $\trm{ins}(\betterid{i}{B1}{5},L)$.
-Le noeud A détermine que cet élément doit être inséré à la fin de la séquence, puisque $\betterid{i}{B1}{4} \lid \betterid{i}{B1}{5}$.
+Le noeud A reçoit l'opération $\trm{ins}(\betterid{i}{B1}{4},L)$.
+Le noeud A détermine que cet élément doit être inséré à la fin de la séquence, puisque $\betterid{i}{B1}{3} \lid \betterid{i}{B1}{4}$.
 Ces deux identifiants étant contigus, il ajoute cet élément au bloc existant.
 
-De son côté, le noeud B reçoit tout d'abord l'opération $\trm{rmv}(\betterid{i}{B1}{2})$.
+De son côté, le noeud B reçoit tout d'abord l'opération $\trm{rmv}(\betterid{i}{B1}{1})$.
 Le noeud B supprime donc l'élément correspondant de son état, "R".
 
-Il reçoit ensuite l'opération $\trm{ins}(\betterid{i}{B1}{1}\betterid{f}{A1}{1},E)$.
+Il reçoit ensuite l'opération $\trm{ins}(\betterid{i}{B1}{0}\betterid{f}{A1}{0},E)$.
 Le noeud B insère cet élément entre les éléments "H" et "L", puisqu'on a :
 \begin{equation*}
-  \betterid{i}{B1}{1} \lid \betterid{i}{B1}{1}\betterid{f}{A1}{1} \lid \betterid{i}{B1}{3}
+  \betterid{i}{B1}{1} \lid \betterid{i}{B1}{0}\betterid{f}{A1}{0} \lid \betterid{i}{B1}{2}
 \end{equation*}
 
 L'intention de chaque noeud est donc préservée et les copies convergent.

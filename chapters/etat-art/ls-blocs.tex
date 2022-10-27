@@ -58,8 +58,8 @@ LogootSplit utilise une structure de données pour associer un intervalle d'iden
 \end{definition}
 
 Nous représentons un exemple de séquence LogootSplit dans la \autoref{fig:logootsplit-seq}.
-Dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants $\betterid{i}{B1}{1}$, $\betterid{i}{B1}{2}$ et $\betterid{i}{B1}{3}$ forment une chaîne d'identifiants contigus.
-LogootSplit est donc capable de regrouper ces éléments en un bloc représentant l'intervalle d'identifiants $\betterid{i}{B1}{1..3}$ pour minimiser les métadonnées stockées, comme illustré dans la \autoref{fig:logootsplit-seq-as-block}.
+Dans la \autoref{fig:logootsplit-seq-as-letters}, les identifiants $\betterid{i}{B1}{0}$, $\betterid{i}{B1}{1}$ et $\betterid{i}{B1}{2}$ forment une chaîne d'identifiants contigus.
+LogootSplit est donc capable de regrouper ces éléments en un bloc représentant l'intervalle d'identifiants $\betterid{i}{B1}{0..2}$ pour minimiser les métadonnées stockées, comme illustré dans la \autoref{fig:logootsplit-seq-as-block}.
 
 \begin{figure}[!ht]
   \centering
@@ -68,9 +68,9 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
       \centering
           \begin{tikzpicture}
               \path
-                  node[letter, label=below:{\id{i}{B1}{1}}] {H}
-                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B1}{2}}] {L}
-                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B1}{3}}] {O};
+                  node[letter, label=below:{\id{i}{B1}{0}}] {H}
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B1}{1}}] {L}
+                  ++(0:\widthletter) node[letter, label=below:{\id{i}{B1}{2}}] {O};
           \end{tikzpicture}
           \label{fig:logootsplit-seq-as-letters}
       \end{minipage}}
@@ -80,7 +80,7 @@ LogootSplit est donc capable de regrouper ces éléments en un bloc représentan
       \centering
           \begin{tikzpicture}
               \path
-                  node[block, label=below:{\id{i}{B1}{1..3}}] {HLO};
+                  node[block, label=below:{\id{i}{B1}{0..2}}] {HLO};
           \end{tikzpicture}
           \label{fig:logootsplit-seq-as-block}
       \end{minipage}}
@@ -101,4 +101,4 @@ Ce changement de granularité permet d'améliorer les performances de la structu
 
 Il est intéressant de noter que la paire $\langle \trm{nodeId},\trm{nodeSeq} \rangle$ du dernier tuple d'un identifiant permet d'identifier de manière unique la partie commune des identifiants de l'intervalle d'identifiants auquel il appartient.
 Ainsi, nous pouvons identifier de manière unique un intervalle d'identifiants avec le quadruplet $\langle \trm{nodeId}, \trm{nodeSeq}, \trm{offsetBegin}, \trm{offsetEnd} \rangle$.
-Par exemple, l'intervalle d'identifiants $\betterid{i}{B1}{2}\betterid{f}{A1}{2..4}$ peut être référencé à l'aide du quadruplet $\langle A,1,2,4 \rangle$.
+Par exemple, l'intervalle d'identifiants $\betterid{i}{B1}{1}\betterid{f}{A1}{2..4}$ peut être référencé à l'aide du quadruplet $\langle A,1,2,4 \rangle$.

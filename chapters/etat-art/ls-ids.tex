@@ -16,8 +16,8 @@ avec les tuples LogootSplit définis de la manière suivante :
 \end{definition}
 
 Dans ce manuscrit, nous représentons les tuples LogootSplit par le biais de la notation suivante : $\betterid{position}{nodeId~nodeSeq}{offset}$.
-Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$ et des entiers naturels pour $\trm{nodeSeq}$ et $\trm{offset}$.
-Par exemple, nous représentons l'identifiant $\langle \langle i,A,1,1 \rangle \langle f,B,1,1 \rangle \rangle$ par $\betterid{i}{A1}{1}\betterid{f}{B1}{1}$.
+Sans perdre en généralité, nous utiliserons des lettres minuscules comme valeurs pour $\trm{pos}$, des lettres majuscules pour $\trm{nodeId}$, des entiers naturels pour $\trm{nodeSeq}$ et des entiers relatifs pour $\trm{offset}$.
+Par exemple, nous représentons l'identifiant $\langle \langle i,A,1,0 \rangle \langle f,B,1,0 \rangle \rangle$ par $\betterid{i}{A1}{0}\betterid{f}{B1}{0}$.
 
 LogootSplit utilise les identifiants de position pour ordonner relativement les éléments les uns par rapport aux autres.
 LogootSplit définit une relation d'ordre strict total sur les identifiants : $\lid$.
@@ -47,8 +47,8 @@ avec la relation d'ordre strict total les tuples $\ltuple$ définie de la maniè
 
 Par exemple, nous avons :
 \begin{enumerate}
-  \item  \id{i}{A1}{1} $\lid$ \id{i}{B1}{1} car le tuple composant le premier identifiant est inférieur au tuple composant le second identifiant, \ie \id{i}{A1}{1} $\ltuple$ \id{i}{B1}{1}.
-  \item \id{i}{B1}{1} $\lid$ \id{i}{B1}{1}\id{f}{A1}{1} car le premier identifiant est un préfixe du second identifiant.
+  \item  \id{i}{A1}{0} $\lid$ \id{i}{B1}{0} car le tuple composant le premier identifiant est inférieur au tuple composant le second identifiant, \ie \id{i}{A1}{0} $\ltuple$ \id{i}{B1}{0}.
+  \item \id{i}{B1}{0} $\lid$ \id{i}{B1}{0}\id{f}{A1}{0} car le premier identifiant est un préfixe du second identifiant.
 \end{enumerate}
 
 Il est intéressant de noter que le triplet $\langle \trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ du dernier tuple d'un identifiant permet de l'identifier de manière unique.
