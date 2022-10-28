@@ -9,7 +9,7 @@ LSEQ définit donc plusieurs stratégies d'allocation d'identifiants adaptées �
 Les noeuds choisissent aléatoirement une de ces stratégies pour chaque taille d'identifiants.
 De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifiants : l'intervalle des identifiants possibles double à chaque fois que la taille des identifiants augmente.
 Cela permet à LSEQ de choisir avec soin la taille des identifiants et la stratégie d'allocation en fonction des besoins.
-En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.
+En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.\\
 
 Bien que l'approche LSEQ ralentisse la vitesse de croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés, le surcoût de la séquence reste proportionnel à son nombre d'éléments.
 À l'inverse, le mécanisme de renommage de RenamableLogootSplit permet de réduire les métadonnées à une quantité fixe, indépendamment du nombre d'éléments.

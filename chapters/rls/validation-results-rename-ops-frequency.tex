@@ -71,7 +71,7 @@ Le \autoref{tab:impact-frequency-memory} permet d'observer que les opérations $
 Ce résultat s'explique de part le fait qu'elles intègrent leur époque de génération comme donnée additionnelle.
 Mais alors que la taille des opérations de LogootSplit augmentent indéfiniment, celle des opérations de RenamableLogootSplit est bornée.
 La valeur de cette borne est définie par la fréquence de l'opération $\trm{rename}$.
-Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.
+Cela permet à RenamableLogootSplit d'atteindre un coût moindre par opération.\\
 
 D'un autre côté, le coût des opérations $\trm{rename}$ est bien plus important (1000x) que celui des autres types d'opérations.
 Ceci s'explique par le fait que l'opération $\trm{rename}$ intègre l'\emph{ancien état}, \ie la liste de tous les blocs composant l'état de la séquence au moment de la génération de l'opération.

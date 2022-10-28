@@ -105,11 +105,11 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
   \label{fig:concurrent-insert-rename-inconsistent}
 \end{figure}
 
-Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B1}{0}\id{m}{B2}{0} et diffuse cette modification, de manière concurrente à l'opération $\trm{rename}$ décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
+Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B1}{0}\id{m}{B2}{0} et diffuse cette modification, de manière concurrente à l'opération $\trm{rename}$ décrite dans la \autoref{fig:renaming}.
 À la réception de l'opération $\trm{insert}$, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
 Cependant, puisque les identifiants ont été modifiés par l'opération $\trm{rename}$ concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A2}{3} $\lid$ \id{i}{B1}{0}\id{m}{B2}{0}) au lieu de l'insérer à la position souhaitée.
 Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
-Il est donc nécessaire de traiter les opérations concurrentes aux opérations $\trm{rename}$ de manière particulière.
+Il est donc nécessaire de traiter les opérations concurrentes aux opérations $\trm{rename}$ de manière particulière.\\
 
 Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opérations $\trm{rename}$.
 Pour cela, nous utilisons un système basé sur des \emph{époques}.
@@ -120,10 +120,10 @@ Nous définissons les époques de la manière suivante :
 
 \begin{definition}[Époque]
   Une époque est un couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ où
-  \begin{itemize}
+  \begin{enumerate}
     \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré cette époque.
     \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de cette époque.
-  \end{itemize}
+  \end{enumerate}
 \end{definition}
 
 Notons que l'époque générée est caractérisée et identifiée de manière unique par son couple $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$.
@@ -134,13 +134,13 @@ De plus, les noeuds marquent chaque opération avec leur époque courante au mom
 À la réception d'une opération, les noeuds comparent l'époque de l'opération à l'époque courante de leur séquence.
 
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'intégrer.
-Les noeuds déterminent par rapport à quelles opérations $\trm{rename}$ doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.
+Les noeuds déterminent par rapport à quelles opérations $\trm{rename}$ doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.\\
 
-Les noeuds utilisent la fonction \textsc{renameId}, décrite dans l'\autoref{alg:renameId}, pour transformer les opérations $\trm{insert}$ et $\trm{remove}$ par rapport aux opérations $\trm{rename}$.
+Les noeuds utilisent la fonction \texttt{renameId}, décrite dans l'\autoref{alg:renameId}, pour transformer les opérations $\trm{insert}$ et $\trm{remove}$ par rapport aux opérations $\trm{rename}$.
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
-L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$ en utilisant leur prédecesseur.
+L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$ en utilisant leur prédecesseur dans l'ancien état (nommé $\trm{renamedIds}$ dans \autoref{alg:renameId}).
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
-Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \textsc{renameId} pour renommer l'identifiants généré de façon concurrente avant de l'insérer dans son état.
+Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \texttt{renameId} pour renommer l'identifiant généré de façon concurrente avant de l'insérer dans son état.
 
 \begin{algorithm}[!ht]
   \footnotesize
@@ -289,7 +289,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
         \draw[->, dashed, shorten >= 1] (b-ins-l) -- (a-recv-ins-l);
     \end{tikzpicture}
   }
-  \caption{Renommage de la modification concurrente avant son intégration en utilisant \textsc{renameId} afin de maintenir l'ordre souhaité}
+  \caption{Renommage de la modification concurrente avant son intégration en utilisant \texttt{renameId} afin de maintenir l'ordre souhaité}
   \label{fig:concurrent-insert-rename-fixed}
 \end{figure}
 
@@ -299,14 +299,14 @@ Ensuite, il calcule l'équivalent de \id{i}{B1}{0}\id{f}{A1}{0} dans l'état ren
 Finalement, le noeud A concatène (noté $\oplus$) cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} (ligne \ref{alg:renameId-concat-predecessor}).
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
 
-\textsc{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
+\texttt{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
-À la réception de l'opération $\trm{rename}$ du noeud A, le noeud B utilise \textsc{renameId} sur chacun des identifiants de son état pour le renommer et atteindre un état équivalent à celui du noeud A.
+À la réception de l'opération $\trm{rename}$ du noeud A, le noeud B utilise \texttt{renameId} sur chacun des identifiants de son état pour le renommer et atteindre un état équivalent à celui du noeud A.\\
 
-L'\autoref{alg:renameId} présente seulement le cas principal de \textsc{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
-Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans l'\autoref{app:rename-id}.
+L'\autoref{alg:renameId} présente seulement le cas principal de \texttt{renameId}, \ie le cas où l'identifiant à renommer appartient à l'intervalle des identifiants formant l'ancien état ($\trm{firstId} \leq_{id} \trm{id} \leq_{id} \trm{lastId}$).
+Les fonctions pour gérer les autres cas, \ie les cas où l'identifiant à renommer n'appartient pas à cet intervalle ($\trm{id} <_{id} \trm{firstId}$ ou $\trm{lastId} <_{id} \trm{id}$), sont présentées dans l'\autoref{app:rename-id}.\\
 
 Nous notons que l'algorithme que nous présentons ici permet aux noeuds de renommer leur état identifiant par identifiant.
-Une extension possible est de concevoir \textsc{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
-\textsc{renameBlock} réduirait le temps d'intégration des opérations $\trm{rename}$, puisque sa complexité en temps ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
-De plus, son exécution réduirait le temps d'intégration des prochaines opérations $\trm{rename}$ puisque le mécanisme de renommage regroupe les éléments en moins de blocs.
+Une extension possible est de concevoir \texttt{renameBlock}, une version améliorée qui renomme l'état bloc par bloc.
+\texttt{renameBlock} réduirait le temps d'intégration des opérations $\trm{rename}$, puisque sa complexité en temps ne dépendrait plus du nombre d'identifiants (\ie du nombre d'éléments) mais du nombre de blocs.
+De plus, son exécution réduirait le temps d'intégration des prochaines opérations $\trm{rename}$ puisque le mécanisme de renommage réduit le nombre de blocs.

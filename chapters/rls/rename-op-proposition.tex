@@ -185,12 +185,12 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
 Son comportement est illustré dans la \autoref{fig:renaming}.
 Dans cet exemple, le noeud A initie une opération $\trm{rename}$ sur son état local.
 Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B1}{0}).
-Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
+Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel ($2$).
 De plus, son offset est mis à 0.
 Le noeud A réassigne l'identifiant résultant (\id{i}{A2}{0}) au premier élément de la séquence, comme décrit dans la \autoref{fig:renaming-first-id}.
 Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A2}{1}, \id{i}{A2}{2}, \id{i}{A2}{3}), comme présenté dans la \autoref{fig:renaming-second-id}.
 Comme nous assignons des identifiants consécutifs à tous les éléments de la séquence, nous pouvons au final aggréger ces éléments en un seul bloc, comme illustré en \autoref{fig:renaming-final-state}.
-Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs et de minimiser le surcoût en métadonnés de l'état résultat.
+Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs et de minimiser le surcoût en métadonnés de l'état résultat.\\
 
 Pour converger, les autres noeuds doivent renommer leur état de manière identique.
 Cependant, ils ne peuvent pas simplement remplacer leur état courant par l'état généré par le renommage.

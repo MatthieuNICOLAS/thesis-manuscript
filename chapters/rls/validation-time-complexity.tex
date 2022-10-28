@@ -18,7 +18,7 @@ Pour chaque opération, nous distinguons deux complexités : une complexité pou
 
 La complexité de l'intégration de l'opération $\trm{insert}$ locale est inchangée par rapport à celle obtenue pour LogootSplit.
 Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre souhaité puis à insérer le bloc dans l'arbre AVL.
-D'après \cite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.
+D'après \cite{2013-logootsplit}, nous obtenons donc une complexité de \bigO{\log{}b} pour cette opération locale, où $b$ représente le nombre de blocs dans la séquence.\\
 
 La complexité de l'intégration de l'opération $\trm{insert}$ distante, elle, évolue par rapport à celle définie pour LogootSplit.
 En effet, plusieurs étapes se rajoutent au processus d'intégration de l'opération notamment dans le cas où celle-ci provient d'une autre époque que l'époque courante.
@@ -30,24 +30,24 @@ Cette étape peut être effectuée en \bigO{h}, où $h$ représente la hauteur d
 L'obtention de l'époque \ac{LCA} entre l'époque de l'opération et l'époque courante permet de déterminer les $k$ renommages dont les effets doivent être retirés de l'opération et les $l$ renommages dont les effets doivent être intégrés à l'opération.
 Le noeud intégrant l'opération procède ainsi aux $k$ inversions de renommages successives puis aux $l$ application de renommages, et ce pour tous les $s$ identifiants insérés par l'opération.
 
-Pour retirer les effets des renommages à inverser, le noeud intégrant l'opération utilise \textsc{revertRenameId}.
+Pour retirer les effets des renommages à inverser, le noeud intégrant l'opération utilise \texttt{revertRenameId}.
 Cet algorithme retourne pour un identifiant donné un nouvel identifiant correspondant à l'époque précédente.
-Pour cela, \textsc{revertRenameId} utilise le prédécesseur et le successeur de l'identifiant donné dans l'\emph{ancien état} renommé.
-Pour retrouver ces deux identifiants au sein de l'\emph{ancien état}, \textsc{revertRenameId} utilise l'offset du premier tuple de l'identifiant donné.
+Pour cela, \texttt{revertRenameId} utilise le prédécesseur et le successeur de l'identifiant donné dans l'\emph{ancien état} renommé.
+Pour retrouver ces deux identifiants au sein de l'\emph{ancien état}, \texttt{revertRenameId} utilise l'offset du premier tuple de l'identifiant donné.
 Par définition, cet élément correspond à l'index du prédecesseur de l'identifiant donné dans l'\emph{ancien état}.
 Aucun parcours de l'\emph{ancien état} n'est nécessaire.
-Le reste de \textsc{revertRenameId} consistant en des comparaisons et manipulations d'identifiants, nous obtenons que \textsc{revertRenameId} s'effectue en \bigO{1}.
+Le reste de \texttt{revertRenameId} consistant en des comparaisons et manipulations d'identifiants, nous obtenons que \texttt{revertRenameId} s'effectue en \bigO{1}.
 
-Pour inclure les effets des renommages à appliquer, le noeud utilise ensuite \textsc{renameId}.
-De manière similaire à \textsc{revertRenameId}, \textsc{renameId} génère pour un identifiant donné un nouvel identifiant équivalent à l'époque suivante en se basant sur son prédecesseur.
+Pour inclure les effets des renommages à appliquer, le noeud utilise ensuite \texttt{renameId}.
+De manière similaire à \texttt{revertRenameId}, \texttt{renameId} génère pour un identifiant donné un nouvel identifiant équivalent à l'époque suivante en se basant sur son prédecesseur.
 Cependant, il est nécessaire ici de faire une recherche pour déterminer le prédecesseur de l'identifiant donné dans l'\emph{ancien état}.
 L'\emph{ancien état} étant un tableau trié d'identifiants, il est possible de procéder à une recherche dichotomique.
 Cela permet de trouver le prédecesseur en \bigO{\log{}n}, où $n$ correspond ici au nombre d'identifiants composant l'\emph{ancien état}.
-Comme pour \textsc{revertRenameId}, les instructions restantes consistent en des comparaisons et manipulations d'identifiants.
-La complexité de \textsc{renameId} est donc de \bigO{\log{}n}.
+Comme pour \texttt{revertRenameId}, les instructions restantes consistent en des comparaisons et manipulations d'identifiants.
+La complexité de \texttt{renameId} est donc de \bigO{\log{}n}.
 
 Une fois les identifiants introduits par l'opération $\trm{insert}$ renommés pour l'époque courante, il ne reste plus qu'à les insérer dans la séquence.
-Cette étape se réalise en \bigO{\log{}b} pour chaque identifiant, le temps nécessaire pour trouver son emplacement dans l'arbre AVL.
+Cette étape se réalise en \bigO{\log{}b} pour chaque identifiant, le temps nécessaire pour trouver son emplacement dans l'arbre AVL.\\
 
 Ainsi, en reprenant l'ensemble des étapes composant l'intégration de l'opération $\trm{insert}$ distante, nous obtenons la complexité suivante : \bigO{h + s \cdot (k + l \cdot \log{}n + \log{}b)}.
 
@@ -63,17 +63,17 @@ L'opération $\trm{rename}$ locale se décompose en 2 étapes :
 \end{enumerate}
 La première étape consiste à parcourir la séquence actuelle pour en extraire les intervalles d'identifiants.
 Elle s'effectue donc en \bigO{b}.
-La seconde étape consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier id de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
+La seconde étape consiste à instancier une nouvelle séquence vide, et à y insérer un bloc qui associe le contenu actuel de la séquence à l'intervalle d'identifiants \id{pos}{nodeId~nodeSeq}{0..n-1}, avec $\trm{pos}$ la position du premier tuple du premier identifiant de l'état, $\trm{nodeId}$ et $\trm{nodeSeq}$ l'identifiant et le numéro de séquence actuel du noeud et $\trm{n}$ la taille du contenu.
 Cette seconde étape s'effectue en \bigO{1}.
-L'opération $\trm{rename}$ locale a donc une complexité de \bigO{b}.
+L'opération $\trm{rename}$ locale a donc une complexité de \bigO{b}.\\
 
-L'intégration de l'opération $\trm{rename}$ se décompose en les étapes suivantes :
+L'intégration de l'opération distante $\trm{rename}$ se décompose en les étapes suivantes :
 \begin{enumerate}
   \item L'insertion de la nouvelle époque et de l'\emph{ancien état} associé dans l'\emph{arbre des époques}.
   \item La récupération des $n$ identifiants formant l'état courant.
   \item \label{item:distant-rename-op-3} Le calcul de l'époque \ac{LCA} entre l'époque courante et l'époque cible.
   \item L'identification des $k$ opérations $\trm{rename}$ à inverser et des $l$ opérations $\trm{rename}$ à jouer.
-  \item Le renommage de chacun des identifiants à l'aide de \textsc{revertRenameId} et \textsc{renameId}.
+  \item Le renommage de chacun des identifiants à l'aide de \texttt{revertRenameId} et \texttt{renameId}.
   \item \label{item:distant-rename-op-6} L'insertion de chacun des identifiants renommés dans une nouvelle séquence.
 \end{enumerate}
 L'\emph{arbre des époques} étant représenté à l'aide d'une table de hachage, la première étape s'effectue en \bigO{1}.
@@ -82,19 +82,19 @@ La seconde étape nécessite elle de parcourir l'arbre AVL et de convertir chaqu
 Les étapes \ref{item:distant-rename-op-3} à \ref{item:distant-rename-op-6} peuvent être effectuées en réutilisant pour chaque identifiant l'algorithme pour l'intégration d'opérations $\trm{insert}$ distantes analysé précédemment.
 Ces étapes s'effectuent donc en \bigO{n \cdot (k + l \cdot \log{}n + \log{}b)}.
 
-Nous obtenons donc une complexité en temps de \bigO{h + n \cdot (k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération $\trm{rename}$ distante.
+Nous obtenons donc une complexité en temps de \bigO{h + n \cdot (k + l \cdot \log{}n + \log{}b)} pour l'intégration de l'opération $\trm{rename}$ distante.\\
 
 Nous pouvons néanmoins améliorer ce premier résultat.
 Notamment, nous pouvons tirer parti des faits suivants :
 \begin{enumerate}
-  \item Le fonctionnement de \textsc{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe.
+  \item Le fonctionnement de \texttt{renameId} repose sur l'utilisation de l'identifant prédecesseur comme préfixe.
   \item Les identifiants de l'état courant et de l'\emph{ancien état} forment tous deux des listes triées.
 \end{enumerate}
 Ainsi, plutôt que d'effectuer une recherche dichotomique sur l'\emph{ancien état} pour trouver le prédecesseur de l'identifiant à renommer, nous pouvons parcourir les deux listes en parallèle.
 Ceci nous permet de renommer l'intégralité des identifiants en un seul parcours de l'état courant et de l'\emph{ancien état}, \ie en \bigO{n} instructions.
 Ensuite, plutôt que d'insérer les identifiants un à un dans la nouvelle séquence, nous pouvons recomposer au préalable les différents blocs en parcourant la liste des identifiants et en les aggrégeant au fur et à mesure.
 Il ne reste plus qu'à constituer la nouvelle séquence à partir des blocs obtenus.
-Ces actions s'effectuent respectivement en \bigO{n} et \bigO{b} instructions.
+Ces actions s'effectuent respectivement en \bigO{n} et \bigO{b} instructions.\\
 
 Ainsi, ces améliorations nous permettent d'obtenir une complexité en temps en \bigO{h + n \cdot (k + l) + b} pour le traitement de l'opération $\trm{rename}$ distante.
 

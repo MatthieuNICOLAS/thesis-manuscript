@@ -97,7 +97,7 @@ Dans cette figure, la flèche tireté rouge représente l'ordre entre les époqu
 
 Pour déterminer l'époque cible, les noeuds reposent sur la relation \emph{priority}.
 D'après l'ordre lexicographique sur le chemin des époques dans l'\emph{arbre des époques}, nous avons \epoch{0}~<~\epoch{0}\epoch{A2}~<~\epoch{0}\epoch{A2}\epoch{C6}~<~\epoch{0}\epoch{B3}~<~\epoch{0}\epoch{B3}\epoch{B7}.
-Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.
+Chaque noeud sélectionne donc \epoch{B7} comme époque cible de manière non-coordonnée.\\
 
 D'autres stratégies pourraient être proposées pour définir la relation \emph{priority}.
 Par exemple, l'ordre proposé \emph{priority} pourrait se baser sur une représentation du travail effectué sur le document, à l'aide de métriques additionnelles intégrées au sein des opérations $\trm{rename}$.

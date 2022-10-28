@@ -10,7 +10,7 @@ Cependant, les protocoles de consensus ne passent pas à l'échelle et ne sont p
 Pour pallier ce problème, les auteurs proposent de répartir les noeuds dans deux groupes : le \emph{core} et la \emph{nebula}.
 Le \emph{core} est un ensemble, de taille réduite, de noeuds stables et hautement connectés tandis que la \emph{nebula} est un ensemble, de taille non-bornée, de noeuds.
 Seuls les noeuds du \emph{core} participent à l'exécution du protocole de consensus.
-Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{insert}$ et $\trm{remove}$.
+Les noeuds de la \emph{nebula} contribuent toujours au document par le biais des opérations $\trm{insert}$ et $\trm{remove}$.\\
 
 Notre travail peut être vu comme une extension des travaux.
 Avec RenamableLogootSplit, nous adaptons l'opération $\trm{rebalance}$ et le mécanisme de \emph{catch-up} à LogootSplit pour tirer partie de la fonctionnalité offerte par les blocs.
@@ -19,6 +19,6 @@ Notre contribution est donc une approche plus générique puisque RenamableLogoo
 
 Dans les systèmes disposant d'un \emph{core}, nous pouvons donc combiner RenamableLogootSplit avec un protocole de consensus pour éviter la génération d'opérations $\trm{rename}$ concurrentes.
 Cette approche offre plusieurs avantages.
-Elle permet de se passer de tout ce qui à attrait au support d'opérations $\trm{rename}$ concurrentes, \ie la définition d'une relation \emph{priority} et l'implémentation de \textsc{revertRenameId}.
+Elle permet de se passer de tout ce qui à attrait au support d'opérations $\trm{rename}$ concurrentes, \ie la définition d'une relation \emph{priority} et l'implémentation de \texttt{revertRenameId}.
 Elle permet aussi de simplifier l'implémentation du mécanisme de récupération de mémoire des époques et \emph{anciens états} pour reposer seulement sur la stabilité causale des opérations.
 Concernant ses performances, cette approche se comporte de manière similaire à RenamableLogootSplit avec un seul \emph{renaming bot} \cf{sec:evaluation-results}, mais avec un surcoût correspondant au coût du protocole de consensus sélectionné.

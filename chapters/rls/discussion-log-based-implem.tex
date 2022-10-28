@@ -2,7 +2,7 @@ Nous avons décrit précédemment l'algorithme que nous utilisons pour intégrer
 Pour rappel, cet algorithme se compose principalement des étapes suivantes :
 \begin{enumerate}
   \item L'identification de l'époque \ac{LCA} entre l'époque courante et l'époque cible, de façon à determiner les opérations de renommage à annuler et celles à appliquer.
-  \item L'utilisation successive des fonctions \textsc{revertRenameId} et \textsc{renameId} sur l'ensemble des identifiants de l'état courant pour obtenir l'état correspondant à l'époque cible.
+  \item L'utilisation successive des fonctions \texttt{revertRenameId} et \texttt{renameId} sur l'ensemble des identifiants de l'état courant pour obtenir l'état correspondant à l'époque cible.
   \item La création d'une nouvelle séquence à partir des identifiants calculés et du contenu courant.
 \end{enumerate}
 
@@ -28,14 +28,14 @@ Cet algorithme est équivalent à ré-ordonner le journal des opérations de fa�
 
 Cette approche présente plusieurs avantages par rapport à l'implémentation décrite précédemment.
 Tout d'abord, elle modifie le facteur du nombre de transformations à effectuer.
-La version précédente transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si nous disposons de \textsc{renameBlock}) de l'état courant.
+La version précédente transforme de l'époque courante vers l'époque cible chaque identifiant (ou chaque bloc si nous disposons de \texttt{renameBlock}) de l'état courant.
 La version présentée ici effectue une transformation pour chaque opération concurrente à l'opération $\trm{rename}$ à intégrer présente dans le journal des opérations.
 Le nombre de transformation peut donc être réduit de plusieurs ordres de grandeur avec cette approche, notamment si les opérations sont propagées aux pairs du réseau rapidement.
 
 Un autre avantage de cette approche est qu'elle permet de récupérer et de réutiliser les identifiants originaux des opérations.
 Lorsqu'une suite de transformations est appliquée sur les identifiants d'une opération, elle est appliquée sur les identifiants originaux et non plus sur leur équivalents présents dans l'état courant.
-Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans la \autoref{sec:reverting-rename-ops} : le cas où \textsc{revertRenameId} est utilisé pour retirer l'effet d'une opération $\trm{rename}$ sur un identifiant, avant d'utiliser \textsc{renameId} pour ré-intégrer l'effet de la même opération $\trm{rename}$.
-Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \textsc{renameId} et \textsc{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \textsc{renameId} et \textsc{revertRenameId}.
+Ceci permet de réinitialiser les transformations appliquées à un identifiant et d'éviter le cas de figure mentionné dans la \autoref{sec:reverting-rename-ops} : le cas où \texttt{revertRenameId} est utilisé pour retirer l'effet d'une opération $\trm{rename}$ sur un identifiant, avant d'utiliser \texttt{renameId} pour ré-intégrer l'effet de la même opération $\trm{rename}$.
+Cette implémentation supprime donc la contrainte de définir un couple de fonctions réciproques \texttt{renameId} et \texttt{revertRenameId}, ce qui nous offre une plus grande flexibilité dans le choix de la relation \lepoch et du couple de fonctions \texttt{renameId} et \texttt{revertRenameId}.\\
 
 Cette implémentation dispose néanmoins de plusieurs limites.
 Tout d'abord, elle nécessite que chaque noeud maintienne localement le journal des opérations.

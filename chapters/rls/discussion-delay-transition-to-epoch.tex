@@ -1,7 +1,7 @@
-Comme illustré par le \autoref{tab:evolution-integration-time-rename}, intégrer des opérations $\trm{rename}$ distantes est généralement coûteux.
+Comme illustré par le \autoref{tab:evolution-integration-time-rename} \cf{sec:integration-time-rename}, intégrer des opérations $\trm{rename}$ distantes est généralement coûteux.
 Ce traitement peut générer un surcoût computationnel significatif en cas de multiples opérations $\trm{rename}$ concurrentes.
 En particulier, un noeud peut recevoir et intégrer les opérations $\trm{rename}$ concurrentes dans l'ordre inverse défini par la relation \emph{priority} sur leur époques.
-Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.
+Dans ce scénario, le noeud considérerait chaque nouvelle époque introduite comme la nouvelle époque cible et renommerait son état en conséquence à chaque fois.\\
 
 % \mnnote{TODO: Ajouter figure où noeud reçoit successivement plusieurs opérations $\trm{rename}$ concurrentes et procéde au renommage de son état à chaque fois}
 
@@ -11,10 +11,10 @@ Plusieurs stratégies peuvent être proposées pour calculer le niveau de confia
 Ces stratégies peuvent reposer sur une variété de métriques pour produire le niveau de confiance, tel que le temps écoulé depuis que le noeud a reçu une opération $\trm{rename}$ concurrente et le nombre de noeuds en ligne qui n'ont pas encore reçu l'opération $\trm{rename}$.
 
 Durant cette période d'incertitude introduite par le report, les noeuds peuvent recevoir des opérations provenant d'époques différentes, notamment de l'époque cible.
-Néanmoins, les noeuds peuvent toujours intégrer les opérations $\trm{insert}$ et $\trm{remove}$ en utilisant \textsc{renameId} et \textsc{revertRenameId} au prix d'un surcoût computationnel pour chaque identifiant.
-Cependant, ce coût est négligeable (plusieurs centaines de microsecondes par identifiant d'après la \autoref{fig:evolution-integration-time-remote-insert}) comparé au coût de renommer, de manière inutile, complètement l'état (plusieurs centaines de milliseconds à des secondes complètes d'après le \autoref{tab:evolution-integration-time-rename}).
+Néanmoins, les noeuds peuvent toujours intégrer les opérations $\trm{insert}$ et $\trm{remove}$ en utilisant \texttt{renameId} et \texttt{revertRenameId} au prix d'un surcoût computationnel pour chaque identifiant.
+Cependant, ce coût est négligeable (plusieurs centaines de microsecondes par identifiant d'après la \autoref{fig:evolution-integration-time-remote-insert} \cf{sec:integration-time-standard-ops}) comparé au coût de renommer, de manière inutile, complètement l'état (plusieurs centaines de milliseconds à des secondes complètes d'après le \autoref{tab:evolution-integration-time-rename}).\\
 
-Notons que ce mécanisme nécessite que \textsc{renameId} et \textsc{revertRenameId} soient des fonctions réciproques.
-En effet, au cours de la période d'incertitude, un noeud peut avoir à utiliser \textsc{revertRenameId} pour intégrer les identifiants d'opérations $\trm{insert}$ distantes provenant de l'époque cible.
+Notons que ce mécanisme nécessite que \texttt{renameId} et \texttt{revertRenameId} soient des fonctions réciproques.
+En effet, au cours de la période d'incertitude, un noeud peut avoir à utiliser \texttt{revertRenameId} pour intégrer les identifiants d'opérations $\trm{insert}$ distantes provenant de l'époque cible.
 Ensuite, le noeud peut devoir renommer son état vers l'époque cible une fois que celle-ci a obtenu le niveau de confiance requis.
-Il s'ensuit que \textsc{renameId} doit restaurer les identifiants précédemment transformés par \textsc{revertRenameId} à leur valeur initiale pour garantir la convergence.
+Il s'ensuit que \texttt{renameId} doit restaurer les identifiants précédemment transformés par \texttt{revertRenameId} à leur valeur initiale pour garantir la convergence.

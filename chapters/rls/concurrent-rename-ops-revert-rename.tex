@@ -154,7 +154,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
   \label{fig:revertRenameId}
 \end{figure}
 
-C'est précisément le but de \textsc{revertRenameId}, qui associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
+C'est précisément le but de \texttt{revertRenameId}, qui associe les identifiants de l'époque \emph{enfant} aux identifiants correspondant dans l'époque \emph{parente}.
 Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 
 \begin{algorithm}[!ht]
@@ -206,7 +206,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
   \label{alg:revertRenameId}
 \end{algorithm}
 
-Les objectifs de \textsc{revertRenameId} sont les suivants :
+Les objectifs de \texttt{revertRenameId} sont les suivants :
 \begin{enumerate}
   \item \label{item:revert-rename-1}
     Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération $\trm{rename}$ annulée.
@@ -217,14 +217,14 @@ Les objectifs de \textsc{revertRenameId} sont les suivants :
 \end{enumerate}
 
 Le cas \ref{item:revert-rename-1} est le plus trivial.
-Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
+Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \texttt{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
 En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
-Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A2}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B1}{0} (ligne \ref{alg:revertRenameId-case-i}).
+Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A2}{0} a pour offset 0, \texttt{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B1}{0} (ligne \ref{alg:revertRenameId-case-i}).\\
 
 Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
 Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
 Deux invariants sont associés à ce motif.
-D'après la \autoref{prop:order}, nous avons :
+D'après la propriété de préservation de l'ordre \cf{prop:order}, nous avons :
 \[\trm{newId} \in ]\trm{newPredId}, \trm{newSuccId}[\]
 et nous devons obtenir :
 \[\trm{id} \in ]\trm{predId}, \trm{succId}[\]
@@ -233,8 +233,8 @@ Le premier sous-cas se produit quand nous avons $\trm{tail} \in ]\trm{predId}, \
 Dans ce cas, $\trm{newId}$ peut résulter d'une opération $\trm{insert}$ concurrent à l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-2}).
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
-Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
-Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
+Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \texttt{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
+Nous observons qu'en renvoyant $\trm{tail}$, \texttt{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
 Pour illustrer ce cas, considérons l'identifiant \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} dans la \autoref{fig:revertRenameId}.
 Pour cet identifiant, nous avons :
 \begin{itemize}
@@ -252,10 +252,10 @@ Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
 $\trm{newId}$ ne peut avoir été inséré que causalement après l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-3}).
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[\]
-Puisque $\trm{newId}$ a été inséré causalement après l'opération $\trm{rename}$, il n'existe pas de contrainte sur la valeur à retourner autre que la \autoref{prop:order}.
+Puisque $\trm{newId}$ a été inséré causalement après l'opération $\trm{rename}$, il n'existe pas de contrainte sur la valeur à retourner autre que la préservation de l'ordre \cf{prop:order}.
 Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{minTuple}$ et $\trm{maxTuple}$, notés respectivement $\bott$ et $\topt$.
 Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants.
-En utilisant $\trm{minTuple}$, \textsc{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bott~tail}$, ligne \ref{alg:revertRenameId-case-iii}).
+En utilisant $\trm{minTuple}$, \texttt{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bott~tail}$, ligne \ref{alg:revertRenameId-case-iii}).
 Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mintuple}.
 
 \begin{figure}[!ht]
@@ -559,7 +559,7 @@ En parallèle, le noeud D effectue un renommage de son état.
 Cette opération $\trm{rename}$ est donc concurrente à l'opération $\trm{rename}$ générée précédemment par C.
 
 Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération $\trm{rename}$ de D est livrée au noeud C.
-L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C2} \lepoch \epoch{D4}), le noeud C procède à l'annulation de son opération $\trm{rename}$.
+L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C2} \lepoch \epoch{D4}), le noeud C procède à l'annulation de son opération $\trm{rename}$.\\
 
 L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération $\trm{rename}$ annulée : \id{k}{C2}{1}\id{i}{C3}{0}.
 Cet identifiant est compris entre les identifiants suivants :
@@ -573,31 +573,31 @@ Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C2}{1}\id{i}
 \[n^{C1}_{0} <_{id} \trm{id} <_{id} n^{C1}_{0}e^{D3}_{0}\]
 
 Utiliser $\trm{predId}$ (\id{n}{C1}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$.
-Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la \autoref{prop:order}.
+Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la propriété de préservation de l'ordre.
 En effet, nous obtiendrions $\trm{id} = $ \id{n}{C1}{0}\id{i}{C3}{0}, or \id{n}{C1}{0}\id{i}{C3}{0} $\nless_{id}$ \id{n}{C1}{0}\id{e}{D3}{0}.
 
 Ainsi, nous devons choisir un autre préfixe dans cette situation, notamment pour garantir que l'identifiant résultant sera plus petit que les identifiants suivants.
 C'est pour cela que nous introduisons $\trm{minTuple}$.
 En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C1}{0}\id{e}{D3}{0}.
-Nous obtenons donc $\trm{id} = $ \id{n}{C1}{0}$\bott$\id{i}{C3}{0}, ce qui respecte la \autoref{prop:order}.
+Nous obtenons donc $\trm{id} = $ \id{n}{C1}{0}$\bott$\id{i}{C3}{0}, qui respecte l'ordre souhaité.\\
 
 Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
 Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[\]
 La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre souhaité.
-Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}$ et $\trm{maxTuple}$.
+Pour générer ce préfixe, \texttt{revertRenameId} utilise  $\trm{predOfSuccId}$ et $\trm{maxTuple}$.
 $\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
-Ainsi, pour préserver l'ordre souhaité, \textsc{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.
+Ainsi, pour préserver l'ordre souhaité, \texttt{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.\\
 
-% Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B3}.
+% Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \texttt{revertRenameId}, il peut appliquer \texttt{renameId} pour calculer l'état correspondant à \epoch{B3}.
 
-Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
+Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \texttt{revertRenameId}.
 Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).
-Les fonctions pour gérer les cas restants sont présentées dans l'\autoref{app:revert-rename-id}.
+Les fonctions pour gérer les cas restants sont présentées dans l'\autoref{app:revert-rename-id}.\\
 
-Notons que \textsc{renameId} et \textsc{revertRenameId} ne sont pas des fonctions réciproques.
-\textsc{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération $\trm{rename}$.
-Par contre, \textsc{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération $\trm{rename}$.
+Notons que \texttt{renameId} et \texttt{revertRenameId} ne sont pas des fonctions réciproques.
+\texttt{revertRenameId} restaure à leur valeur initiale les identifiants insérés causalement avant ou de manière concurrente à l'opération $\trm{rename}$.
+Par contre, \texttt{renameId} ne fait pas de même pour les identifiants insérés causalement après l'opération $\trm{rename}$.
 Rejouer une opération $\trm{rename}$ précédemment annulée altère donc ces identifiants.
 Cette modification peut entraîner une divergence entre les noeuds, puis qu'un même élément sera désigné par des identifiants différents.
 

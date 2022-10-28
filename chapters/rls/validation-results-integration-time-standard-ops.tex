@@ -1,3 +1,5 @@
+\label{sec:integration-time-standard-ops}
+
 Nous avons ensuite comparé l'évolution du temps d'intégration des opérations standards, \ie les opérations $\trm{insert}$ et $\trm{remove}$, sur des documents LogootSplit et RenamableLogootSplit.
 Puisque les deux types d'opérations partagent la même complexité en temps, nous avons seulement utilisé des opérations $\trm{insert}$ dans nos benchmarks.
 Nous faisons par contre la différence entre les mises à jours \emph{locales} et \emph{distantes}.
@@ -30,10 +32,10 @@ Cette amélioration s'explique par le fait que l'opération $\trm{rename}$ optim
 Dans le cadre des opérations distantes, nous avons mesuré des temps d'intégration spécifiques à RenamableLogootSplit : le temps d'intégration d'opérations distantes provenant d'époques \emph{parentes} et d'époques \emph{soeurs}, respectivement affiché sous la forme de boxplots blanches et rouges dans la \autoref{fig:evolution-integration-time-remote-insert}.
 
 Les opérations distantes provenant d'époques \emph{parentes} sont des opérations générées de manière concurrente à l'opération $\trm{rename}$ mais appliquées après cette dernière.
-Puisque l'opération doit être transformée au préalable en utilisant \textsc{renameId}, nous observons un surcoût computationnel par rapport aux autres opérations.
+Puisque l'opération doit être transformée au préalable en utilisant \texttt{renameId}, nous observons un surcoût computationnel par rapport aux autres opérations.
 Mais ce surcoût est compensé par l'optimisation de la représentation interne de la séquence effectuée par l'opération $\trm{rename}$.
 
-Concernant les opérations provenant d'époques \emph{soeurs}, nous observons de nouveau un surcoût puisque les noeuds doivent tout d'abord annuler les effets de l'opération $\trm{rename}$ concurrente en utilisant \textsc{revertRenameId}.
+Concernant les opérations provenant d'époques \emph{soeurs}, nous observons de nouveau un surcoût puisque les noeuds doivent tout d'abord annuler les effets de l'opération $\trm{rename}$ concurrente en utilisant \texttt{revertRenameId}.
 À cause de cette étape supplémentaire, les performances de RenamableLogootSplit pour ces opérations sont comparables à celles de LogootSplit.
 
 Pour récapituler, les fonctions de transformation ajoutent un surcoût aux temps d'intégration des opérations concurrentes aux opérations $\trm{rename}$.

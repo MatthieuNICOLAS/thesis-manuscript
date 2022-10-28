@@ -7,12 +7,12 @@ Dans cette section, nous présentons un mécanisme permettant aux noeuds de dét
 
 Pour proposer un tel mécanisme, nous nous reposons sur la notion de \emph{stabilité causale des opérations} \cite{10.1007/978-3-662-43352-2_11}.
 Une opération est causalement stable une fois qu'elle a été livrée à tous les noeuds.
-Dans le contexte de l'opération $\trm{rename}$, cela implique que tous les noeuds ont progressé à l'époque introduite par cette opération ou à une époque plus grande d'après la relation \emph{priority}.
+Dans le contexte de l'opération $\trm{rename}$, cela implique que tous les noeuds ont progressé à l'époque introduite par cette opération ou à une époque plus prioritaire d'après la relation \emph{priority}.
 À partir de ce constat, nous définissons les \emph{potentielles époques courantes} :
 
 \begin{definition}[Potentielles époques courantes]
   L'ensemble des époques auxquelles les noeuds peuvent se trouver actuellement et à partir desquelles ils peuvent émettre des opérations, du point de vue du noeud courant.
-  Il s'agit d'un sous-ensemble de l'ensemble des époques, composé de l'époque maximale introduite par une opération $\trm{rename}$ causalement stable et de toutes les époques plus grande que cette dernière d'après la relation \emph{priority}.
+  Il s'agit d'un sous-ensemble de l'ensemble des époques, composé de l'époque maximale introduite par une opération $\trm{rename}$ causalement stable et de toutes les époques plus prioritaire que cette dernière d'après la relation \emph{priority}.
 \end{definition}
 
 Les prochaines opérations livrées seront donc générées à partir de ces époques seulement\footnote{
@@ -145,15 +145,15 @@ Le noeud A déduit que les époques \epoch{0}, \epoch{A2} et \epoch{A8} peuvent 
 À l'inverse, la livraison de l'opération $\trm{rename}$ vers \epoch{A2} au noeud B ne lui permet pas de supprimer la moindre métadonnée.
 À partir de ses connaissances, le noeud B calcule que \epoch{A2}, \epoch{B3} et \epoch{B7} forment l'ensemble des \emph{potentielles époques courantes}.
 De cette information, le noeud B détermine que ces époques et leur \ac{LCA} forment l'ensemble des \emph{époques requises}.
-Toute époque connue appartient donc à l'ensemble des \emph{époques requises}, empêchant leur suppression.
+Toute époque connue appartient donc à l'ensemble des \emph{époques requises}, empêchant leur suppression.\\
 
 À terme, une fois que le système devient inactif, les noeuds atteignent la même époque et l'opération $\trm{rename}$ correspondante devient causalement stable.
-Les noeuds peuvent alors supprimer toutes les autres époques et métadonnées associées, supprimant ainsi le surcoût mémoire introduit par le mécanisme de renommage.
+Les noeuds peuvent alors supprimer toutes les autres époques et métadonnées associées, supprimant ainsi le surcoût mémoire introduit par le mécanisme de renommage.\\
 
 Notons que le mécanisme de récupération de mémoire peut être simplifié dans les systèmes empêchant les opérations $\trm{rename}$ concurrentes.
 Puisque les époques forment une chaîne dans de tels systèmes, la dernière époque introduite par une opération $\trm{rename}$ causalement stable devient le \ac{LCA} des \emph{potentielles époques courantes}.
 Il s'ensuit que cette époque et ses descendantes forment l'ensemble des \emph{époques requises}.
-Les noeuds n'ont donc besoin que de suivre les opérations $\trm{rename}$ causalement stables pour déterminer quelles époques peuvent être supprimées dans les systèmes sans opérations $\trm{rename}$ concurrentes.
+Les noeuds n'ont donc besoin que de suivre les opérations $\trm{rename}$ causalement stables pour déterminer quelles époques peuvent être supprimées dans les systèmes sans opérations $\trm{rename}$ concurrentes.\\
 
 Pour déterminer qu'une opération $\trm{rename}$ donnée est causalement stable, les noeuds doivent être conscients des autres et de leur avancement.
 Un protocole de gestion de groupe tel que \cite{swim2002,lifeguard2018} est donc requis.

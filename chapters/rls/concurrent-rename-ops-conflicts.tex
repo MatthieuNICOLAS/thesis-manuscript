@@ -129,7 +129,7 @@ Nous considérons à présent les scénarios avec des opérations $\trm{rename}$
 \end{figure}
 
 Après avoir diffusé son opération $\trm{insert}$, le noeud B effectue une opération $\trm{rename}$ sur son état.
-Cette opération réassigne à chaque élément un nouvel identifiant à partir de l'identifiant du premier élément de la séquence (\id{i}{B1}{0}), de l'identifiant du noeud (\textbf{B}) et de son numéro de séquence courant (2).
+Cette opération réassigne à chaque élément un nouvel identifiant à partir de l'identifiant du premier élément de la séquence (\id{i}{B1}{0}), de l'identifiant du noeud (\textbf{B}) et de son numéro de séquence courant (3).
 Cette opération introduit aussi une nouvelle époque : \epoch{B3}.
 Puisque l'opération $\trm{rename}$ de A n'a pas encore été livrée au noeud B à ce moment, les deux opérations $\trm{rename}$ sont concurrentes.
 
@@ -157,17 +157,17 @@ Les époques sont representées sous la forme de noeuds de l'arbre et la relatio
 
 À l'issue du scénario décrit dans la \autoref{fig:conflicting-rename-operations}, les noeuds A et B sont respectivement aux époques \epoch{A2} et \epoch{B3}.
 Pour converger, tous les noeuds devraient atteindre la même époque à terme.
-Cependant, la fonction \textsc{renameId} décrite dans l'\autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
+Cependant, la fonction \texttt{renameId} décrite dans l'\autoref{alg:renameId} permet seulement aux noeuds de progresser d'une époque \emph{parente} à une de ses époques \emph{enfants}.
 Le noeud A (resp. B) est donc dans l'incapacité de progresser vers l'époque du noeud B (resp. A).
-Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.
+Il est donc nécessaire de faire évoluer notre mécanisme de renommage pour sortir de cette impasse.\\
 
 Tout d'abord, les noeuds doivent se mettre d'accord sur une époque commune de l'\emph{arbre des époques} comme époque cible.
 Afin d'éviter des problèmes de performance dûs à une coordination synchrone, les noeuds doivent sélectionner cette époque de manière non-coordonnée, \ie en utilisant seulement les données présentes dans l'\emph{arbre des époques}.
 Nous présentons un tel mécanisme dans la \autoref{sec:priority}.
 
 Ensuite, les noeuds doivent se déplacer à travers l'\emph{arbre des époques} afin d'atteindre l'époque cible.
-La fonction \textsc{renameId} permet déjà aux noeuds de descendre dans l'arbre.
+La fonction \texttt{renameId} permet déjà aux noeuds de descendre dans l'arbre.
 Les cas restants à gérer sont ceux où les noeuds se trouvent actuellement à une époque \emph{soeur} ou \emph{cousine} de l'époque cible.
 Dans ces cas, les noeuds doivent être capable de remonter dans l'\emph{arbre des époques} pour retourner au \ac{LCA} de l'époque courante et l'époque cible.
 Ce déplacement est en fait similaire à l'annulation de l'effet des opérations $\trm{rename}$ précédemment appliquées.
-Nous proposons un algorithme, \textsc{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.
+Nous proposons un algorithme, \texttt{revertRenameId}, qui remplit cet objectif dans la \autoref{sec:reverting-rename-ops}.

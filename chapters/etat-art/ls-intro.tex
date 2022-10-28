@@ -1,6 +1,6 @@
 \label{sec:logootsplit}
 
-LogootSplit \cite{2013-logootsplit} est à notre connaissance le dernier \ac{CRDT} pour le type Séquence appartenant à l'approche à identifiants densément ordonnés proposé.
+LogootSplit \cite{2013-logootsplit} est le dernier \ac{CRDT} proposé pour le type Séquence qui appartient à l'approche à identifiants densément ordonnés.
 Ce \ac{CRDT} propose un mécanisme permettant d'aggréger de manière dynamique des éléments en blocs d'éléments.
 
 L'aggrégation des éléments en blocs offre plusieurs bénéfices.
@@ -8,4 +8,4 @@ Tout d'abord, elle permet de factoriser les métadonnées des éléments aggrég
 Ensuite, la séquence stocke directement les blocs, en place et lieu des éléments, ce qui réduit sa taille et rend sa manipulation plus efficace.
 Finalement, les blocs permettent de représenter des modifications à l'échelle de plusieurs éléments, ce qui réduit la taille des messages diffusés sur le réseau.
 
-Nous détaillons ci-dessous le fonctionnement de LogootSplit.
+Nous détaillons dans cette section le fonctionnement de LogootSplit.

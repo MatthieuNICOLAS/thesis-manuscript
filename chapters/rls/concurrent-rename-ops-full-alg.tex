@@ -183,7 +183,7 @@ La fonction \textsc{getPathBetweenEpochs} applique l'algorithme suivant :
 
 Le chemin entre l'époque de l'opération et l'époque \ac{LCA} ([\epoch{A2}]) correspond aux renommages dont les effets doivent être retirés de l'opération.
 Pour cela, le noeud récupère les informations de chaque renommage via l'\emph{arbre des époques} (lignes \ref{alg:insertRemote-retrieve-rename-data-1}-\ref{alg:insertRemote-retrieve-rename-data-2}).
-Puis il applique \textsc{revertRenameId} sur chaque identifiant de l'opération (ligne \ref{alg:insertRemote-revertRenameId}).
+Puis il applique \texttt{revertRenameId} sur chaque identifiant de l'opération (ligne \ref{alg:insertRemote-revertRenameId}).
 Le noeud procède ensuite de manière similaire pour les époques appartenant au chemin entre l'époque \ac{LCA} et l'époque courante ([\epoch{B2}]), qui correspondent aux renommages dont les effets doivent être intégrés à l'opération (lignes \ref{alg:insertRemote-renameId-1}-\ref{alg:insertRemote-renameId-2}).
 
 À ce stade, le noeud obtient la liste des identifiants à insérer à l'époque courante.
@@ -372,12 +372,12 @@ La \autoref{fig:integration-process-rename-op} reprend le scénario décrit pré
 Elle complète ce dernier en faisant apparaître la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2} par le noeud A.
 C'est sur ce point que nous allons nous focaliser ici.
 
-À la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2}, le noeud A utilise \textsc{renRemote} pour intégrer cette opération.
+À la réception de l'opération $\trm{rename}$ vers l'époque \epoch{B2}, le noeud A utilise \texttt{renRemote} pour intégrer cette opération.
 Tout d'abord, le noeud A ajoute l'époque \epoch{B2} et les métadonnées associées (ancien état, auteur de l'opération $\trm{rename}$, numéro de séquence de l'auteur de l'opération $\trm{rename}$) à son propre arbre des époques (ligne \ref{alg:renameRemote-addEpoch}).
 
 Le noeud compare ensuite l'époque introduite (\epoch{B2}) à son époque courante (\epoch{A2}) en utilisant la relation \lepoch.
 Si l'époque introduite était plus petite que l'époque courante, aucun traitement supplémentaire ne serait nécessaire.
-\textsc{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées, et le nouvel \emph{arbre des époques} (ligne \ref{alg:renameRemote-return-1}).
+\texttt{renRemote} se contenterait de renvoyer comme résultats la séquence et l'époque courante, inchangées, et le nouvel \emph{arbre des époques} (ligne \ref{alg:renameRemote-return-1}).
 
 Dans le cas présent, nous avons \epoch{A2} \lepoch \epoch{B2}.
 \epoch{B2} devient donc la nouvelle époque courante.
@@ -390,4 +390,4 @@ Le noeud obtient alors la liste des identifiants courant, à la nouvelle époque
 Il ne lui reste plus qu'à construire une nouvelle séquence à partir de ces identifiants.
 Pour cela, le noeud regénère des blocs à partir des intervalles d'identifiants obtenus et du contenu de la séquence courante.
 Le noeud utilise ensuite ces données pour instancier une nouvelle séquence équivalente à l'époque cible (ligne \ref{alg:renameRemote-newSeq}).
-Finalement, \textsc{renRemote} renvoie cette nouvelle séquence, la nouvelle époque courante ainsi que le nouvel \emph{arbre des époques}.
+Finalement, \texttt{renRemote} renvoie cette nouvelle séquence, la nouvelle époque courante ainsi que le nouvel \emph{arbre des époques}.

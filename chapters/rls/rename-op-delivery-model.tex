@@ -107,9 +107,9 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
   \label{fig:rls-invalid-delivery-order}
 \end{figure}
 
-Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "ABCD".
+Dans la \autoref{fig:rls-invalid-delivery-order}, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "WOLD".
 Tout d'abord, le noeud A procède au renommage de cet état.
-Puis il insère un nouvel élément, "X", entre "B" et "C".
+Puis il insère un nouvel élément, "R", entre "O" et "L".
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
 Cependant, l'opération $\trm{rename}$ n'est pas livrée au noeud B, par exemple suite à un problème réseau.
@@ -120,7 +120,7 @@ Il convient de s'interroger sur l'état à produire dans cette situation.
 
 Comme nous l'avions déjà illustré par la \autoref{fig:concurrent-insert-rename-inconsistent}, les identifiants d'une époque ne peuvent être comparés qu'aux identifiants de la même époque.
 Tenter d'intégrer une opération $\trm{insert}$ ou $\trm{remove}$ provenant d'une époque encore inconnue ne résulterait qu'en un état incohérent et une transgression de l'intention utilisateur \cf{prop:rename-op-intention-preservation}.
-Il est donc nécessaire d'empêcher ce scénario de se produire.
+Il est donc nécessaire d'empêcher ce scénario de se produire.\\
 
 Pour cela, nous proposons de faire évoluer le modèle de livraison des opérations de RenamableLogootSplit.
 Celui-ci repose sur celui de LogootSplit \cf{def:ls-delivery-model}.
@@ -265,8 +265,8 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
   \label{fig:rls-out-of-order-rename}
 \end{figure}
 
-Dans cet exemple, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "ABCD".
-Le noeud A commence par insérer un nouvel élément, "X", entre les éléments "B" et "C".
+Dans cet exemple, les noeuds A et B répliquent tous deux une même séquence, contenant les éléments "WOLD".
+Le noeud A commence par insérer un nouvel élément, "R", entre les éléments "O" et "L".
 Puis il procède au renommage de son état.
 Les opérations correspondantes aux actions du noeud A sont diffusées sur le réseau.
 
@@ -275,6 +275,6 @@ L'opération $\trm{rename}$ est donc livrée en première au noeud B.
 En utilisant les informations contenues dans l'opération, le noeud B renomme chaque identifiant composant son état.
 
 Ensuite, le noeud B reçoit l'opération $\trm{insert}$.
-Comme l'époque de génération de l'opération $\trm{insert}$ (\epoch{0}) est différente de celle de son état courant (\epoch{A3}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
+Comme l'époque de génération de l'opération $\trm{insert}$ (\epoch{0}) est différente de celle de son état courant (\epoch{A3}), le noeud B utilise \texttt{renameId} pour renommer l'identifiant avant de l'insérer.
 \id{m}{A2}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A3} (\id{i}{A3}{2}).
-Le noeud B insère l'élément "X" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
+Le noeud B insère l'élément "R" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
