@@ -12,7 +12,7 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
                 ++(0:0.5) node (a) {}
                 +(0:22) node (a-end) {}
                 +(0:1) node (a-initial) {}
-                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,1)$}] (a-ren-a1) {}
+                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,2)$}] (a-ren-A2) {}
                 +(0:9) node[point] (a-recv-ren-b7) {}
                 +(0:11) node[point, label=above:{$\trm{ren}(\betterepoch{B7}, A,10)$}] (a-ren-a8) {}
                 +(0:13) node (a-ellipse-debut) {}
@@ -22,21 +22,21 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
                 +(0:21) node (a-final) {};
 
               \draw[dotted] (a) -- (a-initial) (a-ellipse-debut) -- (a-ellipse-fin) (a-final) -- (a-end);
-              \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-recv-ren-b7) --  (a-ren-a8) -- (a-ellipse-debut) (a-ellipse-fin) -- (a-ren-a100) -- (a-recv-ren-c1) -- (a-final);
+              \draw[->, thick] (a-initial) --  (a-ren-A2) -- (a-recv-ren-b7) --  (a-ren-a8) -- (a-ellipse-debut) (a-ellipse-fin) -- (a-ren-a100) -- (a-recv-ren-c1) -- (a-final);
 
               \path
                   ++(270:2) node {\textbf{B}}
                   ++(0:0.5) node (b) {}
                   +(0:22) node (b-end) {}
                   +(0:1) node (b-initial) {}
-                  +(0:5) node[point] (b-recv-ren-a1) {}
-                  +(0:7) node[point, label=below:{$\trm{ren}(\betterepoch{A1},B,7)$}] (b-ren-b7) {}
+                  +(0:5) node[point] (b-recv-ren-A2) {}
+                  +(0:7) node[point, label=below:{$\trm{ren}(\betterepoch{A2},B,7)$}] (b-ren-b7) {}
                   +(0:13) node (b-ellipse-debut) {}
                   +(0:15) node (b-ellipse-fin) {}
                   +(0:21) node (b-final) {};
 
               \draw[dotted] (b) -- (b-initial) (b-ellipse-debut) -- (b-ellipse-fin) (b-final) -- (b-end);
-              \draw[->, thick] (b-initial) --  (b-recv-ren-a1) -- (b-ren-b7) -- (b-ellipse-debut) (b-ellipse-fin) -- (b-final);
+              \draw[->, thick] (b-initial) --  (b-recv-ren-A2) -- (b-ren-b7) -- (b-ellipse-debut) (b-ellipse-fin) -- (b-final);
 
               \path
                   ++(270:4) node {\textbf{C}}
@@ -51,7 +51,7 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
               \draw[dotted] (c) -- (c-initial) (c-ellipse-debut) -- (c-ellipse-fin) (c-final) -- (c-end);
               \draw[->, thick] (c-initial) --  (c-ren-c1) -- (c-ellipse-debut) (c-ellipse-fin) -- (c-final);
 
-              \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (b-recv-ren-a1);
+              \draw[->, dashed, shorten >= 1] (a-ren-A2) -- (b-recv-ren-A2);
               \draw[->, dashed, shorten >= 1] (b-ren-b7) -- (a-recv-ren-b7);
               \draw[->, dashed, shorten >= 1] (c-ren-c1) -- (a-recv-ren-c1);
             \end{tikzpicture}
@@ -66,7 +66,7 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
             \begin{tikzpicture}
                 \path
                     node[op] (e0) {\epoch{0}}
-                    ++(225:1.5) node[op] (eA1) {\epoch{A1}}
+                    ++(225:1.5) node[op] (eA2) {\epoch{A2}}
                     ++(270:1.5) node[op] (eB7) {\epoch{B7}}
                     ++(270:1.5) node[op] (eA10) {\epoch{A10}}
                     ++(270:1) node (eA11) {}
@@ -75,9 +75,9 @@ La \autoref{fig:worst-case-priority} présente un tel cas.
                 \path
                     ++(315:1.5) node[op, red] (eC1) {\epoch{C1}};
 
-                \draw[->, thick] (e0) edge (eA1) (eA1) edge (eB7) (eB7) edge (eA10) (eA10) edge (eA11) (eA99) edge(eA100) (e0) edge (eC1);
+                \draw[->, thick] (e0) edge (eA2) (eA2) edge (eB7) (eB7) edge (eA10) (eA10) edge (eA11) (eA99) edge(eA100) (e0) edge (eC1);
                 \draw[dotted] (eA11) edge (eA99);
-                \draw[->, dashed, thick, red] (eC1.270) -- (eA100.45) (eA100.50) -- (eA10.315) (eA10.45) -- (eB7.315) (eB7.45) -- (eA1.315) (eA1.0) -- (e0.270);
+                \draw[->, dashed, thick, red] (eC1.270) -- (eA100.45) (eA100.50) -- (eA10.315) (eA10.45) -- (eB7.315) (eB7.45) -- (eA2.315) (eA2.0) -- (e0.270);
             \end{tikzpicture}
           }
           \label{fig:worst-case-priority-tree}
@@ -90,7 +90,7 @@ Dans cet exemple, les noeuds A et B éditent en collaboration un document.
 Au fur et à mesure de leur collaboration, ils effectuent plusieurs opérations $\trm{rename}$.
 Cependant, après un nombre conséquent de modifications de leur part, un autre noeud C se reconnecte.
 Celui-ci leur transmet sa propre opération $\trm{rename}$, concurrente à toutes leurs opérations.
-D'après la relation \emph{priority}, nous avons \epoch{0}~\lepoch~\epoch{A1}~\lepoch~...~\lepoch~\epoch{A100}~\lepoch~\epoch{C1}.
+D'après la relation \emph{priority}, nous avons \epoch{0}~\lepoch~\epoch{A2}~\lepoch~...~\lepoch~\epoch{A100}~\lepoch~\epoch{C1}.
 La nouvelle époque cible étant \epoch{C1}, les noeuds A et B doivent pour l'atteindre annuler successivement l'ensemble des opérations $\trm{rename}$ composant leur branche de l'\emph{arbre des époques}.
 Ainsi, un noeud isolé peut forcer l'ensemble des noeuds à effectuer un lourd calcul.
 Il serait plus efficace que, dans cette situation, ce soit seulement le noeud isolé qui doive se mettre à jour.

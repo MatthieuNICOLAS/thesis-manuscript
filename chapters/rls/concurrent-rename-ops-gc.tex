@@ -41,30 +41,30 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:1) node (a-initial) {}
-                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,1)$}] (a-ren-a1) {}
-                +(0:7) node[point, label=above:{$\trm{ren}(\betterepoch{A1}, A,8)$}] (a-ren-a8) {}
-                +(0:9) node[point] (a-recv-ren-b2) {}
-                +(0:11) node[point, label=above:{$\trm{ren}(\betterepoch{B2}, A,9)$}] (a-ren-a9) {}
+                +(0:3) node[point, label=above:{$\trm{ren}(\betterepoch{0}, A,2)$}] (a-ren-A2) {}
+                +(0:7) node[point, label=above:{$\trm{ren}(\betterepoch{A2}, A,8)$}] (a-ren-a8) {}
+                +(0:9) node[point] (a-recv-ren-B3) {}
+                +(0:11) node[point, label=above:{$\trm{ren}(\betterepoch{B3}, A,9)$}] (a-ren-a9) {}
                 +(0:13) node (a-final) {};
 
             \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-            \draw[->, thick] (a-initial) --  (a-ren-a1) --  (a-ren-a8) -- (a-recv-ren-b2) --  (a-ren-a9) -- (a-final);
+            \draw[->, thick] (a-initial) --  (a-ren-A2) --  (a-ren-a8) -- (a-recv-ren-B3) --  (a-ren-a9) -- (a-final);
 
             \path
                 ++(270:2) node {\textbf{B}}
                 ++(0:0.5) node (b) {}
                 +(0:14) node (b-end) {}
                 +(0:1) node (b-initial) {}
-                +(0:3) node[point, label=below:{$\trm{ren}(\betterepoch{0},B,2)$}] (b-ren-b2) {}
-                +(0:5) node[point] (b-recv-ren-a1) {}
-                +(0:11) node[point, label=below:{$\trm{ren}(\betterepoch{B2},B,7)$}] (b-ren-b7) {}
+                +(0:3) node[point, label=below:{$\trm{ren}(\betterepoch{0},B,3)$}] (b-ren-B3) {}
+                +(0:5) node[point] (b-recv-ren-A2) {}
+                +(0:11) node[point, label=below:{$\trm{ren}(\betterepoch{B3},B,7)$}] (b-ren-b7) {}
                 +(0:13) node (b-final) {};
 
             \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-            \draw[->, thick] (b-initial) -- (b-ren-b2) -- (b-recv-ren-a1) -- (b-ren-b7) -- (b-final);
+            \draw[->, thick] (b-initial) -- (b-ren-B3) -- (b-recv-ren-A2) -- (b-ren-b7) -- (b-final);
 
-            \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (b-recv-ren-a1);
-            \draw[->, dashed, shorten >= 1] (b-ren-b2) -- (a-recv-ren-b2);
+            \draw[->, dashed, shorten >= 1] (a-ren-A2) -- (b-recv-ren-A2);
+            \draw[->, dashed, shorten >= 1] (b-ren-B3) -- (a-recv-ren-B3);
           \end{tikzpicture}}
           \label{fig:GC-execution}
       \end{minipage}}
@@ -76,11 +76,11 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
               \path
                   node {\textbf{A}}
                   ++(270:1) node[causalop] (Ae0) {\epoch{0}}
-                  ++(225:1.5) node[op] (AeA1) {\epoch{A1}}
+                  ++(225:1.5) node[op] (AeA2) {\epoch{A2}}
                   ++(270:1.5) node[op] (AeA8) {\epoch{A8}};
               \path
                   ++(270:1)
-                  ++(315:1.5) node[causalop] (AeB2) {\epoch{B2}}
+                  ++(315:1.5) node[causalop] (AeB3) {\epoch{B3}}
                       node[outer sep=12pt] (A-tl-potential-epochs) {}
                       node[outer sep=15pt] (A-tl-required-epochs) {}
                   ++(270:1.5) node[op, red] (AeA9) {\epoch{A9}}
@@ -93,23 +93,23 @@ La \autoref{fig:GC-epochs} illustre un cas d'utilisation du mécanisme de récup
               \path
                   ++(0:4) node {\textbf{B}}
                   ++(270:1) node[causalop] (Be0) {\epoch{0}}
-                  ++(315:1.5) node[op] (BeB2) {\epoch{B2}}
+                  ++(315:1.5) node[op] (BeB3) {\epoch{B3}}
                   ++(270:1.5) node[op, red] (BeB7) {\epoch{B7}}
                       node[outer sep=12pt] (B-br-potential-epochs) {}
                       node[outer sep=15pt] (B-br-required-epochs) {};
               \path
                   ++(0:4)
                   ++(270:1)
-                  ++(225:1.5) node[causalop] (BeA1) {\epoch{A1}}
+                  ++(225:1.5) node[causalop] (BeA2) {\epoch{A2}}
                       node[outer sep=12pt] (B-tl-potential-epochs) {};
 
               \draw[dashed] (B-tl-potential-epochs.north west) rectangle (B-br-potential-epochs.south east);
               \draw[dotted, thick, darkgreen] (B-tl-potential-epochs.north west)[xshift=-3pt, yshift=33pt] rectangle (B-br-required-epochs.south east);
 
-              \draw[thick, ->] (Ae0) edge (AeA1) (AeA1) edge (AeA8) (Ae0) edge (AeB2) (AeB2) edge (AeA9);
-              \draw[thick, ->] (Be0) edge (BeB2) (BeB2) edge (BeB7) (Be0) edge (BeA1);
-              \draw[->, dashed, thick, red] (AeA9.135) -- (AeB2.225) (AeB2.180) -- (AeA8.45) -- (AeA1.315) (AeA1.0) -- (Ae0.270);
-              \draw[->, dashed, thick, red] (BeB7.135) -- (BeB2.225) (BeB2.180) -- (BeA1.0) -- (Be0.270);
+              \draw[thick, ->] (Ae0) edge (AeA2) (AeA2) edge (AeA8) (Ae0) edge (AeB3) (AeB3) edge (AeA9);
+              \draw[thick, ->] (Be0) edge (BeB3) (BeB3) edge (BeB7) (Be0) edge (BeA2);
+              \draw[->, dashed, thick, red] (AeA9.135) -- (AeB3.225) (AeB3.180) -- (AeA8.45) -- (AeA2.315) (AeA2.0) -- (Ae0.270);
+              \draw[->, dashed, thick, red] (BeB7.135) -- (BeB3.225) (BeB3.180) -- (BeA2.0) -- (Be0.270);
 
           \end{tikzpicture}
           \label{fig:GC-epoch-trees}
@@ -123,27 +123,27 @@ Dans la \autoref{fig:GC-epoch-trees}, nous représentons les \emph{arbre des ép
 Les époques introduites par des opérations $\trm{rename}$ causalement stables sont representées en utilisant des doubles cercles.
 L'ensemble des \emph{potentielles époques courantes} est montré sous la forme d'un rectangle noir tireté, tandis que l'ensemble des \emph{époques requises} est représenté par un rectangle vert pointillé.
 
-Le noeud A génère tout d'abord une opération $\trm{rename}$ vers \epoch{A1} et ensuite une opération $\trm{rename}$ vers \epoch{A8}.
-Il reçoit ensuite une opération $\trm{rename}$ du noeud B qui introduit \epoch{B2}.
-Puisque \epoch{B2} est plus grand que son époque courante actuelle (\epoch{e0}\epoch{A1}\epoch{A8} < \epoch{e0}\epoch{B2}), le noeud A la sélectionne comme sa nouvelle époque cible et procède au renommage de son état en conséquence.
+Le noeud A génère tout d'abord une opération $\trm{rename}$ vers \epoch{A2} et ensuite une opération $\trm{rename}$ vers \epoch{A8}.
+Il reçoit ensuite une opération $\trm{rename}$ du noeud B qui introduit \epoch{B3}.
+Puisque \epoch{B3} est plus grand que son époque courante actuelle (\epoch{e0}\epoch{A2}\epoch{A8} < \epoch{e0}\epoch{B3}), le noeud A la sélectionne comme sa nouvelle époque cible et procède au renommage de son état en conséquence.
 Finalement, le noeud A génère une troisième opération $\trm{rename}$ vers \epoch{A9}.
 
-De manière concurrente, le noeud B génère l'opération $\trm{rename}$ vers \epoch{B2}.
-Il reçoit ensuite l'opération $\trm{rename}$ vers \epoch{A1} du noeud A.
-Cependant, le noeud B conserve \epoch{B2} comme époque courante (puisque \epoch{e0}\epoch{A1} < \epoch{e0}\epoch{B2}).
+De manière concurrente, le noeud B génère l'opération $\trm{rename}$ vers \epoch{B3}.
+Il reçoit ensuite l'opération $\trm{rename}$ vers \epoch{A2} du noeud A.
+Cependant, le noeud B conserve \epoch{B3} comme époque courante (puisque \epoch{e0}\epoch{A2} < \epoch{e0}\epoch{B3}).
 Après, le noeud B génère une autre opération $\trm{rename}$ vers \epoch{B7}.
 
-À la livraison de l'opération $\trm{rename}$ introduisant l'époque \epoch{B2} au noeud A, cette opération devient causalement stable.
+À la livraison de l'opération $\trm{rename}$ introduisant l'époque \epoch{B3} au noeud A, cette opération devient causalement stable.
 À partir de ce point, le noeud A sait que tous les noeuds ont progressé jusqu'à cette époque ou une plus grande d'après la relation \emph{priority}.
-Les époques \epoch{B2} et \epoch{A9} forment donc l'ensemble des \emph{potentielles époques courantes} et les noeuds peuvent seulement émettre des opérations depuis ces époques ou une de leur descendante encore inconnue.
+Les époques \epoch{B3} et \epoch{A9} forment donc l'ensemble des \emph{potentielles époques courantes} et les noeuds peuvent seulement émettre des opérations depuis ces époques ou une de leur descendante encore inconnue.
 Le noeud A procède ensuite au calcul de l'ensemble des \emph{époques requises}.
-Pour ce faire, il détermine le \ac{LCA} des \emph{potentielles époques courantes} : \epoch{B2}.
-Il génère ensuite l'ensemble des \emph{époques requises} en ajoutant toutes les époques formant les chemins entre \epoch{B2} et les \emph{potentielles époques courantes}.
-Les époques \epoch{B2} et \epoch{A9} forment donc l'ensemble des \emph{époques requises}.
-Le noeud A déduit que les époques \epoch{0}, \epoch{A1} et \epoch{A8} peuvent être supprimées de manière sûre.
+Pour ce faire, il détermine le \ac{LCA} des \emph{potentielles époques courantes} : \epoch{B3}.
+Il génère ensuite l'ensemble des \emph{époques requises} en ajoutant toutes les époques formant les chemins entre \epoch{B3} et les \emph{potentielles époques courantes}.
+Les époques \epoch{B3} et \epoch{A9} forment donc l'ensemble des \emph{époques requises}.
+Le noeud A déduit que les époques \epoch{0}, \epoch{A2} et \epoch{A8} peuvent être supprimées de manière sûre.
 
-À l'inverse, la livraison de l'opération $\trm{rename}$ vers \epoch{A1} au noeud B ne lui permet pas de supprimer la moindre métadonnée.
-À partir de ses connaissances, le noeud B calcule que \epoch{A1}, \epoch{B2} et \epoch{B7} forment l'ensemble des \emph{potentielles époques courantes}.
+À l'inverse, la livraison de l'opération $\trm{rename}$ vers \epoch{A2} au noeud B ne lui permet pas de supprimer la moindre métadonnée.
+À partir de ses connaissances, le noeud B calcule que \epoch{A2}, \epoch{B3} et \epoch{B7} forment l'ensemble des \emph{potentielles époques courantes}.
 De cette information, le noeud B détermine que ces époques et leur \ac{LCA} forment l'ensemble des \emph{époques requises}.
 Toute époque connue appartient donc à l'ensemble des \emph{époques requises}, empêchant leur suppression.
 
