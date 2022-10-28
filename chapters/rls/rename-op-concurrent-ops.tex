@@ -8,22 +8,22 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
         \newcommand\nodeh[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
         }
         \newcommand\nodee[1]{
-            node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
         }
         \newcommand\nodelo[1]{
-            node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
         }
         \newcommand\renhelo[1]{
-            node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0..3}$}] {HELO}
+            node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{0..3}$}] {HELO}
         }
         \newcommand\nodel[1]{
-            node[letter, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
         \newcommand\crossl[1]{
-            node[letter, cross, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, cross, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
 
         \newcommand\initialstate[3]{
@@ -72,7 +72,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
             ++(0:0.5) node (a) {}
             +(0:20) node (a-end) {}
             +(0:2) node[point] (a-initial) {}
-            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
+            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,2)$}}] (a-ren-a1) {}
             +(0:14) node[point] (a-recv-ins-l) {}
             +(0:18) node (a-final) {};
 
@@ -88,7 +88,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
             ++(0:0.5) node (b) {}
             +(0:20) node (b-end) {}
             +(0:2) node[point] (b-initial) {}
-            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}({\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}},L)$}}] (b-ins-l) {}
+            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}({\coloridthree\betterid{i}{B1}{0}\betterid{m}{B2}{0}},L)$}}] (b-ins-l) {}
             +(0:18) node (b-final) {};
 
 
@@ -105,9 +105,9 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
   \label{fig:concurrent-insert-rename-inconsistent}
 \end{figure}
 
-Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B0}{0}\id{m}{B1}{0} et diffuse cette modification, de manière concurrente à l'opération $\trm{rename}$ décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
+Dans cet exemple, le noeud B insère un nouvel élément "L", lui assigne l'identifiant \id{i}{B1}{0}\id{m}{B2}{0} et diffuse cette modification, de manière concurrente à l'opération $\trm{rename}$ décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent}.
 À la réception de l'opération $\trm{insert}$, le noeud A ajoute l'élément inséré au sein de sa séquence, en utilisant l'identifiant de l'élément pour déterminer sa position.
-Cependant, puisque les identifiants ont été modifiés par l'opération $\trm{rename}$ concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A1}{3} $\lid$ \id{i}{B0}{0}\id{m}{B1}{0}) au lieu de l'insérer à la position souhaitée.
+Cependant, puisque les identifiants ont été modifiés par l'opération $\trm{rename}$ concurrente, le noeud A insère le nouvel élément à la fin de sa séquence (puisque \id{i}{A2}{3} $\lid$ \id{i}{B1}{0}\id{m}{B2}{0}) au lieu de l'insérer à la position souhaitée.
 Comme illustré par cet exemple, appliquer naivement les modifications concurrentes provoquerait des anomalies.
 Il est donc nécessaire de traiter les opérations concurrentes aux opérations $\trm{rename}$ de manière particulière.
 
@@ -115,7 +115,7 @@ Tout d'abord, les noeuds doivent détecter les opérations concurrentes aux opé
 Pour cela, nous utilisons un système basé sur des \emph{époques}.
 Initialement, la séquence répliquée débute à l'époque \emph{origine} notée \epoch{0}.
 Chaque opération $\trm{rename}$ introduit une nouvelle époque et permet aux noeuds d'y avancer depuis l'époque précédente.
-Par exemple, l'opération $\trm{rename}$ décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A1}.
+Par exemple, l'opération $\trm{rename}$ décrite dans la \autoref{fig:concurrent-insert-rename-inconsistent} permet aux noeuds de faire progresser leur état de \epoch{0} à \epoch{A2}.
 Nous définissons les époques de la manière suivante :
 
 \begin{definition}[Époque]
@@ -185,28 +185,28 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
         \newcommand\nodeh[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
         }
         \newcommand\nodee[1]{
-            node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
         }
         \newcommand\nodelo[1]{
-            node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
         }
         \newcommand\renhelo[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..3}$}] {HELO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..3}$}] {HELO}
         }
         \newcommand\nodel[1]{
-            node[letter, fill=\colorblockthree,label=#1:{\coloridthree$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockthree,label=#1:{\coloridthree$\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
         \newcommand\renhe[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..1}$}] {HE}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..1}$}] {HE}
         }
         \newcommand\renl[1]{
-            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A1}{1}\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
         \newcommand\renlo[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{2..3}$}] {LO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{2..3}$}] {LO}
         }
 
         \newcommand\initialstate[3]{
@@ -225,7 +225,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renhelo{-#3};
         }
 
@@ -246,7 +246,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renhe{-#3}
                 ++(0:\widthblock) \renl{#3}
                 ++(0:\widthletter) \renlo{-#3};
@@ -260,7 +260,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
             ++(0:0.5) node (a) {}
             +(0:20) node (a-end) {}
             +(0:2) node[point] (a-initial) {}
-            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(\betterepoch{0}, A,1)$}}] (a-ren-a1) {}
+            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(\betterepoch{0}, A,2)$}}] (a-ren-a1) {}
             +(0:14) node[point] (a-recv-ins-l) {}
             +(0:18) node (a-final) {};
 
@@ -276,7 +276,7 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
             ++(0:0.5) node (b) {}
             +(0:20) node (b-end) {}
             +(0:2) node[point] (b-initial) {}
-            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}(\betterepoch{0}, {\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}},L)$}}] (b-ins-l) {}
+            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}(\betterepoch{0}, {\coloridthree\betterid{i}{B1}{0}\betterid{m}{B2}{0}},L)$}}] (b-ins-l) {}
             +(0:18) node (b-final) {};
 
 
@@ -294,9 +294,9 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
 \end{figure}
 
 L'algorithme procède de la manière suivante.
-Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B0}{0}\id{m}{B1}{0} dans l'ancien état : \id{i}{B0}{0}\id{f}{A0}{0} (ligne \ref{alg:renameId-find-predecessor}).
-Ensuite, il calcule l'équivalent de \id{i}{B0}{0}\id{f}{A0}{0} dans l'état renommé : \id{i}{A1}{1} (ligne \ref{alg:renameId-rename-predecessor}).
-Finalement, le noeud A concatène (noté $\oplus$) cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} (ligne \ref{alg:renameId-concat-predecessor}).
+Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B1}{0}\id{m}{B2}{0} dans l'ancien état : \id{i}{B1}{0}\id{f}{A1}{0} (ligne \ref{alg:renameId-find-predecessor}).
+Ensuite, il calcule l'équivalent de \id{i}{B1}{0}\id{f}{A1}{0} dans l'état renommé : \id{i}{A2}{1} (ligne \ref{alg:renameId-rename-predecessor}).
+Finalement, le noeud A concatène (noté $\oplus$) cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} (ligne \ref{alg:renameId-concat-predecessor}).
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
 
 \textsc{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
