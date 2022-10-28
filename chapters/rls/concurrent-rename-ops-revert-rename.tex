@@ -3,8 +3,8 @@
 À présent, nous développons le scénario présenté dans la \autoref{fig:conflicting-rename-operations}.
 Dans la \autoref{fig:revertRenameId}, le noeud A reçoit l'opération $\trm{rename}$ du noeud B.
 Cette opération est concurrente à l'opération $\trm{rename}$ que le noeud A a appliqué précédemment.
-D'après la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B2} comme l'époque cible (\epoch{A1} \lepoch \epoch{B2}).
-Mais pour pouvoir renommer son état vers l'époque \epoch{B2}, il doit au préalable faire revenir son état courant de l'époque \epoch{A1} à un état équivalent à l'époque \epoch{0}.
+D'après la relation \emph{priority} proposée, le noeud A sélectionne l'époque introduite \epoch{B3} comme l'époque cible (\epoch{A2} \lepoch \epoch{B3}).
+Mais pour pouvoir renommer son état vers l'époque \epoch{B3}, il doit au préalable faire revenir son état courant de l'époque \epoch{A2} à un état équivalent à l'époque \epoch{0}.
 Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'une opération $\trm{rename}$ appliquée précédemment.
 
 \begin{figure}[!ht]
@@ -12,31 +12,31 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
         \newcommand\nodeh[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+            node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
         }
         \newcommand\nodee[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
         }
         \newcommand\nodelo[1]{
-            node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+            node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
         }
         \newcommand\renhelo[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {HELO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..3}$}] {HELO}
         }
         \newcommand\nodel[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockthree,label=#1:{\coloridthree$\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
         \newcommand\renhe[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{0..1}$}] {HE}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..1}$}] {HE}
         }
         \newcommand\renl[1]{
-            node[letter, label=#1:{$\betterid{i}{A1}{1}\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{m}{B2}{0}$}] {L}
         }
         \newcommand\renlo[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{2..3}$}] {LO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{2..3}$}] {LO}
         }
         \newcommand\renhello[1]{
-            node[block, label=#1:{$\betterid{i}{B2}{0..4}$}] {HELLO}
+            node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{i}{B3}{0..4}$}] {HELLO}
         }
 
         \newcommand\initialstate[3]{
@@ -55,7 +55,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renhelo{-#3};
         }
 
@@ -76,7 +76,7 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renhe{-#3}
                 ++(0:\widthblock) \renl{#3}
                 ++(0:\widthletter) \renlo{-#3};
@@ -86,29 +86,29 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renhe{-#3}
                 ++(0:\widthblock) \renl{#3}
                 ++(0:\widthletter) \renlo{-#3}
-                ++(0:\widthblock) node (ea1-right) {}
+                ++(0:\widthblock) node (eA2-right) {}
                 ++(0:1.5) node[epoch] (e0-left) {\epoch{0}}
                 ++(0:1.05 * \widthoriginepoch) \nodeh{-#3}
                 ++(0:\widthletter) \nodee{#3}
                 ++(0:\widthletter) \nodel{-#3}
                 ++(0:\widthletter) \nodelo{#3}
                 ++(0:\widthblock) node (e0-right) {}
-                ++(0:1.5) node[epoch] (eb2-left) {\epoch{B2}}
+                ++(0:1.5) node[epoch] (eB3-left) {\epoch{B3}}
                 ++(0:1.3 * \widthepoch) \renhello{#3};
 
-                \draw[->, loosely dash dot, shorten >= 1] (ea1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
-                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{B2}} (eb2-left);
+                \draw[->, loosely dash dot, shorten >= 1] (eA2-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
+                \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{B3}} (eB3-left);
         }
         \newcommand\finalstateb[3]{
             \path
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{B2}}
+                ++(#3:0.5) node[epoch] {\epoch{B3}}
                 ++(0:1.3 * \widthepoch) \renhello{#3};
         }
 
@@ -121,33 +121,33 @@ Nous devons définir un mécanisme permettant aux noeuds d'annuler les effets d'
             +(0:26) node (a-end) {}
             +(0:1) node[point] (a-initial) {}
             +(0:5) node[point] (a-recv-ins-l) {}
-            +(0:12) node[point] (a-recv-ren-b2) {}
+            +(0:12) node[point] (a-recv-ren-B3) {}
             +(0:25) node (a-final) {};
 
         \ren{(a-initial)}{\offseta}{90};
         \recvrenl{(a-recv-ins-l)}{\offseta}{90};
-        \finalstatea{(a-recv-ren-b2)}{\offseta}{90};
+        \finalstatea{(a-recv-ren-B3)}{\offseta}{90};
 
         \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-        \draw[->, thick] (a-initial) --  (a-recv-ins-l) -- (a-recv-ren-b2) -- (a-final);
+        \draw[->, thick] (a-initial) --  (a-recv-ins-l) -- (a-recv-ren-B3) -- (a-final);
 
         \path
             ++(270:3) node {\textbf{B}}
             ++(0:0.5) node (b) {}
             +(0:26) node (b-end) {}
-            +(0:1) node[point, label={[xshift=20pt]10:{$\trm{ins}(\betterepoch{0}, \betterid{i}{B0}{0}\betterid{m}{B1}{0},L)$}}] (b-initial) {}
-            +(0:8) node[point, label=170:{$\trm{ren}()$}, label={[xshift=30pt]10:{$\trm{ren}(\betterepoch{0}, B,2)$}}] (b-ren-b2) {}
+            +(0:1) node[point, label={[xshift=20pt]10:{$\trm{ins}(\betterepoch{0}, {\coloridthree\betterid{i}{B1}{0}\betterid{m}{B2}{0}},L)$}}] (b-initial) {}
+            +(0:8) node[point, label=170:{$\trm{ren}()$}, label={[xshift=30pt]10:{$\trm{ren}(\betterepoch{0}, B,3)$}}] (b-ren-B3) {}
             +(0:25) node (b-final) {};
 
 
         \insl{(b-initial)}{\offsetb}{-90};
-        \finalstateb{(b-ren-b2)}{\offsetb}{-90};
+        \finalstateb{(b-ren-B3)}{\offsetb}{-90};
 
         \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-        \draw[->, thick] (b-initial) --  (b-ren-b2) -- (b-final);
+        \draw[->, thick] (b-initial) --  (b-ren-B3) -- (b-final);
 
         \draw[->, dashed, shorten >= 1] (b-initial) -- (a-recv-ins-l);
-        \draw[->, dashed, shorten >= 1] (b-ren-b2) -- (a-recv-ren-b2);
+        \draw[->, dashed, shorten >= 1] (b-ren-B3) -- (a-recv-ren-B3);
     \end{tikzpicture}
   }
   \caption{Annulation d'une opération $\trm{rename}$ intégrée précèdemment en présence d'un identifiant inséré en concurrence}
@@ -219,7 +219,7 @@ Les objectifs de \textsc{revertRenameId} sont les suivants :
 Le cas \ref{item:revert-rename-1} est le plus trivial.
 Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \textsc{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
 En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
-Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A1}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B0}{0} (ligne \ref{alg:revertRenameId-case-i}).
+Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A2}{0} a pour offset 0, \textsc{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B1}{0} (ligne \ref{alg:revertRenameId-case-i}).
 
 Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
 Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
@@ -235,18 +235,18 @@ Nous avons alors :
 \[\trm{newId} \in ]\trm{newPredId~predId}, \trm{newPredId~succId}[\]
 Dans cette situation, $\trm{newId}$ a été obtenu en utilisant \textsc{renIdFromPredId} et nous avons $\trm{id} = \trm{tail}$.
 Nous observons qu'en renvoyant $\trm{tail}$, \textsc{revertRenameId} valident les deux contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
-Pour illustrer ce cas, considérons l'identifiant \id{i}{A1}{1}\id{i}{B0}{0}\id{m}{B1}{0} dans la \autoref{fig:revertRenameId}.
+Pour illustrer ce cas, considérons l'identifiant \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} dans la \autoref{fig:revertRenameId}.
 Pour cet identifiant, nous avons :
 \begin{itemize}
-  \item $newPredId = $\id{i}{A1}{1}, donc $predId = $\id{i}{B0}{0}\id{f}{A0}{0} d'après le cas \ref{item:revert-rename-1}.
-  \item $newSuccId = $\id{i}{A1}{2}, donc $succId = $\id{i}{B0}{1} d'après le cas \ref{item:revert-rename-1}.
+  \item $newPredId = $\id{i}{A2}{1}, donc $predId = $\id{i}{B1}{0}\id{f}{A1}{0} d'après le cas \ref{item:revert-rename-1}.
+  \item $newSuccId = $\id{i}{A2}{2}, donc $succId = $\id{i}{B1}{1} d'après le cas \ref{item:revert-rename-1}.
 \end{itemize}
 Nous avons donc bien :
-\[i^{A1}_{1}i^{B0}_{0}m^{B1}_{0} \in ]i^{A1}_{1}i^{B0}_{0}f^{A0}_{0}, i^{A1}_{1}i^{B0}_{1}[\]
-et $tail = $\id{i}{B0}{0}\id{m}{B1}{0}.
+\[i^{A2}_{1}i^{B1}_{0}m^{B2}_{0} \in ]i^{A2}_{1}i^{B1}_{0}f^{A1}_{0}, i^{A2}_{1}i^{B1}_{1}[\]
+et $tail = $\id{i}{B1}{0}\id{m}{B2}{0}.
 Renvoyer cette valeur (ligne \ref{alg:revertRenameId-case-ii}) nous permet ainsi de conserver l'ordre entre les identifiants puisque :
 
-\[i^{B0}_{0}f^{A0}_{0} <_{id} i^{B0}_{0}m^{B1}_{0} <_{id} i^{B0}_{1}\]
+\[i^{B1}_{0}f^{A1}_{0} <_{id} i^{B1}_{0}m^{B2}_{0} <_{id} i^{B1}_{1}\]
 
 Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
 $\trm{newId}$ ne peut avoir été inséré que causalement après l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-3}).
@@ -265,34 +265,34 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
             \newcommand\nodew[1]{
-                node[letter, label=#1:{$\betterid{k}{D0}{0}$}] {W}
+                node[letter, label=#1:{$\betterid{k}{D1}{0}$}] {W}
             }
             \newcommand\nodeo[1]{
-                node[letter, label=#1:{$\betterid{n}{C0}{0}$}] {O}
+                node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{n}{C1}{0}$}] {O}
             }
             \newcommand\noded[1]{
-                node[letter, label=#1:{$\betterid{o}{D1}{0}$}] {D}
+                node[letter, label=#1:{$\betterid{o}{D2}{0}$}] {D}
             }
             \newcommand\renwod[1]{
-                node[block, label=#1:{$\betterid{k}{C1}{0..2}$}] {WOD}
+                node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{0..2}$}] {WOD}
             }
             \newcommand\renwo[1]{
-                node[block, label=#1:{$\betterid{k}{C1}{0..1}$}] {WO}
+                node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{0..1}$}] {WO}
             }
             \newcommand\renl[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{C2}{1}\betterid{n}{C1}{0}\betterid{e}{D3}{0}$}] {L}
             }
             \newcommand\rend[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{2}$}] {D}
+                node[letter, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{2}$}] {D}
             }
             \newcommand\renr[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{i}{C2}{0}$}] {R}
+                node[letter, label=#1:{$\betterid{k}{C2}{1}\betterid{i}{C3}{0}$}] {R}
             }
             \newcommand\nodel[1]{
-                node[letter, label=#1:{$\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+                node[letter, fill=\colorblockthree, label=#1:{\coloridthree$\betterid{n}{C1}{0}\betterid{e}{D3}{0}$}] {L}
             }
             \newcommand\renwold[1]{
-                node[block, label=#1:{$\betterid{k}{D3}{0..3}$}] {WOLD}
+                node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{0..3}$}] {WOLD}
             }
 
             \newcommand\initialstate[3]{
@@ -311,7 +311,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwod{-#3};
             }
 
@@ -320,7 +320,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwo{-#3}
                     ++(0:\widthblock) \renl{#3}
                     ++(0:\widthletter) \rend{-#3};
@@ -331,7 +331,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwo{-#3}
                     ++(0:\widthblock) \renr{#3}
                     ++(0:\widthletter) \renl{-#3}
@@ -355,7 +355,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{D3}}
+                    ++(#3:0.5) node[epoch] {\epoch{D4}}
                     ++(0:1.3 * \widthepoch) \renwold{-#3};
             }
 
@@ -367,34 +367,34 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                 ++(0:0.5) node (c) {}
                 +(0:27) node (c-end) {}
                 +(0:1) node[point] (c-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(\betterepoch{0}, C,1)$}}] (c-ren-c1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(\betterepoch{0}, C,2)$}}] (c-ren-C2) {}
                 +(0:13) node[point] (c-recv-ins-l) {}
-                +(0:21) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C1}, \betterid{k}{C1}{1}\betterid{i}{C2}{0},R)$}}] (c-ins-r) {}
+                +(0:21) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C2}, \betterid{k}{C2}{1}\betterid{i}{C3}{0},R)$}}] (c-ins-r) {}
                 +(0:26) node (c-final) {};
 
             \initialstate{(c-initial)}{\offsetc}{90};
-            \renc{(c-ren-c1)}{\offsetc}{90};
+            \renc{(c-ren-C2)}{\offsetc}{90};
             \recvrenl{(c-recv-ins-l)}{\offsetc}{90};
             \insr{(c-ins-r)}{\offsetc}{90};
 
             \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
-            \draw[->, thick] (c-initial) --  (c-ren-c1) -- (c-recv-ins-l) -- (c-ins-r) -- (c-final);
+            \draw[->, thick] (c-initial) --  (c-ren-C2) -- (c-recv-ins-l) -- (c-ins-r) -- (c-final);
 
             \path
                 ++(270:3) node {\textbf{D}}
                 ++(0:0.5) node (d) {}
                 +(0:27) node (d-end) {}
                 +(0:1) node[point] (d-initial) {}
-                +(0:8) node[point, label=170:{$\trm{ins}(O \prec L \prec D)$}, label={[xshift=30pt]10:{$\trm{ins}(\betterepoch{0}, \betterid{n}{C0}{0}\betterid{e}{D2}{0},L)$}}] (d-ins-l) {}
-                +(0:21) node[point, label=170:{$\trm{ren}()$}, label={[xshift=0pt]10:{$\trm{ren}(\betterepoch{0}, D,3)$}}] (d-ren-d3) {}
+                +(0:8) node[point, label=170:{$\trm{ins}(O \prec L \prec D)$}, label={[xshift=30pt]10:{$\trm{ins}(\betterepoch{0}, {\coloridthree\betterid{n}{C1}{0}\betterid{e}{D3}{0}},L)$}}] (d-ins-l) {}
+                +(0:21) node[point, label=170:{$\trm{ren}()$}, label={[xshift=0pt]10:{$\trm{ren}(\betterepoch{0}, D,4)$}}] (d-ren-D4) {}
                 +(0:26) node (d-final) {};
 
             \initialstate{(d-initial)}{\offsetd}{-90};
             \insl{(d-ins-l)}{\offsetd}{-90};
-            \rendwold{(d-ren-d3)}{\offsetd}{-90};
+            \rendwold{(d-ren-D4)}{\offsetd}{-90};
 
             \draw[dotted] (d) -- (d-initial) (d-final) -- (d-end);
-            \draw[->, thick] (d-initial) -- (d-ins-l) --  (d-ren-d3) -- (d-final);
+            \draw[->, thick] (d-initial) -- (d-ins-l) --  (d-ren-D4) -- (d-final);
 
             \draw[->, dashed, shorten >= 1] (d-ins-l) -- (c-recv-ins-l);
         \end{tikzpicture}
@@ -408,47 +408,47 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
       \resizebox{\columnwidth}{!}{
         \begin{tikzpicture}
             \newcommand\nodew[1]{
-                node[letter, label=#1:{$\betterid{k}{D0}{0}$}] {W}
+                node[letter, label=#1:{$\betterid{k}{D1}{0}$}] {W}
             }
             \newcommand\nodeo[1]{
-                node[letter, label=#1:{$\betterid{n}{C0}{0}$}] {O}
+                node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{n}{C1}{0}$}] {O}
             }
             \newcommand\noded[1]{
-                node[letter, label=#1:{$\betterid{o}{D1}{0}$}] {D}
+                node[letter, label=#1:{$\betterid{o}{D2}{0}$}] {D}
             }
             \newcommand\renwod[1]{
-                node[block, label=#1:{$\betterid{k}{C1}{0..2}$}] {WOD}
+                node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{0..2}$}] {WOD}
             }
             \newcommand\renwo[1]{
-                node[block, label=#1:{$\betterid{k}{C1}{0..1}$}] {WO}
+                node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{0..1}$}] {WO}
             }
             \newcommand\renl[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{C2}{1}\betterid{n}{C1}{0}\betterid{e}{D3}{0}$}] {L}
             }
             \newcommand\rend[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{2}$}] {D}
+                node[letter, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{k}{C2}{2}$}] {D}
             }
             \newcommand\renr[1]{
-                node[letter, label=#1:{$\betterid{k}{C1}{1}\betterid{i}{C2}{0}$}] {R}
+                node[letter, label=#1:{$\betterid{k}{C2}{1}\betterid{i}{C3}{0}$}] {R}
             }
             \newcommand\nodel[1]{
-                node[letter, label=#1:{$\betterid{n}{C0}{0}\betterid{e}{D2}{0}$}] {L}
+                node[letter, fill=\colorblockthree, label=#1:{\coloridthree$\betterid{n}{C1}{0}\betterid{e}{D3}{0}$}] {L}
             }
             \newcommand\renwold[1]{
-                node[block, label=#1:{$\betterid{k}{D3}{0..3}$}] {WOLD}
+                node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{0..3}$}] {WOLD}
             }
             \newcommand\noder[1]{
-                node[letter, label=#1:{$\betterid{n}{C0}{0}\bott\betterid{i}{C2}{0}$}] {R}
+                node[letter, label=#1:{$\betterid{n}{C1}{0}\bott\betterid{i}{C3}{0}$}] {R}
             }
             \newcommand\rendwo[1]{
-                node[block, label=#1:{$\betterid{k}{D3}{0..1}$}] {WO}
+                node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{0..1}$}] {WO}
             }
             \newcommand\rendr[1]{
-                node[letter, label=#1:{$\betterid{k}{D3}{1}\betterid{n}{C0}{0}\bott\betterid{i}{C2}{0}$}] {R}
+                node[letter, label=#1:{$\betterid{k}{D4}{1}\betterid{n}{C1}{0}\bott\betterid{i}{C3}{0}$}] {R}
             }
 
             \newcommand\rendld[1]{
-                node[block, label=#1:{$\betterid{k}{D3}{2..3}$}] {LD}
+                node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{2..3}$}] {LD}
             }
 
             \newcommand\insr[3]{
@@ -456,7 +456,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwo{-#3}
                     ++(0:\widthblock) \renr{#3}
                     ++(0:\widthletter) \nodel{-#3}
@@ -468,7 +468,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwo{-#3}
                     ++(0:\widthblock) \renr{#3}
                     ++(0:\widthletter) \renl{-#3}
@@ -480,12 +480,12 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{C1}}
+                    ++(#3:0.5) node[epoch] {\epoch{C2}}
                     ++(0:1.3 * \widthepoch) \renwo{-#3}
                     ++(0:\widthblock) \renr{#3}
                     ++(0:\widthletter) \renl{-#3}
                     ++(0:\widthletter) \rend{#3}
-                    ++(0:\widthletter) node (ec1-right) {}
+                    ++(0:\widthletter) node (eC2-right) {}
                     ++(0:1.5) node[epoch] (e0-left) {\epoch{0}}
                     ++(0:1.05 * \widthoriginepoch) \nodew{-#3}
                     ++(0:\widthletter) \nodeo{#3}
@@ -493,13 +493,13 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     ++(0:\widthletter) \nodel{#3}
                     ++(0:\widthletter) \noded{-#3}
                     ++(0:\widthletter) node (e0-right) {}
-                    ++(0:1.5) node[epoch] (ed3-left) {\epoch{D3}}
+                    ++(0:1.5) node[epoch] (eD4-left) {\epoch{D4}}
                     ++(0:1.3 * \widthepoch) \rendwo{-#3}
                     ++(0:\widthblock) \rendr{#3}
                     ++(0:\widthletter) \rendld{-#3};
 
-                    \draw[->, loosely dash dot, shorten >= 1] (ec1-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
-                    \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{D3}} (ed3-left);
+                    \draw[->, loosely dash dot, shorten >= 1] (eC2-right) --  node[above, align=center]{\emph{revert}\\ \emph{to} \epoch{0}} (e0-left);
+                    \draw[->, loosely dash dot, shorten >= 1] (e0-right) --  node[above, align=center]{$\trm{rename}$\\ \emph{to} \epoch{D4}} (eD4-left);
             }
 
             \newcommand\rendwold[3]{
@@ -507,7 +507,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                     #1
                     ++#2
                     ++(0:0.5)
-                    ++(#3:0.5) node[epoch] {\epoch{D3}}
+                    ++(#3:0.5) node[epoch] {\epoch{D4}}
                     ++(0:1.3 * \widthepoch) \renwold{-#3};
             }
 
@@ -519,20 +519,20 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
                 ++(0:0.5) node (c) {}
                 +(0:26) node (c-end) {}
                 +(0:1) node[point] (c-initial) {}
-                +(0:9) node[point] (c-recv-ren-d3) {}
+                +(0:9) node[point] (c-recv-ren-D4) {}
                 +(0:25) node (c-final) {};
 
             \rencworld{(c-initial)}{\offsetc}{90};
-            \rendworld{(c-recv-ren-d3)}{\offsetc}{90};
+            \rendworld{(c-recv-ren-D4)}{\offsetc}{90};
 
             \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
-            \draw[->, thick] (c-initial) -- (c-recv-ren-d3) -- (c-final);
+            \draw[->, thick] (c-initial) -- (c-recv-ren-D4) -- (c-final);
 
             \path
                 ++(270:3) node {\textbf{D}}
                 ++(0:0.5) node (d) {}
                 +(0:26) node (d-end) {}
-                +(0:1) node[point, label={[xshift=45pt]10:{$\trm{ren}(\betterepoch{0}, D,3)$}}] (d-initial) {}
+                +(0:1) node[point, label={[xshift=45pt]10:{$\trm{ren}(\betterepoch{0}, D,4)$}}] (d-initial) {}
                 +(0:25) node (d-final) {};
 
             \rendwold{(d-initial)}{\offsetd}{-90};
@@ -540,7 +540,7 @@ Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mint
             \draw[dotted] (d) -- (d-initial) (d-final) -- (d-end);
             \draw[->, thick] (d-initial) -- (d-final);
 
-            \draw[->, dashed, shorten >= 1] (d-initial) -- (c-recv-ren-d3);
+            \draw[->, dashed, shorten >= 1] (d-initial) -- (c-recv-ren-D4);
         \end{tikzpicture}
         }
         \label{fig:revertRenameId-mintuple-revert}
@@ -559,27 +559,27 @@ En parallèle, le noeud D effectue un renommage de son état.
 Cette opération $\trm{rename}$ est donc concurrente à l'opération $\trm{rename}$ générée précédemment par C.
 
 Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération $\trm{rename}$ de D est livrée au noeud C.
-L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C1} \lepoch \epoch{D3}), le noeud C procède à l'annulation de son opération $\trm{rename}$.
+L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C2} \lepoch \epoch{D4}), le noeud C procède à l'annulation de son opération $\trm{rename}$.
 
-L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération $\trm{rename}$ annulée : \id{k}{C1}{1}\id{i}{C2}{0}.
+L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération $\trm{rename}$ annulée : \id{k}{C2}{1}\id{i}{C3}{0}.
 Cet identifiant est compris entre les identifiants suivants :
-\[k^{C1}_{1} <_{id} k^{C1}_{1}i^{C2}_{0} <_{id} k^{C1}_{1}n^{C0}_{0}e^{D2}_{0}\]
+\[k^{C2}_{1} <_{id} k^{C2}_{1}i^{C3}_{0} <_{id} k^{C2}_{1}n^{C1}_{0}e^{D3}_{0}\]
 D'après les règles présentées précédemment :
 \begin{itemize}
-  \item \id{k}{C1}{1} est transformé en \id{n}{C0}{0} (cas \ref{item:revert-rename-1}, ligne \ref{alg:revertRenameId-case-i}).
-  \item \id{k}{C1}{1}\id{n}{C0}{0}\id{e}{D2}{0} est transformé en \id{n}{C0}{0}\id{e}{D2}{0} (cas \ref{item:revert-rename-2}, ligne \ref{alg:revertRenameId-case-ii}).
+  \item \id{k}{C2}{1} est transformé en \id{n}{C1}{0} (cas \ref{item:revert-rename-1}, ligne \ref{alg:revertRenameId-case-i}).
+  \item \id{k}{C2}{1}\id{n}{C1}{0}\id{e}{D3}{0} est transformé en \id{n}{C1}{0}\id{e}{D3}{0} (cas \ref{item:revert-rename-2}, ligne \ref{alg:revertRenameId-case-ii}).
 \end{itemize}
-Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C1}{1}\id{i}{C2}{0} tel que :
-\[n^{C0}_{0} <_{id} \trm{id} <_{id} n^{C0}_{0}e^{D2}_{0}\]
+Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C2}{1}\id{i}{C3}{0} tel que :
+\[n^{C1}_{0} <_{id} \trm{id} <_{id} n^{C1}_{0}e^{D3}_{0}\]
 
-Utiliser $\trm{predId}$ (\id{n}{C0}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$.
+Utiliser $\trm{predId}$ (\id{n}{C1}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$.
 Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la \autoref{prop:order}.
-En effet, nous obtiendrions $\trm{id} = $ \id{n}{C0}{0}\id{i}{C2}{0}, or \id{n}{C0}{0}\id{i}{C2}{0} $\nless_{id}$ \id{n}{C0}{0}\id{e}{D2}{0}.
+En effet, nous obtiendrions $\trm{id} = $ \id{n}{C1}{0}\id{i}{C3}{0}, or \id{n}{C1}{0}\id{i}{C3}{0} $\nless_{id}$ \id{n}{C1}{0}\id{e}{D3}{0}.
 
 Ainsi, nous devons choisir un autre préfixe dans cette situation, notamment pour garantir que l'identifiant résultant sera plus petit que les identifiants suivants.
 C'est pour cela que nous introduisons $\trm{minTuple}$.
-En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C0}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C0}{0}\id{e}{D2}{0}.
-Nous obtenons donc $\trm{id} = $ \id{n}{C0}{0}$\bott$\id{i}{C2}{0}, ce qui respecte la \autoref{prop:order}.
+En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C1}{0}\id{e}{D3}{0}.
+Nous obtenons donc $\trm{id} = $ \id{n}{C1}{0}$\bott$\id{i}{C3}{0}, ce qui respecte la \autoref{prop:order}.
 
 Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
 Nous avons alors :
@@ -589,7 +589,7 @@ Pour générer ce préfixe, \textsc{revertRenameId} utilise  $\trm{predOfSuccId}
 $\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
 Ainsi, pour préserver l'ordre souhaité, \textsc{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.
 
-% Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B2}.
+% Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \textsc{revertRenameId}, il peut appliquer \textsc{renameId} pour calculer l'état correspondant à \epoch{B3}.
 
 Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \textsc{revertRenameId}.
 Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).
