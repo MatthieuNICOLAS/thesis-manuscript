@@ -22,7 +22,7 @@ S'il s'agit d'un nouveau dot, le module de livraison peut livrer l'opération au
 Le cas échéant, cela indique que l'opération a déjà été livrée précédemment et doit être ignorée cette fois-ci.
 
 Plusieurs structures de données sont adaptées pour maintenir l'ensemble des opérations reçues.
-Dans le cadre de MUTE, nous avons choisi d'utiliser un vecteur de version.
+Dans le cadre de MUTE, nous avons choisi d'utiliser un vecteur de versions.
 Cette structure nous permet de réduire à un dot par noeud le surcoût en métadonnées du module de livraison, puisqu'il ne nécessite que de stocker le dot le plus récent par noeud.
 Cette structure permet aussi de vérifier en temps constant si une opération est déjà connue.
 La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
@@ -151,27 +151,27 @@ La \autoref{fig:exactly-once-delivery} illustre son fonctionnement.\\
 Dans cet exemple, deux noeuds A et B répliquent une séquence.
 Initialement, celle-ci contient les éléments "WOLD".
 Ces éléments ont été insérés un par un par le noeud A, donc par le biais des opérations $a_1$ à $a_4$.
-Le module de livraison de chaque noeud maintient donc initialement le vecteur de version $\langle A:4 \rangle$.
+Le module de livraison de chaque noeud maintient donc initialement le vecteur de versions $\langle A:4 \rangle$.
 
 Le noeud A insère l'élément "R" entre les éléments "O" et "L".
 Cette modification est alors labellisée $a_5$ par son module de livraison et est envoyée au noeud B.
-À la réception de cette opération, le module de B compare son dot avec son vecteur de version local.
-L'opération $a_5$ étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors livrée au \ac{CRDT} et le vecteur de version est mis à jour.
+À la réception de cette opération, le module de B compare son dot avec son vecteur de versions local.
+L'opération $a_5$ étant la prochaine opération attendue de A, celle-ci est acceptée : elle est alors livrée au \ac{CRDT} et le vecteur de versions est mis à jour.
 
 Le noeud B supprime ensuite l'élément nouvellement inséré.
-S'agissant de la première modification de B, cette modification $b_1$ ajoute l'entrée correspondante dans le vecteur de version $\langle A:5, B:1 \rangle$.
+S'agissant de la première modification de B, cette modification $b_1$ ajoute l'entrée correspondante dans le vecteur de versions $\langle A:5, B:1 \rangle$.
 L'opération est envoyée au noeud A.
 Cette opération étant la prochaine opération attendue de B, elle est acceptée et livrée.
 
 Finalement, le noeud B reçoit de nouveau l'opération $a_5$.
-Son module de livraison détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de version $\langle A:5, B:1 \rangle$.
+Son module de livraison détermine alors qu'il s'agit d'un doublon : l'opération apparaît déjà dans le vecteur de versions $\langle A:5, B:1 \rangle$.
 L'opération est donc ignorée, et la résurgence de l'élément "I" empêchée.\\
 
 Il est à noter que dans le cas où un noeud recevrait une opération avec un dot plus élevé que celui attendu (\eg le noeud A recevrait une opération $b_3$ à la fin de l'exemple), cette opération serait mise en attente.
-En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de version à $\langle A:5,B:3 \rangle$ et masquerait le fait que l'opération $b_2$ n'a jamais été reçue.
+En effet, livrer cette opération nécessiterait de mettre à jour le vecteur de versions à $\langle A:5,B:3 \rangle$ et masquerait le fait que l'opération $b_2$ n'a jamais été reçue.
 L'opération $b_3$ est donc mise en attente jusqu'à la livraison de l'opération $b_2$.
 
-Ainsi, l'implémentation de livraison en exactement un exemplaire d'une opération avec un vecteur de version comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
+Ainsi, l'implémentation de livraison en exactement un exemplaire d'une opération avec un vecteur de versions comme structure de données force une livraison \ac{FIFO} des opérations par noeuds.
 Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
 Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme de livraison en exactement un exemplaire et son impact sur l'expérience utilisateur.\\
 

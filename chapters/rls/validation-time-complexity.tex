@@ -128,10 +128,10 @@ Nous récapitulons les complexités en temps présentées précédemment dans le
 Pour compléter notre analyse théorique des performances de RenamableLogootSplit, nous proposons une analyse en complexité en temps du mécanisme présenté en \autoref{sec:gc-mechanism} qui permet de supprimer les époques devenues obsolètes et de récupérer la mémoire occupée par leur \emph{ancien état} respectif.
 
 L'algorithme du mécanisme de récupération de la mémoire se compose des étapes suivantes.
-Tout d'abord, il établit le vecteur de version des opérations causalement stables.
-Pour cela, chaque noeud doit maintenir une matrice des vecteurs de version de tous les noeuds.
-L'algorithme génère le vecteur de version des opérations causalement stable en récupérant pour chaque noeud la valeur minimale qui y est associée dans la matrice des vecteurs de version.
-Cette étape correspond à fusionner $p$ vecteurs de version contenant $p$ entrées, elle s'exécute donc en \bigO{p^2} instructions.
+Tout d'abord, il établit le vecteur de versions des opérations causalement stables.
+Pour cela, chaque noeud doit maintenir une matrice des vecteurs de versions de tous les noeuds.
+L'algorithme génère le vecteur de versions des opérations causalement stable en récupérant pour chaque noeud la valeur minimale qui y est associée dans la matrice des vecteurs de versions.
+Cette étape correspond à fusionner $p$ vecteurs de versions contenant $p$ entrées, elle s'exécute donc en \bigO{p^2} instructions.
 
 La seconde étape consiste à parcourir l'arbre des époques de manière inverse à l'ordre défini par la relation \emph{priority}.
 Ce parcours s'effectue jusqu'à trouver l'époque maximale causalement stable, \ie la première époque pour laquelle l'opération $\trm{rename}$ associée est causalement stable.
@@ -164,7 +164,7 @@ Nous récapitulons ce résultat dans la \autoref{tab:time-complexity-gc-mechanis
           \toprule
           Étape & Temps \\
           \midrule
-          \emph{calculer le vecteur de version des opérations causalement stables} & \bigO{p^2} \\
+          \emph{calculer le vecteur de versions des opérations causalement stables} & \bigO{p^2} \\
           \emph{calculer les chemins de la racine aux \emph{potentielles époques courantes}} & \bigO{e \cdot h} \\
           \emph{identifier le \ac{LCA}} & \bigO{e \cdot h} \\
           \emph{calculer l'ensembe des \emph{époques requises}} & \bigO{e \cdot h} \\

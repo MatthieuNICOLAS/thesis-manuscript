@@ -46,10 +46,10 @@ Plus globalement, les noeuds doivent aussi conserver le journal des opérations 
 Il s'agit donc d'une contrainte déjà imposée aux noeuds pour d'autres fonctionnalités du système.
 
 Un autre défaut de cette implémentation est qu'elle nécessite de détecter les opérations concurrentes à l'opération $\trm{rename}$ à intégrer.
-Cela implique d'ajouter des informations de causalité à l'opération $\trm{rename}$, tel qu'un vecteur de version.
-Cependant, la taille des vecteurs de version croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
+Cela implique d'ajouter des informations de causalité à l'opération $\trm{rename}$, tel qu'un vecteur de versions.
+Cependant, la taille des vecteurs de versions croît de façon monotone avec le nombre de noeuds qui participent à la collaboration.
 Diffuser cette information à l'ensemble des noeuds peut donc représenter un coût significatif dans les collaborations à large échelle.
-Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de version dans le cadre du fonctionnement du mécanisme d'anti-entropie.
+Néanmoins, il faut rappeler que les noeuds échangent déjà régulièrement des vecteurs de versions dans le cadre du fonctionnement du mécanisme d'anti-entropie.
 Les opérations $\trm{rename}$ étant rares en comparaison, ce surcoût nous paraît acceptable.
 
 Finalement, cette approche implique aussi de parcourir le journal des opérations à la recherche d'opérations concurrentes.

@@ -30,7 +30,7 @@ Afin de pouvoir utiliser l'opération $\trm{rename}$ comme état initial, il est
 
 De plus, des informations de causalité doivent être intégrées à l'opération $\trm{rename}$.
 Ces informations doivent permettre aux noeuds d'identifier les opérations supplémentaires nécessaires pour obtenir l'état courant, \ie toutes les opérations desquelles l'opération $\trm{rename}$ ne dépend pas causalement.
-L'ajout à l'opération $\trm{rename}$ d'un \emph{vecteur de version}, structure représentant l'ensemble des opérations intégrées par l'auteur de l'opération $\trm{rename}$ au moment de sa génération, permettrait cela.
+L'ajout à l'opération $\trm{rename}$ d'un \emph{vecteur de versions}, structure représentant l'ensemble des opérations intégrées par l'auteur de l'opération $\trm{rename}$ au moment de sa génération, permettrait cela.
 
 Nous définissons donc de la manière suivante l'opération $\trm{rename}$ enrichie compatible avec ce mécanisme de compression du journal :
 
@@ -42,7 +42,7 @@ Nous définissons donc de la manière suivante l'opération $\trm{rename}$ enric
       \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération $\trm{rename}$.
       \item $\trm{nodeSeq}$ est le numéro de séquence du noeud au moment de la génération de l'opération $\trm{rename}$.
       \item $\trm{formerState}$ est l'ancien état du noeud au moment du renommage.
-      \item $\trm{versionVector}$ est le vecteur de version représentant l'ancien état du noeud au moment du renommage.
+      \item $\trm{versionVector}$ est le vecteur de versions représentant l'ancien état du noeud au moment du renommage.
       \item $\trm{content}$ est le contenu du document au moment du renommage.
     \end{enumerate}
   \end{definition}

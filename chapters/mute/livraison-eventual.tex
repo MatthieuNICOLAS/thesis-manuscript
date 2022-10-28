@@ -10,9 +10,9 @@ Il est executé par l'ensemble des noeuds de manière indépendante.
 Nous décrivons ci-dessous son fonctionnement.\\
 
 De manière périodique, le noeud choisit un autre noeud cible de manière aléatoire.
-Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de version.
+Le noeud source lui envoie alors une représentation de son état courant, \ie son vecteur de versions.
 
-À la réception de ce message, le noeud cible compare le vecteur de version reçu par rapport à son propre vecteur de version.
+À la réception de ce message, le noeud cible compare le vecteur de versions reçu par rapport à son propre vecteur de versions.
 À partir de ces données, il identifie les dots des opérations de sa connaissance qui sont inconnues au noeud source.
 Grâce à leur dot, le noeud cible retrouve ces opérations depuis son journal des opérations.
 Il envoie alors une réponse composée de ces opérations au noeud source.
@@ -132,7 +132,7 @@ La \autoref{fig:anti-entropy} illustre ce mécanisme.\\
 
 Dans la \autoref{fig:anti-entropy-setup}, nous représentons le début d'une exécution à laquelle participent trois noeuds : A, B et C.
 Initialement, les trois noeuds sont synchronisés.
-Leur vecteurs de version sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
+Leur vecteurs de versions sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
 
 Le noeud A effectue les opérations $a_8$ puis $a_9$ et les diffusent sur le réseau.
 Le noeud B reçoit ces opérations et les livre à son \ac{CRDT}.
@@ -145,23 +145,23 @@ Néanmoins, cela ne l'empêche pas de livrer l'opération $b_4$\footnote{On cons
 La \autoref{fig:anti-entropy-sync} continue ce scénario.
 Le noeud C déclenche son mécanisme d'anti-entropie.
 Il choisit aléatoirement le noeud B comme noeud cible.
-Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:7,B:8,C:1 \rangle$.
+Il lui envoie un message de synchronisation avec pour contenu le vecteur de versions $\langle A:7,B:8,C:1 \rangle$.
 
 À la réception de ce message, le noeud B compare ce vecteur avec le sien.
 Il détermine que le noeud C n'a pas reçu les opérations $a_8$ et $a_9$.
 B les récupère depuis son journal des opérations et les envoie à C par le biais d'un nouveau message.
 
 À la réception de la réponse de B, le noeud C livre les opérations $a_8$ et $a_9$.
-Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.\\
+Il atteint alors le même état que A et B, représenté par le vecteur de versions $\langle A:9,B:4,C:1 \rangle$.\\
 
 Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les pertes de message.
 Il nous sert aussi de mécanisme de synchronisation : à la connexion d'un pair, celui-ci utilise ce mécanisme pour récupérer les opérations effectuées depuis sa dernière connexion.
-Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de version vide pour récupérer l'intégralité des opérations.
+Dans le cas où il s'agit de la première connexion du pair, il lui suffit d'envoyer un vecteur de versions vide pour récupérer l'intégralité des opérations.
 
 Ce mécanisme propose plusieurs avantages.
 Son exécution n'implique que le noeud source et le noeud cible, ce qui limite les coûts de coordination.
 De plus, si une défaillance a lieu lors de l'exécution du mécanisme (perte d'un des messages, panne du noeud cible...), cette défaillance n'est pas critique : le noeud source se synchronisera à la prochaine exécution du mécanisme.
-Ensuite, ce mécanisme réutilise le vecteur de version déjà nécessaire pour la livraison en exactement un exemplaire, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
+Ensuite, ce mécanisme réutilise le vecteur de versions déjà nécessaire pour la livraison en exactement un exemplaire, comme présenté en \autoref{sec:mute-exactly-once-delivery}.
 Il ne nécessite donc pas de stocker une nouvelle structure de données pour détecter les différences entre noeuds.
 
 En contrepartie, la principale limite de ce mécanisme d'anti-entropie est qu'il nécessite de maintenir et de parcourir périodiquement le journal des opérations pour répondre aux requêtes de synchronisation.

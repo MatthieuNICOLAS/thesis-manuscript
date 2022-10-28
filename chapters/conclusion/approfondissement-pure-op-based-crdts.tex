@@ -10,7 +10,7 @@ Tout d'abord, il ne permet que la conception de \acp{CRDT} purs synchronisés pa
 Cette contrainte limite à des types de données simples, \eg le Compteur ou l'Ensemble, les \acp{CRDT} pouvant être spécifiés et exclut des types de données plus complexes, \eg la Séquence ou le Graphe.
 
 Une seconde limite de ce framework est qu'il repose sur le modèle de livraison causal des opérations.
-Ce modèle induit l'ajout de données de causalité précises à chaque opération, sous la forme d'un vecteur de version \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'une barrière causale \cite{1997-causal-barrier}.
+Ce modèle induit l'ajout de données de causalité précises à chaque opération, sous la forme d'un vecteur de versions \cite{1988-version-vector-mattern,1991-version-vector-fidge} ou d'une barrière causale \cite{1997-causal-barrier}.
 Nous jugeons ce modèle trop coûteux pour les applications \ac{LFS} à large échelle.
 
 Nous souhaitons donc proposer un nouveau framework pour la conception de \acp{CRDT} synchronisés par opérations répondant à ces limites.

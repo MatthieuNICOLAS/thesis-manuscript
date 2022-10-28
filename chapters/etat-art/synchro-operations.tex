@@ -49,7 +49,7 @@ En effet, la perte d'une opération par le réseau provoque la mise en attente d
 Les opérations mises en attente ne pourront en effet être livrées qu'une fois l'opération perdue re-diffusée et livrée.
 
 De plus, il nécessite que des informations de causalité précises soient attachées à chaque opération.
-Pour cela, les systèmes reposent généralement sur l'utilisation de vecteurs de version \cite{1988-version-vector-mattern,1991-version-vector-fidge}.
+Pour cela, les systèmes reposent généralement sur l'utilisation de vecteurs de versions \cite{1988-version-vector-mattern,1991-version-vector-fidge}.
 Or, la taille de cette structure de données croît de manière linéaire avec le nombre de noeuds du système.
 Les métadonnées de causalité peuvent ainsi représenter la majorité des données diffusées sur le réseau\footnote{
   La relation de causalité étant transitive, les opérations et leurs relations de causalité forment un DAG.
@@ -136,7 +136,7 @@ Comme indiqué précédemment, nous considérons que la livraison causale des op
 Le noeud B obtient alors l'état $\set{a,c,d,e}$.
 
 Ensuite, le mécanisme d'anti-entropie du noeud B se déclenche.
-Le noeud B envoie alors à A une demande de synchronisation contenant un résumé de son état, \eg son vecteur de version.
+Le noeud B envoie alors à A une demande de synchronisation contenant un résumé de son état, \eg son vecteur de versions.
 À partir de cette donnée, le noeud A détermine que B n'a pas reçu l'opération $\trm{add}(a)$.
 Il génère alors une réponse contenant cette opération et lui envoie.
 À la réception de l'opération, le noeud B l'intègre.

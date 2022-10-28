@@ -7,7 +7,7 @@
         \item Préciser les dépendances causales d'un message
       \end{enumerate}
     \item Comme présenté précédemment, nous utilisons plusieurs vecteurs pour représenter des données dans l'application MUTE
-    \item Notamment pour le vecteur de version, utilisé pour respecter le modèle de livraison requis par le \ac{CRDT}
+    \item Notamment pour le vecteur de versions, utilisé pour respecter le modèle de livraison requis par le \ac{CRDT}
     \item Et pour la liste des collaborateur-rices, utilisé pour offrir des informations nécessaires à la conscience de groupe aux utilisateurs
     \item Ces vecteurs sont maintenus localement par chacun des noeuds et sont échangés de manière périodique
     \item Cependant, la taille de ces vecteurs croit de manière linéaire au nombre de noeuds impliqués dans la collaboration
@@ -18,10 +18,10 @@
     \item Intuition est qu'une collaboration repose en fait sur un petit noyau de collaborateur-rices principaux
     \item Et que majorité des collaborateur-rices se connectent de manière éphèmère
     \item Serait intéressant de pouvoir réduire la taille des vecteurs en oubliant les collaborateur-rices éphèmères
-    \item Dynamo\cite{2007-dynamo} tronque le vecteur de version lorsqu'il dépasse une taille seuil
+    \item Dynamo\cite{2007-dynamo} tronque le vecteur de versions lorsqu'il dépasse une taille seuil
     \item Conduit alors à une perte d'informations
     \item Pour la liste des collaborateur-rices, approche peut être adoptée (pas forcément gênant de limiter à 100 la taille de la liste)
-    \item Mais pour vecteur de version, conduirait à une relivraison d'opérations déjà observées
+    \item Mais pour vecteur de versions, conduirait à une relivraison d'opérations déjà observées
     \item Approche donc pas applicable pour cette partie
     \item Autre approche possible est de réutiliser le système d'époque
     \item Idée serait de ACK un vecteur avec un changement d'époque
