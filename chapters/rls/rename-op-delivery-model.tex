@@ -20,16 +20,16 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
             node[letter, label=#1:{$\betterid{y}{D0}{0}$}] {D}
         }
         \newcommand\renwold[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {WOLD}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..3}$}] {WOLD}
         }
         \newcommand\renwo[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{0..1}$}] {WO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..1}$}] {WO}
         }
         \newcommand\renr[1]{
-            node[letter, label=#1:{$\betterid{i}{A1}{1}\betterid{f}{A2}{0}$}] {R}
+            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A1}{1}\betterid{f}{A2}{0}$}] {R}
         }
         \newcommand\renld[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{2..3}$}] {LD}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{2..3}$}] {LD}
         }
 
         \newcommand\initialstate[3]{
@@ -73,7 +73,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
             +(0:24) node (a-end) {}
             +(0:2) node[point] (a-initial) {}
             +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,1)$}}] (a-ren-a1) {}
-            +(0:16) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=20pt]-10:{$\trm{ins}(\betterepoch{A1}, \betterid{i}{A1}{1}\betterid{f}{A2}{0},R)$}}] (a-ins-r) {}
+            +(0:16) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=20pt]-10:{$\trm{ins}(\betterepoch{A1}, {\coloridfour\betterid{i}{A1}{1}\betterid{f}{A2}{0}},R)$}}] (a-ins-r) {}
             +(0:22) node (a-final) {};
 
         \initialstate{(a-initial)}{\offseta}{90};
@@ -166,16 +166,16 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
           node[letter, label=#1:{$\betterid{y}{D0}{0}$}] {D}
       }
       \newcommand\noder[1]{
-          node[letter, label=#1:{$\betterid{m}{A1}{0}$}] {R}
+          node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{m}{A1}{0}$}] {R}
       }
       \newcommand\renworld[1]{
-          node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {WORLD}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..3}$}] {WORLD}
       }
       \newcommand\renwo[1]{
-          node[block, label=#1:{$\betterid{i}{A1}{0..1}$}] {WO}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..1}$}] {WO}
       }
       \newcommand\renld[1]{
-          node[block, label=#1:{$\betterid{i}{A1}{2..3}$}] {LD}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{2..3}$}] {LD}
       }
 
       \newcommand\initialstate[3]{
@@ -230,7 +230,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
           ++(0:0.5) node (a) {}
           +(0:32) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
-          +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{A1}, \betterid{m}{A1}{0})$}}] (a-ins-r) {}
+          +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{A1}, {\coloridone\betterid{m}{A1}{0}}, R)$}}] (a-ins-r) {}
           +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,2)$}}] (a-ren-a2) {}
           +(0:30) node (a-final) {};
 
