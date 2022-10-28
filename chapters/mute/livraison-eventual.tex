@@ -21,83 +21,137 @@ Il envoie alors une réponse composée de ces opérations au noeud source.
 La \autoref{fig:anti-entropy} illustre ce mécanisme.\\
 
 \begin{figure}[!ht]
-  \centering
-  \resizebox{\columnwidth}{!}{
-    \begin{tikzpicture}
-      \path
-        node {\textbf{A}}
-        +(0:37) node (a-end) {}
-        ++(0:0.5) node (a0) {}
-        ++(0:3) node[op, label=above:{$\langle A:8,B:3,C:1 \rangle$}] (a8) {a8}
-        ++(0:6) node [op, label=above:{$\langle A:9,B:3,C:1 \rangle$}] (a9) {a9}
-        ++(0:15) node[point, label=above:{$\langle A:9,B:4,C:1 \rangle$}, label=below:{\emph{deliver}}] (a-receives-b4) {};
+  \subfloat[Exécution avec pertes de messages à destination du noeud C]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{\columnwidth}{!}{
+        \begin{tikzpicture}
+          \path
+            node {\textbf{A}}
+            ++(0:0.5) node (a) {}
+            +(0:20) node (a-end) {}
+            +(0:1) node (a-initial) {}
+            +(0:2) node[point, label=90:{$\langle A:8,B:3,C:1 \rangle$}, label={[xshift=-20pt]-90:{\emph{tag as} $a_8$}}] (a-a8) {}
+            +(0:6) node[point, label=90:{$\langle A:9,B:3,C:1 \rangle$}, label={[xshift=-20pt]-90:{\emph{tag as} $a_9$}}] (a-a9) {}
+            +(0:18) node[point, label={90:{$\langle A:9,B:4,C:1 \rangle$}}, label={[xshift=-55pt]-90:{\emph{deliver} $b_{4}$}}] (a-recv-b4) {}
+            +(0:19) node (a-final) {};
 
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) --  (a-a8) --  (a-a9) --  (a-recv-b4) -- (a-final);
 
-      \draw[thick] (a0) --  (a8) -- (a9) -- (a-receives-b4) -- (a-end);
+          \path
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:20) node (b-end) {}
+            +(0:1) node[point, label=-90:{$\langle A:7,B:3,C:1 \rangle$}] (b-initial) {}
+            +(0:6) node[point, label=-90:{$\langle A:8,B:3,C:1 \rangle$}, label={[xshift=-50pt]90:{\emph{deliver} $a_8$}}] (b-recv-a8) {}
+            +(0:10) node[point, label=-90:{$\langle A:9,B:3,C:1 \rangle$}, label={[xshift=-50pt]90:{\emph{deliver} $a_9$}}] (b-recv-a9) {}
+            +(0:14) node[point, label={[xshift=-20pt, yshift=15pt]90:{$\langle A:9,B:4,C:1 \rangle$}}, label={[xshift=-20pt]90:{\emph{tag as} $b_4$}}] (b-b4) {}
+            +(0:19) node (b-final) {};
 
-      \path
-          ++(270:2) node {\textbf{B}}
-          +(0:37) node (b-end) {}
-          ++(0:0.5) node (b0) {}
-          ++(0:9) node[point, label=below:{$\langle A:8,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}] (b-receives-a8) {}
-          ++(0:6) node[point, label=below:{$\langle A:9,B:3,C:1 \rangle$}, label=above:{\emph{deliver}}](b-receives-a9) {}
-          ++(0:4) node[op, label=above:{$\langle A:9,B:4,C:1 \rangle$}] (b4) {b4}
-          ++(0:12) node[point, label=above:{\emph{reply to sync query}}] (b-receives-c-sync-request) {};
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) -- (b-recv-a8) -- (b-recv-a9) -- (b-b4) -- (b-final);
 
-      \draw[thick] (b0) -- (b-receives-a8) -- (b-receives-a9) -- (b4) -- (b-receives-c-sync-request) -- (b-end);
+          \path
+            ++(270:6) node {\textbf{C}}
+            ++(0:0.5) node (c) {}
+            +(0:20) node (c-end) {}
+            +(0:1) node[point, label=-90:{$\langle A:7,B:3,C:1 \rangle$}] (c-initial) {}
+            +(0:4) node (c-recv-a8) {}
+            +(0:9) node (c-recv-a9) {}
+            +(0:18) node[point, label=-90:{$\langle A:7,B:4,C:1 \rangle$}, label={[xshift=-50pt]90:{\emph{deliver} $b_4$}}] (c-recv-b4) {}
+            +(0:19) node (c-final) {};
 
-      \path
-          ++(270:4) node {\textbf{C}}
-          +(0:37) node (c-end) {}
-          ++(0:0.5) node (c0) {}
-          ++(0:8) node (c-receives-a8) {}
-          +(90:0.5) node[cross] (fail-a8) {}
-          ++(0:6) node (c-receives-a9) {}
-          +(90:0.5) node[cross] (fail-a9) {}
-          ++(0:10) node[point, label=below:{$\langle A:7,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b4) {}
-          ++(0:4) node[op, label=below:{$\langle A:7,B:4,C:1 \rangle$}] (c-query-sync) {sync}
-          ++(0:6) node[point, label=below:{$\langle A:9,B:4,C:1 \rangle$}, label=above:{\emph{deliver}}] (c-receives-b-sync-reply) {};
+          \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+          \draw[->, thick] (c-initial) -- (c-recv-b4) -- (c-final);
 
+          \draw[->, dashed, shorten >= 1] (a-a8) -- (b-recv-a8);
+          \draw[->, dashed, shorten >= 1] (a-a9) -- (b-recv-a9);
+          \draw[->, dashed, shorten >= 1] (b-b4) -- (a-recv-b4);
+          \draw[->, dashed, shorten >= 1] (b-b4) -- (c-recv-b4);
 
-      \draw[thick] (c0) -- (c-receives-b4) -- (c-query-sync) --  (c-receives-b-sync-reply) -- (c-end);
+          \path (a-a8) -- node[near end, cross] (fail-a8) {}  (c-recv-a8);
+          \path (a-a9) -- node[near end, cross] (fail-a9) {}  (c-recv-a9);
 
-      \draw[->, dashed, shorten >= 1]
-        (a8.east) edge (b-receives-a8.west)
-        (a8.east) edge (fail-a8)
-        (a9.east) edge (b-receives-a9.west)
-        (a9.east) edge (fail-a9)
-        (b4.east) edge (a-receives-b4.west)
-        (b4.east) edge (c-receives-b4.west)
-        (b-receives-c-sync-request.east) edge (c-receives-b-sync-reply.west)
-        (c-query-sync.east) edge (b-receives-c-sync-request.west);
-
-    \end{tikzpicture}
+          \draw[->, dashed, shorten >= 1] (a-a8) -- (fail-a8);
+          \draw[->, dashed, shorten >= 1] (a-a9) -- (fail-a9);
+        \end{tikzpicture}
+        \label{fig:anti-entropy-setup}
+      }
+    \end{minipage}
   }
-  \caption{Utilisation du mécanisme d'anti-entropie par le noeud C pour se synchroniser avec le noeud B}
+  \hfil
+  \subfloat[Utilisation du mécanisme d'anti-entropie par le noeud C pour se synchroniser avec le noeud B]{
+    \begin{minipage}{\linewidth}
+      \centering
+      \resizebox{0.8\columnwidth}{!}{
+        \begin{tikzpicture}
+          \path
+            node {\textbf{A}}
+            ++(0:0.5) node (a) {}
+            +(0:18) node (a-end) {}
+            +(0:1)  node[point, label={90:{$\langle A:9,B:4,C:1 \rangle$}}] (a-initial) {}
+            +(0:17) node (a-final) {};
+
+          \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
+          \draw[->, thick] (a-initial) -- (a-final);
+
+          \path
+            ++(270:3) node {\textbf{B}}
+            ++(0:0.5) node (b) {}
+            +(0:18) node (b-end) {}
+            +(0:1) node[point, label=-90:{$\langle A:9,B:4,C:1 \rangle$}] (b-initial) {}
+            +(0:10) node[point, label={[xshift=0pt]90:{\emph{send} $a_8$ \emph{and} $a_9$}}] (b-recv-query-sync) {}
+            +(0:17) node (b-final) {};
+
+          \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
+          \draw[->, thick] (b-initial) -- (b-recv-query-sync) -- (b-final);
+
+          \path
+            ++(270:6) node {\textbf{C}}
+            ++(0:0.5) node (c) {}
+            +(0:18) node (c-end) {}
+            +(0:1) node[point, label=-90:{$\langle A:7,B:4,C:1 \rangle$}] (c-initial) {}
+            +(0:4) node[point, label={[xshift=-25pt]90:{\emph{query sync B}}}] (c-query-sync) {}
+            +(0:16) node[point, label=-90:{$\langle A:9,B:4,C:1 \rangle$}, label={[xshift=-80pt]90:{\emph{deliver} $a_8$ \emph{and} $a_9$}}] (c-recv-reply-sync) {}
+            +(0:17) node (c-final) {};
+
+          \draw[dotted] (c) -- (c-initial) (c-final) -- (c-end);
+          \draw[->, thick] (c-initial) -- (c-query-sync) -- (c-recv-reply-sync) -- (c-final);
+
+          \draw[->, dashed, shorten >= 1] (b-recv-query-sync) -- (c-recv-reply-sync);
+          \draw[->, dashed, shorten >= 1] (c-query-sync) -- (b-recv-query-sync);
+        \end{tikzpicture}
+        \label{fig:anti-entropy-sync}
+      }
+    \end{minipage}
+  }
+  \caption{Gestion de la livraison des opérations à terme}
   \label{fig:anti-entropy}
 \end{figure}
 
-Dans cette figure, nous représentons une exécution à laquelle participent trois noeuds : A, B et C.
+Dans la \autoref{fig:anti-entropy-setup}, nous représentons le début d'une exécution à laquelle participent trois noeuds : A, B et C.
 Initialement, les trois noeuds sont synchronisés.
 Leur vecteurs de version sont identiques et ont pour valeur $\langle A:7,B:3,C:1 \rangle$.
 
-Le noeud A effectue les opérations \emph{a8} puis \emph{a9} et les diffusent sur le réseau.
+Le noeud A effectue les opérations $a_8$ puis $a_9$ et les diffusent sur le réseau.
 Le noeud B reçoit ces opérations et les livre à son \ac{CRDT}.
-Il effectue ensuite et propage l'opération \emph{b4}, qui est reçue et livrée par A.
+Il effectue ensuite et propage l'opération $b_4$, qui est reçue et livrée par A.
 Ils atteignent tous deux la version représenté par le vecteur $\langle A:9,B:4,C:1 \rangle$
 
-De son côté, le noeud C ne reçoit pas les opérations \emph{a8} et \emph{a9} à cause d'une perte de message du réseau.
-Néanmoins, cela ne l'empêche pas de livrer l'opération \emph{b4} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
+De son côté, le noeud C ne reçoit pas les opérations $a_8$ et $a_9$ à cause d'une perte de message du réseau.
+Néanmoins, cela ne l'empêche pas de livrer l'opération $b_4$\footnote{On considère que $a_8$, $a_9$ et $b_4$ sont des opérations d'insertion, \ie n'ont pas de dépendances.} à sa réception et d'obtenir la version $\langle A:7,B:4,C:1 \rangle$.
 
-Le noeud C déclenche ensuite son mécanisme d'anti-entropie.
+La \autoref{fig:anti-entropy-sync} continue ce scénario.
+Le noeud C déclenche son mécanisme d'anti-entropie.
 Il choisit aléatoirement le noeud B comme noeud cible.
 Il lui envoie un message de synchronisation avec pour contenu le vecteur de version $\langle A:7,B:8,C:1 \rangle$.
 
 À la réception de ce message, le noeud B compare ce vecteur avec le sien.
-Il détermine que le noeud C n'a pas reçu les opérations \emph{a8} et \emph{a9}.
+Il détermine que le noeud C n'a pas reçu les opérations $a_8$ et $a_9$.
 B les récupère depuis son journal des opérations et les envoie à C par le biais d'un nouveau message.
 
-À la réception de la réponse de B, le noeud C livre les opérations \emph{a8} et \emph{a9}.
+À la réception de la réponse de B, le noeud C livre les opérations $a_8$ et $a_9$.
 Il atteint alors le même état que A et B, représenté par le vecteur de version $\langle A:9,B:4,C:1 \rangle$.\\
 
 Ce mécanisme d'anti-entropie nous permet ainsi de garantir la livraison à terme de toutes les opérations et de compenser les pertes de message.
