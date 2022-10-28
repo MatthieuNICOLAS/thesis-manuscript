@@ -11,13 +11,13 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
                 node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
             }
             \newcommand\renh[1]{
-                node[letter, label=#1:{$\betterid{i}{A1}{0}$}] {H}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0}$}] {H}
             }
 
             \newcommand\initialstate[3]{
@@ -53,14 +53,6 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
 
             \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
             \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-final);
-            %   \path
-            %       node {\textbf{A}}
-            %       ++(0:\widthletter) node[letter, label=below:{\id{i}{B0}{0}}] {H}
-            %       ++(0:\widthletter) node[letter, fill=mydarkorange, label=above:{\color{mydarkorange}\id{i}{B0}{0}\id{f}{A0}{0}}] {E}
-            %       ++(0:\widthletter) node[block, label=below:{\id{i}{B0}{1..2}}] (LO) {LO}
-            %       ++(0:4 * \widthletter) node[letter, fill=mydarkblue, label=below:{\color{mydarkblueid}\id{i}{A1}{0}}] (H) {H};
-
-            %   \draw[->, thick] (LO) -- node[below, align=center]{$\trm{rename}$} (H);
           \end{tikzpicture}}
           \label{fig:renaming-first-id}
       \end{minipage}}
@@ -74,22 +66,22 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
                 node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
             }
             \newcommand\renh[1]{
-                node[letter, label=#1:{$\betterid{i}{A1}{0}$}] {H}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0}$}] {H}
             }
             \newcommand\rene[1]{
-                node[letter, label=#1:{$\betterid{i}{A1}{1}$}] {E}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{1}$}] {E}
             }
             \newcommand\renl[1]{
-                node[letter, label=#1:{$\betterid{i}{A1}{2}$}] {L}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{2}$}] {L}
             }
             \newcommand\reno[1]{
-                node[letter, label=#1:{$\betterid{i}{A1}{3}$}] {O}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{3}$}] {O}
             }
 
             \newcommand\initialstate[3]{
@@ -141,13 +133,13 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
                 node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
             }
             \newcommand\renhelo[1]{
-                node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {HELO}
+                node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0..3}$}] {HELO}
             }
 
             \newcommand\initialstate[3]{
