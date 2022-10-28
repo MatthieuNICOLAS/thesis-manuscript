@@ -11,19 +11,19 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
             node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
         }
         \newcommand\nodee[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+            node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
         }
         \newcommand\nodelo[1]{
             node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
         }
         \newcommand\renhelo[1]{
-            node[block, label=#1:{$\betterid{i}{A1}{0..3}$}] {HELO}
+            node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0..3}$}] {HELO}
         }
         \newcommand\nodel[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
         }
         \newcommand\crossl[1]{
-            node[letter, cross, label=#1:{$\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
+            node[letter, cross, fill=\colorblockthree, label=#1:{$\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}$}] {L}
         }
 
         \newcommand\initialstate[3]{
@@ -88,7 +88,7 @@ La \autoref{fig:concurrent-insert-rename-inconsistent} illustre de tels cas.
             ++(0:0.5) node (b) {}
             +(0:20) node (b-end) {}
             +(0:2) node[point] (b-initial) {}
-            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}(\betterid{i}{B0}{0}\betterid{m}{B1}{0},L)$}}] (b-ins-l) {}
+            +(0:8) node[point, label=170:{$\trm{ins}(E \prec L \prec O)$}, label={[xshift=45pt]10:{$\trm{ins}({\coloridthree\betterid{i}{B0}{0}\betterid{m}{B1}{0}},L)$}}] (b-ins-l) {}
             +(0:18) node (b-final) {};
 
 
