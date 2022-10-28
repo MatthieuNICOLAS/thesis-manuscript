@@ -8,16 +8,16 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
           \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
             \newcommand\nodeh[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+                node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
-                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+                node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
             }
             \newcommand\renh[1]{
-                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0}$}] {H}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{0}$}] {H}
             }
 
             \newcommand\initialstate[3]{
@@ -45,7 +45,7 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,2)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -63,25 +63,25 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
           \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
             \newcommand\nodeh[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+                node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
-                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+                node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
             }
             \newcommand\renh[1]{
-                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0}$}] {H}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{0}$}] {H}
             }
             \newcommand\rene[1]{
-                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{1}$}] {E}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{1}$}] {E}
             }
             \newcommand\renl[1]{
-                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{2}$}] {L}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{2}$}] {L}
             }
             \newcommand\reno[1]{
-                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{3}$}] {O}
+                node[letter, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{3}$}] {O}
             }
 
             \newcommand\initialstate[3]{
@@ -112,7 +112,7 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,2)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -130,16 +130,16 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
           \resizebox{0.7 \columnwidth}{!}{
           \begin{tikzpicture}
             \newcommand\nodeh[1]{
-                node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {H}
+                node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {H}
             }
             \newcommand\nodee[1]{
-                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B0}{0}\betterid{f}{A0}{0}$}] {E}
+                node[letter, fill=\colorblockone, label=#1:{$\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
             }
             \newcommand\nodelo[1]{
-                node[block, label=#1:{$\betterid{i}{B0}{1..2}$}] {LO}
+                node[block, label=#1:{$\betterid{i}{B1}{1..2}$}] {LO}
             }
             \newcommand\renhelo[1]{
-                node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A1}{0..3}$}] {HELO}
+                node[block, fill=\colorblocktwo, label=#1:{$\coloridtwo\betterid{i}{A2}{0..3}$}] {HELO}
             }
 
             \newcommand\initialstate[3]{
@@ -167,7 +167,7 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
                 ++(0:0.5) node (a) {}
                 +(0:14) node (a-end) {}
                 +(0:2) node[point] (a-initial) {}
-                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,1)$}}] (a-ren-a1) {}
+                +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=0pt]-10:{$\trm{ren}(A,2)$}}] (a-ren-a1) {}
                 +(0:12) node (a-final) {};
 
             \initialstate{(a-initial)}{\offseta}{90};
@@ -184,11 +184,11 @@ L'opération $\trm{rename}$, abrégée en $\trm{ren}$ dans nos figures, réassig
 
 Son comportement est illustré dans la \autoref{fig:renaming}.
 Dans cet exemple, le noeud A initie une opération $\trm{rename}$ sur son état local.
-Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B0}{0}).
+Tout d'abord, le noeud A génère un nouvel identifiant à partir du premier tuple de l'identifiant du premier élément de la séquence (\id{i}{B1}{0}).
 Pour générer ce nouvel identifiant, le noeud A reprend la position de ce tuple (\emph{i}) mais utilise son propre identifiant de noeud (\textbf{A}) et numéro de séquence actuel (\emph{1}).
 De plus, son offset est mis à 0.
-Le noeud A réassigne l'identifiant résultant (\id{i}{A1}{0}) au premier élément de la séquence, comme décrit dans la \autoref{fig:renaming-first-id}.
-Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A1}{1}, \id{i}{A1}{2}, \id{i}{A1}{3}), comme présenté dans la \autoref{fig:renaming-second-id}.
+Le noeud A réassigne l'identifiant résultant (\id{i}{A2}{0}) au premier élément de la séquence, comme décrit dans la \autoref{fig:renaming-first-id}.
+Ensuite, le noeud A dérive des identifiants contigus pour tous les éléments restants en incrémentant de manière successive l'offset (\id{i}{A2}{1}, \id{i}{A2}{2}, \id{i}{A2}{3}), comme présenté dans la \autoref{fig:renaming-second-id}.
 Comme nous assignons des identifiants consécutifs à tous les éléments de la séquence, nous pouvons au final aggréger ces éléments en un seul bloc, comme illustré en \autoref{fig:renaming-final-state}.
 Ceci permet aux noeuds de bénéficier au mieux de la fonctionnalité des blocs et de minimiser le surcoût en métadonnés de l'état résultat.
 
