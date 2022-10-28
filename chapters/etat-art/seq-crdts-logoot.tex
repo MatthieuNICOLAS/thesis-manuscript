@@ -125,10 +125,10 @@ Nous illustrons cela à l'aide de la \autoref{fig:logoot}.
         node[letter, label=#1:{$\betterid{m}{B1}{}$}] {E}
       }
       \newcommand\nodela[1]{
-        node[letter, label=#1:{$\betterid{m}{B1}{}\betterid{o}{A3}{}$}] {L}
+        node[letter, fill=\colorblockthree, label=#1:{\coloridthree$\betterid{m}{B1}{}\betterid{o}{A3}{}$}] {L}
       }
       \newcommand\nodem[1]{
-        node[letter, label=#1:{$\betterid{n}{B2}{}$}] {M}
+        node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{n}{B2}{}$}] {M}
       }
       \newcommand\nodel[1]{
         node[letter, label=#1:{$\betterid{s}{A2}{}$}] {L}
@@ -194,7 +194,7 @@ Nous illustrons cela à l'aide de la \autoref{fig:logoot}.
           ++(0:0.5) node (a) {}
           +(0:30) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
-          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=5em]-10:{$\trm{ins}(\langle \betterid{m}{B1}{}\betterid{o}{A3}{},L \rangle)$}}] (a-ins-l) {}
+          +(0:12) node[point, label=-170:{$\trm{ins}(E \prec L \prec M)$}, label={[xshift=5em]-10:{$\trm{ins}({\coloridthree\betterid{m}{B1}{}\betterid{o}{A3}{}},L)$}}] (a-ins-l) {}
           +(0:20) node[point] (a-recv-rmv-m) {}
           +(0:28) node (a-final) {};
 
