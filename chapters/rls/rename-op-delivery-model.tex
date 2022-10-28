@@ -8,28 +8,28 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
         \newcommand\nodew[1]{
-            node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {W}
+            node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {W}
         }
         \newcommand\nodeo[1]{
-            node[letter, label=#1:{$\betterid{l}{C0}{0}$}] {O}
+            node[letter, label=#1:{$\betterid{l}{C1}{0}$}] {O}
         }
         \newcommand\nodel[1]{
-            node[letter, label=#1:{$\betterid{t}{A0}{0}$}] {L}
+            node[letter, label=#1:{$\betterid{t}{A1}{0}$}] {L}
         }
         \newcommand\noded[1]{
-            node[letter, label=#1:{$\betterid{y}{D0}{0}$}] {D}
+            node[letter, label=#1:{$\betterid{y}{D1}{0}$}] {D}
         }
         \newcommand\renwold[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..3}$}] {WOLD}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..3}$}] {WOLD}
         }
         \newcommand\renwo[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{0..1}$}] {WO}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..1}$}] {WO}
         }
         \newcommand\renr[1]{
-            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A1}{1}\betterid{f}{A2}{0}$}] {R}
+            node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{i}{A2}{1}\betterid{f}{A3}{0}$}] {R}
         }
         \newcommand\renld[1]{
-            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A1}{2..3}$}] {LD}
+            node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{2..3}$}] {LD}
         }
 
         \newcommand\initialstate[3]{
@@ -49,7 +49,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renwold{-#3};
         }
 
@@ -58,7 +58,7 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
                 #1
                 ++#2
                 ++(0:0.5)
-                ++(#3:0.5) node[epoch] {\epoch{A1}}
+                ++(#3:0.5) node[epoch] {\epoch{A2}}
                 ++(0:1.3 * \widthepoch) \renwo{-#3}
                 ++(0:\widthblock) \renr{#3}
                 ++(0:\widthletter) \renld{-#3};
@@ -72,34 +72,34 @@ Afin d'illustrer cette nécessité, considérons l'exemple suivant :
             ++(0:0.5) node (a) {}
             +(0:24) node (a-end) {}
             +(0:2) node[point] (a-initial) {}
-            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,1)$}}] (a-ren-a1) {}
-            +(0:16) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=20pt]-10:{$\trm{ins}(\betterepoch{A1}, {\coloridfour\betterid{i}{A1}{1}\betterid{f}{A2}{0}},R)$}}] (a-ins-r) {}
+            +(0:8) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,2)$}}] (a-ren-A2) {}
+            +(0:16) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=20pt]-10:{$\trm{ins}(\betterepoch{A2}, {\coloridfour\betterid{i}{A2}{1}\betterid{f}{A3}{0}},R)$}}] (a-ins-r) {}
             +(0:22) node (a-final) {};
 
         \initialstate{(a-initial)}{\offseta}{90};
-        \ren{(a-ren-a1)}{\offseta}{90};
+        \ren{(a-ren-A2)}{\offseta}{90};
         \finalstate{(a-ins-r)}{\offseta}{90};
 
         \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-        \draw[->, thick] (a-initial) --  (a-ren-a1) -- (a-ins-r) -- (a-final);
+        \draw[->, thick] (a-initial) --  (a-ren-A2) -- (a-ins-r) -- (a-final);
 
         \path
             ++(270:3) node {\textbf{B}}
             ++(0:0.5) node (b) {}
             +(0:24) node (b-end) {}
             +(0:2) node[point] (b-initial) {}
-            +(0:12) node (b-recv-ren-a1) {}
+            +(0:12) node (b-recv-ren-A2) {}
             +(0:20) node[point, label=below right:{$?$}] (b-recv-ins-r) {}
             +(0:22) node (b-final) {};
 
-        \path node[cross] (fail) at ($(a-ren-a1)!0.5!(b-recv-ren-a1)$) {};
+        \path node[cross] (fail) at ($(a-ren-A2)!0.5!(b-recv-ren-A2)$) {};
 
         \initialstate{(b-initial)}{\offsetb}{-90};
 
         \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
         \draw[->, thick] (b-initial) --  (b-recv-ins-r) -- (b-final);
 
-        \draw[->, dashed, shorten >= 1] (a-ren-a1) -- (fail);
+        \draw[->, dashed, shorten >= 1] (a-ren-A2) -- (fail);
         \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
     \end{tikzpicture}
   }
@@ -115,7 +115,7 @@ Les opérations correspondantes aux actions du noeud A sont diffusées sur le r�
 Cependant, l'opération $\trm{rename}$ n'est pas livrée au noeud B, par exemple suite à un problème réseau.
 L'opération $\trm{insert}$ est quant à elle correctement livrée à ce dernier.
 Le noeud B doit alors intégrer dans son état un élément et l'identifiant qui lui est attaché.
-Mais cet identifiant est issu d'une époque (\epoch{A1}) différente de son époque actuelle (\epoch{0}) et dont le noeud n'avait pas encore connaissance.
+Mais cet identifiant est issu d'une époque (\epoch{A2}) différente de son époque actuelle (\epoch{0}) et dont le noeud n'avait pas encore connaissance.
 Il convient de s'interroger sur l'état à produire dans cette situation.
 
 Comme nous l'avions déjà illustré par la \autoref{fig:concurrent-insert-rename-inconsistent}, les identifiants d'une époque ne peuvent être comparés qu'aux identifiants de la même époque.
@@ -154,28 +154,28 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
   \resizebox{\columnwidth}{!}{
     \begin{tikzpicture}
       \newcommand\nodew[1]{
-          node[letter, label=#1:{$\betterid{i}{B0}{0}$}] {W}
+          node[letter, label=#1:{$\betterid{i}{B1}{0}$}] {W}
       }
       \newcommand\nodeo[1]{
-          node[letter, label=#1:{$\betterid{l}{C0}{0}$}] {O}
+          node[letter, label=#1:{$\betterid{l}{C1}{0}$}] {O}
       }
       \newcommand\nodel[1]{
-          node[letter, label=#1:{$\betterid{t}{A0}{0}$}] {L}
+          node[letter, label=#1:{$\betterid{t}{A1}{0}$}] {L}
       }
       \newcommand\noded[1]{
-          node[letter, label=#1:{$\betterid{y}{D0}{0}$}] {D}
+          node[letter, label=#1:{$\betterid{y}{D1}{0}$}] {D}
       }
       \newcommand\noder[1]{
-          node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{m}{A1}{0}$}] {R}
+          node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{m}{A2}{0}$}] {R}
       }
       \newcommand\renworld[1]{
-          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..3}$}] {WORLD}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A3}{0..3}$}] {WORLD}
       }
       \newcommand\renwo[1]{
-          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{0..1}$}] {WO}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A3}{0..1}$}] {WO}
       }
       \newcommand\renld[1]{
-          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A2}{2..3}$}] {LD}
+          node[block, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{i}{A3}{2..3}$}] {LD}
       }
 
       \newcommand\initialstate[3]{
@@ -208,7 +208,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
               #1
               ++#2
               ++(0:0.5)
-              ++(#3:0.5) node[epoch] {\epoch{A2}}
+              ++(#3:0.5) node[epoch] {\epoch{A3}}
               ++(0:1.3 * \widthepoch) \renworld{-#3};
       }
 
@@ -217,7 +217,7 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
               #1
               ++#2
               ++(0:0.5)
-              ++(#3:0.5) node[epoch] {\epoch{A2}}
+              ++(#3:0.5) node[epoch] {\epoch{A3}}
               ++(0:1.3 * \widthepoch) \renwo{-#3}
               ++(0:\widthblock) \renld{-#3};
       }
@@ -230,34 +230,34 @@ La \autoref{fig:rls-out-of-order-rename} présente un exemple de ce cas figure.
           ++(0:0.5) node (a) {}
           +(0:32) node (a-end) {}
           +(0:2) node[point] (a-initial) {}
-          +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{A1}, {\coloridone\betterid{m}{A1}{0}}, R)$}}] (a-ins-r) {}
-          +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,2)$}}] (a-ren-a2) {}
+          +(0:9) node[point, label=-170:{$\trm{ins}(O \prec R \prec L)$}, label={[xshift=100pt]-10:{$\trm{ins}(\betterepoch{0}, {\coloridone\betterid{m}{A2}{0}}, R)$}}] (a-ins-r) {}
+          +(0:18) node[point, label=-170:{$\trm{ren}()$}, label={[xshift=20pt]-10:{$\trm{ren}(\betterepoch{0}, A,3)$}}] (a-ren-A3) {}
           +(0:30) node (a-final) {};
 
       \initialstate{(a-initial)}{\offseta}{90};
       \insr{(a-ins-r)}{\offseta}{90};
-      \finalstate{(a-ren-a2)}{\offseta}{90};
+      \finalstate{(a-ren-A3)}{\offseta}{90};
 
       \draw[dotted] (a) -- (a-initial) (a-final) -- (a-end);
-      \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-ren-a2) -- (a-final);
+      \draw[->, thick] (a-initial) --  (a-ins-r) -- (a-ren-A3) -- (a-final);
 
       \path
           ++(270:3) node {\textbf{B}}
           ++(0:0.5) node (b) {}
           +(0:32) node (b-end) {}
           +(0:2) node[point] (b-initial) {}
-          +(0:22) node[point] (b-recv-ren-a2) {}
+          +(0:22) node[point] (b-recv-ren-A3) {}
           +(0:28) node[point] (b-recv-ins-r) {}
           +(0:30) node (b-final) {};
 
       \initialstate{(b-initial)}{\offsetb}{-90};
-      \renwold{(b-recv-ren-a2)}{\offsetb}{-90};
+      \renwold{(b-recv-ren-A3)}{\offsetb}{-90};
       \finalstate{(b-recv-ins-r)}{\offsetb}{-90};
 
       \draw[dotted] (b) -- (b-initial) (b-final) -- (b-end);
-      \draw[->, thick] (b-initial) -- (b-recv-ren-a2) -- (b-recv-ins-r) -- (b-final);
+      \draw[->, thick] (b-initial) -- (b-recv-ren-A3) -- (b-recv-ins-r) -- (b-final);
 
-      \draw[->, dashed, shorten >= 1] (a-ren-a2) -- (b-recv-ren-a2);
+      \draw[->, dashed, shorten >= 1] (a-ren-A3) -- (b-recv-ren-A3);
       \draw[->, dashed, shorten >= 1] (a-ins-r) -- (b-recv-ins-r);
     \end{tikzpicture}
   }
@@ -275,6 +275,6 @@ L'opération $\trm{rename}$ est donc livrée en première au noeud B.
 En utilisant les informations contenues dans l'opération, le noeud B renomme chaque identifiant composant son état.
 
 Ensuite, le noeud B reçoit l'opération $\trm{insert}$.
-Comme l'époque de génération de l'opération $\trm{insert}$ (\epoch{0}) est différente de celle de son état courant (\epoch{A2}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
-\id{m}{A1}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A2} (\id{i}{A2}{2}).
+Comme l'époque de génération de l'opération $\trm{insert}$ (\epoch{0}) est différente de celle de son état courant (\epoch{A3}), le noeud B utilise \textsc{renameId} pour renommer l'identifiant avant de l'insérer.
+\id{m}{A2}{0} faisant partie de l'\emph{ancien état}, le noeud B utilise l'index de cet identifiant dans l'\emph{ancien état} (2) pour calculer son équivalent à l'époque \epoch{A3} (\id{i}{A3}{2}).
 Le noeud B insère l'élément "X" avec ce nouvel identifiant et converge alors avec le noeud A, malgré la livraison dans le désordre des opérations.
