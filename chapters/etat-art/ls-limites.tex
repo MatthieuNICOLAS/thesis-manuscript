@@ -28,7 +28,7 @@ Considérons l'exemple présenté dans la \autoref{fig:example-split}.
           #1
           ++#2
           ++(0:0.5) node[letter, label=#3:{$\betterid{i}{B1}{0}$}] {H}
-          ++(0:\widthletter) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
+          ++(0:\widthletter) node[letter, fill=\colorblockone, label=-#3:{$\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
           ++(0:\widthletter)  node[block, label=#3:{$\betterid{i}{B1}{1..3}$}] {LLO};
       }
 
@@ -39,7 +39,7 @@ Considérons l'exemple présenté dans la \autoref{fig:example-split}.
         ++(0:0.5) node (a) {}
         +(0:11) node (a-end) {}
         +(0:1) node[point] (a-initial) {}
-        +(0:6) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={-10:{$\trm{ins}({\color{ucl1orange}\betterid{i}{B1}{0}\betterid{f}{A1}{0}},E)$}}] (a-ins-e) {}
+        +(0:6) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={-10:{$\trm{ins}({\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}},E)$}}] (a-ins-e) {}
         +(0:10) node (a-final) {};
 
       \initialstate{(a-initial)}{\offseta}{90};
@@ -107,7 +107,7 @@ La \autoref{fig:example-fragmentation} illustre ces règles.
           #1
           ++#2
           ++(0:0.5) node[block, label=#3:{$\betterid{i}{A1}{0..3}$}] {HELL}
-          ++(0:1.1*\widthblock) node[letter, fill=ucl2orange, label=-#3:{$\color{ucl1orange}\betterid{m}{A2}{0}$}] {O};
+          ++(0:1.1*\widthblock) node[letter, fill=\colorblockone, label=-#3:{$\coloridone\betterid{m}{A2}{0}$}] {O};
       }
 
       \newcommand\offseta{ (90:1.2) }
@@ -119,7 +119,7 @@ La \autoref{fig:example-fragmentation} illustre ces règles.
         +(0:1) node[point] (a-initial) {}
         +(0:4) node[point, label=-170:{$\trm{ins}(L \prec P)$}, label={-10:{$\trm{ins}(\betterid{i}{A1}{4},P)$}}] (a-ins-p) {}
         +(0:9) node[point, label=-170:{$\trm{rmv}(P)$}, label={-10:{$\trm{rmv}(\betterid{i}{A1}{4})$}}] (a-rmv-p) {}
-        +(0:14) node[point, label=-170:{$\trm{ins}(L \prec O)$}, label={-10:{$\trm{ins}({\color{ucl1orange}\betterid{m}{A2}{0}},O)$}}] (a-ins-o) {}
+        +(0:14) node[point, label=-170:{$\trm{ins}(L \prec O)$}, label={-10:{$\trm{ins}({\coloridone\betterid{m}{A2}{0}},O)$}}] (a-ins-o) {}
         +(0:18) node (a-final) {};
 
       \initialstate{(a-initial)}{\offseta}{90};

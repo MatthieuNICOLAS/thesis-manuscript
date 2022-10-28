@@ -68,7 +68,7 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         node[block, label=#1:{$\betterid{i}{B1}{2..3}$}] {LO}
       }
       \newcommand\nodee[1]{
-        node[letter, fill=ucl2orange, label=#1:{\color{ucl1orange}$\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
+        node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{i}{B1}{0}\betterid{f}{A1}{0}$}] {E}
       }
       \newcommand\blockloexclam[1]{
         node[block, label=#1:{$\betterid{i}{B1}{2..4}$}] {LO!}
@@ -124,7 +124,7 @@ Nous présentons dans la \autoref{fig:ls-example} un exemple d'utilisation de ce
         +(0:25) node (a-end) {}
         +(0:2) node[point] (a-initial) {}
         +(0:5) node[point, label=-170:{$\trm{rmv}(R)$}, label={[xshift=3em]-10:{$\trm{rmv}(\betterid{i}{B1}{1})$}}] (a-rmv-r) {}
-        +(0:12) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={[xshift=2em]-10:{$\trm{ins}({\color{ucl1orange}\betterid{i}{B1}{0}\betterid{f}{A1}{0}},E)$}}] (a-ins-e) {}
+        +(0:12) node[point, label=-170:{$\trm{ins}(H \prec E \prec L)$}, label={[xshift=2em]-10:{$\trm{ins}({\coloridone\betterid{i}{B1}{0}\betterid{f}{A1}{0}},E)$}}] (a-ins-e) {}
         +(0:18) node[point] (a-recv-ins-exc) {}
         +(0:23) node (a-final) {};
 

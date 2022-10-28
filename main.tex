@@ -248,6 +248,17 @@
 \newcommand{\elt}{E}
 \newcommand{\nat}{\mathbb{N}}
 
+\newcommand{\colorblockone}{ucl2orange}
+\newcommand{\coloridone}{\color{ucl1orange}}
+
+\newcommand{\colorblocktwo}{ucl2mdblue}
+\newcommand{\coloridtwo}{\color{ucl1mdblue}}
+
+\newcommand{\colorblockthree}{ucl2stone}
+\newcommand{\coloridthree}{\color{ucl1stone}}
+
+\newcommand{\colorcross}{ucl1mdred}
+
 
 % Définit noms pour \autoref
 %---------
@@ -272,7 +283,7 @@
     gc-rule-2/.style={densely dotted, thick, darkgreen},
     cross/.style={
         path picture={
-            \draw[ucl1dkred, very thick]
+            \draw[\colorcross, very thick]
                 (path picture bounding box.south east)--(path picture bounding box.north west)
                 (path picture bounding box.south west)--(path picture bounding box.north east);
         }
@@ -503,8 +514,8 @@ WIP
 
 % \import{chapters/introduction/}{introduction}
 \import{chapters/etat-art/}{etat-art}
-% \import{chapters/rls/}{rls}
-\import{chapters/mute/}{mute}
+\import{chapters/rls/}{rls}
+% \import{chapters/mute/}{mute}
 % \import{chapters/conclusion/}{conclusion}
 % \import{chapters/annexes/}{annexes}
 
