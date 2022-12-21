@@ -12,8 +12,8 @@
         Il s'agit de nouvelles spécifications des types de données, tels que l'Ensemble ou la Séquence, permettant à un ensemble de noeuds de répliquer une donnée.
         Les \acp{CRDT} permettent aux noeuds de consulter et de modifier la donnée sans coordination préalable, et incorporent un mécanisme de résolution de conflits pour intégrer les modifications concurrentes.
         Cependant, les \acp{CRDT} pour le type Séquence souffrent d'une croissance monotone du surcoût de leur mécanisme de résolution de conflits.
-        Pouvons-nous proposer un mécanisme de réduction du surcoût des \acp{CRDT} pour le type Séquence qui soit compatible avec les applications \ac{LFS} ?
-        Dans cette thèse, nous proposons un nouveau \ac{CRDT} pour le type Séquence, RenamableLogootSplit.
+        Dans cette thèse, nous avons identifié le besoin de mécanismes qui (i) permettent de réduire le surcoût des \acp{CRDT} pour le type Séquence, (ii) soint compatibles avec les applications \ac{LFS}.
+        Par conséquent, nous proposons un nouveau \ac{CRDT} pour le type Séquence : RenamableLogootSplit.
         Ce \ac{CRDT} intègre un mécanisme de renommage qui minimise périodiquement le surcoût de son mécanisme de résolution de conflits ainsi qu'un mécanisme de résolution de conflits pour intégrer les modifications concurrentes à un renommage.
         Finalement, nous proposons un mécanisme de \acf{GC} qui supprime à terme le propre surcoût du mécanisme de renommage.
 
@@ -29,8 +29,8 @@
         \acp{CRDT} are new specifications of data types, \eg Set or Sequence, enabling a set of nodes to replicate a data.
         \acp{CRDT} enable nodes to access and modify the data without prior coordination, and incorporate a conflict resolution mechanism to integrate concurrent modifications.
         However, Sequence \acp{CRDT} suffer from a monotonous growth in the overhead of their conflict resolution mechanism.
-        Can we propose a mechanism for reducing the overhead of Sequence-type CRDTs that is compatible with LFS applications?
-        In this thesis, we propose a novel \ac{CRDT} for the Sequence type, RenamableLogootSplit.
+        In this thesis, we have identified the need for mechanisms that (i) reduce the overhead of Sequence \acp{CRDT} (ii) are compatible with \ac{LFS} applications.
+        Thus, we propose a novel Sequence \ac{CRDT}: RenamableLogootSplit.
         This \ac{CRDT} embeds a renaming mechanism that periodically minimizes the overhead of its conflict resolution mechanism as well as a conflict resolution mechanism to integrate concurrent modifications to a rename.
         Finally, we propose a mechanism of \acf{GC} that eventually removes the own overhead of the renaming mechanism.
       % \KeyWords{CRDTs, real-time collaborative editing, eventual consistency, memory-wise optimisation, performance}
