@@ -42,7 +42,7 @@ La séquence LogootSplit autorise deux types de modifications :
     Cette fonction génère et associe un intervalle d'identifiants aux éléments à insérer en utilisant les valeurs pour $\trm{nodeId}$ et $\trm{nodeSeq}$ fournies.
     Elle retourne les données nécessaires pour l'opération $\trm{insert}$, \ie le premier identifiant de l'intervalle d'identifiants alloué et les éléments.
     Par souci de simplicité, nous noterons cette modification $\trm{insert}(\trm{pred} \prec \trm{elts} \prec \trm{succ})$ et utiliserons l'état courant de la séquence comme valeur pour $s$, l'identifiant du noeud auteur de la modification comme valeur pour $\trm{nodeId}$ et le nombre de blocs que le noeud a créé comme valeur pour $\trm{nodeSeq}$ dans nos exemples.
-  \item  $\trm{rmv}(s, i, \trm{nbElts})$, abrégée en $\trm{rmv}$ dans nos figures, qui génère l'opération permettant de supprimer $\trm{nbElts}$ dans la séquence $s$ à partir de l'index $i$.
+  \item  $\trm{remove}(s, i, \trm{nbElts})$, abrégée en $\trm{rmv}$ dans nos figures, qui génère l'opération permettant de supprimer $\trm{nbElts}$ dans la séquence $s$ à partir de l'index $i$.
     Elle retourne les données nécessaires pour l'opération $\trm{remove}$, \ie les intervalles d'identifiants supprimés.
     Par souci de simplicité, nous noterons cette modifications $\trm{remove}(\trm{elts})$ dans nos exemples.
 \end{enumerate}

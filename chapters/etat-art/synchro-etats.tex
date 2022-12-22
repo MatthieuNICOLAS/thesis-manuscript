@@ -11,7 +11,7 @@ Les noeuds convergeront tant que la couche de livraison garantit que les noeuds 
 Il s'agit là de la principale force des \acp{CRDT} synchronisés par états.
 
 Néanmoins, la définition de la fonction \texttt{merge} offrant ces propriétés peut s'avérer complexe et a des répercussions sur la spécification même du \ac{CRDT}.
-Notamment, les états doivent conserver une trace de l'existence des éléments et de leur suppression afin d'éviter qu'une fusion d'états ne les fassent ressurgirent.
+Notamment, les états doivent conserver une trace de l'existence des éléments et de leur suppression afin d'éviter qu'une fusion d'états ne les fassent ressurgir.
 Ainsi, les \acp{CRDT} synchronisés par états utilisent régulièrement des pierres tombales.
 
 \begin{definition}[Pierre tombale]
