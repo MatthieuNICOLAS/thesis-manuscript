@@ -1,7 +1,7 @@
 \cite{letia:hal-01248270} puis \cite{zawirski:hal-01248197} définissent un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour Treedoc \cite{2009-treedoc-preguica}.
 Ce mécanisme, qui prend la forme d'une nouvelle opération $\trm{rebalance}$, permet aux noeuds de réassigner des identifiants plus courts aux éléments du document.
 Cependant, cette nouvelle opération n'est ni commutative avec les opérations $\trm{insert}$ et $\trm{remove}$, ni avec elle-même.
-Pour assurer la convergence à terme \cite{10.1145/224057.224070} du système, \cite{zawirski:hal-01248197} fait le choix d'empêcher la génération d'opérations $\trm{rebalance}$ concurrentes.
+Pour assurer la cohérence à terme \cite{10.1145/224057.224070} du système, \cite{zawirski:hal-01248197} fait le choix d'empêcher la génération d'opérations $\trm{rebalance}$ concurrentes.
 Pour cela, cette approche requiert un consensus entre les noeuds pour générer les opérations $\trm{rebalance}$.
 Les opérations $\trm{insert}$ et $\trm{remove}$ sont elles toujours générées sans coordination entre les noeuds et peuvent donc être concurrentes aux opérations $\trm{rebalance}$.
 Pour gérer les opérations concurrentes aux opérations $\trm{rebalance}$, les auteurs proposent de transformer les opérations concernées par rapport aux effets des opérations$\trm{rebalance}$, à l'aide un mécanisme de \emph{catch-up}, avant de les appliquer.

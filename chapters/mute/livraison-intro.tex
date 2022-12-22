@@ -3,7 +3,7 @@
 Comme indiqué précédemment, la couche livraison est formée d'un unique composant, que nous nommons module de livraison.
 Ce module est associé aux \acp{CRDT} synchronisés par opérations représentant le document texte, \ie LogootSplit ou RenamableLogootSplit.
 
-Le rôle de ce module est de garantir que le modèle de livraison des opérations requis par le \ac{CRDT} pour assurer la convergence à terme \cf{def:eventual-consistency} soit satisfait, \ie que l'ensemble des opérations soient livrées dans un ordre correct à l'ensemble des noeuds.
+Le rôle de ce module est de garantir que le modèle de livraison des opérations requis par le \ac{CRDT} pour assurer la cohérence à terme \cf{def:eventual-consistency} soit satisfait, \ie que l'ensemble des opérations soient livrées dans un ordre correct à l'ensemble des noeuds.
 
 Pour cela, le module de livraison doit implémenter les contraintes imposées par ces \acp{CRDT} sur l'ordre de livraison des opérations (cf. \autoref{def:ls-delivery-model}, page \pageref{def:ls-delivery-model} et \autoref{def:rls-delivery-model}, page \pageref{def:ls-delivery-model}).
 Pour rappel, le modèle de livraison de RenamableLogootSplit est le suivant :

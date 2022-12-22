@@ -20,11 +20,11 @@ Chaque noeud du système possède en local une copie de la donnée.
 Les noeuds peuvent consulter et éditer leur copie locale à tout moment, sans se coordonner entre eux.
 Les modifications sont appliquées à la copie locale immédiatement et de manière atomique.
 Les modifications sont ensuite transmises aux autres noeuds de manière asynchrone par le biais de messages, afin qu'ils puissent à leur tour intégrer les modifications à leur copie.
-L'application garantit la convergence à terme des copies.
+L'application garantit la cohérence à terme \cite{10.1145/224057.224070} des copies.
 
-\begin{definition}[Convergence à terme]
+\begin{definition}[Cohérence à terme]
     \label{def:eventual-consistency}
-    La convergence à terme est une propriété de sûreté indiquant que l'ensemble des noeuds du système ayant intégrés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
+    La cohérence à terme est une propriété de sûreté indiquant que l'ensemble des noeuds du système ayant intégrés le même ensemble de modifications obtiendront des états équivalents\footnotemark.
     \footnotetext{Nous considérons comme équivalents deux états pour lesquels chaque observateur du type de données renvoie un même résultat, \ie les deux états sont indifférenciables du point de vue des utilisateur-rices du système.}
 \end{definition}
 

@@ -131,7 +131,7 @@ Pour permettre cela, les applications \ac{LFS} doivent adopter des méthodes de 
 Un mécanisme de synchronisation permet ensuite aux noeuds de partager les modifications effectuées et de les intégrer de façon à converger à terme \cite{10.1145/224057.224070}, \ie obtenir de nouveau des états équivalents.
 
 Il convient de noter que les méthodes de réplication optimistes autorisent la génération en concurrence de modifications provoquant un conflit, \eg la modification et la suppression d'une même page dans un wiki.
-Un mécanisme de résolution de conflits est alors nécessaire pour assurer la convergence à terme des noeuds.
+Un mécanisme de résolution de conflits est alors nécessaire pour assurer la cohérence à terme des noeuds.
 
 De nouveau, le modèle du système des applications que nous visons, \ie des applications \ac{LFS} à large échelle, limitent les choix possibles concernant les mécanismes de résolution de conflits.
 Notamment, ces applications ne disposent d'aucun contrôle sur le nombre de noeuds qui compose le système, \ie le nombre d'appareils utilisés par l'ensemble de leurs utilisateur-rices.

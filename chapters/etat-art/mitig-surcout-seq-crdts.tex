@@ -28,7 +28,7 @@ Ce mécanisme prend la forme d'une nouvelle opération, que nous notons $\trm{re
 
 Notons que l'opération $\trm{rebalance}$ contrevient à une des propriétés des identifiants de position densément ordonnés : leur \emph{immutabilité} \cf{def:id-prop}.
 L'opération $\trm{rebalance}$ est donc intrinséquement non-commutative avec les opérations $\trm{insert}$ et $\trm{remove}$ concurrentes.
-Pour assurer la convergence à terme des copies, les auteurs mettent en place un mécanisme de \emph{catch-up}.
+Pour assurer la cohérence à terme des copies, les auteurs mettent en place un mécanisme de \emph{catch-up}.
 Ce mécanisme consiste à transformer les opérations concurrentes aux opérations $\trm{rebalance}$ avant de les intégrer, de façon à prendre en compte les effets des ré-équilibrages.
 
 Toutefois, l'opération $\trm{rebalance}$ n'est pas non plus commutative avec elle-même.
