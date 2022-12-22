@@ -203,7 +203,14 @@ Pour ce faire, le noeud qui a généré l'opération $\trm{rename}$ diffuse les 
   Un \emph{ancien état} est la liste des intervalles d'identifiants qui composent l'état courant de la séquence répliquée au moment du renommage.
 \end{definition}
 
-De ce fait, nous définissons l'opération $\trm{rename}$ de la manière suivante :
+Par souci de simplicité, nous représentons dans ce manuscrit l'\emph{ancien état} par la liste des identifiants correspondant à la liste d'intervalles d'identifiants.
+Par exemple, l'ancien état (nommé $\trm{renamedIds}$ dans nos algorithmes) diffusé par l'opération $\trm{rename}$ de la \autoref{fig:renaming} est le suivant :
+
+\begin{equation*}
+    renamedIds = [\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]
+\end{equation*}
+
+Ainsi, nous définissons l'opération $\trm{rename}$ de la manière suivante :
 
 \begin{definition}[rename]
   \label{def:rename-op}
