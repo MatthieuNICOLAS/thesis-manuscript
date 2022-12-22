@@ -160,7 +160,15 @@ La \autoref{fig:size-snapshots-content-vs-ls} présente le résultat obtenu.
   \label{fig:size-snapshots-content-vs-ls}
 \end{figure}
 
-Sur cette figure, nous représentons l'évolution au fur et à mesure que des modifications sont effectuées sur une séquence LogootSplit de la taille de son contenu, sous la forme d'une ligne pointillée bleu, et de la taille de la séquence LogootSplit complète, sous la forme d'une ligne continue rouge.
+Sur cette figure, nous représentons l'évolution de la taille en mémoire d'une séquence au fur et à mesure que des modifications sont effectuées sur cette dernière.
+Les mesures de la taille de la séquence sont effectuées toutes les 10k modifications.
+À partir des résultats obtenus, nous présentons les courbes suivantes :
+\begin{enumerate}
+  \item La courbe pointillée bleu représente la taille du contenu.
+    Ainsi, elle correspond à la taille en mémoire nécessaire pour stocker les éléments en utilisant le type Séquence séquentiel.
+  \item La courbe continue rouge représente la taille en mémoire de la séquence LogootSplit complète, \ie la taille de son contenu et de ses métadonnées (identifiants, blocs\dots).
+\end{enumerate}
+
 Nous constatons que le contenu représente à terme moins de 1\% de taille de la structure de données.
 Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée, \ie la taille des identifiants, les blocs composant la séquence LogootSplit, mais aussi la structure de données utilisée en interne pour représenter la séquence de manière efficace.
 
