@@ -172,7 +172,7 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
         \If{$\text{id} \lid \text{newFirstId}$}
           \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
         \ElsIf{$\text{id} = \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$}
-            \Statex \Comment id obtained through \autoref{alg:renameId}, ligne \ref{alg:rename-id-in-renamedids}
+            \Statex \Comment id obtained through \autoref{alg:renameId}, ligne \ref{alg:renameId-id-in-renamedids-end}
             \State \Return $\text{id}_i$ \label{alg:revertRenameId-case-i}
         \ElsIf{$\text{newLastId} \lid \text{id}$}
             \State \Return revRenIdGreaterThanNewLastId(id, lastId)

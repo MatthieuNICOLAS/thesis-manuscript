@@ -136,42 +136,79 @@ De plus, les noeuds marquent chaque opération avec leur époque courante au mom
 Si les époques diffèrent, les noeuds doivent transformer l'opération avant de pouvoir l'intégrer.
 Les noeuds déterminent par rapport à quelles opérations $\trm{rename}$ doit être transformée l'opération reçue en calculant le chemin entre l'époque de l'opération et leur époque courante en utilisant la \emph{chaîne des époques}.\\
 
-Les noeuds utilisent la fonction \texttt{renameId}, décrite dans l'\autoref{alg:renameId}, pour transformer les opérations $\trm{insert}$ et $\trm{remove}$ par rapport aux opérations $\trm{rename}$.
+Les noeuds utilisent la fonction \texttt{renameId}, décrite dans l'\autoref{alg:renameId}\footnotemark, pour transformer les opérations $\trm{insert}$ et $\trm{remove}$ par rapport aux opérations $\trm{rename}$.
+\footnotetext{
+    Pour expliciter le formalisme de notre pseudo-code : nous utilisons l'\emph{assignation par décomposition}.
+    Par exemple, les valeurs du tableau $\text{array} = [42, 7, 53]$ peuvent être affectées respectivement aux variables $\text{val}_1$, $\text{val}_2$ et $\text{val}_3$ via l'instruction $[\text{val}_1,\text{val}_2,\text{val}_3] \leftarrow \text{array}$.
+    Finalement, nous désignons par $\_$ une ou un ensembe de valeurs non-nécessaires par notre algorithme.
+    Ainsi, pour récupérer uniquement le premier tuple d'un identifiant $\text{id}$, nous utilisons la notation suivante : $\text{firstTuple} \oplus \_ \leftarrow id$.
+}
 Cet algorithme associe les identifiants d'une époque \emph{parente} aux identifiants correspondant dans l'époque \emph{enfant}.
-L'idée principale de cet algorithme est de renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$ en utilisant leur prédecesseur dans l'ancien état (nommé $\trm{renamedIds}$ dans \autoref{alg:renameId}).
+Pour cela, la fonction \texttt{renameId} distingue les deux cas suivants :
+
+\begin{enumerate}
+    \item L'identifiant à renommer $\trm{id}$ fait partie des identifiants présents à la génération de l'opération $\trm{rename}$, \ie $\trm{id}$ appartient à l'ancien état (nommé $\trm{renamedIds}$ dans \autoref{alg:renameId}).
+        Ce cas est géré par les lignes \ref{alg:renameId-id-in-renamedids-begin} à \ref{alg:renameId-id-in-renamedids-end}.
+        \label{item:renameId-id-in-former-state}
+    \item L'identifiant à renommer $\trm{id}$ n'était pas présent lors de la génération de l'opération $\trm{rename}$, \ie $\trm{id}$ a été inséré en concurrence à cette dernière\footnotemark.
+        \footnotetext{
+            Dans le cas où nous autorisons une livraison non-causale de l'opération $\trm{rename}$ \cf{sec:renamablelogootsplit-delivery-model}, $\trm{id}$ peut aussi avoir été supprimé au préalable et l'opération $\trm{remove}$ correspondante pas encore livrée au noeud courant
+        }
+        Ce cas est géré par le reste de l'algorithme.
+        \label{item:renameId-id-not-in-former-state}
+\end{enumerate}
+
+\subsubsection{Renommage d'un identifiant appartenant à l'ancien état}
+
+TODO: Expliciter la correspondance entre l'offset d'un id après renommage et son index dans /renIds/
+
+\subsubsection{Renommage d'un identifiant inséré en concurrence de l'opération $\trm{rename}$}
+
+Pour renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$ (cas \ref{item:renameId-id-not-in-former-state}), \texttt{renameId} utilise plusieurs stratégies.
+La stratégie principale repose sur l'utilisation du prédecesseur dans l'ancien état de l'identifiant à renommer.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
-Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \texttt{renameId} pour renommer l'identifiant généré de façon concurrente avant de l'insérer dans son état.
+Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \texttt{renameId} pour renommer l'identifiant généré de façon concurrente, $\betterid{i}{B1}{0}\betterid{m}{B2}{0}$, avant de l'insérer dans son état.
+L'algorithme procède de la manière suivante.
 
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
       \Function {renameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I}\rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$} {: $\mathbb{I}$}
-          \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
+
+          \Statex
+          \State $[\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}] \gets \text{renamedIds}$
+          \Comment Retrieve the identifiers of the \emph{former state}
           % \State \Comment{$id$ is the id to rename}
           % \State \Comment{$renamedIds$ is the list of ids of the \emph{former state}}
           % \State \Comment{$nId$ is $node~id$ of the node that issued the $\trm{rename}$ op}
           % \State \Comment{$nSeq$ is $node~seq$ of the node that issued the $\trm{rename}$ op}
           \State $\text{firstId} \gets \text{id}_0$
           \State $\text{lastId} \gets \text{id}_{n - 1}$
-          \Statex \Comment $\text{firstId} = \langle \text{pos}, \_, \_, \_ \rangle \oplus \text{suffix}$
-          \\
+          \State $\langle \text{pos}, \_, \_, \_ \rangle \oplus \_ \gets \text{firstId}$
+          \Comment Retrieve the value \emph{pos} of the first tuple of \emph{id}
+          \Statex
           \If{$\text{id} \lid \text{firstId}$}
               \State $\text{newFirstId} \gets \newFirstId$
               \State \Return renIdLessThanFirstId(id, newFirstId)
           \ElsIf{$\text{id} \in \text{renamedIds}$}
-              \Statex \Comment $\text{id} = \text{id}_i$
-              \State \Return $\langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$ \label{alg:rename-id-in-renamedids}
+              \label{alg:renameId-id-in-renamedids-begin}
+              \State Retrieve the index \emph{i} of \emph{id} in \emph{renamedIds}
+              \State \Return $\langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$ \label{alg:renameId-id-in-renamedids-end}
+              \Comment Use \emph{i} as the \emph{offset} of the generated id
           \ElsIf{$\text{lastId} \lid \text{id}$}
               \State $\text{newLastId} \gets \newLastId$
               \State \Return renIdGreaterThanLastId(id, newLastId)
           \Else
+                \label{alg:renameId-main-case}
+              \Statex \Comment $\text{firstId} \lid \text{id} \lid \text{lastId} \land \text{id} \notin \text{renamedIds}$
               \State \Return renIdFromPredId(id, renamedIds, pos, nodeId, nodeSeq)
           \EndIf
       \EndFunction
-      \\
+      \Statex
       \Function {renIdFromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array} \langle \mathbb{I} \rangle$, pos $\in \mathbb{N}$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$} {: $\mathbb{I}$}
-          \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
-          \State Find $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$ \label{alg:renameId-find-predecessor}
+          \Statex
+          \State $[\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}] \gets \text{renamedIds}$
+          \State Search $\text{id}_i \in \text{renamedIds such that id}_i \lid \text{id} \lid \text{id}_{i+1}$ \label{alg:renameId-find-predecessor}
           \State $\text{newPredId} \gets \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$ \label{alg:renameId-rename-predecessor}
           \State \Return $\text{newPredId} \oplus \text{id}$ \label{alg:renameId-concat-predecessor}
       \EndFunction
@@ -293,11 +330,21 @@ Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-re
   \label{fig:concurrent-insert-rename-fixed}
 \end{figure}
 
-L'algorithme procède de la manière suivante.
-Tout d'abord, le noeud récupère le prédecesseur de l'identifiant donné \id{i}{B1}{0}\id{m}{B2}{0} dans l'ancien état : \id{i}{B1}{0}\id{f}{A1}{0} (ligne \ref{alg:renameId-find-predecessor}).
-Ensuite, il calcule l'équivalent de \id{i}{B1}{0}\id{f}{A1}{0} dans l'état renommé : \id{i}{A2}{1} (ligne \ref{alg:renameId-rename-predecessor}).
-Finalement, le noeud A concatène (noté $\oplus$) cet identifiant et l'identifiant donné pour générer l'identifiant correspondant dans l'époque \emph{enfant} : \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} (ligne \ref{alg:renameId-concat-predecessor}).
-En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité.
+Tout d'abord, il détermine quelle stratégie utiliser pour renommer l'identifiant ($\betterid{i}{B1}{0}\betterid{m}{B2}{0}$) en le comparant aux identifiants présents dans l'ancien état, dont notamment deux identifiants clés : $\trm{firstId}$ et $\trm{lastId}$.
+Ces identifiants correspondent respectivement au premier ($\betterid{i}{B1}{0}$) et au dernier identifiants ($\betterid{i}{B1}{2}$) présents dans l'ancien état ($[\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]$).
+Ici, nous avons :
+\[\trm{firstId} <_{id} \trm{id} <_{id} \trm{lastId}\]
+Nous sommes donc dans le cas correspondant à la ligne \ref{alg:renameId-main-case} et l'algorithme utilise \texttt{renIdFromPredId} pour renommer l'identifiant.
+
+Cet algorithme recherche le prédecesseur de l'identifiant donné (\id{i}{B1}{0}\id{m}{B2}{0}) dans l'ancien état, \ie l'identifiant maximal présent dans l'ancien état et qui est inférieur à l'identifiant donné (ligne \ref{alg:renameId-find-predecessor})\footnote{Notons que l'ancien état est un tableau trié d'identifiants, il est donc possible d'effectuer une recherche dichotomique pour trouver efficacement le prédecesseur}.
+Dans le cas présent, cette recherche établit que $\betterid{i}{B1}{0}\betterid{f}{A1}{0}$ est le prédécesseur de $\betterid{i}{B1}{0}\betterid{m}{B2}{0}$.
+
+Ensuite, l'algorithme renomme le prédecesseur obtenu pour déterminer l'identifiant correspondant à l'époque \emph{enfant} (ligne \ref{alg:renameId-rename-predecessor}).
+Puisque le prédecesseur appartient à l'ancien état, ce renommage correspond au cas \ref{item:renameId-id-in-former-state} expliqué précédemment et repose sur l'index du prédecesseur dans l'ancien état.
+Dans notre exemple, $\betterid{i}{B1}{0}\betterid{f}{A1}{0}$ est renommé en $\betterid{i}{A2}{1}$.
+
+Finalement, le noeud A concatène (noté $\oplus$) le prédecesseur renommé et l'identifiant donné pour générer l'identifiant correspondant à l'époque \emph{enfant} : \id{i}{A2}{1}\id{i}{B1}{0}\id{m}{B2}{0} (ligne \ref{alg:renameId-concat-predecessor}).
+En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité entre les éléments.
 
 \texttt{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
