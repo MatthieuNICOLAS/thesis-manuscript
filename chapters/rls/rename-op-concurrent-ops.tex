@@ -160,11 +160,26 @@ Pour cela, la fonction \texttt{renameId} distingue les deux cas suivants :
 
 \subsubsection{Renommage d'un identifiant appartenant à l'ancien état}
 
-TODO: Expliciter la correspondance entre l'offset d'un id après renommage et son index dans /renIds/
+Ce premier cas correspond à l'algorithme que nous avons décrit de manière informelle lors de la présentation de l'opération \emph{rename} \cf{sec:rename-op-proposition}.
+Cet algorithme associe à chaque identifiant appartenant à l'ancien état un nouvel identifiant composé d'un unique tuple.
+
+Pour chaque identifiant renommé, le nouvel identifiant obtenu est de la forme $\langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle$ où :
+\begin{enumerate}
+    \item $\trm{pos}$ est la valeur du champ $\trm{pos}$ du premier identifiant appartenant à l'ancien état.
+        Dans notre exemple, l'ancien état est le suivant :
+        \begin{equation*}
+            [\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]
+        \end{equation*}
+        La valeur de $\trm{pos}$ est donc \emph{i} (ligne \ref{alg:renameId-get-pos}).
+    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename} (\textbf{A}, obtenu par paramètre)
+    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud qui a généré l'opération \emph{rename} (2, obtenu par paramètre)
+    \item $\trm{offset}$ est l'index de l'identifiant renommé dans l'ancien état ($\betterid{i}{B1}{0} \rightarrow 0,\betterid{i}{B1}{0}\betterid{f}{A1}{0} \rightarrow 1, \dots$.)
+    Ce dernier peut être récupéré via une recherche de l'identifiant donné dans l'ancien état\footnote{Notons que l'ancien état est un tableau trié d'identifiants, il est donc possible d'effectuer une recherche dichotomique pour trouver efficacement l'index d'un identifiant.} (ligne \ref{alg:renameId-id-in-renamedids-begin}).
+\end{enumerate}
 
 \subsubsection{Renommage d'un identifiant inséré en concurrence de l'opération $\trm{rename}$}
 
-Pour renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$ (cas \ref{item:renameId-id-not-in-former-state}), \texttt{renameId} utilise plusieurs stratégies.
+Pour renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$, \texttt{renameId} utilise plusieurs stratégies.
 La stratégie principale repose sur l'utilisation du prédecesseur dans l'ancien état de l'identifiant à renommer.
 Un exemple est présenté dans la \autoref{fig:concurrent-insert-rename-fixed}.
 Cette figure décrit le même scénario que la \autoref{fig:concurrent-insert-rename-inconsistent}, à l'exception que le noeud A utilise \texttt{renameId} pour renommer l'identifiant généré de façon concurrente, $\betterid{i}{B1}{0}\betterid{m}{B2}{0}$, avant de l'insérer dans son état.
@@ -185,6 +200,7 @@ L'algorithme procède de la manière suivante.
           \State $\text{firstId} \gets \text{id}_0$
           \State $\text{lastId} \gets \text{id}_{n - 1}$
           \State $\langle \text{pos}, \_, \_, \_ \rangle \oplus \_ \gets \text{firstId}$
+            \label{alg:renameId-get-pos}
           \Comment Retrieve the value \emph{pos} of the first tuple of \emph{id}
           \Statex
           \If{$\text{id} \lid \text{firstId}$}
@@ -336,7 +352,7 @@ Ici, nous avons :
 \[\trm{firstId} <_{id} \trm{id} <_{id} \trm{lastId}\]
 Nous sommes donc dans le cas correspondant à la ligne \ref{alg:renameId-main-case} et l'algorithme utilise \texttt{renIdFromPredId} pour renommer l'identifiant.
 
-Cet algorithme recherche le prédecesseur de l'identifiant donné (\id{i}{B1}{0}\id{m}{B2}{0}) dans l'ancien état, \ie l'identifiant maximal présent dans l'ancien état et qui est inférieur à l'identifiant donné (ligne \ref{alg:renameId-find-predecessor})\footnote{Notons que l'ancien état est un tableau trié d'identifiants, il est donc possible d'effectuer une recherche dichotomique pour trouver efficacement le prédecesseur}.
+Cet algorithme recherche le prédecesseur de l'identifiant donné (\id{i}{B1}{0}\id{m}{B2}{0}) dans l'ancien état, \ie l'identifiant maximal présent dans l'ancien état et qui est inférieur à l'identifiant donné (ligne \ref{alg:renameId-find-predecessor}).
 Dans le cas présent, cette recherche établit que $\betterid{i}{B1}{0}\betterid{f}{A1}{0}$ est le prédécesseur de $\betterid{i}{B1}{0}\betterid{m}{B2}{0}$.
 
 Ensuite, l'algorithme renomme le prédecesseur obtenu pour déterminer l'identifiant correspondant à l'époque \emph{enfant} (ligne \ref{alg:renameId-rename-predecessor}).
