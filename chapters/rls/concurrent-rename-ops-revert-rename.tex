@@ -160,41 +160,44 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 \begin{algorithm}[!ht]
   \footnotesize
   \begin{algorithmic}[1]
-    \Function{revertRenameId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}{: $\mathbb{I}$}
-      \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
+    \Function{revertRenameId}{newId $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, nodeId $\in \mathbb{N}$, nodeSeq $\in \mathbb{N}$}{: $\mathbb{I}$}
 
+        \Statex
+        \State $[\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}] \leftarrow \text{renamedIds}$
         \State $\text{firstId} \gets \text{id}_0$
         \State $\text{lastId} \gets \text{id}_{n - 1}$
-        \Statex \Comment $\text{firstId} = \langle \text{pos}, \_, \_, \_ \rangle \oplus \text{suffix}$
+        \State $\langle \text{pos}, \_, \_, \_ \rangle \oplus \text{\_} \leftarrow \text{firstId}$
         \State $\text{newFirstId} \gets \newFirstId$
         \State $\text{newLastId} \gets \newLastId$
-
-        \If{$\text{id} \lid \text{newFirstId}$}
-          \State \Return revRenIdLessThanNewFirstId(id, firstId, newFirstId)
-        \ElsIf{$\text{id} = \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, i \rangle$}
-            \Statex \Comment id obtained through \autoref{alg:renameId}, ligne \ref{alg:renameId-id-in-renamedids-end}
+        \Statex
+        \If{$\text{newId} \lid \text{newFirstId}$}
+          \State \Return revRenIdLessThanNewFirstId(newId, firstId, newFirstId)
+        \ElsIf{$\text{newId} = \langle \text{pos}, \text{nodeId}, \text{nodeSeq}, \_ \rangle$}
+            \label{alg:revertRenameId-in-former-state}
+            \Statex \Comment newId obtained through \autoref{alg:renameId}, line \ref{alg:renameId-id-in-renamedids-end}
+            \State $\langle \_,\_,\_,i \rangle \leftarrow \text{newId}$
             \State \Return $\text{id}_i$ \label{alg:revertRenameId-case-i}
-        \ElsIf{$\text{newLastId} \lid \text{id}$}
-            \State \Return revRenIdGreaterThanNewLastId(id, lastId)
+        \ElsIf{$\text{newLastId} \lid \text{newId}$}
+            \State \Return revRenIdGreaterThanNewLastId(newId, lastId)
         \Else
-            \Statex \Comment $\text{id} = \newlogootsplituple{i} \oplus \text{suffix}$
-            \State \Return revRenIdfromPredId(id, renamedIds, $i$)
+            \Statex \Comment $\text{newId} = \newlogootsplituple{i} \oplus \text{tail}$
+            \State \Return revRenIdfromPredId(newId, renamedIds, $i$)
         \EndIf
     \EndFunction
-    \\
-    \Function{revRenIdfromPredId}{id $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, index $\in \mathbb{N}$}{: $\mathbb{I}$}
-        \Statex \Comment $\text{renamedIds} = [\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}]$
-        \Statex \Comment $\text{id} = \newlogootsplituple{\text{index}} \oplus \text{tail}$
-
+    \Statex
+    \Function{revRenIdfromPredId}{newId $\in \mathbb{I}$, renamedIds $\in \trm{Array}\langle \mathbb{I} \rangle$, index $\in \mathbb{N}$}{: $\mathbb{I}$}
+        \Statex
+        \State $[\text{id}_0, \text{id}_1, \cdots, \text{id}_{n-2}, \text{id}_{n-1}] \leftarrow \text{renamedIds}$
+        \State $\newlogootsplituple{\text{index}} \oplus \text{tail} \leftarrow \text{newId}$
         \State $\text{predId} \gets \text{id}_{\text{index}}$
         \State $\text{succId} \gets \text{id}_{\text{index}+1}$
-
+        \Statex
         \If{$\text{tail} \lid \text{predId}$}
-            \Statex \Comment id has been inserted causally after the $\trm{rename}$ op
+            \Statex \Comment newId has been inserted causally after the $\trm{rename}$ op
             \State \Return $\text{predId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott \label{alg:revertRenameId-case-iii}
         \ElsIf{$\text{succId} \lid \text{tail}$}
-            \Statex \Comment id has been inserted causally after the $\trm{rename}$ op
-            \Statex \Comment $\text{succId} = \text{prefix} \oplus \logootsplituple{j}$
+            \Statex \Comment newId has been inserted causally after the $\trm{rename}$ op
+            \State $\text{prefix} \oplus \logootsplituple{j} \oplus \_ \leftarrow \text{succId}$
             \State $\text{predOfSuccId} \gets \text{prefix} \oplus \langle \text{pos}_j,\text{nodeId}_j,\text{nodeSeq}_j,\text{offset}_{j} - 1 \rangle$
             \State \Return $\text{predOfSuccId} \oplus \topt \oplus \text{tail}$ \Comment \commenttopt
         \Else
@@ -209,17 +212,40 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
 Les objectifs de \texttt{revertRenameId} sont les suivants :
 \begin{enumerate}
   \item \label{item:revert-rename-1}
-    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération $\trm{rename}$ annulée.
+    Restaurer à leur ancienne valeur les identifiants générés causalement avant l'opération $\trm{rename}$ annulée, \ie les identifiants appartenant à l'ancien état de l'opération (\eg $\betterid{i}{A2}{1} \rightarrow \betterid{i}{B1}{0}\betterid{f}{A1}{0}$ dans la \autoref{fig:revertRenameId}).
+    Ce cas revient à annuler l'effet du cas \ref{item:renameId-id-in-former-state} de \texttt{renameId} (cf. page \pageref{item:renameId-id-in-former-state}).
   \item \label{item:revert-rename-2}
-    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération $\trm{rename}$ annulée.
+    Restaurer à leur ancienne valeur les identifiants générés de manière concurrente à l'opération $\trm{rename}$ annulée, \ie les identifiants n'appartenant pas à l'ancien état de l'opération (\eg $\betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{m}{B2}{0} \rightarrow \betterid{i}{B1}{0}\betterid{m}{B2}{0}$ dans la figure \autoref{fig:revertRenameId}).
+    Ce cas revient à annuler l'effet du cas \ref{item:renameId-id-not-in-former-state} de \texttt{renameId} (cf. page \pageref{item:renameId-id-in-former-state}).
   \item \label{item:revert-rename-3}
-    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération $\trm{rename}$ annulée.
+    Assigner de nouveaux identifiants respectant l'ordre souhaité aux éléments qui ont été insérés causalement après l'opération $\trm{rename}$ annulée, \ie les identifiants n'appartenant pas à l'ancien état de l'opération et que nous déterminons comme postérieurs à cette dernière d'après leur valeur.
+    Ce dernier cas n'est pas illustré dans la \autoref{fig:revertRenameId}.
+    Ainsi, nous introduirons un nouvel exemple à l'aide de la \autoref{fig:revertRenameId-mintuple} pour le présenter.
 \end{enumerate}
 
-Le cas \ref{item:revert-rename-1} est le plus trivial.
-Pour retrouver la valeur de $\trm{id}$ à partir de $\trm{newId}$\footnote{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}, \texttt{revertRenameId} utilise simplement la valeur de offset de $\trm{newId}$.
-En effet, cette valeur correspond à l'index de $\trm{id}$ dans l'\emph{ancien état} (\ie $\trm{renamedIds[offset]} = \trm{id}$).
-Par exemple, dans la \autoref{fig:revertRenameId}, l'identifiant \id{i}{A2}{0} a pour offset 0, \texttt{revertRenameId} renvoie donc $\trm{renamedIds[0]} =$ \id{i}{B1}{0} (ligne \ref{alg:revertRenameId-case-i}).\\
+Pour déterminer dans quel cas nous nous trouvons pour un identifiant donné, \texttt{revertRenameId} effectue un filtrage par motif sur la valeur de l'identifiant.
+
+\subsubsection{Annuler l'effet du renommage sur un identifiant généré causalement avant l'opération $\trm{rename}$}
+
+Pour déterminer si l'identifiant donné $\trm{newId}$\footnotemark a été obtenu via le renommage d'un identifiant $\trm{id}$\footnotemark[\value{footnote}] appartenant à l'ancien état de l'opération à annuler, il convient de se rappeler le résultat de \texttt{renameId} pour ces derniers.
+\footnotetext{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, t
+andis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}
+Comme présenté précédemment \cf{sec:totyo}, \texttt{renameId} retourne pour des identifiants appartenant à l'ancien état des identifiants de la forme suivante :
+\[ \langle \trm{pos},\trm{nodeId},\trm{nodeSeq},\trm{offset} \rangle \]
+où :
+\begin{enumerate}
+    \item $\trm{pos}$ est la valeur du champ $\trm{pos}$ du premier identifiant appartenant à l'ancien état.
+    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename}.
+    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud qui a généré l'opération \emph{rename}.
+    \item $\trm{offset}$ est l'index de l'identifiant renommé dans l'ancien état.
+\end{enumerate}
+Ainsi, \texttt{revertRenameId} détermine que $\trm{newId}$ a été obtenu via le renommage d'un identifiant appartenant à l'ancien état lorsqu'il présente ce motif ($\betterid{i}{A2}{offset}$ dans la \autoref{fig:revertRenameId}, ligne \ref{alg:revertRenameId-in-former-state} de \autoref{alg:revertRenameId}).
+
+Dans ce cas, \texttt{revertRenameId} utilise simplement la valeur de $\trm{offset}$ de $\trm{newId}$ pour retrouver $\trm{id}$ dans l'\emph{ancien état}.
+Par exemple, pour annuler l'effet du renommage sur l'identifiant $\betterid{i}{A2}{0}$ dans la \autoref{fig:revertRenameId} et ainsi retrouver sa valeur précédente, \texttt{revertRenameId} utilise l'offset de l'identifiant (0) pour retrouver l'identifiant à cet index dans l'ancien état ($[\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]$).
+De cette manière, $\betterid{i}{A2}{0}$ est restauré à son ancienne valeur : $\betterid{i}{B1}{0}$ (ligne \ref{alg:revertRenameId-case-i}).
+
+\subsubsection{Annuler l'effet du renommage sur un identifiant généré en concurrence de l'opération $\trm{rename}$}
 
 Les cas \ref{item:revert-rename-2} et \ref{item:revert-rename-3} sont gérés en utilisant les stratégies suivantes.
 Le motif générique pour l'identifiant $\trm{newId}$ est de la forme $\trm{newPredId~tail}$.
@@ -247,6 +273,8 @@ et $tail = $\id{i}{B1}{0}\id{m}{B2}{0}.
 Renvoyer cette valeur (ligne \ref{alg:revertRenameId-case-ii}) nous permet ainsi de conserver l'ordre entre les identifiants puisque :
 
 \[i^{B1}_{0}f^{A1}_{0} <_{id} i^{B1}_{0}m^{B2}_{0} <_{id} i^{B1}_{1}\]
+
+\subsubsection{Annuler l'effet du renommage sur un identifiant généré causalement après l'opération $\trm{rename}$}
 
 Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
 $\trm{newId}$ ne peut avoir été inséré que causalement après l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-3}).
@@ -587,9 +615,11 @@ Nous avons alors :
 La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre souhaité.
 Pour générer ce préfixe, \texttt{revertRenameId} utilise  $\trm{predOfSuccId}$ et $\trm{maxTuple}$.
 $\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
-Ainsi, pour préserver l'ordre souhaité, \texttt{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.\\
+Ainsi, pour préserver l'ordre souhaité, \texttt{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.
 
 % Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \texttt{revertRenameId}, il peut appliquer \texttt{renameId} pour calculer l'état correspondant à \epoch{B3}.
+
+\subsubsection{Notes additionnelles}
 
 Comme pour l'\autoref{alg:renameId}, l'\autoref{alg:revertRenameId} ne présente seulement que le cas principal de \texttt{revertRenameId}.
 Il s'agit du cas où l'identifiant à restaurer appartient à l'intervalle des identifiants renommés $\trm{newFirstId}$ \leqid $\trm{id}$ \leqid $\trm{newLastId}$).

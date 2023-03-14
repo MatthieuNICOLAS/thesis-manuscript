@@ -344,6 +344,7 @@ Finalement, le noeud A concatène (noté $\oplus$) le prédecesseur renommé et 
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité entre les éléments.
 
 \subsubsection{Renommage d'un identifiant appartenant à l'ancien état}
+\label{sec:totyo}
 
 \texttt{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
@@ -358,9 +359,9 @@ Pour chaque identifiant renommé, le nouvel identifiant obtenu est de la forme $
             [\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]
         \end{equation*}
         La valeur de $\trm{pos}$ est donc \emph{i} (ligne \ref{alg:renameId-get-pos}).
-    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename} (\textbf{A}, obtenu par paramètre)
-    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud qui a généré l'opération \emph{rename} (2, obtenu par paramètre)
-    \item $\trm{offset}$ est l'index de l'identifiant renommé dans l'ancien état ($\betterid{i}{B1}{0} \rightarrow 0,\betterid{i}{B1}{0}\betterid{f}{A1}{0} \rightarrow 1, \dots$.)
+    \item $\trm{nodeId}$ est l'identifiant du noeud qui a généré l'opération \emph{rename} (\textbf{A}, obtenu par paramètre).
+    \item $\trm{nodeSeq}$ est le numéro de séquence du noeud qui a généré l'opération \emph{rename} (2, obtenu par paramètre).
+    \item $\trm{offset}$ est l'index de l'identifiant renommé dans l'ancien état ($\betterid{i}{B1}{0} \rightarrow 0,\betterid{i}{B1}{0}\betterid{f}{A1}{0} \rightarrow 1, \dots$).
     Ce dernier peut être récupéré via une recherche de l'identifiant donné dans l'ancien état (ligne \ref{alg:renameId-id-in-renamedids-begin}).
 \end{enumerate}
 
