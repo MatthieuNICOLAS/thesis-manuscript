@@ -207,6 +207,7 @@ Pour cela, la fonction \texttt{renameId} distingue deux cas :
   \end{algorithm}
 
 \subsubsection{Renommage d'un identifiant inséré en concurrence de l'opération $\trm{rename}$}
+\label{sec:renameId-id-not-in-former-state}
 
 Pour renommer les identifiants inconnus au moment de la génération de l'opération $\trm{rename}$, \texttt{renameId} utilise plusieurs stratégies.
 La stratégie principale repose sur l'utilisation du prédecesseur dans l'ancien état de l'identifiant à renommer.
@@ -344,7 +345,7 @@ Finalement, le noeud A concatène (noté $\oplus$) le prédecesseur renommé et 
 En réassignant cet identifiant à l'élément inséré de manière concurrente, le noeud A peut l'insérer à son état tout en préservant l'ordre souhaité entre les éléments.
 
 \subsubsection{Renommage d'un identifiant appartenant à l'ancien état}
-\label{sec:totyo}
+\label{sec:renameId-id-in-former-state}
 
 \texttt{renameId} permet aussi aux noeuds de gérer le cas contraire : intégrer des opérations $\trm{rename}$ distantes sur leur copie locale alors qu'ils ont précédemment intégré des modifications concurrentes.
 Ce cas correspond à celui du noeud B dans la \autoref{fig:concurrent-insert-rename-fixed}.
