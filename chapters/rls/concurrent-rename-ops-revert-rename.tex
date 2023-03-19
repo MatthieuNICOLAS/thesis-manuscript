@@ -264,7 +264,21 @@ Il lit alors l'\emph{offset} (1) de $\trm{newPredId}$ (ligne \ref{alg:revertRena
 Comme indiqué précédemment, cet \emph{offset} correspond à l'index de $\trm{predId}$ dans l'\emph{ancien état} ($[\betterid{i}{B1}{0},\betterid{i}{B1}{0}\betterid{f}{A1}{0},\betterid{i}{B1}{1},\betterid{i}{B1}{2}]$).
 Ceci permet de récupérer $\trm{predId}$ ($\betterid{i}{B1}{0}\betterid{f}{A1}{0}$, ligne \ref{alg:revertRenameId-predId}) ainsi que $\trm{succId}$ ($\betterid{i}{B1}{1}$, ligne \ref{alg:revertRenameId-succId}).
 Dès lors, il ne reste plus qu'à comparer $\trm{tail}$ à ces deux valeurs (ligne \ref{alg:revertRenameId-case-ii}) pour valider que $\trm{tail} \in ]\trm{predId},\trm{succId}[$.
-Cette vérification effectuée, l'algorithme peut dès lors retourner la valeur $\trm{tail}$ pour annuler l'effet du renommage tout en satisfaisant nos contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
+Cette vérification effectuée, l'algorithme peut dès lors retourner la valeur $\trm{tail}$ ($\betterid{i}{B1}{0}\betterid{m}{B2}{0}$) pour annuler l'effet du renommage tout en satisfaisant nos contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
+\\
+Il convient de noter que le filtre présenté ci-dessus pour détecter les identifiants générés en concurrence à l'opération $\trm{rename}$ présente des cas de faux-positifs.
+En effet, bien qu'il permette de détecter les identifiants insérés en concurrence à l'opération $\trm{rename}$, il englobe aussi une partie des identifiants insérés causalement après cette dernière.
+Pour illustrer ce point, reprenons l'exemple illustré par la \autoref{fig:revertRenameId}.
+Avant la réception de l'opération $\trm{rename}$ générée par le noeud B, considérons que le noeud A procède à l'insertion d'un nouvel élément entre les élément "L" et "L".
+Le noeud A génère alors un nouvel identifiant $\trm{newId}$ : $\betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{t}{A3}{0}$.
+Ce dernier respecte notre contrainte d'ordre suivante :
+\[ \betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{m}{B2}{0} \lid \betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{t}{A3}{0} \lid \betterid{i}{A2}{2} \]
+
+Lors de l'annulation de l'effet de l'opération $\trm{rename}$, de manière identique à précédemment, \texttt{revertRenameId} décompose cet identifiant en $\trm{newPredId}$ ($\betterid{i}{A2}{1}$) et en $\trm{tail}$ ($\betterid{i}{B1}{0}\betterid{t}{A3}{0}$), détermine les valeurs de $\trm{predId}$ ($\betterid{i}{B1}{0}\betterid{f}{A1}{0}$) et $\trm{succId}$ ($\betterid{i}{B1}{1}$) et vérifie que $\trm{tail} \in ]\trm{predId},\trm{succId}[$.
+Ainsi, \texttt{revertRenameId} retourne la valeur de $\trm{tail}$ : $\betterid{i}{B1}{0}\betterid{t}{A3}{0}$.
+
+Cette valeur de retour satisfait notre seule contrainte portant sur cet identifiant, \ie la propriété de préservation de l'ordre \cf{prop:order}.
+En effet, elle préserve l'ordre existant entre les identifiants de l'époque \emph{fille} à l'époque \emph{parente}, que ça soit $\trm{predId}$, $\trm{succId}$ ou les autres identifiants renommés à l'aide de cette même stratégie (\eg $\betterid{i}{B1}{0}\betterid{m}{B2}{0} \lid \betterid{i}{B1}{0}\betterid{t}{A3}{0} \lid \betterid{i}{B1}{1}$).
 
 \subsubsection{Annuler l'effet du renommage sur un identifiant généré causalement après l'opération $\trm{rename}$}
 
