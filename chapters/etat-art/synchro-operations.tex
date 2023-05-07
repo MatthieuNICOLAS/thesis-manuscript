@@ -14,8 +14,10 @@ Son rôle est d'encoder la modification sous la forme d'un ou plusieurs élémen
   Il ne peut être obtenu par la fusion d'autres états.
 \end{definition}
 
-Il est à noter que dans le cas des \acp{CRDT} purs synchronisés par opérations \cite{baquero2017pure}, les modifications estampillées avec leur information de causalité correspondent à des éléments irréductibles, \ie à des opérations.
+Il est à noter que pour certains \acp{CRDT}, leurs modifications s'avèrent indépendantes de l'état courant (\eg l'Ensemble LWW).
+Pour ces \acp{CRDT} synchronisés par opérations, les modifications estampillées avec leur information de causalité correspondent à des éléments irréductibles, \ie à des opérations.
 La fonction \texttt{prepare} peut donc être omise pour cette sous-catégorie de \acp{CRDT} synchronisés par opérations.
+Ces \acp{CRDT} sont nommés \acp{CRDT} purs synchronisés par opérations \cite{baquero2017pure}.
 
 La fonction \texttt{effect} permet quant à elle d'intégrer les effets d'une opération générée ou reçue.
 Elle prend en paramètre l'état courant et l'opération, et retourne un nouvel état.
