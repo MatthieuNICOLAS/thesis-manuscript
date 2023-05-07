@@ -227,6 +227,8 @@ Pour déterminer dans quel cas nous nous trouvons pour un identifiant donné, \t
 
 \subsubsection{Annuler l'effet du renommage sur un identifiant généré causalement avant l'opération $\trm{rename}$}
 
+\label{sec:reverting-rename-ops-id-in-former-state}
+
 Pour déterminer si l'identifiant donné $\trm{newId}$\footnotemark a été obtenu via le renommage d'un identifiant $\trm{id}$\footnotemark[\value{footnote}] appartenant à l'ancien état de l'opération à annuler, il convient de se rappeler le résultat de \texttt{renameId} pour ces derniers.
 \footnotetext{Nous appelons $\trm{newX}$ les identifiants dans l'époque résultant de l'application d'une opération $\trm{rename}$, tandis que $\trm{X}$ décrit leur équivalent à l'époque initiale.}
 Comme présenté précédemment \cf{sec:renameId-id-in-former-state}, \texttt{renameId} retourne pour des identifiants appartenant à l'ancien état des identifiants de la forme suivante :
@@ -245,6 +247,8 @@ Par exemple, pour annuler l'effet du renommage sur l'identifiant $\betterid{i}{A
 De cette manière, $\betterid{i}{A2}{0}$ est restauré à son ancienne valeur : $\betterid{i}{B1}{0}$ (ligne \ref{alg:revertRenameId-case-i}).
 
 \subsubsection{Annuler l'effet du renommage sur un identifiant généré en concurrence de l'opération $\trm{rename}$}
+
+\label{sec:reverting-rename-ops-id-inserted-concurrently}
 
 De manière similaire au cas précédent, il convient tout d'abord de déterminer si l'identifiant donné $\trm{newId}$ est le résultat du renommage d'un identifiant généré en concurrence de l'opération $\trm{rename}$.
 Pour cela, rappelons le comportement adopté par \texttt{renameId} dans ce cas de figure.
@@ -267,6 +271,8 @@ Dès lors, il ne reste plus qu'à comparer $\trm{tail}$ à ces deux valeurs (lig
 Cette vérification effectuée, l'algorithme peut dès lors retourner la valeur $\trm{tail}$ ($\betterid{i}{B1}{0}\betterid{m}{B2}{0}$) pour annuler l'effet du renommage tout en satisfaisant nos contraintes, \ie préserver l'ordre souhaité et restaurer à sa valeur initiale l'identifiant.
 
 \subsubsection{Annuler l'effet du renommage sur un identifiant généré causalement après l'opération $\trm{rename}$}
+
+\label{sec:reverting-rename-ops-id-inserted-causally-after}
 
 Les identifiants générés causalement après l'opération $\trm{rename}$ se distinguent des cas décrits précédemment, \ie les identifiants appartenant à l'\emph{ancien état} ou généré en concurrence de l'opération $\trm{rename}$.
 Contrairement à ces derniers, les identifiants générés causalement après l'opération $\trm{rename}$ ne possèdent pas de valeurs correspondantes dans l'époque \emph{parente}.
@@ -715,11 +721,30 @@ Nous nous intéressons ici à la manière dont cet algorithme procède pour les 
 
 Nous distinguons deux catégories d'identifiants générés causalement après l'opération $\trm{rename}$ :
 \begin{enumerate}
-    \item Les identifiants dont la valeur ne permet pas de déterminer leur moment de génération par rapport à l'opération $\trm{rename}$ (\eg $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$), \ie la valeur ne permet de déterminer si l'identifiant a été inséré en concurrence de l'opération $\trm{rename}$ ou de façon postérieure à cette dernière.
-    \item Les identifiants dont la valeur indique qu'ils ont été généré de façon postérieure à l'opération $\trm{rename}$ ($\betterid{g}{C3}{2}\betterid{e}{C4}{0}$).
+    \item \label{item:id-causal-rename-unknown}
+        Les identifiants dont la valeur ne permet pas de déterminer leur moment de génération par rapport à l'opération $\trm{rename}$ (\eg $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$), \ie la valeur ne permet de déterminer si l'identifiant a été inséré en concurrence de l'opération $\trm{rename}$ ou de façon postérieure à cette dernière.
+    \item \label{item:id-causal-rename-determined}
+        Les identifiants dont la valeur indique qu'ils ont été généré de façon postérieure à l'opération $\trm{rename}$ (\eg $\betterid{g}{C3}{2}\betterid{e}{C4}{0}$).
 \end{enumerate}
 Nous présentons ci-dessous comment \texttt{revertRenameId} gère chacun de ces cas.
 
+\paragraph{Cas \ref{item:id-causal-rename-unknown}}
+
+Comme indiqué précédemment, \texttt{revertRenameId} vérifie pour un identifiant donné $\trm{newId}$ (\eg $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$) si sa $\trm{tail}$ ($\betterid{u}{C5}{0}$), \ie son ou ses tuples à l'exception du premier, est comprise entre son $\trm{predId}$ et $\trm{succId}$.
+Dans le cas de $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$, nous avons respectivement $\betterid{n}{C2}{0}$ et $\betterid{v}{D2}{0}$ comme $\trm{predId}$ et $\trm{succId}$ (les identifiants d'indices 2 et 3 dans l'\emph{ancien état} $[\betterid{g}{C1}{0},\betterid{k}{D1}{0},\betterid{n}{C2}{0},\betterid{v}{D2}{0}]$).
+Nous avons donc $\trm{tail} \in ]\trm{predId},\trm{succId}[$.
+
+Ce cas de figure est le même que celui présenté dans \autoref{sec:reverting-rename-ops-id-inserted-concurrently}.
+Dans certains cas, il n'est donc pas possible de distinguer un identifiant inséré de manière postérieur à l'opération $\trm{rename}$ d'un identifiant inséré de manière concurrente à cette dernière, à moins d'ajouter une métadonnée.
+
+Cependant, il n'est pas nécessaire de différencier ces deux cas : nous pouvons annuler l'effet de l'opération $\trm{rename}$ sur l'identifiant inséré par la suite de la même manière que nous annulons l'effet de l'opération $\trm{rename}$ sur les identifiants insérés en concurrence, \ie en retournant la valeur $\trm{tail}$.
+En effet, cette méthode nous permet de préserver la relation d'ordre de ces identifiants ($\betterid{g}{C3}{2}\betterid{u}{C5}{0}$) avec les autres identifiants existants ($\betterid{g}{C3}{2}$, $\betterid{g}{C3}{2}\betterid{t}{D3}{0}$ et $\betterid{g}{C3}{3}$), de l'époque enfant ($\betterepoch{C2}$) à l'époque parent ($\betterepoch{0}$).
+
+Pour $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$, \texttt{revertRenameId} retourne la valeur $\betterid{u}{C5}{0}$.
+\texttt{revertRenameId} retourne pour les identifiants $\betterid{g}{C3}{2}$ et $\betterid{g}{C3}{3}$ des éléments "R" et "D" leur valeur d'origine, $\betterid{n}{C2}{0}$ et $\betterid{v}{D2}{0}$ (\autoref{sec:reverting-rename-ops-id-in-former-state}).
+Pour l'identifiant $\betterid{g}{C3}{2}\betterid{t}{D3}{0}$ de l'élément "L", \texttt{revertRenameId} retourne $\betterid{t}{D3}{0}$ (\autoref{sec:reverting-rename-ops-id-inserted-concurrently}).
+Ainsi, l'annulation de l'effet de l'opération $\trm{rename}$ préserve à $\betterepoch{0}$ l'ordre des éléments $R \prec L \prec Y \prec D$ puisque nous avons :
+\[ \betterid{n}{C2}{0} \lid \betterid{t}{D3}{0} \lid \betterid{u}{C5}{0} \lid \betterid{v}{D2}{0}\]
 
 % Il convient de noter que le filtre présenté ci-dessus pour détecter les identifiants générés en concurrence à l'opération $\trm{rename}$ présente des cas de faux-positifs.
 % En effet, bien qu'il permette de détecter les identifiants insérés en concurrence à l'opération $\trm{rename}$, il englobe aussi une partie des identifiants insérés causalement après cette dernière.
