@@ -162,5 +162,9 @@ Pour résumer, cette approche permet de mettre en place un système en composant
 Mais comme illustré ci-dessus, chaque \ac{CRDT} synchronisé par opérations établit les propriétés de ses différentes opérations et délègue potentiellement des responsabilités à la couche de livraison.
 Une partie de la complexité de cette approche réside ainsi dans l'ajustement du couple $\langle \trm{CRDT}, \trm{couche~livraison} \rangle$ pour régler finement et optimiser leur fonctionnement en tandem.
 Des travaux \cite{baquero2017pure, 2021-improving-reactivity-pure-op-based-crdts-bauwens} ont proposé un patron de conception pour modéliser ces deux composants et leurs interactions.
-Cependant, ce patron repose sur l'hypothèse d'une livraison causale des opérations et n'est donc pas optimal.
+
+Cependant, ce patron repose sur l'hypothèse d'une livraison causale des opération.
+Nous avons toutefois montré que la livraison causale des opérations peut ne pas être nécessaire pour la convergence (\eg opérations d'ajout d'éléments dans un Ensemble).
+Ce patron implique donc l'ajout de métadonnées de causalité aux opérations, \ie des vecteurs de version, de manière parfois superflue.
+Ce patron n'est donc pas optimal.
 \mnnote{TODO: Vérifier que c'est bien le cas dans \cite{2021-improving-reactivity-pure-op-based-crdts-bauwens}}
