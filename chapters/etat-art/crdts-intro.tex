@@ -80,7 +80,8 @@ Elle définit aussi deux observateurs :
 \begin{enumerate}
   \item $\trm{length}(s)$, qui permet de récupérer le nombre d'éléments présents dans un ensemble $s$.
   \item $\trm{read}(s)$, qui permet de consulter l'état d'ensemble $s$.
-    Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{read}$ après chaque modification.
+    Dans le cadre de nos exemples, nous considérons qu'une consultation de l'état est effectuée de manière implicite à l'aide de $\trm{read}$ après chaque modification
+    \footnote{Cette hypothèse nous permettra de préciser le modèle de cohérence assuré par le système \cite{10.1145/2578855.2535848} en fonction des valeurs observées.}.
 \end{enumerate}
 
 Dans le cadre de ce manuscrit, nous travaillons sur des ensembles de caractères.
