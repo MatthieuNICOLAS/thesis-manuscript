@@ -55,17 +55,17 @@ Les identifiants des deux approches partagent donc les propriétés \ref{def:id-
 
 Pour respecter les propriétés \ref{def:id-prop-1} et \ref{def:id-prop-2}, les \acp{CRDT} reposent généralement sur des paires $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ avec :
 \begin{enumerate}
-  \item $\trm{nodeId}$, l'identifiant du noeud qui génère le dot.
+  \item $\trm{nodeId}$, l'identifiant du noeud qui génère l'identifiant.
     Il est supposé unique.
   \item $\trm{nodeSeq}$, un entier propre au noeud, servant d'horloge logique.
-    Il est incrémenté à chaque génération de dot.
+    Il est incrémenté à chaque génération d'identifiant.
 \end{enumerate}
 Ainsi, un couple de taille fixe, $\langle \trm{nodeId},\trm{nodeSeq} \rangle$, permet de respecter la contrainte d'unicité des identifiants.
 
 Le rôle des identifiants diffère entre les approches au niveau des propriétés \ref{def:id-prop-4} et \ref{def:id-prop-5} : les identifiants dans l'approche à pierres tombales doivent permettre d'ordonner un élément par rapport aux éléments insérés en concurrence uniquement, tandis que ceux de la seconde approche doivent permettre d'ordonner un élément par rapport à l'ensemble des éléments insérés.
 Cette nuance se traduit dans la structure des identifiants, notamment leur taille.
 
-Pour ordonner un identifiant par rapport à ceux générés en concurrence, l'approche à pierres tombales peut définir une relation d'ordre total strict sur leur dot respectif, \eg en se basant sur l'ordre lexicographique.
+Pour ordonner un identifiant par rapport à ceux générés en concurrence, l'approche à pierres tombales peut définir une relation d'ordre total strict sur leur paire $\langle \trm{nodeId}, \trm{nodeSeq} \rangle$ respective, \eg en se basant sur l'ordre lexicographique.
 Un élément tiers peut y être ajouté si nécessaire, \eg RGA et son horloge de Lamport \cite{1978-happen-before-lamport}.
 Ainsi, les identifiants de cette approche peuvent être définis tout en ayant une taille fixe, \ie un nombre de composants fixe.
 
