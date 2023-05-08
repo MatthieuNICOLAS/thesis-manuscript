@@ -240,7 +240,8 @@ Nous précisons notre définition de cette propriété ci-dessous :
 
 Nous constatons cependant que le critère \ref{def:causality} et la propriété \ref{def:scalability} peuvent être contradictoires.
 En effet, pour respecter le modèle de cohérence causale, un système peut nécessiter une livraison causale des modifications, \eg un \ac{CRDT} synchronisé par opérations dont seules les opérations concurrentes sont commutatives.
-La livraison causale implique un surcoût computationnel, en métadonnées et en taille des messages qui est fonction du nombre de participants du système \cite{1991-concerning-size-logical-clocks-charron-bost}.
+La livraison causale requiert l'ajout de vecteurs de version aux opérations, ou le calcul et l'ajout aux opérations de leurs dépendances causales.
+La livraison causale implique ainsi un surcoût qui est fonction du nombre de participants du système et qui concerne soit la taille des messages, soit les métadonnées maintenues et les calculs effectuées par les noeuds \cite{1991-concerning-size-logical-clocks-charron-bost}.
 Ainsi, dans le cadre de nos travaux sur la conception de systèmes collaboratifs \ac{P2P} à large échelle, nous cherchons à nous affranchir du modèle de livraison causale des modifications, ce qui peut nécessiter de relaxer le modèle de cohérence causale.
 
 C'est dans une optique similaire que fut proposé WOOT \cite{2006-woot-oster}, un modèle de séquence répliquée qui pose les fondations des \acp{CRDT}.
