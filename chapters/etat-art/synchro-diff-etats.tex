@@ -13,6 +13,8 @@ Ainsi, comme ces derniers, ils disposent d'une fonction \texttt{merge} associati
 
 La spécificité des \acp{CRDT} synchronisés par différences d'états est qu'une modification locale produit en retour un delta.
 Un delta encode la modification effectuée sous la forme d'un état du lattice.
+Par exemple, dans le cas de l'Ensemble, la différence d'état provoquée par l'ajout d'un élément (\eg $\trm{add}(a)$) est representée par l'ensemble contenant uniquement cet élément (\eg $\set{a}$).
+
 Les deltas étant des états, ils peuvent être diffusés puis intégrés par les autres noeuds à l'aide de la fonction \texttt{merge}.
 Ceci permet de bénéficier des propriétés d'associativité, de commutativité et d'idempotence offertes par cette fonction.
 Les \acp{CRDT} synchronisés par différences d'états offrent ainsi :
