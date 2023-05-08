@@ -9,7 +9,7 @@ Dans le cadre des \acp{CRDT} synchronisés par états et des \acp{CRDT} synchron
 Ce n'est pas exactement le cas dans le cadre des \acp{CRDT} synchronisés par opérations.
 Comme indiqué précédemment, les \acp{CRDT} synchronisés par opérations demandent à la couche de livraison des messages qui leur est associée qu'elle satisfasse un ensemble de contraintes.
 Si la couche de livraison ne garantit pas ces contraintes, \eg les opérations sont livrées dans le désordre, l'état des noeuds peut diverger définitivement.
-Ainsi, pour être précis, c'est le couple $\langle \trm{etats~du~CRDT},\trm{couche~livraison} \rangle$ qui forme un sup-demi-treillis dans le cadre de ce modèle de synchronisation.
+Ainsi, pour être précis, c'est le couple $\langle \trm{etats~du~CRDT},\trm{etats~de~la~couche~livraison} \rangle$ qui forme un sup-demi-treillis dans le cadre de ce modèle de synchronisation.
 
 La principale différence entre les modèles de synchronisation proposés réside dans l'unité utilisée lors d'une synchronisation.
 Le modèle de synchronisation par états, de manière équivoque, utilise les états complets.
