@@ -3,7 +3,7 @@
 Ainsi, plusieurs modèles de synchronisation ont été proposés pour permettre aux noeuds utilisant un \ac{CRDT} pour répliquer une donnée de diffuser leurs modifications et d'intégrer celles des autres.
 Nous récapitulons dans cette section les principales propriétés et différences entre ces modèles.
 
-Tout d'abord, rappelons que chaque approche repose sur l'utilisation d'un sup-demi-treillis pour assurer la convergence forte.
+Tout d'abord, rappelons que chaque approche repose sur l'utilisation d'un sup-demi-treillis pour assurer la convergence forte, \ie pour assurer que les noeuds ayant intégrés le même ensemble de modifications obtiendront des états équivalents \cf{def:sec}.
 Dans le cadre des \acp{CRDT} synchronisés par états et des \acp{CRDT} synchronisés par différences d'états, ce sont les états du \acp{CRDT} même qui forment un sup-demi-treillis.
 
 Ce n'est pas exactement le cas dans le cadre des \acp{CRDT} synchronisés par opérations.
