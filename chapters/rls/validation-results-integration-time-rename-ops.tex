@@ -5,9 +5,11 @@ Comme précédemment, nous distinguons les performances des modifications \emph{
 
 Nous rappellons que le traitement d'une opération $\trm{rename}$ dépend de l'ordre défini par la relation \emph{priority} entre l'époque qu'elle introduit et l'époque courante du noeud qui intègre l'opération.
 Le cas des opérations $\trm{rename}$ distantes se décompose donc en trois catégories.
-Les opérations \emph{distantes directes} désignent les opérations $\trm{rename}$ distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
-Les opérations \emph{concurrentes introduisant une époque plus} (resp. \emph{moins}) \emph{ prioritaire} désignent les opérations $\trm{rename}$ qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
-D'après la relation \emph{priority}, l'époque introduite est plus (resp. moins) prioritaire que l'époque courante du noeud.
+\begin{enumerate}
+  \item Les opérations \emph{distantes directes} désignent les opérations $\trm{rename}$ distantes qui introduisent une nouvelle époque \emph{enfant} de l'époque courante du noeud.
+  \item (resp. (iii)) Les opérations \emph{concurrentes introduisant une époque plus} (resp. \emph{moins}) \emph{ prioritaire} désignent les opérations $\trm{rename}$ qui introduisent une époque \emph{soeur} de l'époque courante du noeud.
+  D'après la relation \emph{priority}, l'époque introduite par l'opération concurrente est plus (resp. moins) prioritaire que l'époque courante du noeud.
+\end{enumerate}
 Les résultats obtenus sont présentés dans le \autoref{tab:evolution-integration-time-rename}.
 
 \begin{table}[!ht]
