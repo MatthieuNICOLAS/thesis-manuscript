@@ -430,10 +430,10 @@ Pour illustrer ce cas, nous introduisons un nouvel exemple via la \autoref{fig:r
                     node[letter, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{g}{C3}{3}$}] {D}
                 }
                 \newcommand\renx[1]{
-                    node[letter, label=#1:{$\betterid{g}{C3}{2}\betterid{e}{C4}{0}$}] {X}
+                    node[letter, fill=\colorblocksix, label=#1:{$\betterid{g}{C3}{2}\betterid{e}{C4}{0}$}] {X}
                 }
                 \newcommand\reny[1]{
-                    node[letter, label=#1:{$\betterid{g}{C3}{2}\betterid{u}{C5}{0}$}] {Y}
+                    node[letter, fill=\colorblocksix, label=#1:{$\betterid{g}{C3}{2}\betterid{u}{C5}{0}$}] {Y}
                 }
                 \newcommand\nodel[1]{
                     node[letter, fill=\colorblockthree, label=#1:{\coloridthree$\betterid{t}{D3}{0}$}] {L}
@@ -509,7 +509,7 @@ Pour illustrer ce cas, nous introduisons un nouvel exemple via la \autoref{fig:r
                     +(0:23) node (c-end) {}
                     +(0:1) node[point] (c-initial) {}
                     +(0:8) node[point, label=-170:{$\trm{ins}(R \prec X \prec L)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C3}, \betterid{g}{C3}{2}\betterid{e}{C4}{0},X)$}}] (c-ins-x) {}
-                    +(0:17)  node[point, label=-170:{$\trm{ins}(L \prec Y \prec D)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C3}, \betterid{g}{C3}{2}\betterid{u}{C5}{0},X)$}}] (c-ins-y) {}
+                    +(0:17)  node[point, label=-170:{$\trm{ins}(L \prec Y \prec D)$}, label={[xshift=0pt]-10:{$\trm{ins}(\betterepoch{C3}, \betterid{g}{C3}{2}\betterid{u}{C5}{0},Y)$}}] (c-ins-y) {}
                     +(0:22) node (c-final) {};
 
                 \initialstatec{(c-initial)}{\offsetc}{90};
@@ -567,10 +567,10 @@ Pour illustrer ce cas, nous introduisons un nouvel exemple via la \autoref{fig:r
                 node[letter, fill=\colorblocktwo, label=#1:{\coloridtwo$\betterid{g}{C3}{3}$}] {D}
             }
             \newcommand\renx[1]{
-                node[letter, label=#1:{$\betterid{g}{C3}{2}\betterid{e}{C4}{0}$}] {X}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{g}{C3}{2}\betterid{e}{C4}{0}$}] {X}
             }
             \newcommand\reny[1]{
-                node[letter, label=#1:{$\betterid{g}{C3}{2}\betterid{u}{C5}{0}$}] {Y}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{g}{C3}{2}\betterid{u}{C5}{0}$}] {Y}
             }
             \newcommand\nodel[1]{
                 node[letter, fill=\colorblockthree, label=#1:{\coloridthree$\betterid{t}{D3}{0}$}] {L}
@@ -579,22 +579,22 @@ Pour illustrer ce cas, nous introduisons un nouvel exemple via la \autoref{fig:r
                 node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{0..4}$}] {WORLD}
             }
             \newcommand\nodex[1]{
-                node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{n}{C2}{0}\bott\betterid{e}{C4}{0}$}] {X}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{n}{C2}{0}\bott\betterid{e}{C4}{0}$}] {X}
             }
             \newcommand\nodey[1]{
-                node[letter, fill=\colorblockone, label=#1:{\coloridone$\betterid{u}{C5}{0}$}] {Y}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{u}{C5}{0}$}] {Y}
             }
             \newcommand\rendwor[1]{
                 node[block, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{0..2}$}] {WOR}
             }
             \newcommand\rendx[1]{
-                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{D4}{2}\bott\betterid{e}{C4}{0}$}] {X}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{k}{D4}{2}\bott\betterid{e}{C4}{0}$}] {X}
             }
             \newcommand\rendl[1]{
                 node[letter, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{3}$}] {L}
             }
             \newcommand\rendy[1]{
-                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{D4}{3}\betterid{u}{C5}{0}$}] {Y}
+                node[letter, fill=\colorblocksix, label=#1:{$\betterid{k}{D4}{3}\betterid{u}{C5}{0}$}] {Y}
             }
             \newcommand\rendd[1]{
                 node[letter, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{4}$}] {D}
