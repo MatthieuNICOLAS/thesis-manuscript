@@ -194,12 +194,13 @@ Nous décrivons cette fonction dans l'\autoref{alg:revertRenameId}.
         \Statex
         \If{$\text{tail} \lid \text{predId}$}
             \Statex \Comment newId has been inserted causally after the $\trm{rename}$ op
-            \State \Return $\text{predId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott \label{alg:revertRenameId-case-iii}
+            \State \Return $\text{predId} \oplus \bott \oplus \text{tail}$ \Comment \commentbott \label{alg:revertRenameId-case-iii-min-tuple}
         \ElsIf{$\text{succId} \lid \text{tail}$}
             \Statex \Comment newId has been inserted causally after the $\trm{rename}$ op
             \State $\text{prefix} \oplus \logootsplituple{j} \oplus \_ \leftarrow \text{succId}$
             \State $\text{predOfSuccId} \gets \text{prefix} \oplus \langle \text{pos}_j,\text{nodeId}_j,\text{nodeSeq}_j,\text{offset}_{j} - 1 \rangle$
             \State \Return $\text{predOfSuccId} \oplus \topt \oplus \text{tail}$ \Comment \commenttopt
+            \label{alg:revertRenameId-case-iii-max-tuple}
         \Else
             \State \Return tail \label{alg:revertRenameId-case-ii}
         \EndIf
@@ -593,7 +594,7 @@ Pour illustrer ce cas, nous introduisons un nouvel exemple via la \autoref{fig:r
                 node[letter, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{3}$}] {L}
             }
             \newcommand\rendy[1]{
-                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{D4}{3}\betterid{u}{C5}{0}$}] {X}
+                node[letter, fill=\colorblockfour, label=#1:{\coloridfour$\betterid{k}{D4}{3}\betterid{u}{C5}{0}$}] {Y}
             }
             \newcommand\rendd[1]{
                 node[letter, fill=\colorblockfive, label=#1:{\coloridfive$\betterid{k}{D4}{4}$}] {D}
@@ -737,7 +738,7 @@ Nous avons donc $\trm{tail} \in ]\trm{predId},\trm{succId}[$.
 Ce cas de figure est le même que celui présenté dans \autoref{sec:reverting-rename-ops-id-inserted-concurrently}.
 Dans certains cas, il n'est donc pas possible de distinguer un identifiant inséré de manière postérieur à l'opération $\trm{rename}$ d'un identifiant inséré de manière concurrente à cette dernière, à moins d'ajouter une métadonnée.
 
-Cependant, il n'est pas nécessaire de différencier ces deux cas : nous pouvons annuler l'effet de l'opération $\trm{rename}$ sur l'identifiant inséré par la suite de la même manière que nous annulons l'effet de l'opération $\trm{rename}$ sur les identifiants insérés en concurrence, \ie en retournant la valeur $\trm{tail}$.
+Cependant, il n'est pas nécessaire de différencier ces deux cas : nous pouvons annuler l'effet de l'opération $\trm{rename}$ sur l'identifiant inséré par la suite de la même manière que nous annulons l'effet de l'opération $\trm{rename}$ sur les identifiants insérés en concurrence, \ie en retournant la valeur $\trm{tail}$ (cf. \autoref{alg:revertRenameId}, ligne \ref{alg:revertRenameId-case-ii}, page \pageref{alg:revertRenameId-case-ii}).
 En effet, cette méthode nous permet de préserver la relation d'ordre de ces identifiants ($\betterid{g}{C3}{2}\betterid{u}{C5}{0}$) avec les autres identifiants existants ($\betterid{g}{C3}{2}$, $\betterid{g}{C3}{2}\betterid{t}{D3}{0}$ et $\betterid{g}{C3}{3}$), de l'époque enfant ($\betterepoch{C2}$) à l'époque parent ($\betterepoch{0}$).
 
 Pour $\betterid{g}{C3}{2}\betterid{u}{C5}{0}$, \texttt{revertRenameId} retourne la valeur $\betterid{u}{C5}{0}$.
@@ -746,60 +747,28 @@ Pour l'identifiant $\betterid{g}{C3}{2}\betterid{t}{D3}{0}$ de l'élément "L", 
 Ainsi, l'annulation de l'effet de l'opération $\trm{rename}$ préserve à $\betterepoch{0}$ l'ordre des éléments $R \prec L \prec Y \prec D$ puisque nous avons :
 \[ \betterid{n}{C2}{0} \lid \betterid{t}{D3}{0} \lid \betterid{u}{C5}{0} \lid \betterid{v}{D2}{0}\]
 
-% Il convient de noter que le filtre présenté ci-dessus pour détecter les identifiants générés en concurrence à l'opération $\trm{rename}$ présente des cas de faux-positifs.
-% En effet, bien qu'il permette de détecter les identifiants insérés en concurrence à l'opération $\trm{rename}$, il englobe aussi une partie des identifiants insérés causalement après cette dernière.
-% Pour illustrer ce point, reprenons l'exemple illustré par la \autoref{fig:revertRenameId}.
-% Avant la réception de l'opération $\trm{rename}$ générée par le noeud B, considérons que le noeud A procède à l'insertion d'un nouvel élément entre les élément "L" et "L".
-% Le noeud A génère alors un nouvel identifiant $\trm{newId}$ : $\betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{t}{A3}{0}$.
-% Ce dernier respecte notre contrainte d'ordre suivante :
-% \[ \betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{m}{B2}{0} \lid \betterid{i}{A2}{1}\betterid{i}{B1}{0}\betterid{t}{A3}{0} \lid \betterid{i}{A2}{2} \]
+\paragraph{Cas \ref{item:id-causal-rename-determined}}
 
-% Lors de l'annulation de l'effet de l'opération $\trm{rename}$, de manière identique à précédemment, \texttt{revertRenameId} décompose cet identifiant en $\trm{newPredId}$ ($\betterid{i}{A2}{1}$) et en $\trm{tail}$ ($\betterid{i}{B1}{0}\betterid{t}{A3}{0}$), détermine les valeurs de $\trm{predId}$ ($\betterid{i}{B1}{0}\betterid{f}{A1}{0}$) et $\trm{succId}$ ($\betterid{i}{B1}{1}$) et vérifie que $\trm{tail} \in ]\trm{predId},\trm{succId}[$.
-% Ainsi, \texttt{revertRenameId} retourne la valeur de $\trm{tail}$ : $\betterid{i}{B1}{0}\betterid{t}{A3}{0}$.
+De nouveau, \texttt{revertRenameId} vérifie pour un identifiant donné $\trm{newId}$ (\eg $\betterid{g}{C3}{2}\betterid{e}{C4}{0}$) si sa $\trm{tail}$ ($\betterid{e}{C4}{0}$), \ie son ou ses tuples à l'exception du premier, est comprise entre son $\trm{predId}$ et $\trm{succId}$.
+Dans le cas de $\betterid{g}{C3}{2}\betterid{e}{C4}{0}$, nous avons respectivement $\betterid{n}{C2}{0}$ et $\betterid{v}{D2}{0}$ comme $\trm{predId}$ et $\trm{succId}$ (les identifiants d'indices 2 et 3 dans l'\emph{ancien état} $[\betterid{g}{C1}{0},\betterid{k}{D1}{0},\betterid{n}{C2}{0},\betterid{v}{D2}{0}]$).
+Nous avons donc $\trm{tail} \notin ]\trm{predId},\trm{succId}[$.
 
-% Cette valeur de retour satisfait notre seule contrainte portant sur cet identifiant, \ie la propriété de préservation de l'ordre \cf{prop:order}.
-% En effet, elle préserve l'ordre existant entre les identifiants de l'époque \emph{fille} à l'époque \emph{parente}, que ça soit $\trm{predId}$, $\trm{succId}$ ou les autres identifiants renommés à l'aide de cette même stratégie (\eg $\betterid{i}{B1}{0}\betterid{m}{B2}{0} \lid \betterid{i}{B1}{0}\betterid{t}{A3}{0} \lid \betterid{i}{B1}{1}$).
+Ce résultat particulier indique que l'identifiant donné (\eg $\betterid{g}{C3}{2}\betterid{e}{C4}{0}$) a été inséré de manière postérieure à l'opération $\trm{rename}$.
+Cependant, nous constatons nous ne pouvons pas gérer ce cas de manière similaire au cas précédent, \ie en retournant la valeur $\trm{tail}$.
+En effet, cette approche modifierait la relation d'ordre existante entre les identifiants à l'époque enfant (en $\betterepoch{C2}$, nous avons $\betterid{g}{C3}{2} < \betterid{g}{C3}{2}\betterid{e}{C4}{0}$) lors du passage à l'époque parent (en $\betterepoch{0}$, nous obtiendrions $\betterid{n}{C2}{0} > \betterid{e}{C4}{0}$).
 
-% Le second sous-cas correspond au cas où nous avons $\trm{tail} < \trm{predId}$.
-% $\trm{newId}$ ne peut avoir été inséré que causalement après l'opération $\trm{rename}$ (\ie le cas \ref{item:revert-rename-3}).
-% Nous avons alors :
-% \[\trm{newId} \in ]\trm{newPredId}, \trm{newPredId~predId}[\]
-% Puisque $\trm{newId}$ a été inséré causalement après l'opération $\trm{rename}$, il n'existe pas de contrainte sur la valeur à retourner autre que la préservation de l'ordre \cf{prop:order}.
-% Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{minTuple}$ et $\trm{maxTuple}$, notés respectivement $\bott$ et $\topt$.
-% Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants\footnote{Concrètement, il s'agit de tuples ayant pour $\trm{pos}$ des valeurs respectivement inférieure et supérieure à l'ensemble des valeurs de $\trm{pos}$ utilisables lors de la génération d'un nouvel identifiant.}.
-% En utilisant $\trm{minTuple}$, \texttt{revertRenameId} est capable de renvoyer une valeur pour $\trm{id}$ adaptée à l'ordre souhaité (avec $\trm{id} = \trm{predId~\bott~tail}$, ligne \ref{alg:revertRenameId-case-iii}).
-% Nous justifions ce comportement à l'aide de la \autoref{fig:revertRenameId-mintuple}.
+Pour gérer ce cas, nous introduisons deux nouveaux tuples exclusifs au mécanisme de renommage : $\trm{minTuple}$ et $\trm{maxTuple}$, notés respectivement $\bott$ et $\topt$.
+Ils sont respectivement le tuple minimal et maximal utilisables pour générer des identifiants\footnote{Concrètement, il s'agit de tuples ayant pour $\trm{pos}$ une valeur exclusive respectivement inférieure et supérieure à l'ensemble des valeurs de $\trm{pos}$ utilisables lors de la génération d'un nouvel identifiant.}.
+Nous utilisons ces tuples dans \texttt{revRenIdFromPredId} de la manière suivante.
 
-% Dans la \autoref{fig:revertRenameId-mintuple-revert}, l'opération $\trm{rename}$ de D est livrée au noeud C.
-% L'époque introduite par cette opération étant prioritaire par rapport à l'époque actuelle de C (\epoch{C2} \lepoch \epoch{D4}), le noeud C procède à l'annulation de son opération $\trm{rename}$.\\
-
-% L'identifiant qui nous intéresse ici est l'identifiant inséré causalement après l'opération $\trm{rename}$ annulée : \id{k}{C2}{1}\id{i}{C3}{0}.
-% Cet identifiant est compris entre les identifiants suivants :
-% \[k^{C2}_{1} <_{id} k^{C2}_{1}i^{C3}_{0} <_{id} k^{C2}_{1}n^{C1}_{0}e^{D3}_{0}\]
-% D'après les règles présentées précédemment :
-% \begin{itemize}
-%   \item \id{k}{C2}{1} est transformé en \id{n}{C1}{0} (cas \ref{item:revert-rename-1}, ligne \ref{alg:revertRenameId-case-i}).
-%   \item \id{k}{C2}{1}\id{n}{C1}{0}\id{e}{D3}{0} est transformé en \id{n}{C1}{0}\id{e}{D3}{0} (cas \ref{item:revert-rename-2}, ligne \ref{alg:revertRenameId-case-ii}).
-% \end{itemize}
-% Nous devons générer un identifiant $\trm{id}$ à partir de \id{k}{C2}{1}\id{i}{C3}{0} tel que :
-% \[n^{C1}_{0} <_{id} \trm{id} <_{id} n^{C1}_{0}e^{D3}_{0}\]
-
-% Utiliser $\trm{predId}$ (\id{n}{C1}{0}) en tant que préfixe de $\trm{id}$ nous permet de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$.
-% Cependant, appliquer la même stratégie que pour le cas \ref{item:revert-rename-2} pour générer $\trm{id}$ transgresserait la propriété de préservation de l'ordre.
-% En effet, nous obtiendrions $\trm{id} = $ \id{n}{C1}{0}\id{i}{C3}{0}, or \id{n}{C1}{0}\id{i}{C3}{0} $\nless_{id}$ \id{n}{C1}{0}\id{e}{D3}{0}.
-
-% Ainsi, nous devons choisir un autre préfixe dans cette situation, notamment pour garantir que l'identifiant résultant sera plus petit que les identifiants suivants.
-% C'est pour cela que nous introduisons $\trm{minTuple}$.
-% En concaténant $\trm{predId}$ et le tuple minimal, nous obtenons un préfixe nous permettant à la fois de garantir que \id{n}{C1}{0} $\lid$ $\trm{id}$ et que $\trm{id}$ $\lid$ \id{n}{C1}{0}\id{e}{D3}{0}.
-% Nous obtenons donc $\trm{id} = $ \id{n}{C1}{0}$\bott$\id{i}{C3}{0}, qui respecte l'ordre souhaité.\\
-
-% Finalement, le dernier sous-cas est le pendant du sous-cas précédent et se produit lorsque nous avons $\trm{succId} < \trm{tail}$.
-% Nous avons alors :
-% \[\trm{newId} \in ]\trm{newPredId~succId}, \trm{newSuccId}[\]
-% La stratégie pour gérer ce cas est similaire et consiste à ajouter un préfixe pour créer l'ordre souhaité.
-% Pour générer ce préfixe, \texttt{revertRenameId} utilise  $\trm{predOfSuccId}$ et $\trm{maxTuple}$.
-% $\trm{predOfSuccId}$ est obtenu en décrémentant le dernier offset de $\trm{succId}$.
-% Ainsi, pour préserver l'ordre souhaité, \texttt{revertRenameId} renvoie $\trm{id}$ avec $\trm{id} = \trm{predOfSuccId~\topt~tail}$.
+\begin{itemize}
+    \item[~] $\bott$ : Lorsque $\trm{tail} < \trm{predId}$ ($\betterid{e}{C4}{0} < \betterid{n}{C2}{0}$), \texttt{revRenIdFromPredId} génère un préfixe à partir de $\trm{predId}$ et de $\bott$, et le concatène à $\trm{tail}$ ($\betterid{n}{C2}{0}\bott\betterid{e}{C4}{0})$ (cf. \autoref{alg:revertRenameId}, ligne \ref{alg:revertRenameId-case-iii-min-tuple}, page \pageref{alg:revertRenameId-case-ii}).
+    Ce préfixe ($\betterid{n}{C2}{0}\bott$) permet d'assurer que l'identifiant résultant est supérieur à $\trm{predId}$ ($\betterid{n}{C2}{0}$) tout en restant inférieur aux identifiants insérés en concurrence à la même position ($\betterid{t}{D3}{0}$) \cf{sec:reverting-rename-ops-id-inserted-concurrently}.
+    \item[~] $\topt$ : Lorsque $\trm{succId} < \trm{tail}$, \texttt{revRenIdFromPredId} génère un préfixe à partir du prédecesseur de $\trm{succId}$ et de $\topt$.
+        Le prédecesseur de $\trm{succId}$, $\trm{predOfSuccId}$, est obtenu en décrémentant le dernier offset de $\trm{succId}$ (\eg $\betterid{v}{D2}{-1}$ pour $\betterid{v}{D2}{0}$).
+        Le préfixe ainsi formé ($\betterid{v}{D2}{-1}\topt$) est concaténé à $\trm{tail}$ pour former l'identifiant résultant (cf. \autoref{alg:revertRenameId}, ligne \ref{alg:revertRenameId-case-iii-max-tuple}, page \pageref{alg:revertRenameId-case-ii}).
+        Ce préfixe permet d'assurer que l'identifiant résultant est inférieur à $\trm{succId}$ ($\betterid{v}{D2}{0}$) tout en restant supérieur aux identifiants insérés en concurrence à la même position ($\betterid{t}{D3}{0}$) \cf{sec:reverting-rename-ops-id-inserted-concurrently}.
+\end{itemize}
 
 % Une fois que le noeud A a converti son état à un état équivalent à l'époque \epoch{0} en utilisant \texttt{revertRenameId}, il peut appliquer \texttt{renameId} pour calculer l'état correspondant à \epoch{B3}.
 
