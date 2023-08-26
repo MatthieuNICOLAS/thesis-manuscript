@@ -20,6 +20,7 @@ La \autoref{fig:evolution-integration-time-insert} présente les résultats obte
 Les complexités en temps des algorithmes d'intégration des opérations étant différentes selon que l'opération soit \emph{locale} ou \emph{distante}, \ie soit issue du noeud lui-même ou provenant d'un autre noeud \cf{sec:validation-time-complexity}, nous distinguons les temps obtenus selon ce paramètre.
 Ainsi, nous représentons l'évolution du temps d'intégration des opérations \emph{locales} et \emph{distantes} dans les figures \ref{fig:evolution-integration-time-local-insert} et \ref{fig:evolution-integration-time-remote-insert} respectivement.
 
+De la même manière que dans la \autoref{fig:evolution-document-size}, les barres grises délimitent quand des opérations $\trm{rename}$ sont effectuées.
 Les boxplots oranges correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleues sur des documents RenamableLogootSplit.
 Bien que les temps d'intégration soient initialement équivalents, les temps d'intégration sur des documents RenamableLogootSplit sont ensuite réduits par rapport à ceux de LogootSplit une fois que des opérations $\trm{rename}$ ont été intégrées.
 Cette amélioration s'explique par le fait que l'opération $\trm{rename}$ optimise la représentation interne de la séquence (\ie elle réduit le nombre de blocs stockés dans l'arbre AVL).
