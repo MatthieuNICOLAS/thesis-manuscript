@@ -1,15 +1,7 @@
 \label{sec:integration-time-standard-ops}
 
-Nous avons ensuite comparé l'évolution du temps d'intégration des opérations standards, \ie les opérations $\trm{insert}$ et $\trm{remove}$, sur des documents LogootSplit et RenamableLogootSplit.
-Puisque les deux types d'opérations partagent la même complexité en temps, nous avons seulement utilisé des opérations $\trm{insert}$ dans nos benchmarks.
-Nous faisons par contre la différence entre les mises à jours \emph{locales} et \emph{distantes}.
-Conceptuellement, les modifications locales peuvent être décomposées comme présenté dans \cite{baquero2017pure} en les deux étapes suivantes :
-\begin{enumerate}
-  \item La génération de l'opération correspondante.
-  \item L'application de l'opération correspondante sur l'état local.
-\end{enumerate}
-Cependant, pour des raisons de performances, nous avons fusionné ces deux étapes dans notre implémentation.
-Nous distinguons donc les résultats des modifications \emph{locales} et des modifications \emph{distantes} dans nos benchmarks.
+Nous avons ensuite comparé l'évolution du temps d'intégration des opérations standards, \ie les opérations $\trm{insert}$ et $\trm{remove}$\footnote{Puisque les opérations $\trm{insert}$ et $\trm{remove}$ partagent la même complexité en temps \cf{sec:validation-time-complexity}, nous avons seulement utilisé des opérations $\trm{insert}$ dans nos benchmarks.}, sur des documents LogootSplit et RenamableLogootSplit.
+Puisque nous nous intéressons au surcoût introduit par le mécanisme de renommage, \ie par le système d'époques et le renommage éventuel d'identifiants, nous ne mesurons uniquement que le temps d'intégration des opérations, \ie le temps mis par la séquence répliquée pour appliquer une modification donnée.
 La \autoref{fig:evolution-integration-time-insert} présente les résultats obtenus.
 
 \begin{figure}[!ht]
@@ -25,7 +17,10 @@ La \autoref{fig:evolution-integration-time-insert} présente les résultats obte
   \label{fig:evolution-integration-time-insert}
 \end{figure}
 
-Dans ces figures, les boxplots oranges correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleues sur des documents RenamableLogootSplit.
+Les complexités en temps des algorithmes d'intégration des opérations étant différentes selon que l'opération soit \emph{locale} ou \emph{distante}, \ie soit issue du noeud lui-même ou provenant d'un autre noeud \cf{sec:validation-time-complexity}, nous distinguons les temps obtenus selon ce paramètre.
+Ainsi, nous représentons l'évolution du temps d'intégration des opérations \emph{locales} et \emph{distantes} dans les figures \ref{fig:evolution-integration-time-local-insert} et \ref{fig:evolution-integration-time-remote-insert} respectivement.
+
+Les boxplots oranges correspondent aux temps d'intégration sur des documents LogootSplit, les boxplots bleues sur des documents RenamableLogootSplit.
 Bien que les temps d'intégration soient initialement équivalents, les temps d'intégration sur des documents RenamableLogootSplit sont ensuite réduits par rapport à ceux de LogootSplit une fois que des opérations $\trm{rename}$ ont été intégrées.
 Cette amélioration s'explique par le fait que l'opération $\trm{rename}$ optimise la représentation interne de la séquence (\ie elle réduit le nombre de blocs stockés dans l'arbre AVL).
 
