@@ -35,12 +35,12 @@ En effet, le papier ne précise pas de procédure particulière lorsqu'un nouvea
 Pour obtenir la liste des collaborateur-rices, ce dernier doit donc la demander à un autre pair.
 
 Nous avons donc implémenté pour la liste des collaborateur-rices un mécanisme d'anti-entropie : à sa connexion, puis de manière périodique, un noeud envoie une requête de synchronisation à un noeud cible choisi de manière aléatoire.
-Ce message sert aussi à transmettre l'état courant du noeud source au noeud cible.
-En réponse, le noeud cible lui envoie l'état courant de sa liste.
+Ce message sert aussi au noeud source à transmettre l'état courant de sa liste des collaborateurs au noeud cible.
+En réponse, le noeud cible lui envoie l'état courant de sa propre liste.
 À la réception de cette dernière, le noeud source fusionne la liste reçue avec sa propre liste.
 Cette fusion conserve l'entrée la plus récente pour chaque noeud.\\
 
 Pour récapituler, les mises à jour du groupe sont diffusées de manière atomique de façon épidémique, en utilisant les messages du mécanisme de détection des défaillances des noeuds.
-De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser leur état.
+De manière additionnelle, un mécanisme d'anti-entropie permet à deux noeuds de synchroniser l'état de leur liste des collaborateurs respective.
 Ce mécanisme nous permet de pallier les défaillances éventuelles du réseau.
 Ainsi, dans les faits, nous avons mis en place un \ac{CRDT} synchronisé par différences d'états \cf{sec:delta-crdts} pour la liste des collaborateur-rices.
