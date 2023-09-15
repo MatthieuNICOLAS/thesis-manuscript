@@ -6,6 +6,9 @@ Ce module est associé aux \acp{CRDT} synchronisés par opérations représentan
 Le rôle de ce module est de garantir que le modèle de livraison des opérations requis par le \ac{CRDT} pour assurer la cohérence à terme \cf{def:eventual-consistency} soit satisfait, \ie que l'ensemble des opérations soient livrées dans un ordre correct à l'ensemble des noeuds.
 
 Pour cela, le module de livraison doit implémenter les contraintes imposées par ces \acp{CRDT} sur l'ordre de livraison des opérations (cf. \autoref{def:ls-delivery-model}, page \pageref{def:ls-delivery-model} et \autoref{def:rls-delivery-model}, page \pageref{def:ls-delivery-model}).
+Ces contraintes étant spécifiques au \ac{CRDT} utilisé, nous avons implémenté un module de livraison dédié à chacun.
+Nous décrivons dans cette section comment nous avons implémenté le module de livraison pour RenamableLogootSplit.
+
 Pour rappel, le modèle de livraison de RenamableLogootSplit est le suivant :
 \begin{enumerate}
     \item Une opération doit être livrée à l'ensemble des noeuds à terme.
@@ -14,4 +17,3 @@ Pour rappel, le modèle de livraison de RenamableLogootSplit est le suivant :
     \item Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération $\trm{rename}$ qui a introduit son époque de génération a été délivrée à ce même noeud.
 \end{enumerate}
 
-Nous décrivons ci-dessous comment nous assurons chacune de ces contraintes.
