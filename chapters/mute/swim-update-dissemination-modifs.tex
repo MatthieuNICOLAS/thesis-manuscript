@@ -2,6 +2,7 @@ Nous avons ensuite apporté plusieurs modifications à la version du protocole S
 Notre première modification porte sur l'ordre de priorité entre les états d'un pair.\\
 
 \textbf{Modification de l'ordre de précédence.}
+\label{sec:swim-modif-precedence-order}
 Dans la version originale, un pair désigné comme défaillant l'est de manière irrévocable.
 Ce comportement est dû au fait que la relation d'ordre $\ltuple$ utilise d'abord les valeurs de $\trm{nodeStatus}$ pour ordonner deux états pour un noeud donné.
 Ce n'est seulement qu'en cas d'égalité que $\ltuple$ considère les valeurs de $\trm{nodeIncarn}$.
