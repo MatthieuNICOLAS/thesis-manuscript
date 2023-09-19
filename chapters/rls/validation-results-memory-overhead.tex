@@ -29,6 +29,8 @@ Ce résultat s'explique par le fait que le mécanisme de renommage permet aux no
 
 Pour récapituler les résultats présentés, le mécanisme de renommage introduit un surcoût temporaire en métadonnées qui augmente avec chaque opération $\trm{rename}$.
 Mais ce surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations $\trm{rename}$ deviennent causalement stables.
+Pour être précis, l'utilisation du mécanisme de renommage puis la suppression des métadonnées de ce dernier permet à RenamableLogootSplit de minimiser les métadonnées de la séquence répliquée, \ie de ne conserver qu'une seule époque dans son arbre des époques et d'associer qu'un unique intervalle d'identifiants à l'ensemble des éléments de la séquence.
+RenamableLogootSplit obtient ainsi, d'après nos mesures, une empreinte en métadonnées 100 fois inférieure à celle de LogootSplit.
 
 Il convient de noter que la stabilité causale peut être difficile à atteindre dans un système pair-à-pair dynamique, \eg en cas d'absence prolongée d'un des pairs.
 Afin de limiter l'impact de l'accumulation de métadonnées du mécanisme de renommage sur la séquence répliquée, nous proposons que les \emph{anciens états} soient déchargés sur le disque en attendant que la stabilité causale soit atteinte.
