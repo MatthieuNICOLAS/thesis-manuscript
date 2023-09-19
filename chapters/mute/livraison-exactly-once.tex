@@ -175,6 +175,7 @@ Ainsi, l'implémentation de livraison en exactement un exemplaire d'une opérati
 Il s'agit d'une contrainte non-nécessaire et qui peut introduire des délais dans la collaboration, notamment si une opération d'un noeud est perdue par le réseau.
 Nous jugeons cependant acceptable ce compromis entre le surcoût du mécanisme de livraison en exactement un exemplaire et son impact sur l'expérience utilisateur.\\
 
-Pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
+Toutefois, pour retirer cette contrainte superflue, il est possible de remplacer cette structure de données par un \emph{Interval Version Vector} \cite{2014-optimized-or-sets}.
 Au lieu d'enregistrer seulement le dernier dot intégré par noeud, cette structure de données enregistre les intervalles de dots intégrés.
-Ceci permet une livraison \emph{dans le désordre} des opérations, \ie une livraison des opérations dans un ordre différent de leur ordre d'émission, tout en garantissant une livraison en exactement un exemplaire et en compactant efficacement les données stockées par le module de livraison à terme.
+Ceci permet une livraison \emph{dans le désordre} des opérations, \ie une livraison des opérations dans un ordre différent de leur ordre d'émission.
+Cette structure de données permet ainsi de garantir une livraison en exactement un exemplaire sans introduire de dépendances superflues entre les opérations, tout en compactant efficacement les données stockées par le module de livraison à terme.
