@@ -29,6 +29,9 @@ Ce résultat s'explique par le fait que le mécanisme de renommage permet aux no
 
 Pour récapituler les résultats présentés, le mécanisme de renommage introduit un surcoût temporaire en métadonnées qui augmente avec chaque opération $\trm{rename}$.
 Mais ce surcoût se résorbe à terme une fois que le système devient quiescent et que les opérations $\trm{rename}$ deviennent causalement stables.
-Dans la \autoref{sec:offloading-former-states}, nous détaillerons l'idée que les \emph{anciens états} peuvent être déchargés sur le disque en attendant que la stabilité causale soit atteinte pour atténuer l'impact du surcoût temporaire en métadonnées.
+
+Il convient de noter que la stabilité causale peut être difficile à atteindre dans un système pair-à-pair dynamique, \eg en cas d'absence prolongée d'un des pairs.
+Afin de limiter l'impact de l'accumulation de métadonnées du mécanisme de renommage sur la séquence répliquée, nous proposons que les \emph{anciens états} soient déchargés sur le disque en attendant que la stabilité causale soit atteinte.
+Nous détaillons cette suggestion dans la \autoref{sec:offloading-former-states}.
 
 
