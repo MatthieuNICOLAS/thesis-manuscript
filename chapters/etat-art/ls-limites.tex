@@ -169,7 +169,7 @@ Les mesures de la taille de la séquence sont effectuées toutes les 10k modific
   \item La courbe continue rouge représente la taille en mémoire de la séquence LogootSplit complète, \ie la taille de son contenu et de ses métadonnées (identifiants, blocs\dots).
 \end{enumerate}
 
-Nous constatons que le contenu représente à terme moins de 1\% de taille de la structure de données.
+Nous constatons dès notre première mesure, \ie dès les 10k premières modifications effectuées, que le contenu ne représente plus que 1\% de taille de la structure de données.
 Les 99\% restants correspondent aux métadonnées utilisées par la séquence répliquée, \ie la taille des identifiants, les blocs composant la séquence LogootSplit, mais aussi la structure de données utilisée en interne pour représenter la séquence de manière efficace.
 
 Nous jugeons donc nécessaire de proposer des mécanismes et techniques afin de mitiger le surcoût des \acp{CRDT} pour le type Séquence et sa croissance.
