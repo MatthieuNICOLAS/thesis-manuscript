@@ -155,7 +155,7 @@ Les noeuds reposent alors sur la notion de stabilité causale \cite{10.1007/978-
   Ainsi, toute opération future dépend causalement des opérations causalement stables, \ie les noeuds ne peuvent plus générer d'opérations concurrentes aux opérations causalement stables.
 \end{definition}
 
-Un mécanisme d'instantané \mnnote{TODO: Ajouter refs} doit néanmoins être associé au mécanisme de troncature du journal pour générer un état équivalent à la partie tronquée.
+Un mécanisme d'instantané \cite{1980-database-snapshots-adiba} doit néanmoins être associé au mécanisme de troncature du journal pour générer un état équivalent à la partie tronquée.
 Ce mécanisme est en effet nécessaire pour permettre un nouveau noeud de rejoindre le système et d'obtenir l'état courant à partir de l'instantané et du journal tronqué.
 
 Pour résumer, cette approche permet de mettre en place un système en composant un \ac{CRDT} synchronisé par opérations avec une couche de livraison des messages.
