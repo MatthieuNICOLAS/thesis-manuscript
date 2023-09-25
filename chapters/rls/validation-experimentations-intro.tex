@@ -1,12 +1,12 @@
 \label{sec:validation-experimentations}
 
 Afin de valider l'approche que nous proposons, nous avons procédé à une évaluation expérimentale.
-Les objectifs de cette évaluation étaient de mesurer
+Les objectifs de cette évaluation étaient de mesurer :
 \begin{enumerate}
   \item Le surcoût mémoire de la séquence répliquée.
   \item Le surcoût en calculs ajouté aux opérations $\trm{insert}$ et $\trm{remove}$ par le mécanisme de renommage.
   \item Le coût d'intégration des opérations $\trm{rename}$.
 \end{enumerate}
 
-Par le biais de simulations, nous avons généré le jeu de données utilisé par nos benchmarks.
-Ces simulations suivent le scénario suivant.
+Pour produire le jeu de données nécessaire à nos benchmarks, \ie des instantanés de l'état de séquences répliquées à différents stades de leur vie ainsi que les logs d'opérations correspondant, nous avons mené des simulations de sessions d'édition collaborative.
+Ces simulations suivaient le scénario suivant.
