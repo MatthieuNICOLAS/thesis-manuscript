@@ -4,7 +4,7 @@ Afin d'offrir une haute disponibilité à leurs clients et afin d'accroître leu
 Ce paradigme consiste à ce que chaque noeud composant le système possède une copie de la donnée répliquée.
 Chaque noeud possède le droit de la consulter et de la modifier, sans coordination préalable avec les autres noeuds.
 Les noeuds peuvent alors temporairement diverger, \ie posséder des états différents.
-Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et d'obtenir de nouveau des états équivalent, \ie de converger à terme \cite{10.1145/224057.224070}.
+Un mécanisme de synchronisation leur permet ensuite de partager leurs modifications respectives et d'obtenir de nouveau des états équivalent, \ie de converger \cite{10.1145/224057.224070}.
 
 Pour permettre aux noeuds de converger, les protocoles de réplication optimiste ordonnent généralement les évènements se produisant dans le système distribué.
 Pour les ordonner, la littérature repose généralement sur la relation de causalité entre les évènements, qui est définie par la relation \hb \cite{1978-happen-before-lamport}.

@@ -128,7 +128,7 @@ Ainsi, pour permettre le fonctionnement en mode hors-ligne de l'application, \ie
 
 Ainsi, les applications \ac{LFS} doivent autoriser les noeuds possédant une copie de la donnée à diverger temporairement, \ie à posséder des copies dans des états différents à un moment donné.
 Pour permettre cela, les applications \ac{LFS} doivent adopter des méthodes de réplication dites optimistes \cite{2005-optimistic-replication-saito}, \ie qui permettent la consultation et la modification de la donnée sans coordination au préalable avec les autres noeuds\footnote{Les méthodes de réplication optimistes s'opposent aux méthodes de réplication dites pessimistes qui nécessitent une coordination préalable entre les noeuds avant toute modification de la donnée et interdisent ainsi toute divergence}.
-Un mécanisme de synchronisation permet ensuite aux noeuds de partager les modifications effectuées et de les intégrer de façon à converger à terme \cite{10.1145/224057.224070}, \ie obtenir de nouveau des états équivalents.
+Un mécanisme de synchronisation permet ensuite aux noeuds de partager les modifications effectuées et de les intégrer de façon à converger \cite{10.1145/224057.224070}, \ie obtenir de nouveau des états équivalents.
 
 Il convient de noter que les méthodes de réplication optimistes autorisent la génération en concurrence de modifications provoquant un conflit, \eg la modification et la suppression d'une même page dans un wiki.
 Un mécanisme de résolution de conflits est alors nécessaire pour assurer la cohérence à terme des noeuds.
