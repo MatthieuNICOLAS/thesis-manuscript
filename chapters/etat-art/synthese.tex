@@ -5,11 +5,25 @@ Il en résulte des divergences temporaires entre les copies respectives des noeu
 Pour résoudre les potentiels conflits provoqués par des modifications concurrentes et assurer la cohérence à terme des copies, les systèmes ont tendance à utiliser les \acp{CRDT} \cite{shapiro_2011_crdt} en place et lieu des types de données séquentiels.
 
 Plusieurs \acp{CRDT} pour le type Séquence ont été proposés, notamment pour permettre la conception d'éditeurs collaboratifs pair-à-pair.
-Ces \acp{CRDT} peuvent être regroupés en deux catégories en fonction de leur mécanisme de résolution de conflits : l'approche à pierres tombales \cite{2006-woot-oster,2007-wooto-weiss,2011-evaluation-crdts-ahmed-nacer,ROH2011354,briot:hal-01343941,2019-interleaving-anomalies-collaborative-editors-kleppmann} et l'approche à identifiants densément ordonnées \cite{2009-treedoc-preguica,2009-logoot-weiss,2010-logoot-undo-weiss,2013-logootsplit,2021-these-vic}.
+Ces \acp{CRDT} peuvent être regroupés en deux catégories en fonction de leur mécanisme de résolution de conflits : l'approche à pierres tombales \cite{2006-woot-oster,2007-wooto-weiss,2011-evaluation-crdts-ahmed-nacer,ROH2011354,briot:hal-01343941,2019-interleaving-anomalies-collaborative-editors-kleppmann} et l'approche à identifiants densément ordonnées \cite{2009-treedoc-preguica,2009-logoot-weiss,2010-logoot-undo-weiss,letia:hal-01248270,zawirski:hal-01248197,2013-logootsplit,lseq2013,lseq2017,2021-these-vic}.
 
-Chacune de ces approches introduit néanmoins un surcoût croissant, au moins en termes de métadonnées et de calculs, pénalisant leurs performances à terme.
-Pour résoudre ce problème, plusieurs travaux ont été proposés, notamment \cite{letia:hal-01248270, zawirski:hal-01248197}.
-Cette approche présente un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés.
+Chacune de ces approches introduit néanmoins un surcoût croissant avec le nombre de modifications, \ie le nombre de pierres tombales des éléments supprimés ou la taille des identifiants de position des éléments.
+Ce surcoût croissant pénalise à terme les performances de chacune de ces approches, au moins en termes de métadonnées et de calculs.
+Pour limiter leur surcoût et la croissance de ce dernier, les \acp{CRDT} pour le type Séquence proposent et intègrent divers mécanismes.
 
-Cette approche requiert cependant un protocole de consensus, des renommages concurrents provoquant un nouveau conflit.
+\cite{2013-logootsplit,briot:hal-01343941} proposent un mécanisme d'aggrégation dynamique des élements insérés dans la séquence en blocs.
+L'aggrégation des éléments en blocs permet de modifier la granularité de la séquence : ses performances en termes de métadonnées et de calculs dépendent non plus du nombre d'éléments mais du nombre de blocs.
+Cependant, ce mécanisme est limité par diverses contraintes qui régissent l'ajout d'un élément inséré à l'un des blocs existants et par l'absence de mécanisme de fusion de blocs \emph{a posteriori} \cf{sec:growth-nb-blocks}.
+Ainsi, les insertions et suppressions d'éléments fragmentent au fur et à mesure la séquence en de nombreux blocs composés d'un nombre réduit d'éléments, limitant l'efficacité de ce mécanisme.
+
+\cite{lseq2013,lseq2017} proposent, pour ralentir la croissance des identifiants de position, de combiner l'utilisation de plusieurs stratégies d'allocations des identifiants avec l'utilisation d'une structure de données sur-mesure pour représenter les identifiants.
+Cette approche permet d'obtenir une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.
+Cependant, cette approche fut conçue pour les séquences à granularité fixe : bien que réduit par rapport à une approche naïve, son surcoût reste proportionnel au nombre d'identifiants, \ie au nombre d'élements.
+L'adaptation de cette approche aux séquences à granularité variable est quant à elle un problème ouvert, les contraintes sur l'ajout d'un élément à un bloc existant entrant en conflit avec les stratégies d'allocations proposées.
+
+Finalement, \cite{letia:hal-01248270,zawirski:hal-01248197} présentent un mécanisme de ré-équilibrage de l'arbre des identifiants de position pour les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés.
+Ce mécanisme permet périodiquement de ré-affecter des identifiants de taille minimale aux différents éléments de la séquence.
+Cette approche requiert cependant un protocole de consensus, des ré-équilibrages concurrents provoquant un nouveau conflit.
 Cette contrainte empêche son utilisation dans les systèmes \ac{P2P} ne disposant pas de noeuds suffisamment stables et bien connectés pour participer au protocole de consensus.
+
+Ainsi, aucune approche existante ne paraît viable dans le cadre de systèmes \ac{P2P} dynamiques à large échelle pour limiter le surcoût des \acp{CRDT} pour le type Séquence à granularité variable et pour limiter son impact croissant sur les performances.

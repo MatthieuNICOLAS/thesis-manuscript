@@ -61,6 +61,7 @@ Par conséquent, la taille des identifiants croît à chaque fois qu'un interval
 Comme présenté précédemment \cf{sec:seq-crdts-synth}, cette croissance augmente le surcoût en métadonnées, en calculs et en bande-passante du \ac{CRDT}.
 
 \subsubsection{Fragmentation de la séquence en blocs courts}
+\label{sec:growth-nb-blocks}
 
 La seconde limite de LogootSplit est la fragmentation de l'état en une multitude de blocs courts.
 En effet, plusieurs contraintes sur la génération d'identifiants empêchent les noeuds d'ajouter des nouveaux éléments aux blocs existants :

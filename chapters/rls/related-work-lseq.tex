@@ -11,7 +11,7 @@ De plus, LSEQ adopte une structure d'arbre exponentiel pour allouer les identifi
 Cela permet à LSEQ de choisir avec soin la taille des identifiants et la stratégie d'allocation en fonction des besoins.
 En combinant les différentes stratégies d'allocation avec la structure d'arbre exponentiel, LSEQ offre une croissance polylogarithmique de la taille des identifiants en fonction du nombre d'insertions.\\
 
-Bien que l'approche LSEQ ralentisse la vitesse de croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés, le surcoût de la séquence reste proportionnel à son nombre d'éléments.
+Bien que l'approche LSEQ ralentisse la vitesse de croissance des identifiants des \acp{CRDT} pour le type Séquence à identifiants densément ordonnés, le surcoût de la séquence reste proportionnel à son nombre d'éléments.
 À l'inverse, le mécanisme de renommage de RenamableLogootSplit permet de réduire les métadonnées à une quantité fixe, indépendamment du nombre d'éléments.
 
 Ces deux approches sont néanmoins orthogonales et peuvent, comme avec l'approche précédente, être combinées.

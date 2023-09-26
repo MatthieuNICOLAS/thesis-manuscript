@@ -49,7 +49,7 @@ Cette condition est un obstacle pour le déploiement et la pérennité de cette 
 \subsection{Ralentissement de la croissance des identifiants de position}
 \label{sec:etat-art-lseq}
 
-L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants dans les Séquences \acp{CRDT} à identifiants densément ordonnés.
+L'approche LSEQ \cite{lseq2013, lseq2017} est une approche visant à ralentir la croissance des identifiants des \acp{CRDT} pour le type Séquence à identifiants densément ordonnés.
 Au lieu de réduire périodiquement la taille des métadonnées liées aux identifiants à l'aide d'un mécanisme coûteux de ré-équilibrage de l'arbre des identifiants de position \cite{zawirski:hal-01248197}, les auteurs définissent de nouvelles stratégies d'allocation des identifiants pour réduire leur vitesse de croissance.
 
 Dans ces travaux, les auteurs notent que les stratégies d'allocation des identifiants proposées pour Logoot dans \cite{2009-logoot-weiss} et \cite{2010-logoot-undo-weiss} ne sont adaptées qu'à un seul comportement d'édition : l'édition séquentielle.

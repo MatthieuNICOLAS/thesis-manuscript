@@ -2,10 +2,11 @@
 
 Dans le cadre de cette thèse, nous proposons et présentons un nouveau mécanisme de réduction du surcoût pour les \acp{CRDT} pour le type Séquence à identifiants densément ordonnés et à granularité variable.
 
-Ce mécanisme se distingue des travaux existants, notamment de \cite{letia:hal-01248270,zawirski:hal-01248197}, par les aspects suivants :
+À l'instar de \cite{letia:hal-01248270,zawirski:hal-01248197}, ce mécanisme ré-affecte périodiquement des identifiants de taille minimale aux différents éléments de la séquence.
+Il se distingue toutefois de ces travaux par les aspects suivants :
 \begin{enumerate}
-    \item Il ne nécessite pas de coordination synchrone entre les noeuds.
-    \item Il ré-aggrége les éléments de la séquence en de nouveaux blocs pour réduire leur nombre.
+    \item Conçu pour les systèmes \ac{P2P} dynamiques à large échelle, il ne nécessite pas de coordination synchrone entre les noeuds.
+    \item Conçu pour les séquences à granularité variable, il ré-aggrége les éléments de la séquence en de nouveaux blocs pour réduire leur nombre.
 \end{enumerate}
 
 Nous concevons ce mécanisme pour le \ac{CRDT} LogootSplit.
