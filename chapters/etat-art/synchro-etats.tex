@@ -73,7 +73,7 @@ Le noeud A (resp. B) diffuse alors son état $\set{a,b,c,e}$ (resp. $\set{a,d,e}
 Dans le cadre de l'Ensemble répliqué, cette fonction consiste généralement à faire l'union des états, en prenant en compte l'estampille et le statut (présent ou non) associé à chaque élément.
 Ainsi la fusion de leur état respectif, $\set{a,b,c,e} \cup \set{a,d,e}$, permet aux noeuds de converger à l'état souhaité : $\set{a,b,c,d,e}$.
 
-Avant de conclure, il est intéressant de noter que les \acp{CRDT} adoptant ce modèle de synchronisation respectent de manière intrinsèque le modèle de cohérence causale \cite{2011-consistency-availability-convergence-mahajan}.
+Avant de conclure, il est intéressant de noter que les \acp{CRDT} adoptant ce modèle de synchronisation respectent de manière intrinsèque le modèle de cohérence causale \cite{1995-causal-memory-ahamad-neiger,2011-consistency-availability-convergence-mahajan}.
 
 \begin{definition}[Modèle de cohérence causale]
   \label{def:causal-consistency}
