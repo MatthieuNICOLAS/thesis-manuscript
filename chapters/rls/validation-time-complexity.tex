@@ -14,14 +14,10 @@ Finalement, nous considérons que nous utilisons comme structures de données un
 \subsubsection{Complexité en temps des opérations $\trm{insert}$ et $\trm{remove}$}
 
 À partir de ces hypothèses, nous établissons les complexités en temps des opérations.
-Conceptuellement, les modifications locales peuvent être décomposées comme présenté dans \cite{baquero2017pure} en les deux étapes suivantes :
-\begin{enumerate}
-  \item La génération de l'opération correspondante.
-  \item L'application de l'opération correspondante sur l'état local.
-\end{enumerate}
-Cependant, pour des raisons de performances, nous avons fusionné ces deux étapes dans notre implémentation.
-% Par souci de cohérence avec notre évaluation expérimentale décrite en \autoref{sec:evaluation-results}, nous analysons ici les complexités en temps de notre implémentation.
-Nous distinguons donc pour chaque opération deux complexités : une complexité pour l'intégration de l'opération \emph{locale}, une pour l'intégration de l'opération \emph{distante}.
+Nous distinguons pour chaque opération deux complexités : une complexité pour l'intégration de l'opération \emph{locale}, une pour l'intégration de l'opération \emph{distante}.
+
+Nous désignons par intégration de l'opération \emph{locale} le processus d'application d'une modification issue du noeud lui-même sur son état courant, \eg l'insertion d'un nouvel élément à partir de son index et l'allocation de l'identifiant de position correspondant, et de génération de l'opération correspondante.
+L'intégration de l'opération \emph{distante} correspond quant à elle au processus d'application d'une opération provenant d'un autre noeud, \eg l'insertion d'un nouvel élément à partir de son identifiant de position.
 
 La complexité de l'intégration de l'opération $\trm{insert}$ locale est inchangée par rapport à celle obtenue pour LogootSplit.
 Son intégration consiste toujours à déterminer entre quels identifiants se situe les nouveaux éléments insérés, à générer de nouveaux identifiants correspondants à l'ordre souhaité puis à insérer le bloc dans l'arbre AVL.
